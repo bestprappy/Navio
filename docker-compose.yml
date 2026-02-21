@@ -32,6 +32,8 @@ services:
     restart: unless-stopped
 
   # ---------- API Gateway (Spring Boot) ----------------------------------------
+  # NOTE: The API Gateway lives inside the Navio-Server submodule.
+  # Path: server/api-gateway/ (submodule within submodule)
   api-gateway:
     build:
       context: ./server/api-gateway

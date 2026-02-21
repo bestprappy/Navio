@@ -123,14 +123,16 @@ This is an **umbrella repository** that uses **Git Submodules** to compose indep
 
 ```
 Navio/                          ← You are here (umbrella repo)
-├── client/                     ← Git submodule  – Frontend application
-├── server/
-│   └── api-gateway/            ← Git submodule  – Spring Boot API Gateway
+├── client/                     ← Git submodule → Navio-Client (frontend)
+├── server/                     ← Git submodule → Navio-Server (backend ecosystem)
+│   ├── api-gateway/            ← Submodule inside Navio-Server – Spring Boot API Gateway
+│   ├── itinerary-service/      ← (planned) future submodule
+│   └── community-service/      ← (planned) future submodule
 ├── docker-compose.yml          ← Orchestrates all services locally
 └── README.md
 ```
 
-> As the system grows, additional microservices will be added under `server/` as new submodules (e.g., `server/itinerary-service`, `server/community-service`).
+> `server/` is itself a Git repository ([Navio-Server](https://github.com/bestprappy/Navio-Server)) that houses each backend microservice as its own submodule. This two-level submodule strategy cleanly separates the frontend and backend ecosystems while keeping every service independently versioned.
 
 ---
 
@@ -189,10 +191,10 @@ docker compose down -v
 
 ## Roadmap
 
-- [ ] Initialise client and API Gateway submodule repos
+- [ ] Add API Gateway as submodule inside Navio-Server
 - [ ] Implement gateway routing & health checks
-- [ ] Add Itinerary Service (`server/itinerary-service`)
-- [ ] Add Community Service (`server/community-service`)
+- [ ] Add Itinerary Service as submodule inside Navio-Server
+- [ ] Add Community Service as submodule inside Navio-Server
 - [ ] Integrate EV charging station APIs
 - [ ] Introduce gRPC contracts between services
 - [ ] CI/CD pipeline (GitHub Actions)
