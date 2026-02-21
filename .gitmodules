@@ -1,0 +1,19 @@
+# =============================================================================
+#  Git Submodules — Navio Umbrella Repository
+# =============================================================================
+#  The entries below are PLACEHOLDERS. Once the submodule repositories are
+#  created on GitHub, replace the URLs and run:
+#
+#    git submodule add <REPO_URL> client
+#    git submodule add <REPO_URL> server/api-gateway
+#
+#  Then commit the resulting .gitmodules file and the submodule references.
+# =============================================================================
+
+[submodule "client"]
+	path = client
+	url = https://github.com/bestprappy/Navio-Client.git
+
+[submodule "server/api-gateway"]
+	path = server/api-gateway
+	url = https://github.com/bestprappy/Navio-Server.git

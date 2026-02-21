@@ -1,0 +1,112 @@
+# ============================================================================
+#  Navio — Docker Compose (Development Orchestration)
+# ============================================================================
+#  Spins up the full distributed stack:
+#    • Client          – React / Next.js frontend
+#    • API Gateway     – Spring Boot entry-point for all backend traffic
+#    • Kafka Broker    – Event backbone for async inter-service communication
+#    • Zookeeper       – Required coordination service for Kafka
+#
+#  Usage:
+#    docker compose up --build        # first run / after code changes
+#    docker compose down -v           # tear down + remove volumes
+# ============================================================================
+
+version: "3.9"
+
+services:
+  # ---------- Frontend ---------------------------------------------------------
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: navio-client
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8080
+    depends_on:
+      - api-gateway
+    networks:
+      - navio-network
+    restart: unless-stopped
+
+  # ---------- API Gateway (Spring Boot) ----------------------------------------
+  api-gateway:
+    build:
+      context: ./server/api-gateway
+      dockerfile: Dockerfile
+    container_name: navio-api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - navio-network
+    restart: unless-stopped
+
+  # ---------- Kafka Broker -----------------------------------------------------
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: navio-kafka
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    depends_on:
+      zookeeper:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "kafka-broker-api-versions --bootstrap-server localhost:9092",
+        ]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - navio-network
+    restart: unless-stopped
+
+  # ---------- Zookeeper (Kafka dependency) ------------------------------------
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    container_name: navio-zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    healthcheck:
+      test: ["CMD-SHELL", "echo ruok | nc localhost 2181 | grep imok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - navio-network
+    restart: unless-stopped
+
+# ---------- Network -----------------------------------------------------------
+networks:
+  navio-network:
+    driver: bridge
+    name: navio-network
+
+# ---------- Volumes (extend as services grow) ---------------------------------
+volumes:
+  kafka-data:
+    driver: local
