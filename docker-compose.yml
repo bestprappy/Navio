@@ -1,52 +1,60 @@
 # ============================================================================
-#  Navio — Docker Compose (Development Orchestration)
+#  Navio — Docker Compose (Development)
 # ============================================================================
-#  Spins up the full distributed stack:
-#    • Client          – React / Next.js frontend
-#    • API Gateway     – Spring Boot entry-point for all backend traffic
-#    • Kafka Broker    – Event backbone for async inter-service communication
-#    • Zookeeper       – Required coordination service for Kafka
+#  Current stack (Phase 0–1):
+#    • PostgreSQL 16  – Primary database (schemas: iam, trip, media, …)
+#    • Keycloak 26    – Identity Provider (OIDC / JWT)
+#    • Kafka + ZK     – Event backbone for async inter-service communication
 #
 #  Usage:
-#    docker compose up --build        # first run / after code changes
+#    docker compose up -d             # start all infrastructure
 #    docker compose down -v           # tear down + remove volumes
 # ============================================================================
 
-version: "3.9"
-
 services:
-  # ---------- Frontend ---------------------------------------------------------
-  client:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-    container_name: navio-client
+  # ---------- PostgreSQL -------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: navio-postgres
     ports:
-      - "3000:3000"
+      - "5432:5432"
     environment:
-      - REACT_APP_API_URL=http://localhost:8080
-    depends_on:
-      - api-gateway
+      POSTGRES_DB: tripplanner
+      POSTGRES_USER: tripplanner
+      POSTGRES_PASSWORD: tripplanner # override via .env in production
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U tripplanner -d tripplanner"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       - navio-network
     restart: unless-stopped
 
-  # ---------- API Gateway (Spring Boot) ----------------------------------------
-  # NOTE: The API Gateway lives inside the Navio-Server submodule.
-  # Path: server/api-gateway/ (submodule within submodule)
-  api-gateway:
-    build:
-      context: ./server/api-gateway
-      dockerfile: Dockerfile
-    container_name: navio-api-gateway
+  # ---------- Keycloak (Identity Provider) ------------------------------------
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.1
+    container_name: navio-keycloak
+    command: start-dev
     ports:
-      - "8080:8080"
+      - "8180:8080"
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
-    depends_on:
-      kafka:
-        condition: service_healthy
+      KC_DB: dev-mem # H2 in-memory for dev
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin # change in production
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "exec 3<>/dev/tcp/localhost/8080 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200'",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
     networks:
       - navio-network
     restart: unless-stopped
@@ -108,7 +116,9 @@ networks:
     driver: bridge
     name: navio-network
 
-# ---------- Volumes (extend as services grow) ---------------------------------
+# ---------- Volumes -----------------------------------------------------------
 volumes:
+  pg-data:
+    driver: local
   kafka-data:
     driver: local
