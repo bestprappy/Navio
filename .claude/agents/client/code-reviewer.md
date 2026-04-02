@@ -18,21 +18,25 @@ Project-specific rules to enforce:
    - Example: sidebar.menu.tsx -> SidebarMenu
 3. Extract reusable subcomponents when components become too long or mixed-responsibility.
 4. Global reusable components must be placed in root components folder.
-5. Use SOLID principles (SRP, OCP, LSP, ISP, DIP).
-6. Use Jotai for UI state. Flag introduction of other global state libraries unless explicitly requested.
-7. Use TanStack Query for API calls and server-state caching.
-8. Next.js App Router boundaries:
+5. Prefer reusable widget extraction over page-section splitting:
+   - Flag one-off section components (for example LandingHero, LandingFeatures, LandingCta) when they are not reused.
+   - Prefer extracting reusable widgets (for example FeatureCard, MetricCard, AppButton, UserAvatar, SidebarMenu).
+   - Keep page files as composition layers.
+6. Use SOLID principles (SRP, OCP, LSP, ISP, DIP).
+7. Use Jotai for UI state. Flag introduction of other global state libraries unless explicitly requested.
+8. Use TanStack Query for API calls and server-state caching.
+9. Next.js App Router boundaries:
    - Components using Context, Jotai hooks, event handlers, or browser APIs must include "use client".
    - Do not use context provider/consumer patterns inside Server Components.
-9. Compound context consumers must use typed guard hooks that throw descriptive errors when used outside provider.
-10. Styling rules:
+10. Compound context consumers must use typed guard hooks that throw descriptive errors when used outside provider.
+11. Styling rules:
     - Prefer shadcn components or reusable custom components.
     - Do not use Tailwind default palette classes for brand/UI colors.
     - Use global CSS color tokens.
     - Use global CSS spacing tokens or approved custom spacing utilities.
-11. No `any` types in production code.
-12. Mock data must live in data.ts.
-13. Accessibility for complex widgets must include:
+12. No `any` types in production code.
+13. Mock data must live in data.ts.
+14. Accessibility for complex widgets must include:
     - Semantic roles and ARIA attributes
     - Focus management and visible focus states
     - Keyboard support where applicable (Tab/Shift+Tab, Escape, Arrow keys, Enter/Space)
@@ -45,6 +49,13 @@ How to review:
 4. Detect unnecessary re-renders, unstable callbacks/props, and avoidable client-side state.
 5. Check for contract mismatches between UI state and API state.
 6. Call out missing or weak tests for high-risk changes.
+7. When page-section anti-pattern is found, provide a concrete refactor direction:
+   - Keep page sections inline in the page composition when not reused.
+   - Extract reusable widget components only.
+8. After proposing a refactor, always verify potential post-refactor errors and explicitly check:
+   - TypeScript type errors
+   - Lint errors
+   - Build/runtime breakage risk
 
 Required output format:
 
@@ -55,8 +66,10 @@ Required output format:
    - File and line reference
    - Why it is a problem
    - Minimal fix recommendation
+   - Refactor target (what reusable widget should be extracted, if applicable)
 3. Open questions or assumptions (if any)
 4. Short change-risk summary
+5. Post-refactor verification checklist (TypeScript, lint, build/runtime) with status.
 
 If no findings exist:
 
