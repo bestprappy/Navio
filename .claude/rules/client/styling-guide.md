@@ -23,7 +23,7 @@ Color system rules:
    - Define one primary/brand token group for key actions.
    - Define semantic tokens for success, warning, error, and info states.
 2. Treat color selection as shade-system design, not one-off color picking.
-3. For palette authoring, prefer OKLCH or HSL token values over random Hex/RGB picking.
+3. For palette authoring, prefer OKLCH token values over random Hex/RGB picking.
 4. Neutral ramps should stay low-chroma (or zero saturation for strict neutrals) and progress in predictable lightness steps.
 5. For elevated surfaces, use lightness stepping to communicate depth (base, surface, raised).
 6. If supporting both dark and light themes, keep token naming logical and elevation direction physically consistent across themes.
@@ -162,7 +162,7 @@ Implementation workflow:
 
 1. Identify reusable UI primitives first (buttons, cards, badges, avatars, input shells, panels).
 2. Define compact color roles first (neutral, primary, semantic) with token names.
-3. Build shade ramps using OKLCH/HSL logic and map them to global CSS tokens.
+3. Build shade ramps using OKLCH logic and map them to global CSS tokens.
 4. Apply token-driven colors from global CSS.
 5. Verify text/background contrast tiers for readability and accessibility.
 6. If dual theme is used, validate dark/light elevation ordering and token naming consistency.
@@ -201,7 +201,7 @@ Quality gate before final output:
 1. shadcn or reusable custom components are used for styling structure.
 2. Colors come from custom global CSS tokens, not Tailwind default palette classes.
 3. Palette roles are simple and complete (neutral + primary + semantic) with compact token sets.
-4. Color ramps are shade-consistent and authored with OKLCH/HSL-oriented logic.
+4. Color ramps are shade-consistent and authored with OKLCH-oriented logic.
 5. Text contrast tiers (primary vs secondary content) are clear and readable.
 6. Layering uses 3 to 4 consistent tonal steps to separate base, surface, and emphasized elements.
 7. Depth treatment uses restrained shadows/gradients with realistic light direction (top highlight + lower shadow when appropriate).
