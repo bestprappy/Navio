@@ -1,0 +1,6745 @@
+openapi: 3.1.0
+info:
+  title: TripPlanner + EV Community API
+  version: 1.1.0
+  description: 'Build-ready OpenAPI spec for the TripPlanner + EV Charger Integration + Community Sharing + Trip Copying project.
+    All endpoints are versioned under /v1.
+
+
+    Fix v1.1 adds detailed trip-planning modules required by the UI: trip dates, sections/lists, saved places, itinerary days,
+    notes, reservations, attachments, budgeting, expenses, and tripmates.'
+servers:
+- url: https://api.tripplanner.local
+  description: NGINX reverse proxy / public API
+- url: http://localhost:8081
+  description: Trip & Media Service local dev
+- url: http://localhost:8082
+  description: EV Intelligence Service local dev
+- url: http://localhost:8083
+  description: Community Service local dev
+- url: http://localhost:8084
+  description: AI Orchestrator Service local dev
+security:
+- bearerAuth: []
+tags:
+- name: Trip & Media Service
+- name: EV Intelligence Service
+- name: Community Service
+- name: AI Orchestrator Service
+- name: Trip Planning Details
+- name: Geo Provider
+- name: Budgeting
+paths:
+  /v1/trips:
+    post:
+      tags:
+      - Trip & Media Service
+      summary: Create trip
+      description: Creates a new private trip owned by the authenticated user.
+      operationId: postTrips
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+              examples:
+                default:
+                  value:
+                    id: trip_01HX
+                    ownerUserId: user_123
+                    title: Bangkok to Hua Hin EV Weekend
+                    visibility: private
+                    stops:
+                    - name: Bangkok
+                      location:
+                        lat: 13.7563
+                        lng: 100.5018
+                        address: Bangkok
+                      orderIndex: 0
+                    - name: Hua Hin
+                      location:
+                        lat: 12.5684
+                        lng: 99.9577
+                        address: Hua Hin
+                      orderIndex: 1
+                    routeLegs: []
+                    evProfile:
+                      vehicleName: BYD Atto 3
+                      batteryCapacityKwh: 60.5
+                      currentBatteryPercent: 80
+                      minArrivalBatteryPercent: 15
+                      consumptionKwhPer100Km: 16.5
+                      connectorTypes:
+                      - CCS2
+                    sourceMetadata: {}
+                    createdAt: '2026-05-07T05:00:00Z'
+                    updatedAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TripRequest'
+            examples:
+              default:
+                value:
+                  title: Bangkok to Hua Hin EV Weekend
+                  description: 2-day EV-friendly road trip
+                  startDate: '2026-06-01'
+                  endDate: '2026-06-02'
+                  stops:
+                  - name: Bangkok
+                    location:
+                      lat: 13.7563
+                      lng: 100.5018
+                      address: Bangkok
+                    orderIndex: 0
+                  - name: Hua Hin
+                    location:
+                      lat: 12.5684
+                      lng: 99.9577
+                      address: Hua Hin
+                    orderIndex: 1
+                  evProfile:
+                    vehicleName: BYD Atto 3
+                    batteryCapacityKwh: 60.5
+                    currentBatteryPercent: 80
+                    minArrivalBatteryPercent: 15
+                    consumptionKwhPer100Km: 16.5
+                    connectorTypes:
+                    - CCS2
+  /v1/trips/{tripId}:
+    get:
+      tags:
+      - Trip & Media Service
+      summary: Get trip
+      description: Returns one trip if the user has access or the trip is public.
+      operationId: getTripsTripId
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+              examples:
+                default:
+                  value:
+                    id: trip_01HX
+                    ownerUserId: user_123
+                    title: Bangkok to Hua Hin EV Weekend
+                    visibility: private
+                    stops:
+                    - name: Bangkok
+                      location:
+                        lat: 13.7563
+                        lng: 100.5018
+                        address: Bangkok
+                      orderIndex: 0
+                    - name: Hua Hin
+                      location:
+                        lat: 12.5684
+                        lng: 99.9577
+                        address: Hua Hin
+                      orderIndex: 1
+                    routeLegs: []
+                    evProfile:
+                      vehicleName: BYD Atto 3
+                      batteryCapacityKwh: 60.5
+                      currentBatteryPercent: 80
+                      minArrivalBatteryPercent: 15
+                      consumptionKwhPer100Km: 16.5
+                      connectorTypes:
+                      - CCS2
+                    sourceMetadata: {}
+                    createdAt: '2026-05-07T05:00:00Z'
+                    updatedAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+    patch:
+      tags:
+      - Trip & Media Service
+      summary: Update trip
+      description: Updates title, dates, stops, route legs, EV profile, or notes and writes a revision.
+      operationId: patchTripsTripId
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+              examples:
+                default:
+                  value:
+                    id: trip_01HX
+                    ownerUserId: user_123
+                    title: Bangkok to Hua Hin EV Weekend
+                    visibility: private
+                    stops:
+                    - name: Bangkok
+                      location:
+                        lat: 13.7563
+                        lng: 100.5018
+                        address: Bangkok
+                      orderIndex: 0
+                    - name: Hua Hin
+                      location:
+                        lat: 12.5684
+                        lng: 99.9577
+                        address: Hua Hin
+                      orderIndex: 1
+                    routeLegs: []
+                    evProfile:
+                      vehicleName: BYD Atto 3
+                      batteryCapacityKwh: 60.5
+                      currentBatteryPercent: 80
+                      minArrivalBatteryPercent: 15
+                      consumptionKwhPer100Km: 16.5
+                      connectorTypes:
+                      - CCS2
+                    sourceMetadata: {}
+                    createdAt: '2026-05-07T05:00:00Z'
+                    updatedAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TripRequest'
+            examples:
+              default:
+                value:
+                  title: Bangkok to Hua Hin EV Weekend
+                  description: 2-day EV-friendly road trip
+                  startDate: '2026-06-01'
+                  endDate: '2026-06-02'
+                  stops:
+                  - name: Bangkok
+                    location:
+                      lat: 13.7563
+                      lng: 100.5018
+                      address: Bangkok
+                    orderIndex: 0
+                  - name: Hua Hin
+                    location:
+                      lat: 12.5684
+                      lng: 99.9577
+                      address: Hua Hin
+                    orderIndex: 1
+                  evProfile:
+                    vehicleName: BYD Atto 3
+                    batteryCapacityKwh: 60.5
+                    currentBatteryPercent: 80
+                    minArrivalBatteryPercent: 15
+                    consumptionKwhPer100Km: 16.5
+                    connectorTypes:
+                    - CCS2
+    delete:
+      tags:
+      - Trip & Media Service
+      summary: Delete trip
+      description: Soft-deletes or deletes a trip owned by the current user.
+      operationId: deleteTripsTripId
+      responses:
+        '204':
+          description: Success - no response body
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+  /v1/trips/{tripId}/revisions:
+    get:
+      tags:
+      - Trip & Media Service
+      summary: List trip revisions
+      description: Lists revision history for rollback and audit display.
+      operationId: getTripsTripIdRevisions
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RevisionList'
+              examples:
+                default:
+                  value:
+                    items:
+                    - id: rev_01HX
+                      tripId: trip_01HX
+                      revisionNumber: 1
+                      message: Initial version
+                      createdAt: '2026-05-07T05:00:00Z'
+                    meta:
+                      page: 0
+                      size: 20
+                      totalItems: 1
+                      totalPages: 1
+                      hasNext: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+        examples:
+          default:
+            value: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+        examples:
+          default:
+            value: 20
+  /v1/trips/{tripId}/rollback:
+    post:
+      tags:
+      - Trip & Media Service
+      summary: Rollback trip
+      description: Restores a trip snapshot from a specific revision and creates a new revision.
+      operationId: postTripsTripIdRollback
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+              examples:
+                default:
+                  value:
+                    id: trip_01HX
+                    ownerUserId: user_123
+                    title: Bangkok to Hua Hin EV Weekend
+                    visibility: private
+                    stops:
+                    - name: Bangkok
+                      location:
+                        lat: 13.7563
+                        lng: 100.5018
+                        address: Bangkok
+                      orderIndex: 0
+                    - name: Hua Hin
+                      location:
+                        lat: 12.5684
+                        lng: 99.9577
+                        address: Hua Hin
+                      orderIndex: 1
+                    routeLegs: []
+                    evProfile:
+                      vehicleName: BYD Atto 3
+                      batteryCapacityKwh: 60.5
+                      currentBatteryPercent: 80
+                      minArrivalBatteryPercent: 15
+                      consumptionKwhPer100Km: 16.5
+                      connectorTypes:
+                      - CCS2
+                    sourceMetadata: {}
+                    createdAt: '2026-05-07T05:00:00Z'
+                    updatedAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RollbackRequest'
+            examples:
+              default:
+                value:
+                  revisionId: rev_01HX
+  /v1/trips/{tripId}/visibility:
+    post:
+      tags:
+      - Trip & Media Service
+      summary: Change visibility
+      description: Changes visibility between private, unlisted, and public.
+      operationId: postTripsTripIdVisibility
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+              examples:
+                default:
+                  value:
+                    id: trip_01HX
+                    ownerUserId: user_123
+                    title: Bangkok to Hua Hin EV Weekend
+                    visibility: private
+                    stops:
+                    - name: Bangkok
+                      location:
+                        lat: 13.7563
+                        lng: 100.5018
+                        address: Bangkok
+                      orderIndex: 0
+                    - name: Hua Hin
+                      location:
+                        lat: 12.5684
+                        lng: 99.9577
+                        address: Hua Hin
+                      orderIndex: 1
+                    routeLegs: []
+                    evProfile:
+                      vehicleName: BYD Atto 3
+                      batteryCapacityKwh: 60.5
+                      currentBatteryPercent: 80
+                      minArrivalBatteryPercent: 15
+                      consumptionKwhPer100Km: 16.5
+                      connectorTypes:
+                      - CCS2
+                    sourceMetadata: {}
+                    createdAt: '2026-05-07T05:00:00Z'
+                    updatedAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisibilityRequest'
+            examples:
+              default:
+                value:
+                  visibility: public
+                  reason: Ready to share
+  /v1/trips/{tripId}/copy:
+    post:
+      tags:
+      - Trip & Media Service
+      summary: Copy trip
+      description: 'Copies a public/community/shared trip into the current user''s private trip library as an independent
+        snapshot.
+
+
+        Notes: Copied trip starts private. Source deletion or edits do not affect the copy.'
+      operationId: postTripsTripIdCopy
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+              examples:
+                default:
+                  value:
+                    id: trip_01HX
+                    ownerUserId: user_123
+                    title: Bangkok to Hua Hin EV Weekend
+                    visibility: private
+                    stops:
+                    - name: Bangkok
+                      location:
+                        lat: 13.7563
+                        lng: 100.5018
+                        address: Bangkok
+                      orderIndex: 0
+                    - name: Hua Hin
+                      location:
+                        lat: 12.5684
+                        lng: 99.9577
+                        address: Hua Hin
+                      orderIndex: 1
+                    routeLegs: []
+                    evProfile:
+                      vehicleName: BYD Atto 3
+                      batteryCapacityKwh: 60.5
+                      currentBatteryPercent: 80
+                      minArrivalBatteryPercent: 15
+                      consumptionKwhPer100Km: 16.5
+                      connectorTypes:
+                      - CCS2
+                    sourceMetadata: {}
+                    createdAt: '2026-05-07T05:00:00Z'
+                    updatedAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CopyTripRequest'
+            examples:
+              default:
+                value:
+                  sourcePostId: post_01HX
+                  newTitle: My Copy of Hua Hin Trip
+  /v1/trips/{tripId}/share-links:
+    post:
+      tags:
+      - Trip & Media Service
+      summary: Create share link
+      description: Creates an unlisted share token, optionally expiring and allowing copy.
+      operationId: postTripsTripIdShareLinks
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShareLink'
+              examples:
+                default:
+                  value:
+                    id: token_01HX
+                    tripId: trip_01HX
+                    token: shr_abc
+                    url: https://api.tripplanner.local/v1/share/shr_abc
+                    allowCopy: true
+                    expiresAt: '2026-07-01T00:00:00Z'
+                    createdAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShareLinkRequest'
+            examples:
+              default:
+                value:
+                  expiresAt: '2026-07-01T00:00:00Z'
+                  allowCopy: true
+  /v1/trips/{tripId}/share-links/{tokenId}:
+    delete:
+      tags:
+      - Trip & Media Service
+      summary: Revoke share link
+      description: Revokes an existing share token.
+      operationId: deleteTripsTripIdShareLinksTokenId
+      responses:
+        '204':
+          description: Success - no response body
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: tokenId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tokenId path parameter
+  /v1/share/{token}:
+    get:
+      tags:
+      - Trip & Media Service
+      summary: Resolve share link
+      description: Public endpoint that returns a shareable trip view from a token.
+      operationId: getShareToken
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShareResolve'
+              examples:
+                default:
+                  value:
+                    trip:
+                      id: trip_01HX
+                      title: Bangkok to Hua Hin EV Weekend
+                      visibility: unlisted
+                      stops: []
+                    canCopy: true
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: token
+        in: path
+        required: true
+        schema:
+          type: string
+        description: token path parameter
+      security: []
+  /v1/trips/{tripId}/permissions:
+    post:
+      tags:
+      - Trip & Media Service
+      summary: Update trip permissions
+      description: Adds or removes viewer/editor ACL entries for a trip.
+      operationId: postTripsTripIdPermissions
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsResponse'
+              examples:
+                default:
+                  value:
+                    items:
+                    - userId: user_456
+                      role: viewer
+                      displayName: Nok
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PermissionsRequest'
+            examples:
+              default:
+                value:
+                  add:
+                  - userId: user_456
+                    role: viewer
+                  removeUserIds: []
+    get:
+      tags:
+      - Trip & Media Service
+      summary: Get trip permissions
+      description: Returns current ACL entries for the trip.
+      operationId: getTripsTripIdPermissions
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionsResponse'
+              examples:
+                default:
+                  value:
+                    items:
+                    - userId: user_456
+                      role: viewer
+                      displayName: Nok
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+  /v1/me:
+    get:
+      tags:
+      - Trip & Media Service
+      summary: Get current user
+      description: Returns the authenticated user's mirrored app profile and preferences.
+      operationId: getMe
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+              examples:
+                default:
+                  value:
+                    id: user_123
+                    displayName: Somchai
+                    email: somchai@example.com
+                    roles:
+                    - user
+                    preferences:
+                      language: en
+                      distanceUnit: km
+                      notificationEmail: true
+                      notificationPush: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/me/preferences:
+    patch:
+      tags:
+      - Trip & Media Service
+      summary: Update preferences
+      description: Updates current user's language, distance, and notification preferences.
+      operationId: patchMePreferences
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+              examples:
+                default:
+                  value:
+                    id: user_123
+                    displayName: Somchai
+                    email: somchai@example.com
+                    roles:
+                    - user
+                    preferences:
+                      language: en
+                      distanceUnit: km
+                      notificationEmail: true
+                      notificationPush: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPreferences'
+            examples:
+              default:
+                value:
+                  language: en
+                  distanceUnit: km
+                  notificationEmail: true
+                  notificationPush: false
+  /v1/mod/users/{userId}/ban:
+    post:
+      tags:
+      - Trip & Media Service
+      summary: Ban user
+      description: 'Moderator/admin endpoint to ban a user.
+
+
+        Requires `mod` or `admin` role.'
+      operationId: postModUsersUserIdBan
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModerationResponse'
+              examples:
+                default:
+                  value:
+                    userId: user_456
+                    status: banned
+                    reason: Spam reports confirmed
+                    updatedAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: userId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModerationRequest'
+            examples:
+              default:
+                value:
+                  reason: Spam reports confirmed
+                  expiresAt: '2026-06-01T00:00:00Z'
+  /v1/mod/users/{userId}/unban:
+    post:
+      tags:
+      - Trip & Media Service
+      summary: Unban user
+      description: 'Moderator/admin endpoint to remove a ban.
+
+
+        Requires `mod` or `admin` role.'
+      operationId: postModUsersUserIdUnban
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModerationResponse'
+              examples:
+                default:
+                  value:
+                    userId: user_456
+                    status: banned
+                    reason: Spam reports confirmed
+                    updatedAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: userId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModerationRequest'
+            examples:
+              default:
+                value:
+                  reason: Spam reports confirmed
+                  expiresAt: '2026-06-01T00:00:00Z'
+  /v1/media/upload-url:
+    post:
+      tags:
+      - Trip & Media Service
+      summary: Request media upload URL
+      description: Creates a media record and returns a pre-signed upload URL.
+      operationId: postMediaUploadUrl
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaUploadUrlResponse'
+              examples:
+                default:
+                  value:
+                    mediaId: media_01HX
+                    uploadUrl: https://minio.local/presigned
+                    method: PUT
+                    headers:
+                      Content-Type: image/jpeg
+                    expiresAt: '2026-05-07T05:15:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MediaUploadUrlRequest'
+            examples:
+              default:
+                value:
+                  filename: charger-photo.jpg
+                  contentType: image/jpeg
+                  sizeBytes: 524288
+                  purpose: charger_review_image
+  /v1/media/complete:
+    post:
+      tags:
+      - Trip & Media Service
+      summary: Complete media upload
+      description: Signals upload completion so the embedded media worker can scan and prepare safe URLs.
+      operationId: postMediaComplete
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Media'
+              examples:
+                default:
+                  value:
+                    id: media_01HX
+                    filename: charger-photo.jpg
+                    contentType: image/jpeg
+                    sizeBytes: 524288
+                    status: ready
+                    safeUrl: https://cdn.local/media/media_01HX.jpg
+                    thumbnailUrl: https://cdn.local/media/media_01HX_thumb.jpg
+                    createdAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MediaCompleteRequest'
+            examples:
+              default:
+                value:
+                  mediaId: media_01HX
+                  objectKey: uploads/user_123/media_01HX.jpg
+  /v1/media/{mediaId}:
+    get:
+      tags:
+      - Trip & Media Service
+      summary: Get media metadata
+      description: Returns media processing status and safe rendering URLs.
+      operationId: getMediaMediaId
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Media'
+              examples:
+                default:
+                  value:
+                    id: media_01HX
+                    filename: charger-photo.jpg
+                    contentType: image/jpeg
+                    sizeBytes: 524288
+                    status: ready
+                    safeUrl: https://cdn.local/media/media_01HX.jpg
+                    thumbnailUrl: https://cdn.local/media/media_01HX_thumb.jpg
+                    createdAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: mediaId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: mediaId path parameter
+  /v1/geo/geocode:
+    post:
+      tags:
+      - EV Intelligence Service
+      summary: Geocode place
+      description: Provider-hidden geocoding endpoint for address/place search.
+      operationId: postGeoGeocode
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GeocodeResponse'
+              examples:
+                default:
+                  value:
+                    items:
+                    - placeId: ChIJ...
+                      name: CentralWorld
+                      formattedAddress: 999/9 Rama I Rd, Bangkok
+                      location:
+                        lat: 13.7466
+                        lng: 100.5391
+                      provider: GOOGLE_MAPS
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GeocodeRequest'
+            examples:
+              default:
+                value:
+                  query: CentralWorld Bangkok
+                  countryBias: TH
+  /v1/geo/route:
+    post:
+      tags:
+      - EV Intelligence Service
+      summary: Compute map route
+      description: Provider-hidden route endpoint using Google Maps v1.0 adapter.
+      operationId: postGeoRoute
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RouteResponse'
+              examples:
+                default:
+                  value:
+                    distanceKm: 191.2
+                    durationMinutes: 165
+                    polyline: encoded_polyline
+                    legs: []
+                    provider: GOOGLE_MAPS
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RouteRequest'
+            examples:
+              default:
+                value:
+                  origin:
+                    lat: 13.7563
+                    lng: 100.5018
+                  destination:
+                    lat: 12.5684
+                    lng: 99.9577
+                  waypoints: []
+                  travelMode: DRIVE
+  /v1/ev/route/compute:
+    post:
+      tags:
+      - EV Intelligence Service
+      summary: Compute EV-aware route
+      description: Calculates EV feasibility and recommends charging stops.
+      operationId: postEvRouteCompute
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvRouteResponse'
+              examples:
+                default:
+                  value:
+                    feasible: true
+                    summary: Route is feasible with 1 charging stop.
+                    distanceKm: 191.2
+                    durationMinutes: 165
+                    estimatedEnergyKwh: 31.5
+                    route:
+                      distanceKm: 191.2
+                      durationMinutes: 165
+                      polyline: encoded
+                      legs: []
+                      provider: GOOGLE_MAPS
+                    chargeStops: []
+                    warnings: []
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvRouteRequest'
+            examples:
+              default:
+                value:
+                  origin:
+                    lat: 13.7563
+                    lng: 100.5018
+                  destination:
+                    lat: 12.5684
+                    lng: 99.9577
+                  waypoints: []
+                  evProfile:
+                    vehicleName: BYD Atto 3
+                    batteryCapacityKwh: 60.5
+                    currentBatteryPercent: 80
+                    minArrivalBatteryPercent: 15
+                    consumptionKwhPer100Km: 16.5
+                    connectorTypes:
+                    - CCS2
+                  preferredConnectors:
+                  - CCS2
+                  minChargerKw: 50
+  /v1/ev/chargers/near:
+    get:
+      tags:
+      - EV Intelligence Service
+      summary: Search chargers near point
+      description: Returns charger markers from local Postgres/PostGIS first; external provider refresh only on cache miss/stale/low
+        confidence.
+      operationId: getEvChargersNear
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChargerList'
+              examples:
+                default:
+                  value:
+                    items: []
+                    meta:
+                      source: local_cache
+                      tileKey: tile_13_6502_3811
+                      stale: false
+                      refreshed: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: lat
+        in: query
+        required: true
+        schema:
+          type: number
+        description: Latitude
+        examples:
+          default:
+            value: 13.7563
+      - name: lng
+        in: query
+        required: true
+        schema:
+          type: number
+        description: Longitude
+        examples:
+          default:
+            value: 100.5018
+      - name: radiusKm
+        in: query
+        required: false
+        schema:
+          type: number
+        description: Search radius in km
+        examples:
+          default:
+            value: 10
+      - name: connector
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - CCS2
+          - CHADEMO
+          - TYPE2
+          - NACS
+          - GB_T
+        description: Connector filter
+        examples:
+          default:
+            value: CCS2
+      - name: minKw
+        in: query
+        required: false
+        schema:
+          type: number
+        description: Minimum charging power
+        examples:
+          default:
+            value: 50
+      - name: refresh
+        in: query
+        required: false
+        schema:
+          type: boolean
+        description: Request backend-controlled refresh
+        examples:
+          default:
+            value: false
+  /v1/ev/chargers/{chargerId}:
+    get:
+      tags:
+      - EV Intelligence Service
+      summary: Get charger detail
+      description: Returns charger details, ratings, confidence, and verification status. May lazy-refresh stale details.
+      operationId: getEvChargersChargerId
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Charger'
+              examples:
+                default:
+                  value:
+                    id: chg_01HX
+                    name: PEA VOLTA CentralWorld
+                    operatorName: PEA VOLTA
+                    location:
+                      lat: 13.7466
+                      lng: 100.5391
+                    connectorTypes:
+                    - CCS2
+                    maxKw: 120
+                    totalConnectors: 4
+                    availableConnectors: 2
+                    source: GOOGLE_PLACES
+                    verificationStatus: GOOGLE_CACHED
+                    status: active
+                    ratingAvg: 4.4
+                    ratingCount: 12
+                    confidenceScore: 0.82
+                    stale: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: chargerId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: chargerId path parameter
+  /v1/ev/chargers/suggest:
+    post:
+      tags:
+      - EV Intelligence Service
+      summary: Suggest missing charger
+      description: Creates a pending verification charger suggestion.
+      operationId: postEvChargersSuggest
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Charger'
+              examples:
+                default:
+                  value:
+                    id: chg_01HX
+                    name: PEA VOLTA CentralWorld
+                    operatorName: PEA VOLTA
+                    location:
+                      lat: 13.7466
+                      lng: 100.5391
+                    connectorTypes:
+                    - CCS2
+                    maxKw: 120
+                    totalConnectors: 4
+                    availableConnectors: 2
+                    source: GOOGLE_PLACES
+                    verificationStatus: GOOGLE_CACHED
+                    status: active
+                    ratingAvg: 4.4
+                    ratingCount: 12
+                    confidenceScore: 0.82
+                    stale: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SuggestChargerRequest'
+            examples:
+              default:
+                value:
+                  name: New EV Station Sukhumvit
+                  operatorName: EA Anywhere
+                  location:
+                    lat: 13.736
+                    lng: 100.56
+                    address: Sukhumvit Rd
+                  connectorTypes:
+                  - CCS2
+                  maxKw: 120
+                  notes: Located behind the mall
+                  mediaIds: []
+  /v1/ev/chargers/{chargerId}/reviews:
+    get:
+      tags:
+      - EV Intelligence Service
+      summary: List charger reviews
+      description: Lists reviews for one charger.
+      operationId: getEvChargersChargerIdReviews
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewList'
+              examples:
+                default:
+                  value:
+                    items: []
+                    meta:
+                      page: 0
+                      size: 20
+                      totalItems: 0
+                      totalPages: 0
+                      hasNext: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: chargerId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: chargerId path parameter
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+        examples:
+          default:
+            value: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+        examples:
+          default:
+            value: 20
+    post:
+      tags:
+      - EV Intelligence Service
+      summary: Create or replace review
+      description: Creates or replaces the current user's review. Enforces one review per user per charger.
+      operationId: postEvChargersChargerIdReviews
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+              examples:
+                default:
+                  value:
+                    id: review_01HX
+                    chargerId: chg_01HX
+                    userId: user_123
+                    rating: 5
+                    reviewText: Worked well, easy parking.
+                    visitDate: '2026-05-01'
+                    chargingSuccessful: true
+                    createdAt: '2026-05-07T05:00:00Z'
+                    updatedAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: chargerId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: chargerId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewRequest'
+            examples:
+              default:
+                value:
+                  rating: 5
+                  reviewText: Worked well, easy parking.
+                  visitDate: '2026-05-01'
+                  chargingSuccessful: true
+                  waitTimeMinutes: 5
+                  connectorUsed: CCS2
+                  mediaIds: []
+  /v1/ev/chargers/{chargerId}/reviews/{reviewId}:
+    patch:
+      tags:
+      - EV Intelligence Service
+      summary: Edit charger review
+      description: Edits the current user's review, or moderator/admin can edit if policy allows.
+      operationId: patchEvChargersChargerIdReviewsReviewId
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+              examples:
+                default:
+                  value:
+                    id: review_01HX
+                    chargerId: chg_01HX
+                    userId: user_123
+                    rating: 5
+                    reviewText: Worked well, easy parking.
+                    visitDate: '2026-05-01'
+                    chargingSuccessful: true
+                    createdAt: '2026-05-07T05:00:00Z'
+                    updatedAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: chargerId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: chargerId path parameter
+      - name: reviewId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: reviewId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewRequest'
+            examples:
+              default:
+                value:
+                  rating: 5
+                  reviewText: Worked well, easy parking.
+                  visitDate: '2026-05-01'
+                  chargingSuccessful: true
+                  waitTimeMinutes: 5
+                  connectorUsed: CCS2
+                  mediaIds: []
+    delete:
+      tags:
+      - EV Intelligence Service
+      summary: Delete charger review
+      description: Deletes own review or moderator/admin deletes inappropriate review.
+      operationId: deleteEvChargersChargerIdReviewsReviewId
+      responses:
+        '204':
+          description: Success - no response body
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: chargerId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: chargerId path parameter
+      - name: reviewId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: reviewId path parameter
+  /v1/ev/chargers/{chargerId}/comments:
+    get:
+      tags:
+      - EV Intelligence Service
+      summary: List charger comments
+      description: Lists charger discussion comments. Omit parentId for top level; provide parentId for replies.
+      operationId: getEvChargersChargerIdComments
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentList'
+              examples:
+                default:
+                  value:
+                    items: []
+                    meta:
+                      page: 0
+                      size: 20
+                      totalItems: 0
+                      totalPages: 0
+                      hasNext: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: chargerId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: chargerId path parameter
+      - name: parentId
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Parent comment ID
+    post:
+      tags:
+      - EV Intelligence Service
+      summary: Create charger comment
+      description: Creates a charger discussion comment or reply.
+      operationId: postEvChargersChargerIdComments
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+              examples:
+                default:
+                  value:
+                    id: cmt_01HX
+                    resourceId: chg_01HX
+                    userId: user_123
+                    parentCommentId: null
+                    body: Is this charger open after midnight?
+                    createdAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: chargerId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: chargerId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+            examples:
+              default:
+                value:
+                  parentCommentId: null
+                  commentText: Is this charger open after midnight?
+  /v1/ev/chargers/{chargerId}/comments/{commentId}:
+    delete:
+      tags:
+      - EV Intelligence Service
+      summary: Delete charger comment
+      description: Deletes own charger comment or moderator/admin deletes it.
+      operationId: deleteEvChargersChargerIdCommentsCommentId
+      responses:
+        '204':
+          description: Success - no response body
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: chargerId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: chargerId path parameter
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: commentId path parameter
+  /v1/ev/chargers/{chargerId}/report:
+    post:
+      tags:
+      - EV Intelligence Service
+      summary: Report charger
+      description: Reports incorrect charger information.
+      operationId: postEvChargersChargerIdReport
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+              examples:
+                default:
+                  value:
+                    id: report_01HX
+                    resourceId: chg_01HX
+                    userId: user_123
+                    type: wrong_connector
+                    description: App shows CCS2 but only Type2 is available.
+                    status: open
+                    createdAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: chargerId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: chargerId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportRequest'
+            examples:
+              default:
+                value:
+                  reportType: wrong_connector
+                  description: App shows CCS2 but only Type2 is available.
+  /v1/ev/chargers/{chargerId}/suggest-edit:
+    post:
+      tags:
+      - EV Intelligence Service
+      summary: Suggest charger edit
+      description: Suggests edits to charger name, address, location, connectors, power, or opening hours.
+      operationId: postEvChargersChargerIdSuggestEdit
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Suggestion'
+              examples:
+                default:
+                  value:
+                    id: sug_01HX
+                    resourceId: chg_01HX
+                    userId: user_123
+                    status: pending
+                    createdAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: chargerId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: chargerId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChargerSuggestionRequest'
+            examples:
+              default:
+                value:
+                  suggestedMaxKw: 150
+                  description: Power upgraded to 150 kW.
+  /v1/admin/ev/charger-reports:
+    get:
+      tags:
+      - EV Intelligence Service
+      summary: List charger reports
+      description: 'Admin/moderator list of charger reports.
+
+
+        Requires `mod` or `admin` role.'
+      operationId: getAdminEvChargerReports
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentList'
+              examples:
+                default:
+                  value:
+                    items: []
+                    meta:
+                      page: 0
+                      size: 20
+                      totalItems: 0
+                      totalPages: 0
+                      hasNext: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - open
+          - reviewing
+          - resolved
+          - rejected
+        description: Report status
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+        examples:
+          default:
+            value: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+        examples:
+          default:
+            value: 20
+  /v1/admin/ev/chargers/{chargerId}/approve:
+    post:
+      tags:
+      - EV Intelligence Service
+      summary: Approve charger
+      description: 'Admin approves a pending/user-submitted charger.
+
+
+        Requires `mod` or `admin` role.'
+      operationId: postAdminEvChargersChargerIdApprove
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDecisionResponse'
+              examples:
+                default:
+                  value:
+                    id: chg_01HX
+                    status: approved
+                    reason: Verified by admin from submitted photo
+                    reviewedAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: chargerId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: chargerId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminDecisionRequest'
+            examples:
+              default:
+                value:
+                  reason: Verified by admin from submitted photo
+  /v1/admin/ev/chargers/{chargerId}/reject:
+    post:
+      tags:
+      - EV Intelligence Service
+      summary: Reject charger
+      description: 'Admin rejects a pending/user-submitted charger.
+
+
+        Requires `mod` or `admin` role.'
+      operationId: postAdminEvChargersChargerIdReject
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDecisionResponse'
+              examples:
+                default:
+                  value:
+                    id: chg_01HX
+                    status: approved
+                    reason: Verified by admin from submitted photo
+                    reviewedAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: chargerId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: chargerId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminDecisionRequest'
+            examples:
+              default:
+                value:
+                  reason: Verified by admin from submitted photo
+  /v1/admin/ev/charger-suggestions/{suggestionId}/approve:
+    post:
+      tags:
+      - EV Intelligence Service
+      summary: Approve charger edit
+      description: 'Admin approves a suggested charger edit and applies it.
+
+
+        Requires `mod` or `admin` role.'
+      operationId: postAdminEvChargerSuggestionsSuggestionIdApprove
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDecisionResponse'
+              examples:
+                default:
+                  value:
+                    id: chg_01HX
+                    status: approved
+                    reason: Verified by admin from submitted photo
+                    reviewedAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: suggestionId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: suggestionId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminDecisionRequest'
+            examples:
+              default:
+                value:
+                  reason: Verified by admin from submitted photo
+  /v1/admin/ev/charger-suggestions/{suggestionId}/reject:
+    post:
+      tags:
+      - EV Intelligence Service
+      summary: Reject charger edit
+      description: 'Admin rejects a suggested charger edit.
+
+
+        Requires `mod` or `admin` role.'
+      operationId: postAdminEvChargerSuggestionsSuggestionIdReject
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminDecisionResponse'
+              examples:
+                default:
+                  value:
+                    id: chg_01HX
+                    status: approved
+                    reason: Verified by admin from submitted photo
+                    reviewedAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: suggestionId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: suggestionId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminDecisionRequest'
+            examples:
+              default:
+                value:
+                  reason: Verified by admin from submitted photo
+  /v1/admin/ev/tiles/{tileKey}/refresh:
+    post:
+      tags:
+      - EV Intelligence Service
+      summary: Refresh EV geo-tile
+      description: 'Manually triggers charger refresh for one geo-tile.
+
+
+        Requires `mod` or `admin` role.'
+      operationId: postAdminEvTilesTileKeyRefresh
+      responses:
+        '202':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TileRefreshResponse'
+              examples:
+                default:
+                  value:
+                    tileKey: tile_13_6502_3811
+                    provider: GOOGLE_PLACES
+                    refreshStatus: queued
+                    requestedAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: tileKey
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tileKey path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminDecisionRequest'
+            examples:
+              default:
+                value:
+                  reason: Verified by admin from submitted photo
+  /v1/posts:
+    post:
+      tags:
+      - Community Service
+      summary: Create post
+      description: Creates a community post, optionally linked to a trip for manual share-to-community flow.
+      operationId: postPosts
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+              examples:
+                default:
+                  value:
+                    id: post_01HX
+                    tripId: trip_01HX
+                    authorUserId: user_123
+                    authorDisplayName: Somchai
+                    title: Bangkok to Hua Hin EV Weekend
+                    body: Sharing my EV-friendly route with one charging stop.
+                    tags:
+                    - ev-trip
+                    score: 18
+                    commentCount: 5
+                    bookmarkedByMe: false
+                    createdAt: '2026-05-07T05:00:00Z'
+                    updatedAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+            examples:
+              default:
+                value:
+                  tripId: trip_01HX
+                  title: Bangkok to Hua Hin EV Weekend
+                  body: Sharing my EV-friendly route with one charging stop.
+                  tags:
+                  - ev-trip
+                  - hua-hin
+                  visibility: public
+  /v1/feed:
+    get:
+      tags:
+      - Community Service
+      summary: Get feed
+      description: Returns community feed sorted by new or top and optionally filtered by tag.
+      operationId: getFeed
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostList'
+              examples:
+                default:
+                  value:
+                    items: []
+                    meta:
+                      page: 0
+                      size: 20
+                      totalItems: 0
+                      totalPages: 0
+                      hasNext: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: sort
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - new
+          - top
+        description: Sort mode
+        examples:
+          default:
+            value: new
+      - name: tag
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Tag filter
+        examples:
+          default:
+            value: ev-trip
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+        examples:
+          default:
+            value: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+        examples:
+          default:
+            value: 20
+  /v1/posts/{postId}:
+    get:
+      tags:
+      - Community Service
+      summary: Get post
+      description: Returns a community post by ID.
+      operationId: getPostsPostId
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+              examples:
+                default:
+                  value:
+                    id: post_01HX
+                    tripId: trip_01HX
+                    authorUserId: user_123
+                    authorDisplayName: Somchai
+                    title: Bangkok to Hua Hin EV Weekend
+                    body: Sharing my EV-friendly route with one charging stop.
+                    tags:
+                    - ev-trip
+                    score: 18
+                    commentCount: 5
+                    bookmarkedByMe: false
+                    createdAt: '2026-05-07T05:00:00Z'
+                    updatedAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: postId path parameter
+    delete:
+      tags:
+      - Community Service
+      summary: Delete post
+      description: 'Moderator/admin deletes a post.
+
+
+        Requires `mod` or `admin` role.'
+      operationId: deletePostsPostId
+      responses:
+        '204':
+          description: Success - no response body
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: postId path parameter
+  /v1/posts/{postId}/comments:
+    get:
+      tags:
+      - Community Service
+      summary: List post comments
+      description: Lists top-level comments or replies by parentId.
+      operationId: getPostsPostIdComments
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentList'
+              examples:
+                default:
+                  value:
+                    items: []
+                    meta:
+                      page: 0
+                      size: 20
+                      totalItems: 0
+                      totalPages: 0
+                      hasNext: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: postId path parameter
+      - name: parentId
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Parent comment ID
+    post:
+      tags:
+      - Community Service
+      summary: Create post comment
+      description: Creates a top-level comment or nested reply on a post.
+      operationId: postPostsPostIdComments
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+              examples:
+                default:
+                  value:
+                    id: cmt_01HX
+                    resourceId: chg_01HX
+                    userId: user_123
+                    parentCommentId: null
+                    body: Is this charger open after midnight?
+                    createdAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: postId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCommentRequest'
+            examples:
+              default:
+                value:
+                  parentCommentId: null
+                  body: Can I copy this trip for my own route?
+  /v1/posts/{postId}/comments/{commentId}:
+    delete:
+      tags:
+      - Community Service
+      summary: Delete post comment
+      description: Deletes own comment or moderator/admin deletes it.
+      operationId: deletePostsPostIdCommentsCommentId
+      responses:
+        '204':
+          description: Success - no response body
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: postId path parameter
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: commentId path parameter
+  /v1/posts/{postId}/vote:
+    put:
+      tags:
+      - Community Service
+      summary: Vote on post
+      description: Upserts current user's vote. direction=1 upvote, -1 downvote, 0 retract.
+      operationId: putPostsPostIdVote
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoteResponse'
+              examples:
+                default:
+                  value:
+                    postId: post_01HX
+                    myVote: 1
+                    score: 19
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: postId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoteRequest'
+            examples:
+              default:
+                value:
+                  direction: 1
+  /v1/posts/{postId}/report:
+    post:
+      tags:
+      - Community Service
+      summary: Report post
+      description: Reports a post for moderation.
+      operationId: postPostsPostIdReport
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+              examples:
+                default:
+                  value:
+                    id: report_01HX
+                    resourceId: chg_01HX
+                    userId: user_123
+                    type: wrong_connector
+                    description: App shows CCS2 but only Type2 is available.
+                    status: open
+                    createdAt: '2026-05-07T05:00:00Z'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: postId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportRequest'
+            examples:
+              default:
+                value:
+                  reportType: wrong_connector
+                  description: App shows CCS2 but only Type2 is available.
+  /v1/posts/{postId}/bookmark:
+    post:
+      tags:
+      - Community Service
+      summary: Bookmark post
+      description: Bookmarks a post for the current user.
+      operationId: postPostsPostIdBookmark
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookmarkResponse'
+              examples:
+                default:
+                  value:
+                    postId: post_01HX
+                    bookmarked: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: postId path parameter
+    delete:
+      tags:
+      - Community Service
+      summary: Remove bookmark
+      description: Removes a bookmark from the current user.
+      operationId: deletePostsPostIdBookmark
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookmarkResponse'
+              examples:
+                default:
+                  value:
+                    postId: post_01HX
+                    bookmarked: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: postId path parameter
+  /v1/me/bookmarks:
+    get:
+      tags:
+      - Community Service
+      summary: List bookmarks
+      description: Lists current user's bookmarked posts.
+      operationId: getMeBookmarks
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostList'
+              examples:
+                default:
+                  value:
+                    items: []
+                    meta:
+                      page: 0
+                      size: 20
+                      totalItems: 0
+                      totalPages: 0
+                      hasNext: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+        examples:
+          default:
+            value: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+        examples:
+          default:
+            value: 20
+  /v1/search:
+    get:
+      tags:
+      - Community Service
+      summary: Search trips/posts
+      description: Searches posts and/or visible trips using Postgres full-text search with visibility enforcement.
+      operationId: getSearch
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+              examples:
+                default:
+                  value:
+                    items:
+                    - type: post
+                      id: post_01HX
+                      title: Bangkok to Hua Hin EV Weekend
+                      snippet: EV-friendly route...
+                      score: 0.92
+                    meta:
+                      page: 0
+                      size: 20
+                      totalItems: 1
+                      totalPages: 1
+                      hasNext: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: q
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Search query
+        examples:
+          default:
+            value: hua hin ev
+      - name: type
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - trips
+          - posts
+          - all
+        description: Search type
+        examples:
+          default:
+            value: all
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+        examples:
+          default:
+            value: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+        examples:
+          default:
+            value: 20
+  /v1/notifications:
+    get:
+      tags:
+      - Community Service
+      summary: List notifications
+      description: Returns current user's in-app notification inbox.
+      operationId: getNotifications
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationList'
+              examples:
+                default:
+                  value:
+                    items:
+                    - id: notif_01HX
+                      type: comment_created
+                      title: New comment
+                      body: Nok commented on your post.
+                      read: false
+                      createdAt: '2026-05-07T05:00:00Z'
+                      data:
+                        postId: post_01HX
+                    meta:
+                      page: 0
+                      size: 20
+                      totalItems: 1
+                      totalPages: 1
+                      hasNext: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: unreadOnly
+        in: query
+        required: false
+        schema:
+          type: boolean
+        examples:
+          default:
+            value: false
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+        examples:
+          default:
+            value: 0
+      - name: size
+        in: query
+        required: false
+        schema:
+          type: integer
+        examples:
+          default:
+            value: 20
+  /v1/notifications/{id}/read:
+    post:
+      tags:
+      - Community Service
+      summary: Mark notification read
+      description: Marks one notification as read.
+      operationId: postNotificationsIdRead
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+        description: id path parameter
+  /v1/ai/plan/suggest:
+    post:
+      tags:
+      - AI Orchestrator Service
+      summary: Suggest plan changes
+      description: Uses Gemini through AI Orchestrator to produce structured itinerary and EV improvement actions. Does not
+        apply unless apply=true.
+      operationId: postAiPlanSuggest
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiPlanSuggestResponse'
+              examples:
+                default:
+                  value:
+                    sessionId: ai_sess_01HX
+                    summary: Add one charging stop before Hua Hin.
+                    actions:
+                    - type: recompute_ev_route
+                      description: Recompute with fresh charger data.
+                      payload: {}
+                    quota:
+                      tokensUsedThisMonth: 12500
+                      monthlyTokenLimit: 100000
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AiPlanSuggestRequest'
+            examples:
+              default:
+                value:
+                  tripId: trip_01HX
+                  goal: Make this trip safer for an EV with fewer low-battery segments.
+                  constraints:
+                  - Prefer CCS2 chargers above 50 kW
+                  apply: false
+  /v1/ai/plan/chat:
+    post:
+      tags:
+      - AI Orchestrator Service
+      summary: Chat with plan
+      description: Conversational plan assistance. Supports JSON response in this spec; implementation may stream text/event-stream.
+      operationId: postAiPlanChat
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AiPlanChatResponse'
+              examples:
+                default:
+                  value:
+                    sessionId: ai_sess_01HX
+                    message: I suggest reducing driving on day 2.
+                    actions: []
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AiPlanChatRequest'
+            examples:
+              default:
+                value:
+                  tripId: trip_01HX
+                  message: Can you make day 2 less tiring?
+  /v1/trips/{tripId}/dates:
+    patch:
+      tags:
+      - Trip Planning Details
+      summary: Update trip dates
+      description: Updates startDate/endDate and enables itinerary day generation.
+      operationId: patchUpdateTripDates
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TripDatesRequest'
+            examples:
+              default:
+                value:
+                  startDate: '2026-05-15'
+                  endDate: '2026-05-21'
+  /v1/trips/{tripId}/sections:
+    get:
+      tags:
+      - Trip Planning Details
+      summary: List trip sections
+      description: Lists custom place lists such as Places to visit, Restaurants, Lodging, and user-created lists.
+      operationId: getListTripSections
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripSectionList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+    post:
+      tags:
+      - Trip Planning Details
+      summary: Create trip section
+      description: Creates a new custom list/section inside the trip.
+      operationId: postCreateTripSection
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripSection'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TripSectionRequest'
+            examples:
+              default:
+                value:
+                  title: Restaurants
+                  sectionType: CUSTOM
+  /v1/trips/{tripId}/sections/{sectionId}:
+    patch:
+      tags:
+      - Trip Planning Details
+      summary: Update trip section
+      description: Renames, collapses, or reorders a trip section.
+      operationId: patchUpdateTripSection
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripSection'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: sectionId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: sectionId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TripSectionRequest'
+    delete:
+      tags:
+      - Trip Planning Details
+      summary: Delete trip section
+      description: Deletes a custom section. Default sections can be protected by business rules.
+      operationId: deleteDeleteTripSection
+      responses:
+        '204':
+          description: No content
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: sectionId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: sectionId path parameter
+  /v1/trips/{tripId}/sections/reorder:
+    patch:
+      tags:
+      - Trip Planning Details
+      summary: Reorder trip sections
+      description: Reorders all trip sections using ordered section IDs.
+      operationId: patchReorderTripSections
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripSectionList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReorderSectionsRequest'
+            examples:
+              default:
+                value:
+                  sectionIds:
+                  - sec_places
+                  - sec_food
+  /v1/trips/{tripId}/sections/{sectionId}/places:
+    get:
+      tags:
+      - Trip Planning Details
+      summary: List section places
+      description: Lists saved places inside one trip section.
+      operationId: getListSectionPlaces
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripPlaceList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: sectionId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: sectionId path parameter
+    post:
+      tags:
+      - Trip Planning Details
+      summary: Add place to section
+      description: Adds a Google or manual place to a trip section.
+      operationId: postAddPlaceToSection
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripPlace'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: sectionId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: sectionId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TripPlaceRequest'
+            examples:
+              default:
+                value:
+                  provider: GOOGLE
+                  providerPlaceId: ChIJ4zGFAZpYwokRGUGph3Mf37k
+                  name: Central Park
+                  address: New York, NY, USA
+                  lat: 40.785091
+                  lng: -73.968285
+  /v1/trips/{tripId}/places/{placeId}:
+    patch:
+      tags:
+      - Trip Planning Details
+      summary: Update trip place
+      description: Updates saved place details, notes, scheduled date/time, or section assignment.
+      operationId: patchUpdateTripPlace
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripPlace'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: placeId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: placeId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TripPlaceRequest'
+    delete:
+      tags:
+      - Trip Planning Details
+      summary: Delete trip place
+      description: Removes a place from the trip. Itinerary items referencing this place should be cleaned up or detached.
+      operationId: deleteDeleteTripPlace
+      responses:
+        '204':
+          description: No content
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: placeId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: placeId path parameter
+  /v1/trips/{tripId}/sections/{sectionId}/places/reorder:
+    patch:
+      tags:
+      - Trip Planning Details
+      summary: Reorder section places
+      description: Reorders places inside a section using ordered place IDs.
+      operationId: patchReorderSectionPlaces
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripPlaceList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: sectionId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: sectionId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReorderPlacesRequest'
+            examples:
+              default:
+                value:
+                  placeIds:
+                  - place_01HX
+                  - place_02HX
+  /v1/geo/places/autocomplete:
+    get:
+      tags:
+      - Geo Provider
+      summary: Autocomplete places
+      description: Backend-controlled Google/Mapbox place autocomplete for the Add a place search box.
+      operationId: getAutocompletePlaces
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaceAutocompleteResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: query
+        in: query
+        required: true
+        schema:
+          type: string
+        description: Search text
+        examples:
+          default:
+            value: central park
+      - name: lat
+        in: query
+        required: false
+        schema:
+          type: number
+        description: Optional location bias latitude
+        examples:
+          default:
+            value: 40.7
+      - name: lng
+        in: query
+        required: false
+        schema:
+          type: number
+        description: Optional location bias longitude
+        examples:
+          default:
+            value: -73.9
+      - name: country
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Country bias
+        examples:
+          default:
+            value: US
+  /v1/geo/places/{providerPlaceId}:
+    get:
+      tags:
+      - Geo Provider
+      summary: Get place detail
+      description: Returns normalized place details for a selected provider place ID. Useful before saving a place to a trip.
+      operationId: getGetPlaceDetail
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaceDetail'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: providerPlaceId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: providerPlaceId path parameter
+      - name: provider
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - GOOGLE
+          - MAPBOX
+        description: Provider
+        examples:
+          default:
+            value: GOOGLE
+  /v1/trips/{tripId}/notes:
+    get:
+      tags:
+      - Trip Planning Details
+      summary: List trip notes
+      description: Lists trip-level, place-level, day-level, or reservation-level notes.
+      operationId: getListTripNotes
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripNoteList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: targetType
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - TRIP
+          - PLACE
+          - DAY
+          - RESERVATION
+      - name: targetId
+        in: query
+        required: false
+        schema:
+          type: string
+    post:
+      tags:
+      - Trip Planning Details
+      summary: Create trip note
+      description: Creates a note attached to the trip, a place, a date/day, or a reservation.
+      operationId: postCreateTripNote
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripNote'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TripNoteRequest'
+            examples:
+              default:
+                value:
+                  targetType: PLACE
+                  targetId: place_01HX
+                  content: Go early morning to avoid crowds.
+  /v1/trips/{tripId}/notes/{noteId}:
+    patch:
+      tags:
+      - Trip Planning Details
+      summary: Update trip note
+      description: Updates a note's content or target.
+      operationId: patchUpdateTripNote
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripNote'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: noteId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: noteId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TripNoteRequest'
+    delete:
+      tags:
+      - Trip Planning Details
+      summary: Delete trip note
+      description: Deletes a note.
+      operationId: deleteDeleteTripNote
+      responses:
+        '204':
+          description: No content
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: noteId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: noteId path parameter
+  /v1/trips/{tripId}/itinerary:
+    get:
+      tags:
+      - Trip Planning Details
+      summary: Get itinerary
+      description: Returns itinerary days generated from trip dates plus scheduled items per day.
+      operationId: getGetItinerary
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItineraryResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+  /v1/trips/{tripId}/itinerary/items:
+    post:
+      tags:
+      - Trip Planning Details
+      summary: Create itinerary item
+      description: Adds a place, reservation, note, transport item, or custom item to one trip day.
+      operationId: postCreateItineraryItem
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItineraryItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItineraryItemRequest'
+            examples:
+              default:
+                value:
+                  date: '2026-05-16'
+                  itemType: PLACE
+                  refId: place_01HX
+                  title: Visit Central Park
+                  startTime: 09:00
+                  endTime: '11:00'
+  /v1/trips/{tripId}/itinerary/items/{itemId}:
+    patch:
+      tags:
+      - Trip Planning Details
+      summary: Update itinerary item
+      description: Updates time, title, date, notes, or referenced item for an itinerary item.
+      operationId: patchUpdateItineraryItem
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItineraryItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: itemId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: itemId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ItineraryItemRequest'
+    delete:
+      tags:
+      - Trip Planning Details
+      summary: Delete itinerary item
+      description: Removes an item from the itinerary day.
+      operationId: deleteDeleteItineraryItem
+      responses:
+        '204':
+          description: No content
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: itemId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: itemId path parameter
+  /v1/trips/{tripId}/itinerary/days/{date}/reorder:
+    patch:
+      tags:
+      - Trip Planning Details
+      summary: Reorder itinerary day
+      description: Reorders items within one itinerary day.
+      operationId: patchReorderItineraryDay
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItineraryDay'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: date
+        in: path
+        required: true
+        schema:
+          type: string
+          format: date
+        description: Itinerary date
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReorderItineraryDayRequest'
+            examples:
+              default:
+                value:
+                  itemIds:
+                  - itin_01HX
+                  - itin_02HX
+  /v1/trips/{tripId}/reservations:
+    get:
+      tags:
+      - Trip Planning Details
+      summary: List reservations
+      description: Lists reservations and attachments for flights, lodging, rental cars, restaurants, activities, and other
+        bookings.
+      operationId: getListReservations
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservationList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: category
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - FLIGHT
+          - LODGING
+          - RENTAL_CAR
+          - RESTAURANT
+          - ACTIVITY
+          - OTHER
+    post:
+      tags:
+      - Trip Planning Details
+      summary: Create reservation
+      description: Creates a booking/reservation record. Attachments are linked separately through trip attachments.
+      operationId: postCreateReservation
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationRequest'
+            examples:
+              default:
+                value:
+                  category: LODGING
+                  title: Hotel in Bangkok
+                  providerName: Agoda
+                  confirmationNumber: ABC123
+                  startDateTime: '2026-05-15T15:00:00+07:00'
+                  endDateTime: '2026-05-18T11:00:00+07:00'
+                  costAmount: 4500
+                  currency: THB
+                  notes: Check-in after 3 PM
+  /v1/trips/{tripId}/reservations/{reservationId}:
+    get:
+      tags:
+      - Trip Planning Details
+      summary: Get reservation
+      description: Returns reservation details.
+      operationId: getGetReservation
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: reservationId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: reservationId path parameter
+    patch:
+      tags:
+      - Trip Planning Details
+      summary: Update reservation
+      description: Updates reservation details.
+      operationId: patchUpdateReservation
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: reservationId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: reservationId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservationRequest'
+    delete:
+      tags:
+      - Trip Planning Details
+      summary: Delete reservation
+      description: Deletes a reservation. Attachments should be unlinked or retained according to policy.
+      operationId: deleteDeleteReservation
+      responses:
+        '204':
+          description: No content
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: reservationId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: reservationId path parameter
+  /v1/trips/{tripId}/attachments:
+    get:
+      tags:
+      - Trip Planning Details
+      summary: List trip attachments
+      description: Lists uploaded media linked to the trip, places, notes, reservations, or expenses.
+      operationId: getListTripAttachments
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripAttachmentList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: targetType
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - TRIP
+          - PLACE
+          - RESERVATION
+          - EXPENSE
+          - NOTE
+      - name: targetId
+        in: query
+        required: false
+        schema:
+          type: string
+    post:
+      tags:
+      - Trip Planning Details
+      summary: Attach media to trip item
+      description: Links an existing uploaded media object to a trip-level target.
+      operationId: postAttachMediaToTripItem
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripAttachment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TripAttachmentRequest'
+            examples:
+              default:
+                value:
+                  mediaId: media_01HX
+                  targetType: RESERVATION
+                  targetId: res_01HX
+                  label: Hotel confirmation PDF
+  /v1/trips/{tripId}/attachments/{attachmentId}:
+    delete:
+      tags:
+      - Trip Planning Details
+      summary: Delete trip attachment link
+      description: Removes the link between a media object and a trip target. It does not necessarily delete the underlying
+        media object.
+      operationId: deleteDeleteTripAttachmentLink
+      responses:
+        '204':
+          description: No content
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: attachmentId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: attachmentId path parameter
+  /v1/trips/{tripId}/budget:
+    get:
+      tags:
+      - Budgeting
+      summary: Get trip budget
+      description: Returns trip budget amount and currency.
+      operationId: getGetTripBudget
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+    patch:
+      tags:
+      - Budgeting
+      summary: Update trip budget
+      description: Sets or updates the total trip budget and default currency.
+      operationId: patchUpdateTripBudget
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BudgetRequest'
+            examples:
+              default:
+                value:
+                  budgetAmount: 30000
+                  currency: THB
+  /v1/trips/{tripId}/budget/summary:
+    get:
+      tags:
+      - Budgeting
+      summary: Get budget summary
+      description: Returns total spent, remaining budget, and category breakdown.
+      operationId: getGetBudgetSummary
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BudgetSummary'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+  /v1/trips/{tripId}/budget/balances:
+    get:
+      tags:
+      - Budgeting
+      summary: Get group balances
+      description: Calculates who owes whom based on expense splits.
+      operationId: getGetGroupBalances
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+  /v1/trips/{tripId}/expenses:
+    get:
+      tags:
+      - Budgeting
+      summary: List expenses
+      description: Lists trip expenses with optional category and date filters.
+      operationId: getListExpenses
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpenseList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: category
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - FLIGHT
+          - LODGING
+          - FOOD
+          - TRANSPORT
+          - ACTIVITY
+          - SHOPPING
+          - OTHER
+      - name: sort
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - date_desc
+          - date_asc
+          - amount_desc
+          - amount_asc
+        examples:
+          default:
+            value: date_desc
+    post:
+      tags:
+      - Budgeting
+      summary: Create expense
+      description: Creates a trip expense and optional split records for group balances.
+      operationId: postCreateExpense
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseRequest'
+            examples:
+              default:
+                value:
+                  title: Dinner
+                  category: FOOD
+                  amount: 850
+                  currency: THB
+                  paidByUserId: user_123
+                  expenseDate: '2026-05-16'
+                  splits:
+                  - userId: user_123
+                    splitType: EQUAL
+                  - userId: user_456
+                    splitType: EQUAL
+  /v1/trips/{tripId}/expenses/{expenseId}:
+    get:
+      tags:
+      - Budgeting
+      summary: Get expense
+      description: Returns one expense and its splits.
+      operationId: getGetExpense
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: expenseId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: expenseId path parameter
+    patch:
+      tags:
+      - Budgeting
+      summary: Update expense
+      description: Updates expense details and recalculates split records when splits are provided.
+      operationId: patchUpdateExpense
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: expenseId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: expenseId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseRequest'
+    delete:
+      tags:
+      - Budgeting
+      summary: Delete expense
+      description: Deletes an expense and its split records.
+      operationId: deleteDeleteExpense
+      responses:
+        '204':
+          description: No content
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: expenseId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: expenseId path parameter
+  /v1/trips/{tripId}/members:
+    get:
+      tags:
+      - Trip Planning Details
+      summary: List trip members
+      description: Lists tripmates used for collaboration and expense splitting.
+      operationId: getListTripMembers
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripMemberList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+  /v1/trips/{tripId}/members/invite:
+    post:
+      tags:
+      - Trip Planning Details
+      summary: Invite trip member
+      description: Invites a tripmate and creates/syncs ACL permissions for collaboration.
+      operationId: postInviteTripMember
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TripMember'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TripMemberInviteRequest'
+            examples:
+              default:
+                value:
+                  email: friend@example.com
+                  role: EDITOR
+                  displayName: Friend
+  /v1/trips/{tripId}/members/{userId}:
+    delete:
+      tags:
+      - Trip Planning Details
+      summary: Remove trip member
+      description: Removes a tripmate and syncs ACL permissions. Existing expenses can keep historical user references.
+      operationId: deleteRemoveTripMember
+      responses:
+        '204':
+          description: No content
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: tripId path parameter
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: userId path parameter
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Keycloak/OIDC JWT access token
+    internalAuth:
+      type: apiKey
+      in: header
+      name: X-Internal-Auth
+      description: Shared secret for service-to-service calls on localhost
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          examples:
+            - '2026-05-07T05:00:00Z'
+        status:
+          type: integer
+          examples:
+            - 400
+        code:
+          type: string
+          examples:
+            - VALIDATION_ERROR
+        message:
+          type: string
+          examples:
+            - Invalid request
+        path:
+          type: string
+          examples:
+            - /v1/trips
+        requestId:
+          type: string
+          examples:
+            - req_01HX...
+      required:
+      - timestamp
+      - status
+      - code
+      - message
+      - path
+    PageMeta:
+      type: object
+      properties:
+        page:
+          type: integer
+          examples:
+            - 0
+        size:
+          type: integer
+          examples:
+            - 20
+        totalItems:
+          type: integer
+          examples:
+            - 42
+        totalPages:
+          type: integer
+          examples:
+            - 3
+        hasNext:
+          type: boolean
+          examples:
+            - true
+    Location:
+      type: object
+      properties:
+        lat:
+          type: number
+          format: double
+          examples:
+            - 13.7563
+        lng:
+          type: number
+          format: double
+          examples:
+            - 100.5018
+        address:
+          type: [string, "null"]
+          examples:
+            - Bangkok, Thailand
+        placeId:
+          type: [string, "null"]
+          examples:
+            - ChIJ...
+      required:
+      - lat
+      - lng
+    TripStop:
+      type: object
+      properties:
+        id:
+          type: string
+          examples:
+            - stop_01HX
+        name:
+          type: string
+          examples:
+            - Bangkok
+        location:
+          $ref: '#/components/schemas/Location'
+        arrivalAt:
+          type: [string, "null"]
+          format: date-time
+        departureAt:
+          type: [string, "null"]
+          format: date-time
+        notes:
+          type: [string, "null"]
+        orderIndex:
+          type: integer
+          examples:
+            - 0
+      required:
+      - name
+      - location
+      - orderIndex
+    EvProfile:
+      type: object
+      properties:
+        vehicleName:
+          type: string
+          examples:
+            - BYD Atto 3
+        batteryCapacityKwh:
+          type: number
+          examples:
+            - 60.5
+        currentBatteryPercent:
+          type: number
+          examples:
+            - 80
+        minArrivalBatteryPercent:
+          type: number
+          examples:
+            - 15
+        consumptionKwhPer100Km:
+          type: number
+          examples:
+            - 16.5
+        connectorTypes:
+          type: array
+          items:
+            type: string
+            enum:
+            - CCS2
+            - CHADEMO
+            - TYPE2
+            - NACS
+            - GB_T
+            examples:
+              - CCS2
+    RouteLeg:
+      type: object
+      properties:
+        fromStopId:
+          type: string
+        toStopId:
+          type: string
+        distanceKm:
+          type: number
+          examples:
+            - 125.4
+        durationMinutes:
+          type: integer
+          examples:
+            - 130
+        polyline:
+          type: [string, "null"]
+        requiresCharging:
+          type: boolean
+          examples:
+            - false
+        recommendedChargerIds:
+          type: array
+          items:
+            type: string
+    TripRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          examples:
+            - Bangkok to Hua Hin EV Weekend
+        description:
+          type: [string, "null"]
+        startDate:
+          type: [string, "null"]
+          format: date
+        endDate:
+          type: [string, "null"]
+          format: date
+        stops:
+          type: array
+          items:
+            $ref: '#/components/schemas/TripStop'
+        routeLegs:
+          type: array
+          items:
+            $ref: '#/components/schemas/RouteLeg'
+        evProfile:
+          $ref: '#/components/schemas/EvProfile'
+        revisionMessage:
+          type: [string, "null"]
+        currency:
+          type: string
+          examples:
+            - THB
+          description: Default trip currency.
+        budgetAmount:
+          type: [number, "null"]
+          examples:
+            - 30000
+      required:
+      - title
+      - stops
+    Trip:
+      type: object
+      properties:
+        id:
+          type: string
+          examples:
+            - trip_01HX
+        ownerUserId:
+          type: string
+          examples:
+            - user_123
+        title:
+          type: string
+        description:
+          type: [string, "null"]
+        visibility:
+          type: string
+          enum:
+          - private
+          - unlisted
+          - public
+          examples:
+            - private
+        startDate:
+          type: [string, "null"]
+          format: date
+        endDate:
+          type: [string, "null"]
+          format: date
+        stops:
+          type: array
+          items:
+            $ref: '#/components/schemas/TripStop'
+        routeLegs:
+          type: array
+          items:
+            $ref: '#/components/schemas/RouteLeg'
+        evProfile:
+          $ref: '#/components/schemas/EvProfile'
+        sourceMetadata:
+          type: object
+          properties:
+            copiedFromTripId:
+              type: [string, "null"]
+            copiedFromPostId:
+              type: [string, "null"]
+            copiedFromTitle:
+              type: [string, "null"]
+            copiedFromAuthorDisplayName:
+              type: [string, "null"]
+            copiedAt:
+              type: [string, "null"]
+              format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        currency:
+          type: string
+          examples:
+            - THB
+        budgetAmount:
+          type: [number, "null"]
+          examples:
+            - 30000
+        sectionsCount:
+          type: integer
+          examples:
+            - 3
+        placesCount:
+          type: integer
+          examples:
+            - 12
+    TripRevision:
+      type: object
+      properties:
+        id:
+          type: string
+        tripId:
+          type: string
+        revisionNumber:
+          type: integer
+        message:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    RevisionList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TripRevision'
+        meta:
+          $ref: '#/components/schemas/PageMeta'
+    RollbackRequest:
+      type: object
+      properties:
+        revisionId:
+          type: string
+          examples:
+            - rev_01HX
+      required:
+      - revisionId
+    VisibilityRequest:
+      type: object
+      properties:
+        visibility:
+          type: string
+          enum:
+          - private
+          - unlisted
+          - public
+          examples:
+            - public
+        reason:
+          type: [string, "null"]
+      required:
+      - visibility
+    CopyTripRequest:
+      type: object
+      properties:
+        sourcePostId:
+          type: [string, "null"]
+          examples:
+            - post_01HX
+        shareToken:
+          type: [string, "null"]
+          examples:
+            - shr_abc
+        newTitle:
+          type: [string, "null"]
+          examples:
+            - My Hua Hin Trip
+    ShareLinkRequest:
+      type: object
+      properties:
+        expiresAt:
+          type: [string, "null"]
+          format: date-time
+        allowCopy:
+          type: boolean
+          examples:
+            - true
+    ShareLink:
+      type: object
+      properties:
+        id:
+          type: string
+        tripId:
+          type: string
+        token:
+          type: string
+        url:
+          type: string
+        allowCopy:
+          type: boolean
+        expiresAt:
+          type: [string, "null"]
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+    ShareResolve:
+      type: object
+      properties:
+        trip:
+          $ref: '#/components/schemas/Trip'
+        canCopy:
+          type: boolean
+          examples:
+            - true
+    PermissionEntry:
+      type: object
+      properties:
+        userId:
+          type: string
+        role:
+          type: string
+          enum:
+          - viewer
+          - editor
+          - owner
+        displayName:
+          type: [string, "null"]
+    PermissionsRequest:
+      type: object
+      properties:
+        add:
+          type: array
+          items:
+            $ref: '#/components/schemas/PermissionEntry'
+        removeUserIds:
+          type: array
+          items:
+            type: string
+    PermissionsResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PermissionEntry'
+    UserPreferences:
+      type: object
+      properties:
+        language:
+          type: string
+          enum:
+          - en
+          - th
+          examples:
+            - en
+        distanceUnit:
+          type: string
+          enum:
+          - km
+          - mi
+          examples:
+            - km
+        notificationEmail:
+          type: boolean
+          examples:
+            - true
+        notificationPush:
+          type: boolean
+          examples:
+            - false
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        displayName:
+          type: string
+        email:
+          type: string
+          format: email
+        roles:
+          type: array
+          items:
+            type: string
+            enum:
+            - user
+            - mod
+            - admin
+        preferences:
+          $ref: '#/components/schemas/UserPreferences'
+    ModerationRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+        expiresAt:
+          type: [string, "null"]
+          format: date-time
+      required:
+      - reason
+    ModerationResponse:
+      type: object
+      properties:
+        userId:
+          type: string
+        status:
+          type: string
+          enum:
+          - banned
+          - unbanned
+        reason:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+    MediaUploadUrlRequest:
+      type: object
+      properties:
+        filename:
+          type: string
+        contentType:
+          type: string
+        sizeBytes:
+          type: integer
+        purpose:
+          type: string
+          enum:
+          - charger_review_image
+          - expense_receipt
+          - note_attachment
+          - place_photo
+          - profile_image
+          - reservation_attachment
+          - trip_attachment
+          - trip_image
+      required:
+      - filename
+      - contentType
+      - sizeBytes
+      - purpose
+    MediaUploadUrlResponse:
+      type: object
+      properties:
+        mediaId:
+          type: string
+        uploadUrl:
+          type: string
+        method:
+          type: string
+          enum:
+          - PUT
+          - POST
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+        expiresAt:
+          type: string
+          format: date-time
+    MediaCompleteRequest:
+      type: object
+      properties:
+        mediaId:
+          type: string
+        objectKey:
+          type: string
+      required:
+      - mediaId
+      - objectKey
+    Media:
+      type: object
+      properties:
+        id:
+          type: string
+        filename:
+          type: string
+        contentType:
+          type: string
+        sizeBytes:
+          type: integer
+        status:
+          type: string
+          enum:
+          - pending_upload
+          - uploaded
+          - scanning
+          - ready
+          - blocked
+        safeUrl:
+          type: [string, "null"]
+        thumbnailUrl:
+          type: [string, "null"]
+        createdAt:
+          type: string
+          format: date-time
+    GeocodeRequest:
+      type: object
+      properties:
+        query:
+          type: string
+        countryBias:
+          type: [string, "null"]
+          examples:
+            - TH
+      required:
+      - query
+    GeocodeResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              placeId:
+                type: string
+              name:
+                type: string
+              formattedAddress:
+                type: string
+              location:
+                $ref: '#/components/schemas/Location'
+              provider:
+                type: string
+                enum:
+                - GOOGLE_MAPS
+                - MAPBOX
+    RouteRequest:
+      type: object
+      properties:
+        origin:
+          $ref: '#/components/schemas/Location'
+        destination:
+          $ref: '#/components/schemas/Location'
+        waypoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/Location'
+        travelMode:
+          type: string
+          enum:
+          - DRIVE
+          - WALK
+          - BICYCLE
+          examples:
+            - DRIVE
+      required:
+      - origin
+      - destination
+    RouteResponse:
+      type: object
+      properties:
+        distanceKm:
+          type: number
+        durationMinutes:
+          type: integer
+        polyline:
+          type: string
+        legs:
+          type: array
+          items:
+            $ref: '#/components/schemas/RouteLeg'
+        provider:
+          type: string
+          enum:
+          - GOOGLE_MAPS
+          - MAPBOX
+    Charger:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        operatorName:
+          type: [string, "null"]
+        location:
+          $ref: '#/components/schemas/Location'
+        address:
+          type: [string, "null"]
+        province:
+          type: [string, "null"]
+        connectorTypes:
+          type: array
+          items:
+            type: string
+            enum:
+            - CCS2
+            - CHADEMO
+            - TYPE2
+            - NACS
+            - GB_T
+        maxKw:
+          type: number
+        totalConnectors:
+          type: integer
+        availableConnectors:
+          type: [integer, "null"]
+        priceText:
+          type: [string, "null"]
+        openingHours:
+          type: object
+          additionalProperties: true
+        source:
+          type: string
+          enum:
+          - GOOGLE_PLACES
+          - OPENCHARGEMAP
+          - ADMIN_IMPORT
+          - USER_SUBMITTED
+          - PARTNER_API
+        verificationStatus:
+          type: string
+          enum:
+          - UNVERIFIED
+          - PENDING_VERIFICATION
+          - GOOGLE_CACHED
+          - USER_VERIFIED
+          - ADMIN_VERIFIED
+          - REJECTED
+          - STALE
+        status:
+          type: string
+          enum:
+          - active
+          - temporarily_closed
+          - permanently_closed
+          - unknown
+        ratingAvg:
+          type: number
+        ratingCount:
+          type: integer
+        confidenceScore:
+          type: number
+        stale:
+          type: boolean
+    ChargerList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Charger'
+        meta:
+          type: object
+          properties:
+            source:
+              type: string
+              enum:
+              - local_cache
+              - provider_refresh
+              - stale_cache
+            tileKey:
+              type: string
+            stale:
+              type: boolean
+            refreshed:
+              type: boolean
+    EvRouteRequest:
+      type: object
+      properties:
+        origin:
+          $ref: '#/components/schemas/Location'
+        destination:
+          $ref: '#/components/schemas/Location'
+        waypoints:
+          type: array
+          items:
+            $ref: '#/components/schemas/Location'
+        evProfile:
+          $ref: '#/components/schemas/EvProfile'
+        preferredConnectors:
+          type: array
+          items:
+            type: string
+        minChargerKw:
+          type: number
+      required:
+      - origin
+      - destination
+      - evProfile
+    EvRouteResponse:
+      type: object
+      properties:
+        feasible:
+          type: boolean
+        summary:
+          type: string
+        distanceKm:
+          type: number
+        durationMinutes:
+          type: integer
+        estimatedEnergyKwh:
+          type: number
+        route:
+          $ref: '#/components/schemas/RouteResponse'
+        chargeStops:
+          type: array
+          items:
+            type: object
+            properties:
+              charger:
+                $ref: '#/components/schemas/Charger'
+              arrivalBatteryPercent:
+                type: number
+              targetDepartureBatteryPercent:
+                type: number
+              estimatedChargeMinutes:
+                type: integer
+              reason:
+                type: string
+        warnings:
+          type: array
+          items:
+            type: string
+    SuggestChargerRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        operatorName:
+          type: [string, "null"]
+        location:
+          $ref: '#/components/schemas/Location'
+        address:
+          type: [string, "null"]
+        connectorTypes:
+          type: array
+          items:
+            type: string
+        maxKw:
+          type: number
+        notes:
+          type: [string, "null"]
+        mediaIds:
+          type: array
+          items:
+            type: string
+      required:
+      - name
+      - location
+      - connectorTypes
+    ReviewRequest:
+      type: object
+      properties:
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        reviewText:
+          type: string
+        visitDate:
+          type: [string, "null"]
+          format: date
+        chargingSuccessful:
+          type: [boolean, "null"]
+        waitTimeMinutes:
+          type: [integer, "null"]
+        connectorUsed:
+          type: [string, "null"]
+        mediaIds:
+          type: array
+          items:
+            type: string
+      required:
+      - rating
+      - reviewText
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+        chargerId:
+          type: string
+        userId:
+          type: string
+        rating:
+          type: integer
+        reviewText:
+          type: string
+        visitDate:
+          type: [string, "null"]
+          format: date
+        chargingSuccessful:
+          type: [boolean, "null"]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ReviewList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Review'
+        meta:
+          $ref: '#/components/schemas/PageMeta'
+    CommentRequest:
+      type: object
+      properties:
+        parentCommentId:
+          type: [string, "null"]
+        commentText:
+          type: string
+      required:
+      - commentText
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+        resourceId:
+          type: string
+        userId:
+          type: string
+        parentCommentId:
+          type: [string, "null"]
+        body:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    CommentList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+        meta:
+          $ref: '#/components/schemas/PageMeta'
+    ReportRequest:
+      type: object
+      properties:
+        reportType:
+          type: string
+        reason:
+          type: [string, "null"]
+        description:
+          type: string
+      required:
+      - description
+    Report:
+      type: object
+      properties:
+        id:
+          type: string
+        resourceId:
+          type: string
+        userId:
+          type: string
+        type:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    ChargerSuggestionRequest:
+      type: object
+      properties:
+        suggestedName:
+          type: [string, "null"]
+        suggestedAddress:
+          type: [string, "null"]
+        suggestedConnectorTypes:
+          type: array
+          items:
+            type: string
+        suggestedMaxKw:
+          type: [number, "null"]
+        suggestedOpeningHours:
+          type: object
+          additionalProperties: true
+        suggestedLocation:
+          $ref: '#/components/schemas/Location'
+        description:
+          type: string
+      required:
+      - description
+    Suggestion:
+      type: object
+      properties:
+        id:
+          type: string
+        resourceId:
+          type: [string, "null"]
+        userId:
+          type: string
+        status:
+          type: string
+          enum:
+          - pending
+          - approved
+          - rejected
+        createdAt:
+          type: string
+          format: date-time
+    AdminDecisionRequest:
+      type: object
+      properties:
+        reason:
+          type: [string, "null"]
+    AdminDecisionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum:
+          - approved
+          - rejected
+        reason:
+          type: [string, "null"]
+        reviewedAt:
+          type: string
+          format: date-time
+    TileRefreshResponse:
+      type: object
+      properties:
+        tileKey:
+          type: string
+        provider:
+          type: string
+        refreshStatus:
+          type: string
+          enum:
+          - queued
+          - completed
+          - failed
+        chargerCount:
+          type: [integer, "null"]
+        requestedAt:
+          type: string
+          format: date-time
+    PostRequest:
+      type: object
+      properties:
+        tripId:
+          type: [string, "null"]
+        title:
+          type: string
+        body:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        visibility:
+          type: string
+          enum:
+          - public
+          - unlisted
+          examples:
+            - public
+      required:
+      - title
+      - body
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+        tripId:
+          type: [string, "null"]
+        authorUserId:
+          type: string
+        authorDisplayName:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        score:
+          type: integer
+        commentCount:
+          type: integer
+        bookmarkedByMe:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    PostList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        meta:
+          $ref: '#/components/schemas/PageMeta'
+    PostCommentRequest:
+      type: object
+      properties:
+        parentCommentId:
+          type: [string, "null"]
+        body:
+          type: string
+      required:
+      - body
+    VoteRequest:
+      type: object
+      properties:
+        direction:
+          type: integer
+          minimum: -1
+          maximum: 1
+          examples:
+            - 1
+      required:
+      - direction
+    VoteResponse:
+      type: object
+      properties:
+        postId:
+          type: string
+        myVote:
+          type: integer
+        score:
+          type: integer
+    BookmarkResponse:
+      type: object
+      properties:
+        postId:
+          type: string
+        bookmarked:
+          type: boolean
+    SearchResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                enum:
+                - trip
+                - post
+              id:
+                type: string
+              title:
+                type: string
+              snippet:
+                type: string
+              score:
+                type: number
+        meta:
+          $ref: '#/components/schemas/PageMeta'
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        read:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        data:
+          type: object
+          additionalProperties: true
+    NotificationList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+        meta:
+          $ref: '#/components/schemas/PageMeta'
+    AiPlanSuggestRequest:
+      type: object
+      properties:
+        tripId:
+          type: string
+        goal:
+          type: string
+        constraints:
+          type: array
+          items:
+            type: string
+        apply:
+          type: boolean
+          examples:
+            - false
+      required:
+      - tripId
+      - goal
+    PlanEditAction:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - add_stop
+          - remove_stop
+          - reorder_stops
+          - update_notes
+          - recompute_ev_route
+        description:
+          type: string
+        payload:
+          type: object
+          additionalProperties: true
+    AiPlanSuggestResponse:
+      type: object
+      properties:
+        sessionId:
+          type: string
+        summary:
+          type: string
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlanEditAction'
+        quota:
+          type: object
+          additionalProperties: true
+    AiPlanChatRequest:
+      type: object
+      properties:
+        tripId:
+          type: string
+        sessionId:
+          type: [string, "null"]
+        message:
+          type: string
+      required:
+      - tripId
+      - message
+    AiPlanChatResponse:
+      type: object
+      properties:
+        sessionId:
+          type: string
+        message:
+          type: string
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PlanEditAction'
+    TripDatesRequest:
+      type: object
+      properties:
+        startDate:
+          type: string
+          format: date
+          examples:
+            - '2026-05-15'
+        endDate:
+          type: string
+          format: date
+          examples:
+            - '2026-05-21'
+      required:
+      - startDate
+      - endDate
+      description: Sets the trip date range used to generate itinerary days.
+    TripSectionRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          examples:
+            - Restaurants
+        sectionType:
+          type: string
+          enum:
+          - PLACES_TO_VISIT
+          - RESTAURANTS
+          - LODGING
+          - ACTIVITIES
+          - CUSTOM
+          examples:
+            - CUSTOM
+        sortOrder:
+          type: [integer, "null"]
+          examples:
+            - 2
+        isCollapsed:
+          type: [boolean, "null"]
+          examples:
+            - false
+      required:
+      - title
+    TripSection:
+      type: object
+      properties:
+        id:
+          type: string
+          examples:
+            - sec_01HX
+        tripId:
+          type: string
+          examples:
+            - trip_01HX
+        title:
+          type: string
+          examples:
+            - Places to visit
+        sectionType:
+          type: string
+          enum:
+          - PLACES_TO_VISIT
+          - RESTAURANTS
+          - LODGING
+          - ACTIVITIES
+          - CUSTOM
+          examples:
+            - PLACES_TO_VISIT
+        sortOrder:
+          type: integer
+          examples:
+            - 0
+        isCollapsed:
+          type: boolean
+          examples:
+            - false
+        placeCount:
+          type: integer
+          examples:
+            - 4
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    TripSectionList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TripSection'
+    ReorderSectionsRequest:
+      type: object
+      properties:
+        sectionIds:
+          type: array
+          items:
+            type: string
+            examples:
+              - sec_01HX
+      required:
+      - sectionIds
+    TripPlaceRequest:
+      type: object
+      properties:
+        provider:
+          type: string
+          enum:
+          - GOOGLE
+          - MANUAL
+          examples:
+            - GOOGLE
+        providerPlaceId:
+          type: [string, "null"]
+          examples:
+            - ChIJ4zGFAZpYwokRGUGph3Mf37k
+        name:
+          type: string
+          examples:
+            - Central Park
+        address:
+          type: [string, "null"]
+          examples:
+            - New York, NY, USA
+        lat:
+          type: [number, "null"]
+          format: double
+          examples:
+            - 40.785091
+        lng:
+          type: [number, "null"]
+          format: double
+          examples:
+            - -73.968285
+        phone:
+          type: [string, "null"]
+          examples:
+            - +1 212-310-6600
+        website:
+          type: [string, "null"]
+          examples:
+            - https://www.centralparknyc.org
+        photoUrl:
+          type: [string, "null"]
+        notes:
+          type: [string, "null"]
+          examples:
+            - Go early morning.
+        plannedDate:
+          type: [string, "null"]
+          format: date
+          examples:
+            - '2026-05-16'
+        startTime:
+          type: [string, "null"]
+          examples:
+            - 09:00
+        endTime:
+          type: [string, "null"]
+          examples:
+            - '11:00'
+        sortOrder:
+          type: [integer, "null"]
+          examples:
+            - 0
+      required:
+      - provider
+      - name
+    TripPlace:
+      type: object
+      properties:
+        id:
+          type: string
+          examples:
+            - place_01HX
+        tripId:
+          type: string
+          examples:
+            - trip_01HX
+        sectionId:
+          type: string
+          examples:
+            - sec_01HX
+        provider:
+          type: string
+          enum:
+          - GOOGLE
+          - MANUAL
+          examples:
+            - GOOGLE
+        providerPlaceId:
+          type: [string, "null"]
+        name:
+          type: string
+          examples:
+            - Central Park
+        address:
+          type: [string, "null"]
+        lat:
+          type: [number, "null"]
+          format: double
+        lng:
+          type: [number, "null"]
+          format: double
+        phone:
+          type: [string, "null"]
+        website:
+          type: [string, "null"]
+        photoUrl:
+          type: [string, "null"]
+        notes:
+          type: [string, "null"]
+        plannedDate:
+          type: [string, "null"]
+          format: date
+        startTime:
+          type: [string, "null"]
+        endTime:
+          type: [string, "null"]
+        sortOrder:
+          type: integer
+          examples:
+            - 0
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    TripPlaceList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TripPlace'
+    ReorderPlacesRequest:
+      type: object
+      properties:
+        placeIds:
+          type: array
+          items:
+            type: string
+            examples:
+              - place_01HX
+      required:
+      - placeIds
+    PlaceAutocompleteResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              provider:
+                type: string
+                enum:
+                - GOOGLE
+                - MAPBOX
+                examples:
+                  - GOOGLE
+              providerPlaceId:
+                type: string
+                examples:
+                  - ChIJ4zGFAZpYwokRGUGph3Mf37k
+              mainText:
+                type: string
+                examples:
+                  - Central Park
+              secondaryText:
+                type: string
+                examples:
+                  - New York, NY, USA
+              types:
+                type: array
+                items:
+                  type: string
+                  examples:
+                    - park
+    PlaceDetail:
+      type: object
+      properties:
+        provider:
+          type: string
+          enum:
+          - GOOGLE
+          - MAPBOX
+          examples:
+            - GOOGLE
+        providerPlaceId:
+          type: string
+        name:
+          type: string
+        address:
+          type: [string, "null"]
+        location:
+          $ref: '#/components/schemas/Location'
+        phone:
+          type: [string, "null"]
+        website:
+          type: [string, "null"]
+        photoUrl:
+          type: [string, "null"]
+        openingHours:
+          type: object
+          additionalProperties: true
+    TripNoteRequest:
+      type: object
+      properties:
+        targetType:
+          type: string
+          enum:
+          - TRIP
+          - PLACE
+          - DAY
+          - RESERVATION
+          examples:
+            - PLACE
+        targetId:
+          type: [string, "null"]
+          examples:
+            - place_01HX
+        content:
+          type: string
+          examples:
+            - Go early morning to avoid crowds.
+        sortOrder:
+          type: [integer, "null"]
+          examples:
+            - 0
+      required:
+      - targetType
+      - content
+    TripNote:
+      type: object
+      properties:
+        id:
+          type: string
+          examples:
+            - note_01HX
+        tripId:
+          type: string
+        targetType:
+          type: string
+          enum:
+          - TRIP
+          - PLACE
+          - DAY
+          - RESERVATION
+        targetId:
+          type: [string, "null"]
+        content:
+          type: string
+        sortOrder:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    TripNoteList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TripNote'
+    ItineraryItemRequest:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+          examples:
+            - '2026-05-16'
+        itemType:
+          type: string
+          enum:
+          - PLACE
+          - RESERVATION
+          - NOTE
+          - TRANSPORT
+          - CUSTOM
+          examples:
+            - PLACE
+        refId:
+          type: [string, "null"]
+          examples:
+            - place_01HX
+        title:
+          type: string
+          examples:
+            - Visit Central Park
+        startTime:
+          type: [string, "null"]
+          examples:
+            - 09:00
+        endTime:
+          type: [string, "null"]
+          examples:
+            - '11:00'
+        notes:
+          type: [string, "null"]
+        sortOrder:
+          type: [integer, "null"]
+          examples:
+            - 0
+      required:
+      - date
+      - itemType
+      - title
+    ItineraryItem:
+      type: object
+      properties:
+        id:
+          type: string
+          examples:
+            - itin_01HX
+        tripId:
+          type: string
+        date:
+          type: string
+          format: date
+        itemType:
+          type: string
+          enum:
+          - PLACE
+          - RESERVATION
+          - NOTE
+          - TRANSPORT
+          - CUSTOM
+        refId:
+          type: [string, "null"]
+        title:
+          type: string
+        startTime:
+          type: [string, "null"]
+        endTime:
+          type: [string, "null"]
+        notes:
+          type: [string, "null"]
+        sortOrder:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ItineraryDay:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItineraryItem'
+    ItineraryResponse:
+      type: object
+      properties:
+        tripId:
+          type: string
+        startDate:
+          type: [string, "null"]
+          format: date
+        endDate:
+          type: [string, "null"]
+          format: date
+        days:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItineraryDay'
+    ReorderItineraryDayRequest:
+      type: object
+      properties:
+        itemIds:
+          type: array
+          items:
+            type: string
+            examples:
+              - itin_01HX
+      required:
+      - itemIds
+    ReservationRequest:
+      type: object
+      properties:
+        category:
+          type: string
+          enum:
+          - FLIGHT
+          - LODGING
+          - RENTAL_CAR
+          - RESTAURANT
+          - ACTIVITY
+          - OTHER
+          examples:
+            - LODGING
+        title:
+          type: string
+          examples:
+            - Hotel in Bangkok
+        providerName:
+          type: [string, "null"]
+          examples:
+            - Agoda
+        confirmationNumber:
+          type: [string, "null"]
+          examples:
+            - ABC123
+        startDateTime:
+          type: [string, "null"]
+          format: date-time
+          examples:
+            - '2026-05-15T15:00:00+07:00'
+        endDateTime:
+          type: [string, "null"]
+          format: date-time
+          examples:
+            - '2026-05-18T11:00:00+07:00'
+        locationName:
+          type: [string, "null"]
+          examples:
+            - Bangkok Hotel
+        address:
+          type: [string, "null"]
+        lat:
+          type: [number, "null"]
+          format: double
+        lng:
+          type: [number, "null"]
+          format: double
+        costAmount:
+          type: [number, "null"]
+          examples:
+            - 4500
+        currency:
+          type: [string, "null"]
+          examples:
+            - THB
+        notes:
+          type: [string, "null"]
+        metadata:
+          type: object
+          additionalProperties: true
+      required:
+      - category
+      - title
+    Reservation:
+      type: object
+      properties:
+        id:
+          type: string
+          examples:
+            - res_01HX
+        tripId:
+          type: string
+        category:
+          type: string
+          enum:
+          - FLIGHT
+          - LODGING
+          - RENTAL_CAR
+          - RESTAURANT
+          - ACTIVITY
+          - OTHER
+        title:
+          type: string
+        providerName:
+          type: [string, "null"]
+        confirmationNumber:
+          type: [string, "null"]
+        startDateTime:
+          type: [string, "null"]
+          format: date-time
+        endDateTime:
+          type: [string, "null"]
+          format: date-time
+        locationName:
+          type: [string, "null"]
+        address:
+          type: [string, "null"]
+        lat:
+          type: [number, "null"]
+        lng:
+          type: [number, "null"]
+        costAmount:
+          type: [number, "null"]
+        currency:
+          type: [string, "null"]
+        notes:
+          type: [string, "null"]
+        metadata:
+          type: object
+          additionalProperties: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ReservationList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reservation'
+    TripAttachmentRequest:
+      type: object
+      properties:
+        mediaId:
+          type: string
+          examples:
+            - media_01HX
+        targetType:
+          type: string
+          enum:
+          - TRIP
+          - PLACE
+          - RESERVATION
+          - EXPENSE
+          - NOTE
+          examples:
+            - RESERVATION
+        targetId:
+          type: [string, "null"]
+          examples:
+            - res_01HX
+        label:
+          type: [string, "null"]
+          examples:
+            - Hotel confirmation PDF
+      required:
+      - mediaId
+      - targetType
+    TripAttachment:
+      type: object
+      properties:
+        id:
+          type: string
+          examples:
+            - att_01HX
+        tripId:
+          type: string
+        mediaId:
+          type: string
+        targetType:
+          type: string
+          enum:
+          - TRIP
+          - PLACE
+          - RESERVATION
+          - EXPENSE
+          - NOTE
+        targetId:
+          type: [string, "null"]
+        label:
+          type: [string, "null"]
+        media:
+          $ref: '#/components/schemas/Media'
+        createdAt:
+          type: string
+          format: date-time
+    TripAttachmentList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TripAttachment'
+    BudgetRequest:
+      type: object
+      properties:
+        budgetAmount:
+          type: [number, "null"]
+          examples:
+            - 30000
+        currency:
+          type: string
+          examples:
+            - THB
+      required:
+      - currency
+    Budget:
+      type: object
+      properties:
+        tripId:
+          type: string
+        budgetAmount:
+          type: [number, "null"]
+        currency:
+          type: string
+          examples:
+            - THB
+        updatedAt:
+          type: string
+          format: date-time
+    BudgetSummary:
+      type: object
+      properties:
+        tripId:
+          type: string
+        budgetAmount:
+          type: [number, "null"]
+          examples:
+            - 30000
+        currency:
+          type: string
+          examples:
+            - THB
+        totalSpent:
+          type: number
+          examples:
+            - 12500
+        remaining:
+          type: [number, "null"]
+          examples:
+            - 17500
+        categoryBreakdown:
+          type: array
+          items:
+            type: object
+            properties:
+              category:
+                type: string
+                examples:
+                  - FOOD
+              amount:
+                type: number
+                examples:
+                  - 2500
+    ExpenseSplitRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+          examples:
+            - user_123
+        amount:
+          type: [number, "null"]
+          examples:
+            - 425
+        percentage:
+          type: [number, "null"]
+          examples:
+            - 50
+        splitType:
+          type: string
+          enum:
+          - EQUAL
+          - EXACT
+          - PERCENTAGE
+          examples:
+            - EQUAL
+      required:
+      - userId
+      - splitType
+    ExpenseRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          examples:
+            - Dinner
+        category:
+          type: string
+          enum:
+          - FLIGHT
+          - LODGING
+          - FOOD
+          - TRANSPORT
+          - ACTIVITY
+          - SHOPPING
+          - OTHER
+          examples:
+            - FOOD
+        amount:
+          type: number
+          examples:
+            - 850
+        currency:
+          type: string
+          examples:
+            - THB
+        paidByUserId:
+          type: string
+          examples:
+            - user_123
+        expenseDate:
+          type: string
+          format: date
+          examples:
+            - '2026-05-16'
+        placeId:
+          type: [string, "null"]
+        reservationId:
+          type: [string, "null"]
+        notes:
+          type: [string, "null"]
+        splits:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpenseSplitRequest'
+      required:
+      - title
+      - category
+      - amount
+      - currency
+      - paidByUserId
+      - expenseDate
+    ExpenseSplit:
+      type: object
+      properties:
+        id:
+          type: string
+          examples:
+            - split_01HX
+        expenseId:
+          type: string
+        userId:
+          type: string
+        amount:
+          type: number
+        splitType:
+          type: string
+          enum:
+          - EQUAL
+          - EXACT
+          - PERCENTAGE
+        percentage:
+          type: [number, "null"]
+        status:
+          type: string
+          enum:
+          - OWED
+          - PAID
+          - WAIVED
+          examples:
+            - OWED
+    Expense:
+      type: object
+      properties:
+        id:
+          type: string
+          examples:
+            - exp_01HX
+        tripId:
+          type: string
+        title:
+          type: string
+        category:
+          type: string
+          enum:
+          - FLIGHT
+          - LODGING
+          - FOOD
+          - TRANSPORT
+          - ACTIVITY
+          - SHOPPING
+          - OTHER
+        amount:
+          type: number
+        currency:
+          type: string
+        paidByUserId:
+          type: string
+        expenseDate:
+          type: string
+          format: date
+        placeId:
+          type: [string, "null"]
+        reservationId:
+          type: [string, "null"]
+        notes:
+          type: [string, "null"]
+        splits:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpenseSplit'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    ExpenseList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Expense'
+    BalanceResponse:
+      type: object
+      properties:
+        tripId:
+          type: string
+        currency:
+          type: string
+          examples:
+            - THB
+        balances:
+          type: array
+          items:
+            type: object
+            properties:
+              fromUserId:
+                type: string
+                examples:
+                  - user_456
+              toUserId:
+                type: string
+                examples:
+                  - user_123
+              amount:
+                type: number
+                examples:
+                  - 425
+              currency:
+                type: string
+                examples:
+                  - THB
+    TripMemberInviteRequest:
+      type: object
+      properties:
+        email:
+          type: [string, "null"]
+          format: email
+          examples:
+            - friend@example.com
+        userId:
+          type: [string, "null"]
+          examples:
+            - user_456
+        role:
+          type: string
+          enum:
+          - EDITOR
+          - VIEWER
+          examples:
+            - EDITOR
+        displayName:
+          type: [string, "null"]
+          examples:
+            - Friend
+      required:
+      - role
+    TripMember:
+      type: object
+      properties:
+        id:
+          type: string
+          examples:
+            - member_01HX
+        tripId:
+          type: string
+        userId:
+          type: [string, "null"]
+        email:
+          type: [string, "null"]
+        displayName:
+          type: string
+        role:
+          type: string
+          enum:
+          - OWNER
+          - EDITOR
+          - VIEWER
+        joinedAt:
+          type: [string, "null"]
+          format: date-time
+        inviteStatus:
+          type: string
+          enum:
+          - ACCEPTED
+          - PENDING
+          examples:
+            - ACCEPTED
+    TripMemberList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TripMember'
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Missing or invalid JWT
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: Not allowed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
