@@ -27,6 +27,23 @@ The database supports:
 
 The design prioritizes feasibility for a university capstone, correctness, clean service boundaries, and future scalability.
 
+### Current Repository Alignment
+
+As of 2026-05-16, the implemented backend migration in `server/Trip-Media-Service` contains the compact Trip & Media baseline only: `trip.trips`, `trip.revisions`, and `trip.share_tokens`. That migration stores stops, route legs, EV profile, tags, copy attribution, and stats in JSONB. The target design below is broader because the frontend already models more features than the backend currently persists.
+
+Treat this document as the target database design, not as a description of what has already been migrated. Before replacing the mocks with APIs, add migrations for the expanded `trip`, `ev`, and `social` schema pieces described below.
+
+| Frontend mock/state area | Target database support |
+| ------------------------ | ----------------------- |
+| Planner date blocks with title/color/items | `trip.itinerary_blocks` plus `trip.itinerary_items` |
+| Planner place cards with rating, reviews, cost, visited state, time, image, and EV charger snapshot | `trip.trip_places`, `trip.itinerary_items`, `trip.expenses`, and `metadata_jsonb` |
+| Planner notes and checklists | `trip.trip_notes` and `trip.itinerary_items` with `item_type = CHECKLIST` |
+| Budget categories and currencies | `trip.expenses`, `trip.expense_splits`, `trip.trips.currency`, `trip.trips.budget_amount` |
+| Garage vehicles and starting battery | `trip.trip_vehicles` and `trip.trips.ev_profile_jsonb` |
+| Explore plan cards with likes/views/reviews/trending | `trip.trips.stats_jsonb` and/or public feed projections |
+| EV charger search and add-to-trip | `ev.chargers`; trip attachment snapshots in `trip.trip_places.metadata_jsonb` |
+| Community groups/posts/comments/votes | Expanded `social` schema in section 11 |
+
 ---
 
 ## 2. Database Architecture Principles
@@ -65,6 +82,25 @@ Each service owns its schemas exclusively.
 8. Audit logs are mandatory for sensitive operations.
 
 Example: `social.posts.trip_id` stores the trip ID, but it does not have a foreign key to `trip.trips(id)`.
+
+### 2.4 Storage Engine Decision
+
+Keep PostgreSQL as the primary database. The current domain is relational: users own trips, posts belong to groups, comments belong to posts, votes are one-per-user-per-target, bookmarks are one-per-user-per-post, and moderation/reporting needs transactional integrity. PostgreSQL also already gives the project PostGIS, JSONB, full-text search, uniqueness constraints, partial indexes, and transactional outbox support in one deployable system.
+
+Do not move the community module to MongoDB for v1. MongoDB would duplicate operational work without removing the need for relational guarantees around votes, comments, memberships, reports, and copy-trip attribution. JSONB inside PostgreSQL is enough for flexible snapshots such as attached trip previews and provider metadata.
+
+Redis is optional infrastructure, not the source of truth. For this capstone scale, store comment counts, view counts, vote counts, bookmark counts, member counts, and copy counts in PostgreSQL. Add Redis later only for caching hot feed pages, rate limiting, short-lived idempotency keys, or batching extremely high-frequency view increments.
+
+| Operation | PostgreSQL v1 approach | Time complexity | Space complexity |
+| --------- | ---------------------- | --------------- | ---------------- |
+| Read feed sorted by newest | `(status, created_at DESC)` index | `O(log P + page_size)` | `O(P)` posts |
+| Read feed sorted by score | `(status, score DESC, created_at DESC)` index | `O(log P + page_size)` | `O(P)` posts |
+| Add/update post vote | Upsert `social.post_votes`, update counters in same transaction | `O(log V)` | `O(V)` vote rows |
+| Add/update comment vote | Upsert `social.comment_votes`, update comment counters | `O(log CV)` | `O(CV)` vote rows |
+| Add comment | Insert comment, increment `posts.comment_count` | `O(log C)` | `O(C)` comments |
+| Read comments for a post | `(post_id, created_at)` or `(post_id, score DESC)` index | `O(log C + page_size)` | `O(C)` comments |
+| Count views | Increment `posts.view_count`; optionally dedupe in `post_views` | `O(1)` counter update, `O(log PV)` if deduped | `O(PV)` view rows if retained |
+| Search posts | GIN `search_vector` and trigram indexes | Approximately `O(log P + matches)` | `O(P)` search index |
 
 ---
 
@@ -191,12 +227,14 @@ erDiagram
 | `trip`   | `trip_sections`            | Custom trip lists/sections such as Places to Visit, Restaurants, Lodging, Activities, and custom sections               |
 | `trip`   | `trip_places`              | Saved Google/manual places inside sections, including schedule date/time and ordering                                   |
 | `trip`   | `trip_notes`               | Notes attached to trip, place, day, or reservation targets                                                              |
+| `trip`   | `itinerary_blocks`         | Date-based planner blocks with title, color, order, and collapsed state                                                 |
 | `trip`   | `itinerary_items`          | Day-based itinerary items referencing places, reservations, notes, transport, or custom items                           |
 | `trip`   | `reservations`             | Flight, lodging, rental car, restaurant, activity, and other booking records                                            |
 | `trip`   | `trip_attachments`         | Links from media assets to trip targets such as reservations, expenses, notes, places, or the trip itself               |
 | `trip`   | `expenses`                 | Trip expenses with category, amount, payer, date, optional place/reservation references                                 |
 | `trip`   | `expense_splits`           | Per-user expense split records for group balance calculations                                                           |
 | `trip`   | `trip_members`             | Tripmates for collaboration and expense splitting; synced with ACL entries                                              |
+| `trip`   | `trip_vehicles`            | Per-trip EV garage vehicles, including preset/custom vehicle snapshots and starting battery                             |
 | `trip`   | `trip_revisions`           | Versioned trip snapshots for history and rollback                                                                       |
 | `trip`   | `share_links`              | Public/unlisted sharing tokens                                                                                          |
 | `trip`   | `trip_copies`              | Analytics/attribution log for copy-to-my-trips                                                                          |
@@ -218,10 +256,18 @@ erDiagram
 | `ev`     | `charger_suggestions`      | Missing charger submissions and suggested edits                                                                         |
 | `ev`     | `provider_request_logs`    | Provider API usage, errors, and quota observability                                                                     |
 | `ev`     | `outbox`                   | Transactional event outbox for EV events                                                                                |
-| `social` | `posts`                    | Community posts linked optionally to trips                                                                              |
+| `social` | `groups`                   | Community groups such as Thailand Restaurants or EV road-trip groups                                                    |
+| `social` | `group_profiles`           | Group banner, summary, and display metadata                                                                             |
+| `social` | `group_memberships`        | Joined, muted, moderator, and banned group membership states                                                            |
+| `social` | `group_rules`              | Ordered group rules displayed in sidebars and create flows                                                              |
+| `social` | `group_flairs`             | Post and user flair definitions scoped to one group                                                                     |
+| `social` | `group_resources`          | Group bookmark/resource links shown in the community sidebar                                                            |
+| `social` | `posts`                    | Community posts linked to groups and optionally to trips                                                                |
 | `social` | `comments`                 | Threaded post comments                                                                                                  |
 | `social` | `post_votes`               | Upsert vote state per user per post                                                                                     |
-| `social` | `bookmarks`                | User bookmarks                                                                                                          |
+| `social` | `comment_votes`            | Upsert vote state per user per comment                                                                                  |
+| `social` | `post_views`               | Optional unique/deduped post view events for analytics                                                                  |
+| `social` | `bookmarks`                | User post bookmarks                                                                                                     |
 | `social` | `reports`                  | Community moderation reports                                                                                            |
 | `social` | `outbox`                   | Transactional event outbox for community events                                                                         |
 | `notif`  | `notification_preferences` | Per-user notification settings                                                                                          |
@@ -239,13 +285,13 @@ erDiagram
 
 # 7. `trip` Schema Design
 
-The `trip` schema stores the main trip aggregate, detailed trip-planning modules, history, share links, copy metadata, and event outbox. OpenAPI v1.1 requires the trip workspace to support dates, sections/lists, saved places, itinerary items, notes, reservations, attachments, budgets, expenses, and tripmates.
+The `trip` schema stores the main trip aggregate, detailed trip-planning modules, history, share links, copy metadata, and event outbox. OpenAPI v1.1 requires the trip workspace to support dates, sections/lists, saved places, itinerary blocks/items, notes, checklists, reservations, attachments, budgets, expenses, EV garage vehicles, and tripmates.
 
 ## 7.1 `trip.trips`
 
 ### Purpose
 
-Stores the trip aggregate root. The row owns high-level trip metadata, trip date range, default currency/budget, route snapshots, EV profile, visibility, and copy metadata. Detailed UI modules such as sections, places, notes, itinerary items, reservations, attachments, expenses, and members are stored in normalized child tables so they can be listed, reordered, updated, and deleted independently.
+Stores the trip aggregate root. The row owns high-level trip metadata, trip date range, default currency/budget, route snapshots, EV profile, public stats, visibility, and copy metadata. Detailed UI modules such as sections, places, notes, itinerary blocks/items, reservations, attachments, expenses, vehicles, and members are stored in normalized child tables so they can be listed, reordered, updated, and deleted independently.
 
 ### Columns
 
@@ -267,6 +313,7 @@ Stores the trip aggregate root. The row owns high-level trip metadata, trip date
 | `route_legs_jsonb`                |         `JSONB` |      Yes | Route leg snapshots                                                      |
 | `route_summary_jsonb`             |         `JSONB` |      Yes | Distance, duration, polyline summary, provider metadata                  |
 | `ev_profile_jsonb`                |         `JSONB` |      Yes | EV profile used for route calculation                                    |
+| `stats_jsonb`                     |         `JSONB` |      Yes | Public/explore display counters and ratings                              |
 | `metadata_jsonb`                  |         `JSONB` |      Yes | Additional extensible metadata                                           |
 | `copied_from_trip_id`             |          `UUID` |       No | Source trip ID for attribution only; no FK                               |
 | `copied_from_post_id`             |          `UUID` |       No | Source post ID for attribution only; no FK                               |
@@ -353,6 +400,22 @@ Stores the trip aggregate root. The row owns high-level trip metadata, trip date
 }
 ```
 
+### JSONB Shape: `stats_jsonb`
+
+```json
+{
+  "viewCount": 12840,
+  "likeCount": 1624,
+  "copyCount": 128,
+  "forkCount": 0,
+  "ratingAvg": 4.8,
+  "reviewCount": 1320,
+  "isTrending": true
+}
+```
+
+`stats_jsonb` exists to match public explore cards and the compact backend migration. If ranking by these values becomes a hot query, promote the specific fields to generated columns or normal columns with indexes.
+
 ---
 
 ## 7.2 `trip.trip_sections`
@@ -397,15 +460,23 @@ Stores saved places inside trip sections. Places can be imported from Google Pla
 | `id`                |         `UUID` |      Yes | Trip place ID                           |
 | `trip_id`           |         `UUID` |      Yes | FK to `trip.trips`                      |
 | `section_id`        |         `UUID` |      Yes | FK to `trip.trip_sections`              |
-| `provider`          |  `VARCHAR(20)` |      Yes | `GOOGLE` or `MANUAL`                    |
+| `provider`          |  `VARCHAR(20)` |      Yes | `GOOGLE`, `MAPBOX`, `MANUAL`, or `EV`   |
 | `provider_place_id` | `VARCHAR(255)` |       No | Google place ID or provider ID          |
 | `name`              | `VARCHAR(200)` |      Yes | Place name/title                        |
+| `description`       |         `TEXT` |       No | Short display description               |
 | `address`           |         `TEXT` |       No | Address text                            |
 | `lat`               | `NUMERIC(9,6)` |       No | Latitude                                |
 | `lng`               | `NUMERIC(9,6)` |       No | Longitude                               |
 | `phone`             |  `VARCHAR(80)` |       No | Phone number                            |
 | `website`           |         `TEXT` |       No | Website URL                             |
 | `photo_url`         |         `TEXT` |       No | Provider/display photo URL              |
+| `category`          | `VARCHAR(120)` |       No | Display category, e.g. Cafe or Hotel    |
+| `price_level`       |  `VARCHAR(20)` |       No | Provider price level display            |
+| `rating`            | `NUMERIC(3,2)` |       No | Provider/display rating                 |
+| `review_count`      |          `INT` |       No | Provider/display review count           |
+| `is_visited`        |      `BOOLEAN` |      Yes | Planner visited toggle                  |
+| `estimated_cost`    | `NUMERIC(12,2)` |       No | Lightweight place-level planned cost    |
+| `source_charger_id` |         `UUID` |       No | EV charger ID when provider is `EV`     |
 | `notes`             |         `TEXT` |       No | Place-specific notes                    |
 | `planned_date`      |         `DATE` |       No | Optional scheduled date                 |
 | `start_time`        |         `TIME` |       No | Optional scheduled start time           |
@@ -418,8 +489,10 @@ Stores saved places inside trip sections. Places can be imported from Google Pla
 
 ### Rules
 
-- `provider = GOOGLE` should include `provider_place_id` when available.
+- `provider = GOOGLE` or `MAPBOX` should include `provider_place_id` when available.
+- `provider = EV` means this place is a trip-level snapshot of an `ev.chargers` row and should store `source_charger_id` plus EV details in `metadata_jsonb`.
 - `provider = MANUAL` requires at least a name; coordinates are optional.
+- Provider rating, review count, category, price level, and image URL are display snapshots. Authoritative live place data remains with the external provider.
 - Moving a place to another section updates `section_id` and `sort_order`.
 - Deleting a place should clean up or detach itinerary items, notes, attachments, and expenses that reference it.
 
@@ -459,7 +532,35 @@ Stores notes attached to a trip, place, day, or reservation target.
 
 ---
 
-## 7.5 `trip.itinerary_items`
+## 7.5 `trip.itinerary_blocks`
+
+### Purpose
+
+Stores the date-based planner blocks used by the current UI. A block has a display title, date, color, and ordered items. This table maps directly to the frontend `TripBlockData` shape.
+
+| Column         |           Type | Required | Description                                      |
+| -------------- | -------------: | -------: | ------------------------------------------------ |
+| `id`           |         `UUID` |      Yes | Block ID                                         |
+| `trip_id`      |         `UUID` |      Yes | FK to `trip.trips`                               |
+| `title`        | `VARCHAR(160)` |      Yes | Block title; defaults to date label              |
+| `block_date`   |         `DATE` |      Yes | Planner date represented by this block           |
+| `color_id`     |  `VARCHAR(30)` |      Yes | UI color token such as `blue`, `teal`, or `rose` |
+| `sort_order`   |          `INT` |      Yes | Display order                                    |
+| `is_collapsed` |      `BOOLEAN` |      Yes | UI collapsed state                               |
+| `metadata_jsonb` |       `JSONB` |      Yes | Future block settings                            |
+| `created_at`   |  `TIMESTAMPTZ` |      Yes | Creation time                                    |
+| `updated_at`   |  `TIMESTAMPTZ` |      Yes | Last update time                                 |
+| `deleted_at`   |  `TIMESTAMPTZ` |       No | Soft delete marker                               |
+
+### Rules
+
+- One trip should not have two active blocks for the same `block_date` unless the product intentionally allows multiple blocks per day.
+- Block color is a UI token, not a hard-coded CSS color.
+- Reordering blocks updates `sort_order` values transactionally.
+
+---
+
+## 7.6 `trip.itinerary_items`
 
 ### Purpose
 
@@ -469,13 +570,15 @@ Stores scheduled items for itinerary days generated from the trip date range.
 | ------------ | -------------: | -------: | ----------------------------------------------------- |
 | `id`         |         `UUID` |      Yes | Itinerary item ID                                     |
 | `trip_id`    |         `UUID` |      Yes | FK to `trip.trips`                                    |
+| `block_id`   |         `UUID` |       No | FK to `trip.itinerary_blocks`; nullable during imports |
 | `date`       |         `DATE` |      Yes | Itinerary day                                         |
-| `item_type`  |  `VARCHAR(30)` |      Yes | `PLACE`, `RESERVATION`, `NOTE`, `TRANSPORT`, `CUSTOM` |
+| `item_type`  |  `VARCHAR(30)` |      Yes | `PLACE`, `EV_CHARGER`, `RESERVATION`, `NOTE`, `CHECKLIST`, `TRANSPORT`, `CUSTOM` |
 | `ref_id`     |         `UUID` |       No | Referenced entity ID for place/reservation/note       |
 | `title`      | `VARCHAR(200)` |      Yes | Display title                                         |
 | `start_time` |         `TIME` |       No | Optional start time                                   |
 | `end_time`   |         `TIME` |       No | Optional end time                                     |
 | `notes`      |         `TEXT` |       No | Item notes                                            |
+| `metadata_jsonb` |       `JSONB` |      Yes | Checklist subitems, EV charge estimate, UI details    |
 | `sort_order` |          `INT` |      Yes | Order within the day                                  |
 | `created_at` |  `TIMESTAMPTZ` |      Yes | Creation time                                         |
 | `updated_at` |  `TIMESTAMPTZ` |      Yes | Last update time                                      |
@@ -485,11 +588,13 @@ Stores scheduled items for itinerary days generated from the trip date range.
 
 - `date` should be inside the trip date range when `start_date` and `end_date` are set.
 - Reordering one day updates all item `sort_order` values for that date.
-- `ref_id` is required for `PLACE`, `RESERVATION`, and `NOTE`; it can be null for `TRANSPORT` or `CUSTOM`.
+- `ref_id` is required for `PLACE`, `EV_CHARGER`, `RESERVATION`, and `NOTE`; it can be null for `CHECKLIST`, `TRANSPORT`, or `CUSTOM`.
+- Checklist items store their subitems in `metadata_jsonb`, e.g. `{ "items": [{ "id": "...", "label": "Passport", "checked": false }] }`.
+- EV charger items reference a `trip.trip_places` row whose `provider = EV`; charge-duration display snapshots can live in `metadata_jsonb`.
 
 ---
 
-## 7.6 `trip.reservations`
+## 7.7 `trip.reservations`
 
 ### Purpose
 
@@ -524,7 +629,7 @@ Stores booking records for flights, lodging, rental cars, restaurants, activitie
 
 ---
 
-## 7.7 `trip.trip_attachments`
+## 7.8 `trip.trip_attachments`
 
 ### Purpose
 
@@ -549,7 +654,7 @@ Links already uploaded media assets to trip targets. The actual file metadata re
 
 ---
 
-## 7.8 `trip.expenses` and `trip.expense_splits`
+## 7.9 `trip.expenses` and `trip.expense_splits`
 
 ### Purpose
 
@@ -562,7 +667,7 @@ Stores trip spending and per-user split records for group balances.
 | `id`              |          `UUID` |      Yes | Expense ID                                                                |
 | `trip_id`         |          `UUID` |      Yes | FK to `trip.trips`                                                        |
 | `title`           |  `VARCHAR(200)` |      Yes | Expense title                                                             |
-| `category`        |   `VARCHAR(30)` |      Yes | `FLIGHT`, `LODGING`, `FOOD`, `TRANSPORT`, `ACTIVITY`, `SHOPPING`, `OTHER` |
+| `category`        |   `VARCHAR(30)` |      Yes | `FLIGHT`, `LODGING`, `CAR_RENTAL`, `TRANSIT`, `FOOD`, `DRINKS`, `SIGHTSEEING`, `ACTIVITY`, `SHOPPING`, `GAS`, `GROCERIES`, `OTHER` |
 | `amount`          | `NUMERIC(12,2)` |      Yes | Expense amount                                                            |
 | `currency`        |       `CHAR(3)` |      Yes | Expense currency                                                          |
 | `paid_by_user_id` |          `UUID` |      Yes | Soft reference to payer                                                   |
@@ -597,7 +702,44 @@ Stores trip spending and per-user split records for group balances.
 
 ---
 
-## 7.9 `trip.trip_members`
+## 7.10 `trip.trip_vehicles`
+
+### Purpose
+
+Stores the per-trip EV garage used by the planner. Preset vehicles can reference a client/server preset ID, while custom vehicles store a full snapshot so route and charge calculations remain stable.
+
+| Column                        |            Type | Required | Description                                      |
+| ----------------------------- | --------------: | -------: | ------------------------------------------------ |
+| `id`                          |          `UUID` |      Yes | Trip vehicle row ID                              |
+| `trip_id`                     |          `UUID` |      Yes | FK to `trip.trips`                               |
+| `source`                      |   `VARCHAR(20)` |      Yes | `preset` or `custom`                             |
+| `preset_vehicle_id`           |  `VARCHAR(120)` |       No | Stable preset ID, e.g. `byd-atto-3`              |
+| `nickname`                    |  `VARCHAR(120)` |       No | User display nickname                            |
+| `make`                        |  `VARCHAR(120)` |      Yes | Vehicle make                                     |
+| `model`                       |  `VARCHAR(120)` |      Yes | Vehicle model                                    |
+| `model_year`                  |           `INT` |       No | Vehicle year                                     |
+| `battery_kwh`                 | `NUMERIC(7,2)`  |      Yes | Battery size                                     |
+| `range_km`                    |           `INT` |       No | Display range                                    |
+| `consumption_kwh_per_100km`   | `NUMERIC(7,2)`  |      Yes | Energy consumption                               |
+| `max_ac_kw`                   | `NUMERIC(7,2)`  |       No | Max AC charge power                              |
+| `max_dc_kw`                   | `NUMERIC(7,2)`  |       No | Max DC charge power                              |
+| `connector_types_jsonb`       |         `JSONB` |      Yes | Connector list such as `CCS2`, `TYPE2`, `NACS`   |
+| `starting_battery_pct`        |    `SMALLINT`   |      Yes | Planner starting battery percent                 |
+| `is_active`                   |       `BOOLEAN` |      Yes | Active vehicle used for current calculations     |
+| `metadata_jsonb`              |         `JSONB` |      Yes | Image URL and future vehicle details             |
+| `created_at`                  |   `TIMESTAMPTZ` |      Yes | Creation time                                    |
+| `updated_at`                  |   `TIMESTAMPTZ` |      Yes | Last update time                                 |
+| `deleted_at`                  |   `TIMESTAMPTZ` |       No | Soft delete marker                               |
+
+### Rules
+
+- A trip can store multiple vehicles, but only one active vehicle should be used for route calculations by default.
+- `trip.trips.ev_profile_jsonb` may cache the active vehicle's derived routing profile for faster route requests.
+- Preset vehicle data should be copied into the row at selection time so future preset edits do not silently change saved trips.
+
+---
+
+## 7.11 `trip.trip_members`
 
 ### Purpose
 
@@ -626,7 +768,7 @@ Stores tripmates for collaboration and expense splitting. This table complements
 
 ---
 
-## 7.10 Copy Behavior for Detailed Trip Modules
+## 7.12 Copy Behavior for Detailed Trip Modules
 
 When copying a public/community/shared trip, create a new private trip and deep-copy safe planning content.
 
@@ -639,12 +781,13 @@ When copying a public/community/shared trip, create a new private trip and deep-
 | Reservations                                                          | Copy sanitized reservation shell only by default; omit confirmation numbers unless explicitly marked shareable                                     |
 | Attachments                                                           | Copy links only for safe/public media; do not duplicate private files blindly                                                                      |
 | Budget amount and currency                                            | Copy as trip-level settings                                                                                                                        |
+| Trip vehicles and active EV profile                                   | Copy vehicle snapshots needed for route display, but the new owner may change starting battery and active vehicle                                  |
 | Expenses and splits                                                   | Do not copy personal debt obligations by default; optionally copy estimated expenses as non-settlement planning data if the product adds that flag |
 | Trip members                                                          | Do not copy accepted members/invites; new owner starts as the only member                                                                          |
 
 ---
 
-## 7.11 `trip.trip_revisions`
+## 7.13 `trip.trip_revisions`
 
 ### Purpose
 
@@ -676,7 +819,7 @@ Recommended retention for v1.0:
 
 ---
 
-## 7.12 `trip.share_links`
+## 7.14 `trip.share_links`
 
 ### Purpose
 
@@ -703,7 +846,7 @@ Stores public/unlisted share links. Only token hashes are stored, never raw toke
 
 ---
 
-## 7.13 `trip.trip_copies`
+## 7.15 `trip.trip_copies`
 
 ### Purpose
 
@@ -723,7 +866,7 @@ Stores copy-to-my-trips events for attribution and analytics. This table does no
 
 ---
 
-## 7.14 `trip.outbox`
+## 7.16 `trip.outbox`
 
 ### Purpose
 
@@ -946,9 +1089,9 @@ Main application read source for EV charger markers and details. Google Places a
 | `source_external_id`         |          `VARCHAR(255)` |       No | Provider external ID                                                                                          |
 | `google_place_id`            |          `VARCHAR(255)` |       No | Google place ID when available                                                                                |
 | `source_url`                 |                  `TEXT` |       No | Provider/source URL                                                                                           |
-| `confidence_score`           |          `NUMERIC(5,2)` |      Yes | 0–100 confidence score                                                                                        |
+| `confidence_score`           |          `NUMERIC(4,3)` |      Yes | Normalized `0.000`-`1.000` confidence score, matching frontend `confidenceScore`                               |
 | `verification_status`        |           `VARCHAR(40)` |      Yes | `UNVERIFIED`, `PENDING_VERIFICATION`, `GOOGLE_CACHED`, `USER_VERIFIED`, `ADMIN_VERIFIED`, `REJECTED`, `STALE` |
-| `status`                     |           `VARCHAR(30)` |      Yes | `active`, `temporarily_closed`, `closed`, `unknown`                                                           |
+| `status`                     |           `VARCHAR(30)` |      Yes | `active`, `temporarily_closed`, `permanently_closed`, `unknown`                                                |
 | `rating_avg`                 |          `NUMERIC(3,2)` |      Yes | Average user rating                                                                                           |
 | `rating_count`               |                   `INT` |      Yes | Number of active reviews                                                                                      |
 | `report_count`               |                   `INT` |      Yes | Number of reports                                                                                             |
@@ -969,6 +1112,7 @@ Main application read source for EV charger markers and details. Google Places a
 - User-submitted records start as `PENDING_VERIFICATION`.
 - Admin-created or admin-approved records should use `ADMIN_VERIFIED`.
 - Provider-derived data should store `source`, `source_external_id`, `google_place_id`, `last_seen_at`, and `expires_at`.
+- API responses may expose `stale: true` when `expires_at < now()` or the tile refresh state is stale; this does not need a separate durable boolean on `ev.chargers`.
 
 ### Indexes
 
@@ -996,7 +1140,7 @@ Tracks geo-tile refresh status to avoid repeated external API calls for nearby m
 | `last_refreshed_at` |  `TIMESTAMPTZ` |       No | Last successful refresh                                    |
 | `expires_at`        |  `TIMESTAMPTZ` |       No | Refresh expiry                                             |
 | `charger_count`     |          `INT` |      Yes | Number of chargers discovered                              |
-| `confidence_score`  | `NUMERIC(5,2)` |      Yes | Tile coverage confidence                                   |
+| `confidence_score`  | `NUMERIC(4,3)` |      Yes | Normalized `0.000`-`1.000` tile coverage confidence        |
 | `refresh_status`    |  `VARCHAR(30)` |      Yes | `fresh`, `stale`, `refreshing`, `failed`, `low_confidence` |
 | `last_error`        |         `TEXT` |       No | Last refresh error                                         |
 | `metadata_jsonb`    |        `JSONB` |      Yes | Provider/raw request metadata                              |
@@ -1144,26 +1288,83 @@ Tracks external provider usage and failures for cost control.
 
 # 11. `social` Schema Design
 
-The `social` schema stores Reddit-like community functionality: posts, comments, votes, bookmarks, reports, and outbox events.
+The `social` schema stores group-based community functionality: groups, group profiles, rules, flairs, memberships, posts, comments, votes, views, bookmarks, reports, and outbox events.
 
-## 11.1 `social.posts`
+The current frontend mock data maps to the database like this:
+
+| Mock type or atom | Durable database shape |
+| ----------------- | ---------------------- |
+| `CommunityGroup` | `social.groups`, `social.group_rules`, `social.group_flairs`, `social.group_resources` |
+| `CommunityGroupProfile` | `social.group_profiles` plus cached group activity counters |
+| `joinedGroupIdsAtom`, `mutedGroupIdsAtom` | `social.group_memberships` |
+| `CommunityPost` | `social.posts` with `group_id`, optional `trip_id`, optional `flair_id`, and counters |
+| `CommunityComment` | `social.comments` with adjacency-list threading through `parent_comment_id` |
+| `upvotedPostIdsAtom`, `downvotedPostIdsAtom` | `social.post_votes` |
+| `upvotedCommentIdsAtom`, `downvotedCommentIdsAtom` | `social.comment_votes` |
+| `copiedTripIdsAtom` | `trip.trip_copies`; `social.posts.copy_count` is a display counter only |
+
+## 11.1 `social.groups`
+
+Stores community groups such as Thailand Restaurants, Bangkok Food Routes, and Thailand EV Charging.
+
+| Column                      |           Type | Required | Description                                      |
+| --------------------------- | -------------: | -------: | ------------------------------------------------ |
+| `id`                        |         `UUID` |      Yes | Group ID                                         |
+| `name`                      | `VARCHAR(120)` |      Yes | Display name                                     |
+| `slug`                      | `VARCHAR(140)` |      Yes | URL-safe unique slug                             |
+| `description`               |         `TEXT` |      Yes | Group description                                |
+| `country`                   | `VARCHAR(120)` |       No | Primary country label                            |
+| `places`                    |       `TEXT[]` |      Yes | Searchable place labels                          |
+| `tags`                      |       `TEXT[]` |      Yes | Searchable group tags                            |
+| `created_by_user_id`        |         `UUID` |      Yes | Soft reference to creator                        |
+| `is_official`               |      `BOOLEAN` |      Yes | Official Navio-created group flag                |
+| `status`                    |  `VARCHAR(30)` |      Yes | `active`, `archived`, `hidden`                   |
+| `member_count`              |          `INT` |      Yes | Cached active member count                       |
+| `post_count`                |          `INT` |      Yes | Cached active post count                         |
+| `weekly_visitor_count`      |          `INT` |      Yes | Cached rolling display counter                   |
+| `weekly_contribution_count` |          `INT` |      Yes | Cached rolling display counter                   |
+| `search_vector`             |     `TSVECTOR` |      Yes | Full-text search vector                          |
+| `created_at`                |  `TIMESTAMPTZ` |      Yes | Creation time                                    |
+| `updated_at`                |  `TIMESTAMPTZ` |      Yes | Last update time                                 |
+
+### Supporting Group Tables
+
+| Table | Purpose |
+| ----- | ------- |
+| `social.group_profiles` | One row per group for banner URL/media ID, summary, and moderator display data |
+| `social.group_memberships` | One row per group/user with role and state: `member`, `moderator`, `admin`, `muted`, `banned`, or `left` |
+| `social.group_rules` | Ordered rules with title and description |
+| `social.group_flairs` | Group-scoped post and user flairs with label and tone |
+| `social.group_resources` | Sidebar resource/bookmark links such as restaurant maps or charging guides |
+
+## 11.2 `social.posts`
 
 | Column                |           Type | Required | Description                                             |
 | --------------------- | -------------: | -------: | ------------------------------------------------------- |
 | `id`                  |         `UUID` |      Yes | Post ID                                                 |
+| `group_id`            |         `UUID` |      Yes | FK to `social.groups`                                   |
 | `author_user_id`      |         `UUID` |      Yes | Soft reference to `iam.users`                           |
 | `trip_id`             |         `UUID` |       No | Soft reference to `trip.trips`                          |
+| `flair_id`            |         `UUID` |       No | FK to `social.group_flairs`                             |
 | `title`               | `VARCHAR(180)` |      Yes | Post title                                              |
 | `body`                |         `TEXT` |       No | Post content                                            |
-| `post_type`           |  `VARCHAR(30)` |      Yes | `trip_share`, `general`                                 |
+| `post_type`           |  `VARCHAR(30)` |      Yes | `trip_share`, `general`, `question`, `itinerary`        |
 | `status`              |  `VARCHAR(30)` |      Yes | `active`, `hidden`, `deleted_by_user`, `deleted_by_mod` |
+| `place_label`         | `VARCHAR(120)` |       No | Display/search place, e.g. Bangkok                      |
+| `country`             | `VARCHAR(120)` |       No | Display/search country                                  |
 | `tags`                |       `TEXT[]` |      Yes | Community tags                                          |
+| `cover_media_id`      |         `UUID` |       No | Soft reference to `media.media_assets`                  |
+| `cover_image_url`     |         `TEXT` |       No | Temporary/mock external image URL                       |
 | `trip_snapshot_jsonb` |        `JSONB` |      Yes | Small denormalized trip display snapshot                |
 | `score`               |          `INT` |      Yes | Ranking score                                           |
 | `upvote_count`        |          `INT` |      Yes | Upvote count                                            |
 | `downvote_count`      |          `INT` |      Yes | Downvote count                                          |
 | `comment_count`       |          `INT` |      Yes | Active comment count                                    |
 | `bookmark_count`      |          `INT` |      Yes | Bookmark count                                          |
+| `view_count`          |       `BIGINT` |      Yes | Display view count                                      |
+| `share_count`         |          `INT` |      Yes | Display share count                                     |
+| `copy_count`          |          `INT` |      Yes | Display count of copy-trip actions from this post       |
+| `last_activity_at`    |  `TIMESTAMPTZ` |      Yes | Used for active discussion sorting                      |
 | `search_vector`       |     `TSVECTOR` |      Yes | Full-text search vector                                 |
 | `created_at`          |  `TIMESTAMPTZ` |      Yes | Creation time                                           |
 | `updated_at`          |  `TIMESTAMPTZ` |      Yes | Last update time                                        |
@@ -1174,6 +1375,7 @@ The `social` schema stores Reddit-like community functionality: posts, comments,
 - Creating a community trip post does not copy the trip.
 - Copying the trip must call Trip & Media Service: `POST /v1/trips/{tripId}/copy`.
 - `trip_snapshot_jsonb` is for feed display only; authoritative trip data remains in Trip & Media Service.
+- Counters are denormalized for feed speed. The vote, comment, bookmark, view, and trip-copy tables remain the auditable source of truth.
 
 ### Indexes
 
@@ -1181,11 +1383,13 @@ The `social` schema stores Reddit-like community functionality: posts, comments,
 - GIN index on `tags`.
 - B-tree index on `(status, created_at DESC)`.
 - B-tree index on `(score DESC, created_at DESC)`.
+- B-tree index on `(group_id, status, created_at DESC)`.
+- B-tree index on `(group_id, status, score DESC, created_at DESC)`.
 - B-tree index on `trip_id`.
 
 ---
 
-## 11.2 `social.comments`
+## 11.3 `social.comments`
 
 | Column              |          Type | Required | Description                                   |
 | ------------------- | ------------: | -------: | --------------------------------------------- |
@@ -1193,8 +1397,15 @@ The `social` schema stores Reddit-like community functionality: posts, comments,
 | `post_id`           |        `UUID` |      Yes | FK to `social.posts`                          |
 | `author_user_id`    |        `UUID` |      Yes | Soft reference to user                        |
 | `parent_comment_id` |        `UUID` |       No | Self-reference for reply                      |
+| `shared_trip_id`    |        `UUID` |       No | Optional trip attachment in a comment         |
 | `body`              |        `TEXT` |      Yes | Comment text                                  |
 | `status`            | `VARCHAR(30)` |      Yes | `active`, `deleted_by_user`, `deleted_by_mod` |
+| `depth`             |    `SMALLINT` |      Yes | Cached nesting depth for UI limits            |
+| `score`             |         `INT` |      Yes | Ranking score                                 |
+| `upvote_count`      |         `INT` |      Yes | Upvote count                                  |
+| `downvote_count`    |         `INT` |      Yes | Downvote count                                |
+| `reply_count`       |         `INT` |      Yes | Direct active reply count                     |
+| `search_vector`     |    `TSVECTOR` |      Yes | Comment search vector                         |
 | `created_at`        | `TIMESTAMPTZ` |      Yes | Creation time                                 |
 | `updated_at`        | `TIMESTAMPTZ` |      Yes | Last update time                              |
 | `deleted_at`        | `TIMESTAMPTZ` |       No | Soft delete marker                            |
@@ -1203,10 +1414,12 @@ The `social` schema stores Reddit-like community functionality: posts, comments,
 
 - `(post_id, created_at)` for top-level comments.
 - `(parent_comment_id, created_at)` for replies.
+- `(post_id, score DESC, created_at)` for best-comment sorting.
+- GIN index on `search_vector` for discussion search.
 
 ---
 
-## 11.3 `social.post_votes`
+## 11.4 `social.post_votes`
 
 ### Purpose
 
@@ -1231,7 +1444,44 @@ Primary key: `(post_id, user_id)`
 
 ---
 
-## 11.4 `social.bookmarks`
+## 11.5 `social.comment_votes`
+
+Stores one vote state per user per comment. This mirrors post votes and supports the current threaded-discussion UI.
+
+| Column       |          Type | Required | Description            |
+| ------------ | ------------: | -------: | ---------------------- |
+| `comment_id` |        `UUID` |      Yes | FK to comment          |
+| `user_id`    |        `UUID` |      Yes | Soft reference to user |
+| `direction`  |    `SMALLINT` |      Yes | `1`, `-1`, or `0`      |
+| `created_at` | `TIMESTAMPTZ` |      Yes | First vote time        |
+| `updated_at` | `TIMESTAMPTZ` |      Yes | Last vote update time  |
+
+Primary key: `(comment_id, user_id)`
+
+---
+
+## 11.6 `social.post_views`
+
+Use this table only when unique view analytics or deduplication is needed. For the basic UI, `social.posts.view_count` can be incremented directly. If dedupe is enabled, keep one row per post/user/day or post/anonymous-session/day and increment `posts.view_count` only when the row is first inserted.
+
+| Column                |          Type | Required | Description                            |
+| --------------------- | ------------: | -------: | -------------------------------------- |
+| `post_id`             |        `UUID` |      Yes | FK to post                             |
+| `viewer_user_id`      |        `UUID` |       No | Logged-in viewer                       |
+| `anonymous_view_hash` | `VARCHAR(128)` |       No | Hashed anonymous/session identifier    |
+| `viewed_on`           |        `DATE` |      Yes | Dedupe date bucket                     |
+| `first_viewed_at`     | `TIMESTAMPTZ` |      Yes | First view in bucket                   |
+| `last_viewed_at`      | `TIMESTAMPTZ` |      Yes | Last view in bucket                    |
+| `view_count`          |         `INT` |      Yes | Raw repeat views inside the same bucket |
+
+Indexes:
+
+- Unique `(post_id, viewer_user_id, viewed_on)` where `viewer_user_id IS NOT NULL`.
+- Unique `(post_id, anonymous_view_hash, viewed_on)` where `anonymous_view_hash IS NOT NULL`.
+
+---
+
+## 11.7 `social.bookmarks`
 
 | Column       |          Type | Required | Description            |
 | ------------ | ------------: | -------: | ---------------------- |
@@ -1243,7 +1493,7 @@ Primary key: `(post_id, user_id)`
 
 ---
 
-## 11.5 `social.reports`
+## 11.8 `social.reports`
 
 | Column                |          Type | Required | Description                                 |
 | --------------------- | ------------: | -------: | ------------------------------------------- |
@@ -1734,6 +1984,8 @@ CREATE TABLE IF NOT EXISTS trip.trips (
         CHECK (jsonb_typeof(route_summary_jsonb) = 'object'),
     ev_profile_jsonb JSONB NOT NULL DEFAULT '{}'::jsonb
         CHECK (jsonb_typeof(ev_profile_jsonb) = 'object'),
+    stats_jsonb JSONB NOT NULL DEFAULT '{"viewCount":0,"likeCount":0,"copyCount":0,"forkCount":0,"ratingAvg":0,"reviewCount":0,"isTrending":false}'::jsonb
+        CHECK (jsonb_typeof(stats_jsonb) = 'object'),
     metadata_jsonb JSONB NOT NULL DEFAULT '{}'::jsonb
         CHECK (jsonb_typeof(metadata_jsonb) = 'object'),
     copied_from_trip_id UUID,
@@ -1782,15 +2034,23 @@ CREATE TABLE IF NOT EXISTS trip.trip_places (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     trip_id UUID NOT NULL REFERENCES trip.trips(id) ON DELETE CASCADE,
     section_id UUID NOT NULL REFERENCES trip.trip_sections(id) ON DELETE CASCADE,
-    provider VARCHAR(20) NOT NULL CHECK (provider IN ('GOOGLE', 'MANUAL')),
+    provider VARCHAR(20) NOT NULL CHECK (provider IN ('GOOGLE', 'MAPBOX', 'MANUAL', 'EV')),
     provider_place_id VARCHAR(255),
     name VARCHAR(200) NOT NULL,
+    description TEXT,
     address TEXT,
     lat NUMERIC(9,6),
     lng NUMERIC(9,6),
     phone VARCHAR(80),
     website TEXT,
     photo_url TEXT,
+    category VARCHAR(120),
+    price_level VARCHAR(20),
+    rating NUMERIC(3,2) CHECK (rating IS NULL OR (rating >= 0 AND rating <= 5)),
+    review_count INT CHECK (review_count IS NULL OR review_count >= 0),
+    is_visited BOOLEAN NOT NULL DEFAULT false,
+    estimated_cost NUMERIC(12,2) CHECK (estimated_cost IS NULL OR estimated_cost >= 0),
+    source_charger_id UUID,
     notes TEXT,
     planned_date DATE,
     start_time TIME,
@@ -1829,16 +2089,35 @@ CREATE TABLE IF NOT EXISTS trip.trip_notes (
 
 CREATE INDEX IF NOT EXISTS idx_trip_notes_trip_target ON trip.trip_notes(trip_id, target_type, target_id, target_date, sort_order) WHERE deleted_at IS NULL;
 
+CREATE TABLE IF NOT EXISTS trip.itinerary_blocks (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    trip_id UUID NOT NULL REFERENCES trip.trips(id) ON DELETE CASCADE,
+    title VARCHAR(160) NOT NULL,
+    block_date DATE NOT NULL,
+    color_id VARCHAR(30) NOT NULL DEFAULT 'blue',
+    sort_order INT NOT NULL DEFAULT 0,
+    is_collapsed BOOLEAN NOT NULL DEFAULT false,
+    metadata_jsonb JSONB NOT NULL DEFAULT '{}'::jsonb CHECK (jsonb_typeof(metadata_jsonb) = 'object'),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    deleted_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_trip_itinerary_blocks_trip_order ON trip.itinerary_blocks(trip_id, sort_order) WHERE deleted_at IS NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_trip_itinerary_blocks_date_active ON trip.itinerary_blocks(trip_id, block_date) WHERE deleted_at IS NULL;
+
 CREATE TABLE IF NOT EXISTS trip.itinerary_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     trip_id UUID NOT NULL REFERENCES trip.trips(id) ON DELETE CASCADE,
+    block_id UUID REFERENCES trip.itinerary_blocks(id) ON DELETE CASCADE,
     date DATE NOT NULL,
-    item_type VARCHAR(30) NOT NULL CHECK (item_type IN ('PLACE', 'RESERVATION', 'NOTE', 'TRANSPORT', 'CUSTOM')),
+    item_type VARCHAR(30) NOT NULL CHECK (item_type IN ('PLACE', 'EV_CHARGER', 'RESERVATION', 'NOTE', 'CHECKLIST', 'TRANSPORT', 'CUSTOM')),
     ref_id UUID,
     title VARCHAR(200) NOT NULL,
     start_time TIME,
     end_time TIME,
     notes TEXT,
+    metadata_jsonb JSONB NOT NULL DEFAULT '{}'::jsonb CHECK (jsonb_typeof(metadata_jsonb) = 'object'),
     sort_order INT NOT NULL DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -1847,6 +2126,7 @@ CREATE TABLE IF NOT EXISTS trip.itinerary_items (
 );
 
 CREATE INDEX IF NOT EXISTS idx_trip_itinerary_trip_date_order ON trip.itinerary_items(trip_id, date, sort_order) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_trip_itinerary_block_order ON trip.itinerary_items(block_id, sort_order) WHERE deleted_at IS NULL;
 CREATE INDEX IF NOT EXISTS idx_trip_itinerary_ref ON trip.itinerary_items(trip_id, item_type, ref_id) WHERE deleted_at IS NULL;
 
 CREATE TABLE IF NOT EXISTS trip.reservations (
@@ -1895,7 +2175,7 @@ CREATE TABLE IF NOT EXISTS trip.expenses (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     trip_id UUID NOT NULL REFERENCES trip.trips(id) ON DELETE CASCADE,
     title VARCHAR(200) NOT NULL,
-    category VARCHAR(30) NOT NULL CHECK (category IN ('FLIGHT', 'LODGING', 'FOOD', 'TRANSPORT', 'ACTIVITY', 'SHOPPING', 'OTHER')),
+    category VARCHAR(30) NOT NULL CHECK (category IN ('FLIGHT', 'LODGING', 'CAR_RENTAL', 'TRANSIT', 'FOOD', 'DRINKS', 'SIGHTSEEING', 'ACTIVITY', 'SHOPPING', 'GAS', 'GROCERIES', 'OTHER')),
     amount NUMERIC(12,2) NOT NULL CHECK (amount > 0),
     currency CHAR(3) NOT NULL DEFAULT 'THB',
     paid_by_user_id UUID NOT NULL,
@@ -1928,6 +2208,32 @@ CREATE TABLE IF NOT EXISTS trip.expense_splits (
 
 CREATE INDEX IF NOT EXISTS idx_trip_expense_splits_expense ON trip.expense_splits(expense_id);
 CREATE INDEX IF NOT EXISTS idx_trip_expense_splits_user ON trip.expense_splits(user_id);
+
+CREATE TABLE IF NOT EXISTS trip.trip_vehicles (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    trip_id UUID NOT NULL REFERENCES trip.trips(id) ON DELETE CASCADE,
+    source VARCHAR(20) NOT NULL CHECK (source IN ('preset', 'custom')),
+    preset_vehicle_id VARCHAR(120),
+    nickname VARCHAR(120),
+    make VARCHAR(120) NOT NULL,
+    model VARCHAR(120) NOT NULL,
+    model_year INT CHECK (model_year IS NULL OR model_year >= 1990),
+    battery_kwh NUMERIC(7,2) NOT NULL CHECK (battery_kwh > 0),
+    range_km INT CHECK (range_km IS NULL OR range_km > 0),
+    consumption_kwh_per_100km NUMERIC(7,2) NOT NULL CHECK (consumption_kwh_per_100km > 0),
+    max_ac_kw NUMERIC(7,2) CHECK (max_ac_kw IS NULL OR max_ac_kw >= 0),
+    max_dc_kw NUMERIC(7,2) CHECK (max_dc_kw IS NULL OR max_dc_kw >= 0),
+    connector_types_jsonb JSONB NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(connector_types_jsonb) = 'array'),
+    starting_battery_pct SMALLINT NOT NULL DEFAULT 80 CHECK (starting_battery_pct BETWEEN 0 AND 100),
+    is_active BOOLEAN NOT NULL DEFAULT false,
+    metadata_jsonb JSONB NOT NULL DEFAULT '{}'::jsonb CHECK (jsonb_typeof(metadata_jsonb) = 'object'),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    deleted_at TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_trip_vehicles_trip ON trip.trip_vehicles(trip_id) WHERE deleted_at IS NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_trip_vehicles_one_active ON trip.trip_vehicles(trip_id) WHERE is_active = true AND deleted_at IS NULL;
 
 CREATE TABLE IF NOT EXISTS trip.trip_members (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -2150,11 +2456,11 @@ CREATE TABLE IF NOT EXISTS ev.chargers (
     source_external_id VARCHAR(255),
     google_place_id VARCHAR(255),
     source_url TEXT,
-    confidence_score NUMERIC(5,2) NOT NULL DEFAULT 50 CHECK (confidence_score BETWEEN 0 AND 100),
+    confidence_score NUMERIC(4,3) NOT NULL DEFAULT 0.500 CHECK (confidence_score BETWEEN 0 AND 1),
     verification_status VARCHAR(40) NOT NULL DEFAULT 'UNVERIFIED'
         CHECK (verification_status IN ('UNVERIFIED', 'PENDING_VERIFICATION', 'GOOGLE_CACHED', 'USER_VERIFIED', 'ADMIN_VERIFIED', 'REJECTED', 'STALE')),
     status VARCHAR(30) NOT NULL DEFAULT 'unknown'
-        CHECK (status IN ('active', 'temporarily_closed', 'closed', 'unknown')),
+        CHECK (status IN ('active', 'temporarily_closed', 'permanently_closed', 'unknown')),
     rating_avg NUMERIC(3,2) NOT NULL DEFAULT 0 CHECK (rating_avg BETWEEN 0 AND 5),
     rating_count INT NOT NULL DEFAULT 0 CHECK (rating_count >= 0),
     report_count INT NOT NULL DEFAULT 0 CHECK (report_count >= 0),
@@ -2187,7 +2493,7 @@ CREATE TABLE IF NOT EXISTS ev.charger_tiles (
     last_refreshed_at TIMESTAMPTZ,
     expires_at TIMESTAMPTZ,
     charger_count INT NOT NULL DEFAULT 0,
-    confidence_score NUMERIC(5,2) NOT NULL DEFAULT 0 CHECK (confidence_score BETWEEN 0 AND 100),
+    confidence_score NUMERIC(4,3) NOT NULL DEFAULT 0 CHECK (confidence_score BETWEEN 0 AND 1),
     refresh_status VARCHAR(30) NOT NULL DEFAULT 'stale'
         CHECK (refresh_status IN ('fresh', 'stale', 'refreshing', 'failed', 'low_confidence')),
     last_error TEXT,
@@ -2288,25 +2594,124 @@ CREATE INDEX IF NOT EXISTS idx_ev_suggestions_charger ON ev.charger_suggestions(
 -- ==========================================================
 -- social
 -- ==========================================================
+CREATE TABLE IF NOT EXISTS social.groups (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(120) NOT NULL,
+    slug VARCHAR(140) NOT NULL UNIQUE,
+    description TEXT NOT NULL,
+    country VARCHAR(120),
+    places TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+    tags TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+    created_by_user_id UUID NOT NULL,
+    is_official BOOLEAN NOT NULL DEFAULT false,
+    status VARCHAR(30) NOT NULL DEFAULT 'active'
+        CHECK (status IN ('active', 'archived', 'hidden')),
+    member_count INT NOT NULL DEFAULT 0 CHECK (member_count >= 0),
+    post_count INT NOT NULL DEFAULT 0 CHECK (post_count >= 0),
+    weekly_visitor_count INT NOT NULL DEFAULT 0 CHECK (weekly_visitor_count >= 0),
+    weekly_contribution_count INT NOT NULL DEFAULT 0 CHECK (weekly_contribution_count >= 0),
+    search_vector TSVECTOR GENERATED ALWAYS AS (
+        to_tsvector('simple', coalesce(name, '') || ' ' || coalesce(description, '') || ' ' ||
+            coalesce(country, '') || ' ' || array_to_string(places, ' ') || ' ' || array_to_string(tags, ' '))
+    ) STORED,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_social_groups_search ON social.groups USING GIN(search_vector);
+CREATE INDEX IF NOT EXISTS idx_social_groups_tags ON social.groups USING GIN(tags);
+CREATE INDEX IF NOT EXISTS idx_social_groups_discovery ON social.groups(status, is_official DESC, member_count DESC);
+
+CREATE TABLE IF NOT EXISTS social.group_profiles (
+    group_id UUID PRIMARY KEY REFERENCES social.groups(id) ON DELETE CASCADE,
+    banner_media_id UUID,
+    banner_url TEXT,
+    summary TEXT NOT NULL,
+    moderator_ids UUID[] NOT NULL DEFAULT ARRAY[]::UUID[],
+    metadata_jsonb JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS social.group_memberships (
+    group_id UUID NOT NULL REFERENCES social.groups(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL,
+    role VARCHAR(30) NOT NULL DEFAULT 'member'
+        CHECK (role IN ('member', 'moderator', 'admin')),
+    state VARCHAR(30) NOT NULL DEFAULT 'joined'
+        CHECK (state IN ('joined', 'muted', 'banned', 'left')),
+    joined_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (group_id, user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_social_group_memberships_user ON social.group_memberships(user_id, state, updated_at DESC);
+CREATE INDEX IF NOT EXISTS idx_social_group_memberships_group_state ON social.group_memberships(group_id, state);
+
+CREATE TABLE IF NOT EXISTS social.group_rules (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    group_id UUID NOT NULL REFERENCES social.groups(id) ON DELETE CASCADE,
+    title VARCHAR(120) NOT NULL,
+    description TEXT NOT NULL,
+    display_order INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_social_group_rules_order ON social.group_rules(group_id, display_order, created_at);
+
+CREATE TABLE IF NOT EXISTS social.group_flairs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    group_id UUID NOT NULL REFERENCES social.groups(id) ON DELETE CASCADE,
+    flair_type VARCHAR(20) NOT NULL CHECK (flair_type IN ('post', 'user')),
+    label VARCHAR(80) NOT NULL,
+    tone VARCHAR(30) NOT NULL DEFAULT 'reliable',
+    display_order INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_social_group_flairs_group_type ON social.group_flairs(group_id, flair_type, display_order);
+
+CREATE TABLE IF NOT EXISTS social.group_resources (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    group_id UUID NOT NULL REFERENCES social.groups(id) ON DELETE CASCADE,
+    label VARCHAR(120) NOT NULL,
+    url TEXT,
+    display_order INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_social_group_resources_order ON social.group_resources(group_id, display_order, created_at);
+
 CREATE TABLE IF NOT EXISTS social.posts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    group_id UUID NOT NULL REFERENCES social.groups(id) ON DELETE CASCADE,
     author_user_id UUID NOT NULL,
     trip_id UUID,
+    flair_id UUID REFERENCES social.group_flairs(id) ON DELETE SET NULL,
     title VARCHAR(180) NOT NULL,
     body TEXT,
     post_type VARCHAR(30) NOT NULL DEFAULT 'general'
-        CHECK (post_type IN ('trip_share', 'general')),
+        CHECK (post_type IN ('trip_share', 'general', 'question', 'itinerary')),
     status VARCHAR(30) NOT NULL DEFAULT 'active'
         CHECK (status IN ('active', 'hidden', 'deleted_by_user', 'deleted_by_mod')),
+    place_label VARCHAR(120),
+    country VARCHAR(120),
     tags TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+    cover_media_id UUID,
+    cover_image_url TEXT,
     trip_snapshot_jsonb JSONB NOT NULL DEFAULT '{}'::jsonb,
     score INT NOT NULL DEFAULT 0,
     upvote_count INT NOT NULL DEFAULT 0,
     downvote_count INT NOT NULL DEFAULT 0,
     comment_count INT NOT NULL DEFAULT 0,
     bookmark_count INT NOT NULL DEFAULT 0,
+    view_count BIGINT NOT NULL DEFAULT 0,
+    share_count INT NOT NULL DEFAULT 0,
+    copy_count INT NOT NULL DEFAULT 0,
+    last_activity_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     search_vector TSVECTOR GENERATED ALWAYS AS (
-        to_tsvector('simple', coalesce(title, '') || ' ' || coalesce(body, '') || ' ' || array_to_string(tags, ' '))
+        to_tsvector('simple', coalesce(title, '') || ' ' || coalesce(body, '') || ' ' ||
+            coalesce(place_label, '') || ' ' || coalesce(country, '') || ' ' || array_to_string(tags, ' '))
     ) STORED,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -2318,6 +2723,8 @@ CREATE INDEX IF NOT EXISTS idx_social_posts_title_trgm ON social.posts USING GIN
 CREATE INDEX IF NOT EXISTS idx_social_posts_tags ON social.posts USING GIN(tags);
 CREATE INDEX IF NOT EXISTS idx_social_posts_new_feed ON social.posts(status, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_social_posts_top_feed ON social.posts(status, score DESC, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_social_posts_group_new ON social.posts(group_id, status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_social_posts_group_top ON social.posts(group_id, status, score DESC, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_social_posts_trip_id ON social.posts(trip_id);
 
 CREATE TABLE IF NOT EXISTS social.comments (
@@ -2325,9 +2732,18 @@ CREATE TABLE IF NOT EXISTS social.comments (
     post_id UUID NOT NULL REFERENCES social.posts(id) ON DELETE CASCADE,
     author_user_id UUID NOT NULL,
     parent_comment_id UUID REFERENCES social.comments(id) ON DELETE CASCADE,
+    shared_trip_id UUID,
     body TEXT NOT NULL,
     status VARCHAR(30) NOT NULL DEFAULT 'active'
         CHECK (status IN ('active', 'deleted_by_user', 'deleted_by_mod')),
+    depth SMALLINT NOT NULL DEFAULT 0 CHECK (depth >= 0),
+    score INT NOT NULL DEFAULT 0,
+    upvote_count INT NOT NULL DEFAULT 0,
+    downvote_count INT NOT NULL DEFAULT 0,
+    reply_count INT NOT NULL DEFAULT 0,
+    search_vector TSVECTOR GENERATED ALWAYS AS (
+        to_tsvector('simple', coalesce(body, ''))
+    ) STORED,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     deleted_at TIMESTAMPTZ
@@ -2335,6 +2751,8 @@ CREATE TABLE IF NOT EXISTS social.comments (
 
 CREATE INDEX IF NOT EXISTS idx_social_comments_post_created ON social.comments(post_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_social_comments_parent_created ON social.comments(parent_comment_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_social_comments_post_score ON social.comments(post_id, score DESC, created_at);
+CREATE INDEX IF NOT EXISTS idx_social_comments_search ON social.comments USING GIN(search_vector);
 
 CREATE TABLE IF NOT EXISTS social.post_votes (
     post_id UUID NOT NULL REFERENCES social.posts(id) ON DELETE CASCADE,
@@ -2346,6 +2764,36 @@ CREATE TABLE IF NOT EXISTS social.post_votes (
 );
 
 CREATE INDEX IF NOT EXISTS idx_social_post_votes_user ON social.post_votes(user_id, updated_at DESC);
+
+CREATE TABLE IF NOT EXISTS social.comment_votes (
+    comment_id UUID NOT NULL REFERENCES social.comments(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL,
+    direction SMALLINT NOT NULL CHECK (direction IN (-1, 0, 1)),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (comment_id, user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_social_comment_votes_user ON social.comment_votes(user_id, updated_at DESC);
+
+CREATE TABLE IF NOT EXISTS social.post_views (
+    post_id UUID NOT NULL REFERENCES social.posts(id) ON DELETE CASCADE,
+    viewer_user_id UUID,
+    anonymous_view_hash VARCHAR(128),
+    viewed_on DATE NOT NULL DEFAULT CURRENT_DATE,
+    first_viewed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    last_viewed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    view_count INT NOT NULL DEFAULT 1,
+    CHECK (viewer_user_id IS NOT NULL OR anonymous_view_hash IS NOT NULL)
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_social_post_views_user_day
+ON social.post_views(post_id, viewer_user_id, viewed_on)
+WHERE viewer_user_id IS NOT NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_social_post_views_anon_day
+ON social.post_views(post_id, anonymous_view_hash, viewed_on)
+WHERE anonymous_view_hash IS NOT NULL;
 
 CREATE TABLE IF NOT EXISTS social.bookmarks (
     post_id UUID NOT NULL REFERENCES social.posts(id) ON DELETE CASCADE,
@@ -2566,13 +3014,13 @@ For cross-service data:
 1. Create database extensions and schemas.
 2. Implement `iam.users`, `iam.user_roles`, and basic user sync from Keycloak.
 3. Implement `trip.trips`, `trip.trip_revisions`, and `trip.share_links`.
-4. Implement OpenAPI v1.1 trip-planning child tables: `trip.trip_sections`, `trip.trip_places`, `trip.trip_notes`, `trip.itinerary_items`, `trip.reservations`, `trip.trip_attachments`, `trip.expenses`, `trip.expense_splits`, and `trip.trip_members`.
+4. Implement OpenAPI v1.1 trip-planning child tables: `trip.trip_sections`, `trip.trip_places`, `trip.trip_notes`, `trip.itinerary_blocks`, `trip.itinerary_items`, `trip.reservations`, `trip.trip_attachments`, `trip.expenses`, `trip.expense_splits`, `trip.trip_vehicles`, and `trip.trip_members`.
 5. Implement copy-trip flow with `trip.trip_copies`, safe child-record copying, and `trip.outbox`.
 6. Implement `media.media_assets` and upload sessions.
 7. Implement `ev.chargers` and PostGIS radius search.
 8. Implement `ev.charger_tiles` and local-first refresh behavior.
 9. Implement charger reviews, reports, and suggestions.
-10. Implement `social.posts`, comments, votes, bookmarks, and reports.
+10. Implement `social.groups`, group profiles/rules/flairs/resources, memberships, posts, comments, post/comment votes, post views, bookmarks, and reports.
 11. Implement `notif.notifications`, preferences, and delivery logs.
 12. Implement outbox publishers and consumer deduplication.
 13. Implement AI tables only after core trip + EV + community flow works.
@@ -2584,3 +3032,5 @@ For cross-service data:
 This database design is appropriate for the approved v1.0 architecture. It keeps the operational footprint low by using one PostgreSQL instance, but preserves professional service boundaries through schema ownership rules. It supports the finalized copy-trip model, the OpenAPI v1.1 detailed trip workspace, Thailand-friendly EV charger data strategy, charger community reviews, community trip sharing, PostGIS charger search, Postgres full-text search, notification delivery, media metadata, and optional AI planning assistance.
 
 For the capstone, the most important implementation discipline is to avoid shortcut cross-schema joins. Even though all schemas are physically inside one PostgreSQL instance, the codebase should behave as if every schema belongs to a separate database.
+
+PostgreSQL should remain the system of record for the community module. MongoDB is not recommended for this project because the community data needs constraints, one-vote-per-user uniqueness, moderation consistency, group membership state, and transactional counter updates. Redis can be introduced later as a cache or view-count batching layer, but the v1 implementation should keep comments, likes/votes, views, bookmarks, group membership, and counters durable in PostgreSQL.
