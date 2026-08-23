@@ -1,31 +1,41 @@
 openapi: 3.1.0
 info:
-  title: TripPlanner + EV Community API
-  version: 1.1.0
-  description: 'Build-ready OpenAPI spec for the TripPlanner + EV Charger Integration + Community Sharing + Trip Copying project.
+  title: Navio API
+  version: 1.3.0
+  description: 'Build-ready OpenAPI specification for Navio user management, trip planning, mobility and EV intelligence,
+    community, and optional AI planning. Production NGINX forwards to Spring Cloud Gateway; development uses the same
+    gateway directly. The gateway resolves services through Eureka and receives non-secret configuration from Config Server.
+    Keycloak supplies authentication. AI Planning uses Spring AI with either local
+    Ollama on the ML VM or a hosted model provider without changing the public API.
     All endpoints are versioned under /v1.
 
 
-    Fix v1.1 adds detailed trip-planning modules required by the UI: trip dates, sections/lists, saved places, itinerary days,
-    notes, reservations, attachments, budgeting, expenses, and tripmates.'
+    Version 1.3 retains the domain API while making Spring Cloud Gateway, Eureka, Config Server, and centralized observability
+    mandatory platform concerns. It assigns user/profile/role endpoints to User Management, media and notifications to
+    Community, geo/routing to Mobility & EV, and documents provider-neutral AI Planning.'
 servers:
-- url: https://api.tripplanner.local
-  description: NGINX reverse proxy / public API
+- url: https://api.navio.local
+  description: Production NGINX edge forwarding to Spring Cloud Gateway
+- url: http://localhost:8080
+  description: Spring Cloud Gateway development entry point
 - url: http://localhost:8081
-  description: Trip & Media Service local dev
+  description: User Management direct private/debug access only
 - url: http://localhost:8082
-  description: EV Intelligence Service local dev
+  description: Trip Planning direct private/debug access only
 - url: http://localhost:8083
-  description: Community Service local dev
+  description: Mobility & EV direct private/debug access only
 - url: http://localhost:8084
-  description: AI Orchestrator Service local dev
+  description: Community direct private/debug access only
+- url: http://localhost:8085
+  description: AI Planning direct private/debug access only; deployed on the ML VM with Ollama or on the application VM with a hosted provider
 security:
 - bearerAuth: []
 tags:
-- name: Trip & Media Service
-- name: EV Intelligence Service
+- name: User Management Service
+- name: Trip Planning Service
+- name: Mobility & EV Service
 - name: Community Service
-- name: AI Orchestrator Service
+- name: AI Planning Service
 - name: Trip Planning Details
 - name: Geo Provider
 - name: Budgeting
@@ -33,7 +43,7 @@ paths:
   /v1/trips:
     post:
       tags:
-      - Trip & Media Service
+      - Trip Planning Service
       summary: Create trip
       description: Creates a new private trip owned by the authenticated user.
       operationId: postTrips
@@ -116,10 +126,88 @@ paths:
                     consumptionKwhPer100Km: 16.5
                     connectorTypes:
                     - CCS2
+  /v1/public-trips:
+    get:
+      tags:
+      - Trip Planning Service
+      summary: Search public trip templates
+      description: Returns public trips for the Explore catalogue. Trip Planning owns the index and enforces visibility.
+      operationId: searchPublicTrips
+      parameters:
+      - name: q
+        in: query
+        schema:
+          type: string
+      - name: destination
+        in: query
+        schema:
+          type: string
+      - name: tags
+        in: query
+        schema:
+          type: array
+          items:
+            type: string
+      - name: sort
+        in: query
+        schema:
+          type: string
+          enum:
+          - recent
+          - trending
+          - popular
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 0
+      - name: size
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+      responses:
+        '200':
+          description: Public trip page
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Trip'
+                  meta:
+                    $ref: '#/components/schemas/PageMeta'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+  /v1/public-trips/{tripId}:
+    get:
+      tags:
+      - Trip Planning Service
+      summary: Get public trip template
+      operationId: getPublicTrip
+      parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Public trip
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+        '404':
+          $ref: '#/components/responses/NotFound'
   /v1/trips/{tripId}:
     get:
       tags:
-      - Trip & Media Service
+      - Trip Planning Service
       summary: Get trip
       description: Returns one trip if the user has access or the trip is public.
       operationId: getTripsTripId
@@ -179,7 +267,7 @@ paths:
         description: tripId path parameter
     patch:
       tags:
-      - Trip & Media Service
+      - Trip Planning Service
       summary: Update trip
       description: Updates title, dates, stops, route legs, EV profile, or notes and writes a revision.
       operationId: patchTripsTripId
@@ -273,7 +361,7 @@ paths:
                     - CCS2
     delete:
       tags:
-      - Trip & Media Service
+      - Trip Planning Service
       summary: Delete trip
       description: Soft-deletes or deletes a trip owned by the current user.
       operationId: deleteTripsTripId
@@ -298,7 +386,7 @@ paths:
   /v1/trips/{tripId}/revisions:
     get:
       tags:
-      - Trip & Media Service
+      - Trip Planning Service
       summary: List trip revisions
       description: Lists revision history for rollback and audit display.
       operationId: getTripsTripIdRevisions
@@ -358,7 +446,7 @@ paths:
   /v1/trips/{tripId}/rollback:
     post:
       tags:
-      - Trip & Media Service
+      - Trip Planning Service
       summary: Rollback trip
       description: Restores a trip snapshot from a specific revision and creates a new revision.
       operationId: postTripsTripIdRollback
@@ -429,7 +517,7 @@ paths:
   /v1/trips/{tripId}/visibility:
     post:
       tags:
-      - Trip & Media Service
+      - Trip Planning Service
       summary: Change visibility
       description: Changes visibility between private, unlisted, and public.
       operationId: postTripsTripIdVisibility
@@ -501,7 +589,7 @@ paths:
   /v1/trips/{tripId}/copy:
     post:
       tags:
-      - Trip & Media Service
+      - Trip Planning Service
       summary: Copy trip
       description: 'Copies a public/community/shared trip into the current user''s private trip library as an independent
         snapshot.
@@ -577,7 +665,7 @@ paths:
   /v1/trips/{tripId}/share-links:
     post:
       tags:
-      - Trip & Media Service
+      - Trip Planning Service
       summary: Create share link
       description: Creates an unlisted share token, optionally expiring and allowing copy.
       operationId: postTripsTripIdShareLinks
@@ -594,7 +682,7 @@ paths:
                     id: token_01HX
                     tripId: trip_01HX
                     token: shr_abc
-                    url: https://api.tripplanner.local/v1/share/shr_abc
+                    url: https://api.navio.local/v1/share/shr_abc
                     allowCopy: true
                     expiresAt: '2026-07-01T00:00:00Z'
                     createdAt: '2026-05-07T05:00:00Z'
@@ -627,7 +715,7 @@ paths:
   /v1/trips/{tripId}/share-links/{tokenId}:
     delete:
       tags:
-      - Trip & Media Service
+      - Trip Planning Service
       summary: Revoke share link
       description: Revokes an existing share token.
       operationId: deleteTripsTripIdShareLinksTokenId
@@ -658,7 +746,7 @@ paths:
   /v1/share/{token}:
     get:
       tags:
-      - Trip & Media Service
+      - Trip Planning Service
       summary: Resolve share link
       description: Public endpoint that returns a shareable trip view from a token.
       operationId: getShareToken
@@ -693,9 +781,9 @@ paths:
   /v1/trips/{tripId}/permissions:
     post:
       tags:
-      - Trip & Media Service
+      - Trip Planning Service
       summary: Update trip permissions
-      description: Adds or removes viewer/editor ACL entries for a trip.
+      description: Adds or removes authoritative viewer/editor permissions owned by Trip Planning.
       operationId: postTripsTripIdPermissions
       responses:
         '200':
@@ -741,9 +829,9 @@ paths:
                   removeUserIds: []
     get:
       tags:
-      - Trip & Media Service
+      - Trip Planning Service
       summary: Get trip permissions
-      description: Returns current ACL entries for the trip.
+      description: Returns current trip-scoped permission entries.
       operationId: getTripsTripIdPermissions
       responses:
         '200':
@@ -774,10 +862,10 @@ paths:
         schema:
           type: string
         description: tripId path parameter
-  /v1/me:
+  /v1/users/me:
     get:
       tags:
-      - Trip & Media Service
+      - User Management Service
       summary: Get current user
       description: Returns the authenticated user's mirrored app profile and preferences.
       operationId: getMe
@@ -795,7 +883,7 @@ paths:
                     displayName: Somchai
                     email: somchai@example.com
                     roles:
-                    - user
+                    - USER
                     preferences:
                       language: en
                       distanceUnit: km
@@ -809,10 +897,10 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
-  /v1/me/preferences:
+  /v1/users/me/preferences:
     patch:
       tags:
-      - Trip & Media Service
+      - User Management Service
       summary: Update preferences
       description: Updates current user's language, distance, and notification preferences.
       operationId: patchMePreferences
@@ -830,7 +918,7 @@ paths:
                     displayName: Somchai
                     email: somchai@example.com
                     roles:
-                    - user
+                    - USER
                     preferences:
                       language: en
                       distanceUnit: km
@@ -855,16 +943,205 @@ paths:
                   distanceUnit: km
                   notificationEmail: true
                   notificationPush: false
-  /v1/mod/users/{userId}/ban:
+  /v1/users/me/vehicles:
+    get:
+      tags:
+      - User Management Service
+      summary: List saved vehicles
+      operationId: listCurrentUserVehicles
+      responses:
+        '200':
+          description: Saved vehicles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserVehicle'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
     post:
       tags:
-      - Trip & Media Service
-      summary: Ban user
-      description: 'Moderator/admin endpoint to ban a user.
+      - User Management Service
+      summary: Add saved vehicle
+      operationId: addCurrentUserVehicle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserVehicleInput'
+      responses:
+        '201':
+          description: Vehicle created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserVehicle'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/users/me/vehicles/{vehicleId}:
+    patch:
+      tags:
+      - User Management Service
+      summary: Update saved vehicle
+      operationId: updateCurrentUserVehicle
+      parameters:
+      - name: vehicleId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserVehicleInput'
+      responses:
+        '200':
+          description: Vehicle updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserVehicle'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - User Management Service
+      summary: Remove saved vehicle
+      operationId: deleteCurrentUserVehicle
+      parameters:
+      - name: vehicleId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Vehicle removed
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/users/{userId}:
+    get:
+      tags:
+      - User Management Service
+      summary: Get public user profile
+      operationId: getPublicUserProfile
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Public profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicUserProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/admin/users:
+    get:
+      tags:
+      - User Management Service
+      summary: Search users for administration
+      description: Requires MODERATOR or ADMIN.
+      operationId: searchAdminUsers
+      parameters:
+      - name: query
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Matching users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /v1/admin/users/{userId}/roles:
+    post:
+      tags:
+      - User Management Service
+      summary: Grant global role
+      description: Grants the role through the Keycloak Admin API and records a Navio audit entry. Requires ADMIN.
+      operationId: grantGlobalUserRole
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleChangeRequest'
+      responses:
+        '200':
+          description: Updated profile/role snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /v1/admin/users/{userId}/roles/{role}:
+    delete:
+      tags:
+      - User Management Service
+      summary: Revoke global role
+      description: Revokes the role through the Keycloak Admin API and records a Navio audit entry. Requires ADMIN.
+      operationId: revokeGlobalUserRole
+      parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: role
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/GlobalRole'
+      responses:
+        '204':
+          description: Role revoked
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /v1/admin/users/{userId}/suspend:
+    post:
+      tags:
+      - User Management Service
+      summary: Suspend user
+      description: 'Disables the account through Keycloak, records a Navio suspension and audit entry, and publishes UserSuspended.v1.
 
 
-        Requires `mod` or `admin` role.'
-      operationId: postModUsersUserIdBan
+        Requires `MODERATOR` or `ADMIN` role.'
+      operationId: suspendUser
       responses:
         '200':
           description: Success
@@ -876,7 +1153,7 @@ paths:
                 default:
                   value:
                     userId: user_456
-                    status: banned
+                    status: suspended
                     reason: Spam reports confirmed
                     updatedAt: '2026-05-07T05:00:00Z'
         '401':
@@ -905,16 +1182,16 @@ paths:
                 value:
                   reason: Spam reports confirmed
                   expiresAt: '2026-06-01T00:00:00Z'
-  /v1/mod/users/{userId}/unban:
+  /v1/admin/users/{userId}/reactivate:
     post:
       tags:
-      - Trip & Media Service
-      summary: Unban user
-      description: 'Moderator/admin endpoint to remove a ban.
+      - User Management Service
+      summary: Reactivate user
+      description: 'Re-enables an eligible Keycloak account, closes the active suspension, records the audit action, and publishes UserReactivated.v1.
 
 
-        Requires `mod` or `admin` role.'
-      operationId: postModUsersUserIdUnban
+        Requires `MODERATOR` or `ADMIN` role.'
+      operationId: reactivateUser
       responses:
         '200':
           description: Success
@@ -926,7 +1203,7 @@ paths:
                 default:
                   value:
                     userId: user_456
-                    status: banned
+                    status: active
                     reason: Spam reports confirmed
                     updatedAt: '2026-05-07T05:00:00Z'
         '401':
@@ -958,7 +1235,7 @@ paths:
   /v1/media/upload-url:
     post:
       tags:
-      - Trip & Media Service
+      - Community Service
       summary: Request media upload URL
       description: Creates a media record and returns a pre-signed upload URL.
       operationId: postMediaUploadUrl
@@ -973,7 +1250,7 @@ paths:
                 default:
                   value:
                     mediaId: media_01HX
-                    uploadUrl: https://minio.local/presigned
+                    uploadUrl: https://uploads.navio.local/presigned
                     method: PUT
                     headers:
                       Content-Type: image/jpeg
@@ -1000,7 +1277,7 @@ paths:
   /v1/media/complete:
     post:
       tags:
-      - Trip & Media Service
+      - Community Service
       summary: Complete media upload
       description: Signals upload completion so the embedded media worker can scan and prepare safe URLs.
       operationId: postMediaComplete
@@ -1042,7 +1319,7 @@ paths:
   /v1/media/{mediaId}:
     get:
       tags:
-      - Trip & Media Service
+      - Community Service
       summary: Get media metadata
       description: Returns media processing status and safe rendering URLs.
       operationId: getMediaMediaId
@@ -1082,7 +1359,7 @@ paths:
   /v1/geo/geocode:
     post:
       tags:
-      - EV Intelligence Service
+      - Mobility & EV Service
       summary: Geocode place
       description: Provider-hidden geocoding endpoint for address/place search.
       operationId: postGeoGeocode
@@ -1124,7 +1401,7 @@ paths:
   /v1/geo/route:
     post:
       tags:
-      - EV Intelligence Service
+      - Mobility & EV Service
       summary: Compute map route
       description: Provider-hidden route endpoint using Google Maps v1.0 adapter.
       operationId: postGeoRoute
@@ -1169,7 +1446,7 @@ paths:
   /v1/ev/route/compute:
     post:
       tags:
-      - EV Intelligence Service
+      - Mobility & EV Service
       summary: Compute EV-aware route
       description: Calculates EV feasibility and recommends charging stops.
       operationId: postEvRouteCompute
@@ -1232,7 +1509,7 @@ paths:
   /v1/ev/chargers/near:
     get:
       tags:
-      - EV Intelligence Service
+      - Mobility & EV Service
       summary: Search chargers near point
       description: Returns charger markers from local Postgres/PostGIS first; external provider refresh only on cache miss/stale/low
         confidence.
@@ -1325,7 +1602,7 @@ paths:
   /v1/ev/chargers/{chargerId}:
     get:
       tags:
-      - EV Intelligence Service
+      - Mobility & EV Service
       summary: Get charger detail
       description: Returns charger details, ratings, confidence, and verification status. May lazy-refresh stale details.
       operationId: getEvChargersChargerId
@@ -1375,7 +1652,7 @@ paths:
   /v1/ev/chargers/suggest:
     post:
       tags:
-      - EV Intelligence Service
+      - Mobility & EV Service
       summary: Suggest missing charger
       description: Creates a pending verification charger suggestion.
       operationId: postEvChargersSuggest
@@ -1436,7 +1713,7 @@ paths:
   /v1/ev/chargers/{chargerId}/reviews:
     get:
       tags:
-      - EV Intelligence Service
+      - Mobility & EV Service
       summary: List charger reviews
       description: Lists reviews for one charger.
       operationId: getEvChargersChargerIdReviews
@@ -1490,7 +1767,7 @@ paths:
             value: 20
     post:
       tags:
-      - EV Intelligence Service
+      - Mobility & EV Service
       summary: Create or replace review
       description: Creates or replaces the current user's review. Enforces one review per user per charger.
       operationId: postEvChargersChargerIdReviews
@@ -1547,7 +1824,7 @@ paths:
   /v1/ev/chargers/{chargerId}/reviews/{reviewId}:
     patch:
       tags:
-      - EV Intelligence Service
+      - Mobility & EV Service
       summary: Edit charger review
       description: Edits the current user's review, or moderator/admin can edit if policy allows.
       operationId: patchEvChargersChargerIdReviewsReviewId
@@ -1609,7 +1886,7 @@ paths:
                   mediaIds: []
     delete:
       tags:
-      - EV Intelligence Service
+      - Mobility & EV Service
       summary: Delete charger review
       description: Deletes own review or moderator/admin deletes inappropriate review.
       operationId: deleteEvChargersChargerIdReviewsReviewId
@@ -1640,7 +1917,7 @@ paths:
   /v1/ev/chargers/{chargerId}/comments:
     get:
       tags:
-      - EV Intelligence Service
+      - Mobility & EV Service
       summary: List charger comments
       description: Lists charger discussion comments. Omit parentId for top level; provide parentId for replies.
       operationId: getEvChargersChargerIdComments
@@ -1684,7 +1961,7 @@ paths:
         description: Parent comment ID
     post:
       tags:
-      - EV Intelligence Service
+      - Mobility & EV Service
       summary: Create charger comment
       description: Creates a charger discussion comment or reply.
       operationId: postEvChargersChargerIdComments
@@ -1733,7 +2010,7 @@ paths:
   /v1/ev/chargers/{chargerId}/comments/{commentId}:
     delete:
       tags:
-      - EV Intelligence Service
+      - Mobility & EV Service
       summary: Delete charger comment
       description: Deletes own charger comment or moderator/admin deletes it.
       operationId: deleteEvChargersChargerIdCommentsCommentId
@@ -1764,7 +2041,7 @@ paths:
   /v1/ev/chargers/{chargerId}/report:
     post:
       tags:
-      - EV Intelligence Service
+      - Mobility & EV Service
       summary: Report charger
       description: Reports incorrect charger information.
       operationId: postEvChargersChargerIdReport
@@ -1814,7 +2091,7 @@ paths:
   /v1/ev/chargers/{chargerId}/suggest-edit:
     post:
       tags:
-      - EV Intelligence Service
+      - Mobility & EV Service
       summary: Suggest charger edit
       description: Suggests edits to charger name, address, location, connectors, power, or opening hours.
       operationId: postEvChargersChargerIdSuggestEdit
@@ -1862,12 +2139,12 @@ paths:
   /v1/admin/ev/charger-reports:
     get:
       tags:
-      - EV Intelligence Service
+      - Mobility & EV Service
       summary: List charger reports
       description: 'Admin/moderator list of charger reports.
 
 
-        Requires `mod` or `admin` role.'
+        Requires `MODERATOR` or `ADMIN` role.'
       operationId: getAdminEvChargerReports
       responses:
         '200':
@@ -1925,12 +2202,12 @@ paths:
   /v1/admin/ev/chargers/{chargerId}/approve:
     post:
       tags:
-      - EV Intelligence Service
+      - Mobility & EV Service
       summary: Approve charger
       description: 'Admin approves a pending/user-submitted charger.
 
 
-        Requires `mod` or `admin` role.'
+        Requires `MODERATOR` or `ADMIN` role.'
       operationId: postAdminEvChargersChargerIdApprove
       responses:
         '200':
@@ -1974,12 +2251,12 @@ paths:
   /v1/admin/ev/chargers/{chargerId}/reject:
     post:
       tags:
-      - EV Intelligence Service
+      - Mobility & EV Service
       summary: Reject charger
       description: 'Admin rejects a pending/user-submitted charger.
 
 
-        Requires `mod` or `admin` role.'
+        Requires `MODERATOR` or `ADMIN` role.'
       operationId: postAdminEvChargersChargerIdReject
       responses:
         '200':
@@ -2023,12 +2300,12 @@ paths:
   /v1/admin/ev/charger-suggestions/{suggestionId}/approve:
     post:
       tags:
-      - EV Intelligence Service
+      - Mobility & EV Service
       summary: Approve charger edit
       description: 'Admin approves a suggested charger edit and applies it.
 
 
-        Requires `mod` or `admin` role.'
+        Requires `MODERATOR` or `ADMIN` role.'
       operationId: postAdminEvChargerSuggestionsSuggestionIdApprove
       responses:
         '200':
@@ -2072,12 +2349,12 @@ paths:
   /v1/admin/ev/charger-suggestions/{suggestionId}/reject:
     post:
       tags:
-      - EV Intelligence Service
+      - Mobility & EV Service
       summary: Reject charger edit
       description: 'Admin rejects a suggested charger edit.
 
 
-        Requires `mod` or `admin` role.'
+        Requires `MODERATOR` or `ADMIN` role.'
       operationId: postAdminEvChargerSuggestionsSuggestionIdReject
       responses:
         '200':
@@ -2121,12 +2398,12 @@ paths:
   /v1/admin/ev/tiles/{tileKey}/refresh:
     post:
       tags:
-      - EV Intelligence Service
+      - Mobility & EV Service
       summary: Refresh EV geo-tile
       description: 'Manually triggers charger refresh for one geo-tile.
 
 
-        Requires `mod` or `admin` role.'
+        Requires `MODERATOR` or `ADMIN` role.'
       operationId: postAdminEvTilesTileKeyRefresh
       responses:
         '202':
@@ -2341,7 +2618,7 @@ paths:
       description: 'Moderator/admin deletes a post.
 
 
-        Requires `mod` or `admin` role.'
+        Requires `MODERATOR` or `ADMIN` role.'
       operationId: deletePostsPostId
       responses:
         '204':
@@ -2647,7 +2924,7 @@ paths:
         schema:
           type: string
         description: postId path parameter
-  /v1/me/bookmarks:
+  /v1/community/bookmarks:
     get:
       tags:
       - Community Service
@@ -2696,13 +2973,13 @@ paths:
         examples:
           default:
             value: 20
-  /v1/search:
+  /v1/community/search:
     get:
       tags:
       - Community Service
-      summary: Search trips/posts
-      description: Searches posts and/or visible trips using Postgres full-text search with visibility enforcement.
-      operationId: getSearch
+      summary: Search community
+      description: Searches community groups and posts. Attached public-trip snapshot text may improve post matching, but Trip Planning remains authoritative for public-trip search.
+      operationId: searchCommunity
       responses:
         '200':
           description: Success
@@ -2749,8 +3026,8 @@ paths:
         schema:
           type: string
           enum:
-          - trips
           - posts
+          - groups
           - all
         description: Search type
         examples:
@@ -2869,10 +3146,9 @@ paths:
   /v1/ai/plan/suggest:
     post:
       tags:
-      - AI Orchestrator Service
+      - AI Planning Service
       summary: Suggest plan changes
-      description: Uses Gemini through AI Orchestrator to produce structured itinerary and EV improvement actions. Does not
-        apply unless apply=true.
+      description: Uses the configured Spring AI provider to produce schema-validated itinerary and EV improvement proposals. The endpoint never applies changes directly; the user must confirm a proposal through Trip Planning.
       operationId: postAiPlanSuggest
       responses:
         '200':
@@ -2912,13 +3188,12 @@ paths:
                   goal: Make this trip safer for an EV with fewer low-battery segments.
                   constraints:
                   - Prefer CCS2 chargers above 50 kW
-                  apply: false
   /v1/ai/plan/chat:
     post:
       tags:
-      - AI Orchestrator Service
+      - AI Planning Service
       summary: Chat with plan
-      description: Conversational plan assistance. Supports JSON response in this spec; implementation may stream text/event-stream.
+      description: Conversational plan assistance using a bounded, allow-listed tool loop. Supports JSON for non-streaming clients and text/event-stream for the frontend. Returned actions are proposals only.
       operationId: postAiPlanChat
       responses:
         '200':
@@ -4457,7 +4732,7 @@ paths:
       tags:
       - Trip Planning Details
       summary: Remove trip member
-      description: Removes a tripmate and syncs ACL permissions. Existing expenses can keep historical user references.
+      description: Removes a tripmate and removes its authoritative trip-scoped permission. Existing expenses can keep historical user references.
       operationId: deleteRemoveTripMember
       responses:
         '204':
@@ -4909,6 +5184,75 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PermissionEntry'
+    GlobalRole:
+      type: string
+      enum:
+      - USER
+      - MODERATOR
+      - ADMIN
+    RoleChangeRequest:
+      type: object
+      required:
+      - role
+      - reason
+      properties:
+        role:
+          $ref: '#/components/schemas/GlobalRole'
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 500
+    UserVehicleInput:
+      type: object
+      required:
+      - make
+      - model
+      - batteryCapacityKwh
+      - rangeKm
+      - connectorTypes
+      properties:
+        nickname:
+          type: [string, "null"]
+        make:
+          type: string
+        model:
+          type: string
+        year:
+          type: [integer, "null"]
+        batteryCapacityKwh:
+          type: number
+          minimum: 1
+        rangeKm:
+          type: number
+          minimum: 1
+        consumptionKwhPer100Km:
+          type: [number, "null"]
+        connectorTypes:
+          type: array
+          minItems: 1
+          items:
+            type: string
+        defaultVehicle:
+          type: boolean
+          default: false
+    UserVehicle:
+      allOf:
+      - $ref: '#/components/schemas/UserVehicleInput'
+      - type: object
+        required:
+        - id
+        - userId
+        properties:
+          id:
+            type: string
+          userId:
+            type: string
+          createdAt:
+            type: string
+            format: date-time
+          updatedAt:
+            type: string
+            format: date-time
     UserPreferences:
       type: object
       properties:
@@ -4941,19 +5285,44 @@ components:
           type: string
         displayName:
           type: string
+        handle:
+          type: [string, "null"]
+        avatarUrl:
+          type: [string, "null"]
+        bio:
+          type: [string, "null"]
+        location:
+          type: [string, "null"]
         email:
           type: string
           format: email
         roles:
           type: array
           items:
-            type: string
-            enum:
-            - user
-            - mod
-            - admin
+            $ref: '#/components/schemas/GlobalRole'
+        status:
+          type: string
+          enum:
+          - active
+          - suspended
+          - deleted
         preferences:
           $ref: '#/components/schemas/UserPreferences'
+    PublicUserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        displayName:
+          type: string
+        handle:
+          type: [string, "null"]
+        avatarUrl:
+          type: [string, "null"]
+        bio:
+          type: [string, "null"]
+        location:
+          type: [string, "null"]
     ModerationRequest:
       type: object
       properties:
@@ -4972,8 +5341,8 @@ components:
         status:
           type: string
           enum:
-          - banned
-          - unbanned
+          - active
+          - suspended
         reason:
           type: string
         updatedAt:
@@ -5615,8 +5984,8 @@ components:
               type:
                 type: string
                 enum:
-                - trip
                 - post
+                - group
               id:
                 type: string
               title:
@@ -5666,10 +6035,6 @@ components:
           type: array
           items:
             type: string
-        apply:
-          type: boolean
-          examples:
-            - false
       required:
       - tripId
       - goal

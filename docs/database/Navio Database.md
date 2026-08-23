@@ -1,12 +1,12 @@
-# TripPlanner + EV + Community — Professional Database Design Documentation
+# Navio Database Design
 
-**Project:** TripPlanner + EV Charger Integration + Community Sharing + Trip Copying + AI Planning Assistance  
-**Database:** PostgreSQL 16+ with PostGIS, `pg_trgm`, and JSONB  
-**Deployment:** Single PostgreSQL instance on one 8 GB university VM  
-**Architecture:** Microservices with schema-per-service isolation  
-**Version:** v1.1 database design — synced with OpenAPI v1.1 trip-planning modules  
-**Prepared for:** Capstone implementation  
-**Date:** 2026-05-07
+**Project:** Navio
+**Database:** PostgreSQL 16+ with PostGIS, `pg_trgm`, and JSONB
+**Deployment:** Single PostgreSQL instance on the application VM; AI Planning may connect from the private ML VM
+**Architecture:** Domain services with schema-per-service isolation behind mandatory Gateway/Config/Eureka platform applications
+**Version:** v1.3 — synchronized with the finalized domain, platform, observability, and AI-profile architecture
+**Prepared for:** Capstone implementation
+**Date:** 2026-08-22
 
 ---
 
@@ -17,21 +17,22 @@ This document defines the professional database design for the TripPlanner + EV 
 The database supports:
 
 - Trip planning with dates, sections/lists, saved places, itinerary days/items, notes, reservations, attachments, budget, expenses, tripmates, route legs, EV profile snapshots, visibility, revisions, rollback, share links, and copy-to-my-trips behavior.
-- IAM user mirror, roles, bans, ACL permissions, and audit logs.
+- Navio user profiles, preferences, saved vehicles, Keycloak role snapshots, suspensions, and audit logs.
 - Media upload metadata, validation status, safe URLs, and thumbnails.
 - EV charger local database with PostGIS search, geo-tile refresh control, provider metadata, user reviews, charger comments, reports, and suggested edits.
 - Community posts, threaded comments, votes, bookmarks, moderation, and full-text search.
 - In-app notifications and delivery logs.
 - AI planning sessions, prompt versions, usage logs, quota counters, and tool invocation logs.
 - Transactional outbox tables for reliable Kafka event publishing.
+- Platform telemetry metadata through structured logs, Micrometer metrics, and traces rather than new business tables.
 
 The design prioritizes feasibility for a university capstone, correctness, clean service boundaries, and future scalability.
 
 ### Current Repository Alignment
 
-As of 2026-05-16, the implemented backend migration in `server/Trip-Media-Service` contains the compact Trip & Media baseline only: `trip.trips`, `trip.revisions`, and `trip.share_tokens`. That migration stores stops, route legs, EV profile, tags, copy attribution, and stats in JSONB. The target design below is broader because the frontend already models more features than the backend currently persists.
+The previously implemented legacy backend migration contains only a compact trip baseline. The finalized target replaces that boundary with User Management, Trip Planning, Mobility & EV, Community, and optional AI Planning services. Treat this document as the target design rather than a description of already-applied migrations.
 
-Treat this document as the target database design, not as a description of what has already been migrated. Before replacing the mocks with APIs, add migrations for the expanded `trip`, `ev`, and `social` schema pieces described below.
+Before replacing the mocks with APIs, add migrations for the expanded `trip`, `ev`, and `social` schema pieces described below.
 
 | Frontend mock/state area | Target database support |
 | ------------------------ | ----------------------- |
@@ -39,7 +40,8 @@ Treat this document as the target database design, not as a description of what 
 | Planner place cards with rating, reviews, cost, visited state, time, image, and EV charger snapshot | `trip.trip_places`, `trip.itinerary_items`, `trip.expenses`, and `metadata_jsonb` |
 | Planner notes and checklists | `trip.trip_notes` and `trip.itinerary_items` with `item_type = CHECKLIST` |
 | Budget categories and currencies | `trip.expenses`, `trip.expense_splits`, `trip.trips.currency`, `trip.trips.budget_amount` |
-| Garage vehicles and starting battery | `trip.trip_vehicles` and `trip.trips.ev_profile_jsonb` |
+| Reusable user garage and default vehicle | `iam.user_vehicles` |
+| Per-trip selected vehicle and starting battery snapshot | `trip.trip_vehicles` and `trip.trips.ev_profile_jsonb` |
 | Explore plan cards with likes/views/reviews/trending | `trip.trips.stats_jsonb` and/or public feed projections |
 | EV charger search and add-to-trip | `ev.chargers`; trip attachment snapshots in `trip.trip_places.metadata_jsonb` |
 | Community groups/posts/comments/votes | Expanded `social` schema in section 11 |
@@ -54,21 +56,26 @@ The system uses a single PostgreSQL instance:
 
 ```txt
 PostgreSQL instance: pg-primary
-Database name: tripplanner_ev
+Database name: navio
 Extensions: pgcrypto, postgis, pg_trgm, unaccent
 Schemas: trip, iam, media, ev, social, notif, ai
 ```
+
+Keycloak uses a separate database/schema for credentials and sessions. It is not one of the seven Navio-owned application schemas.
+
+Spring Cloud Gateway, Spring Cloud Config Server, and Eureka are mandatory Spring platform applications but own no Navio business schema. Config Server reads non-secret configuration from a private Git repository. Eureka keeps an ephemeral service registry. Grafana Alloy exports logs, metrics, and traces to the centralized observability backend; operational telemetry is not stored in the Navio business database.
 
 ### 2.2 Service Ownership Rule
 
 Each service owns its schemas exclusively.
 
-| Service                 | Owned Schemas          | Main Responsibility                                                                                                                                                                             |
-| ----------------------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Trip & Media Service    | `trip`, `iam`, `media` | Trips, trip dates, sections/lists, saved places, itinerary items, notes, reservations, attachments, budget/expenses, tripmates, revisions, sharing, copy trip, ACL, user mirror, media metadata |
-| EV Intelligence Service | `ev`                   | Chargers, charger tiles, EV reviews, comments, reports, suggestions, provider data                                                                                                              |
-| Community Service       | `social`, `notif`      | Posts, comments, votes, bookmarks, moderation, notifications                                                                                                                                    |
-| AI Orchestrator Service | `ai`                   | Prompt configs, AI sessions, usage logs, quota counters                                                                                                                                         |
+| Service | Owned Schemas | Main responsibility |
+| --- | --- | --- |
+| User Management Service | `iam` | Navio profiles, preferences, saved vehicles, suspension/audit history, Keycloak role snapshots, user outbox |
+| Trip Planning Service | `trip` | Trips, planning modules, trip permissions, revisions, public Explore, sharing, and copy-to-my-trips |
+| Mobility & EV Service | `ev` | Places/provider cache, chargers, geo tiles, EV reviews, reports, suggestions, and route/EV snapshots |
+| Community Service | `social`, `notif`, `media` | Groups, posts, comments, votes, bookmarks, media, moderation, search, and in-app notifications |
+| AI Planning Service | `ai` | Provider-neutral prompt/session storage, usage, quota, and tool-call audit |
 
 ### 2.3 Non-Negotiable Data Boundary Rules
 
@@ -80,6 +87,8 @@ Each service owns its schemas exclusively.
 6. Consumers must be idempotent using `event_id` deduplication.
 7. Soft delete is preferred for user-generated content.
 8. Audit logs are mandatory for sensitive operations.
+9. Keycloak is authoritative for credentials and global roles; `iam.user_roles` is a synchronized display/audit snapshot only.
+10. Resource permissions belong to their domain (`trip.trip_members`, community membership tables), never to a generic IAM ACL table.
 
 Example: `social.posts.trip_id` stores the trip ID, but it does not have a foreign key to `trip.trips(id)`.
 
@@ -176,7 +185,7 @@ This ERD shows logical relationships. Dashed relationships represent cross-servi
 erDiagram
     IAM_USERS ||--o{ IAM_USER_ROLES : has
     IAM_USERS ||--o{ IAM_USER_BANS : may_have
-    IAM_USERS ||--o{ IAM_ACL_ENTRIES : grants
+    IAM_USERS ||--o{ IAM_USER_VEHICLES : saves
 
     TRIP_TRIPS ||--o{ TRIP_SECTIONS : has
     TRIP_SECTIONS ||--o{ TRIP_PLACES : contains
@@ -233,18 +242,18 @@ erDiagram
 | `trip`   | `trip_attachments`         | Links from media assets to trip targets such as reservations, expenses, notes, places, or the trip itself               |
 | `trip`   | `expenses`                 | Trip expenses with category, amount, payer, date, optional place/reservation references                                 |
 | `trip`   | `expense_splits`           | Per-user expense split records for group balance calculations                                                           |
-| `trip`   | `trip_members`             | Tripmates for collaboration and expense splitting; synced with ACL entries                                              |
-| `trip`   | `trip_vehicles`            | Per-trip EV garage vehicles, including preset/custom vehicle snapshots and starting battery                             |
+| `trip`   | `trip_members`             | Tripmates and authoritative per-trip owner/editor/viewer permissions                                                     |
+| `trip`   | `trip_vehicles`            | Per-trip snapshot of the selected saved/custom vehicle and starting battery                                              |
 | `trip`   | `trip_revisions`           | Versioned trip snapshots for history and rollback                                                                       |
 | `trip`   | `share_links`              | Public/unlisted sharing tokens                                                                                          |
 | `trip`   | `trip_copies`              | Analytics/attribution log for copy-to-my-trips                                                                          |
 | `trip`   | `outbox`                   | Transactional event outbox for trip events                                                                              |
-| `iam`    | `users`                    | Local user profile mirror from Keycloak                                                                                 |
-| `iam`    | `user_roles`               | User roles: user, mod, admin                                                                                            |
-| `iam`    | `user_bans`                | Ban and moderation state                                                                                                |
-| `iam`    | `acl_entries`              | Resource permissions for trips and future resources                                                                     |
-| `iam`    | `audit_log`                | Security and sensitive action logs                                                                                      |
-| `iam`    | `outbox`                   | Transactional event outbox for IAM events                                                                               |
+| `iam`    | `users`                    | Navio profile keyed by the Keycloak subject                                                                             |
+| `iam`    | `user_roles`               | Read-only synchronized snapshot of Keycloak global roles                                                                |
+| `iam`    | `user_bans`                | Suspension history coordinated with Keycloak account disablement                                                        |
+| `iam`    | `user_vehicles`            | Reusable saved EV/vehicle profiles and default selection                                                                |
+| `iam`    | `audit_log`                | User/role/suspension security audit                                                                                      |
+| `iam`    | `outbox`                   | Transactional event outbox for `user.events.v1`                                                                         |
 | `media`  | `media_assets`             | Uploaded file metadata and processing status                                                                            |
 | `media`  | `upload_sessions`          | Signed upload workflow tracking                                                                                         |
 | `ev`     | `chargers`                 | Durable local charger database and provider cache                                                                       |
@@ -743,7 +752,7 @@ Stores the per-trip EV garage used by the planner. Preset vehicles can reference
 
 ### Purpose
 
-Stores tripmates for collaboration and expense splitting. This table complements `iam.acl_entries` but does not replace authorization checks.
+Stores tripmates for collaboration and expense splitting and is the authoritative source for trip-scoped `OWNER`, `EDITOR`, and `VIEWER` permissions.
 
 | Column               |           Type | Required | Description                   |
 | -------------------- | -------------: | -------: | ----------------------------- |
@@ -763,8 +772,9 @@ Stores tripmates for collaboration and expense splitting. This table complements
 ### Rules
 
 - Every trip must have one active `OWNER` member for the owner.
-- Inviting a member should create or update an ACL entry with `viewer` or `editor` permission.
-- Removing a member should revoke the active ACL grant but preserve historical references on expenses.
+- Inviting a member creates or updates the corresponding `trip_members` row.
+- Removing a member sets `removed_at` while preserving historical references on expenses.
+- Trip Planning performs permission checks against active membership; User Management is not called for each trip authorization decision.
 
 ---
 
@@ -892,7 +902,7 @@ Transactional outbox for trip events.
 
 # 8. `iam` Schema Design
 
-The `iam` schema stores the application's local user mirror and authorization data. Keycloak remains the authentication authority, while this schema stores application-specific profile, roles, bans, ACLs, and audit logs.
+The User Management Service owns `iam`. Keycloak remains authoritative for credentials, sessions, account enablement, and global roles. This schema stores Navio profiles, preferences, saved vehicles, suspension/audit history, and synchronized role snapshots.
 
 ## 8.1 `iam.users`
 
@@ -903,7 +913,7 @@ The `iam` schema stores the application's local user mirror and authorization da
 | `email`             | `VARCHAR(255)` |      Yes | User email                        |
 | `display_name`      | `VARCHAR(120)` |      Yes | Display name                      |
 | `avatar_media_id`   |         `UUID` |       No | Soft reference to media asset     |
-| `status`            |  `VARCHAR(30)` |      Yes | `active`, `deactivated`, `banned` |
+| `status`            |  `VARCHAR(30)` |      Yes | `active`, `suspended`, `deleted`  |
 | `locale`            |  `VARCHAR(20)` |       No | Example: `en`, `th`               |
 | `country_code`      |      `CHAR(2)` |       No | ISO country code                  |
 | `preferences_jsonb` |        `JSONB` |      Yes | User preferences                  |
@@ -921,10 +931,12 @@ The `iam` schema stores the application's local user mirror and authorization da
 
 ## 8.2 `iam.user_roles`
 
+This is a read-only application snapshot synchronized after successful Keycloak role changes. Authorization uses roles in validated Keycloak JWTs; this table is for display and audit support.
+
 | Column               |          Type | Required | Description                  |
 | -------------------- | ------------: | -------: | ---------------------------- |
 | `user_id`            |        `UUID` |      Yes | FK to `iam.users`            |
-| `role`               | `VARCHAR(30)` |      Yes | `user`, `moderator`, `admin` |
+| `role`               | `VARCHAR(30)` |      Yes | `USER`, `MODERATOR`, `ADMIN` |
 | `granted_by_user_id` |        `UUID` |       No | Who granted the role         |
 | `granted_at`         | `TIMESTAMPTZ` |      Yes | Grant time                   |
 
@@ -933,6 +945,8 @@ Primary key: `(user_id, role)`
 ---
 
 ## 8.3 `iam.user_bans`
+
+Records Navio suspension history. Suspending/reactivating a user must also disable/enable the Keycloak account through the User Management Service.
 
 | Column              |          Type | Required | Description             |
 | ------------------- | ------------: | -------: | ----------------------- |
@@ -947,33 +961,38 @@ Primary key: `(user_id, role)`
 
 ### Rules
 
-- A user is considered banned when there is an active ban where `revoked_at IS NULL` and `ends_at IS NULL OR ends_at > now()`.
+- A user is considered suspended when there is an active row where `revoked_at IS NULL` and `ends_at IS NULL OR ends_at > now()`.
 
 ---
 
-## 8.4 `iam.acl_entries`
+## 8.4 `iam.user_vehicles`
 
 ### Purpose
 
-Generic resource-level permissions. Used mainly for trips.
+Reusable vehicle profiles belonging to a user. Trip Planning copies the selected vehicle into `trip.trip_vehicles` so later profile edits do not silently change an existing trip.
 
-| Column               |           Type | Required | Description                 |
-| -------------------- | -------------: | -------: | --------------------------- |
-| `id`                 |         `UUID` |      Yes | ACL entry ID                |
-| `resource_type`      |  `VARCHAR(50)` |      Yes | Example: `trip`             |
-| `resource_id`        |         `UUID` |      Yes | Resource ID                 |
-| `principal_type`     |  `VARCHAR(20)` |      Yes | `user`, `role`, `public`    |
-| `principal_id`       | `VARCHAR(128)` |       No | User ID or role name        |
-| `permission`         |  `VARCHAR(30)` |      Yes | `viewer`, `editor`, `owner` |
-| `granted_by_user_id` |         `UUID` |      Yes | Granting user ID            |
-| `created_at`         |  `TIMESTAMPTZ` |      Yes | Creation time               |
-| `revoked_at`         |  `TIMESTAMPTZ` |       No | Revocation time             |
+| Column | Type | Required | Description |
+| --- | ---: | ---: | --- |
+| `id` | `UUID` | Yes | Vehicle ID |
+| `user_id` | `UUID` | Yes | FK to `iam.users` |
+| `nickname` | `VARCHAR(100)` | No | User-defined name |
+| `make` | `VARCHAR(100)` | Yes | Manufacturer |
+| `model` | `VARCHAR(100)` | Yes | Model |
+| `year` | `SMALLINT` | No | Model year |
+| `battery_capacity_kwh` | `NUMERIC(8,2)` | Yes | Usable/declared battery capacity |
+| `range_km` | `NUMERIC(8,2)` | Yes | Nominal range |
+| `consumption_kwh_per_100km` | `NUMERIC(8,3)` | No | Consumption estimate |
+| `connector_types` | `TEXT[]` | Yes | Compatible connector values |
+| `is_default` | `BOOLEAN` | Yes | User's default vehicle |
+| `metadata_jsonb` | `JSONB` | Yes | Optional provider/preset metadata |
+| `created_at` | `TIMESTAMPTZ` | Yes | Creation time |
+| `updated_at` | `TIMESTAMPTZ` | Yes | Last update time |
+| `deleted_at` | `TIMESTAMPTZ` | No | Soft removal timestamp |
 
 ### Indexes
 
-- `(resource_type, resource_id)` for loading permissions.
-- `(principal_type, principal_id)` for finding all accessible resources.
-- Partial unique index for active grants.
+- `(user_id, deleted_at)` for the garage listing.
+- Partial unique index enforcing at most one active default vehicle per user.
 
 ---
 
@@ -999,19 +1018,16 @@ Append-only security log for sensitive operations.
 
 ### Required Audit Events
 
-- Trip publish/unpublish.
-- Share link create/revoke.
-- ACL changes.
-- Ban/unban users.
-- Moderator post/comment deletion.
-- Admin role grant/revoke.
-- AI quota override.
+- User suspension/reactivation.
+- Keycloak global role grant/revoke.
+- User profile deletion/export requests.
+- Administrative vehicle/profile changes.
 
 ---
 
 # 9. `media` Schema Design
 
-The `media` schema stores metadata only. File bytes are stored in MinIO or the local filesystem.
+The Community Service owns `media`. The schema stores metadata only; file bytes use a capped local filesystem in the capstone profile or external S3-compatible object storage. Running a separate MinIO process on the application VM is not part of the finalized v1 deployment.
 
 ## 9.1 `media.media_assets`
 
@@ -1373,8 +1389,8 @@ Stores community groups such as Thailand Restaurants, Bangkok Food Routes, and T
 ### Rules
 
 - Creating a community trip post does not copy the trip.
-- Copying the trip must call Trip & Media Service: `POST /v1/trips/{tripId}/copy`.
-- `trip_snapshot_jsonb` is for feed display only; authoritative trip data remains in Trip & Media Service.
+- Copying the trip must call Trip Planning Service: `POST /v1/trips/{tripId}/copy`.
+- `trip_snapshot_jsonb` is for feed display only; authoritative trip data remains in Trip Planning Service.
 - Counters are denormalized for feed speed. The vote, comment, bookmark, view, and trip-copy tables remain the auditable source of truth.
 
 ### Indexes
@@ -1596,7 +1612,7 @@ Primary key: `(event_id, consumer_name)`
 
 # 13. `ai` Schema Design
 
-The `ai` schema stores durable state for AI planning assistance, usage tracking, and quota enforcement.
+The `ai` schema stores durable state for provider-neutral AI planning assistance, usage tracking, and quota enforcement. The same schema is used when Spring AI targets local Ollama on the ML VM or a hosted model API from the application VM.
 
 ## 13.1 `ai.prompt_configs`
 
@@ -1605,7 +1621,8 @@ The `ai` schema stores durable state for AI planning assistance, usage tracking,
 | `id`                |         `UUID` |      Yes | Prompt config ID              |
 | `name`              | `VARCHAR(100)` |      Yes | Prompt name                   |
 | `version`           |          `INT` |      Yes | Prompt version                |
-| `model_name`        | `VARCHAR(100)` |      Yes | LLM model, e.g. Gemini        |
+| `provider`          | `VARCHAR(50)`  |      Yes | `ollama` or hosted provider key |
+| `model_name`        | `VARCHAR(100)` |      Yes | Provider model identifier     |
 | `system_prompt`     |         `TEXT` |      Yes | System prompt                 |
 | `tool_schema_jsonb` |        `JSONB` |      Yes | Structured tool/action schema |
 | `temperature`       | `NUMERIC(3,2)` |       No | Model temperature             |
@@ -1652,6 +1669,7 @@ Unique: `(name, version)`
 | `id`             |          `UUID` |      Yes | Usage log ID                         |
 | `session_id`     |          `UUID` |       No | Related session                      |
 | `user_id`        |          `UUID` |      Yes | User ID                              |
+| `provider`       |   `VARCHAR(50)` |      Yes | Configured Spring AI provider        |
 | `model_name`     |  `VARCHAR(100)` |      Yes | LLM model                            |
 | `operation`      |   `VARCHAR(80)` |      Yes | `plan_suggest`, `plan_chat`          |
 | `input_tokens`   |           `INT` |      Yes | Input tokens                         |
@@ -1734,7 +1752,7 @@ If Kafka is down, the transaction still commits. The outbox publisher retries la
   "eventId": "evt_01J...",
   "eventType": "TripCopied.v1",
   "occurredAt": "2026-05-07T10:00:00Z",
-  "producer": "trip-media-service",
+  "producer": "trip-planning-service",
   "partitionKey": "trip_...",
   "trace": {
     "traceId": "...",
@@ -1863,19 +1881,21 @@ Use Flyway with one migration path per service.
 Recommended structure:
 
 ```txt
-trip-media-service/src/main/resources/db/migration/
-  V001__create_trip_schema.sql
-  V002__create_iam_schema.sql
-  V003__create_media_schema.sql
+user-management-service/src/main/resources/db/migration/
+  V001__create_iam_schema.sql
 
-ev-service/src/main/resources/db/migration/
+trip-planning-service/src/main/resources/db/migration/
+  V001__create_trip_schema.sql
+
+mobility-service/src/main/resources/db/migration/
   V001__create_ev_schema.sql
 
 community-service/src/main/resources/db/migration/
   V001__create_social_schema.sql
   V002__create_notif_schema.sql
+  V003__create_media_schema.sql
 
-ai-service/src/main/resources/db/migration/
+ai-planning-service/src/main/resources/db/migration/
   V001__create_ai_schema.sql
 ```
 
@@ -1895,21 +1915,20 @@ Rules:
 Recommended nightly backup:
 
 ```bash
-pg_dump -Fc -d tripplanner_ev -f /backups/tripplanner_ev_$(date +%F).dump
+pg_dump -Fc -d navio -f /backups/navio_$(date +%F).dump
 ```
 
 Also back up:
 
-- Object storage files or MinIO data directory.
+- Local media directory when external object storage is not used.
 - Kafka topic configuration.
-- Config Server Git repository.
 - Environment variable/secrets file.
 
 ## 19.2 Restore
 
 ```bash
-createdb tripplanner_ev_restored
-pg_restore -d tripplanner_ev_restored /backups/tripplanner_ev_YYYY-MM-DD.dump
+createdb navio_restored
+pg_restore -d navio_restored /backups/navio_YYYY-MM-DD.dump
 ```
 
 Validate restore by checking:
@@ -2323,7 +2342,7 @@ CREATE TABLE IF NOT EXISTS iam.users (
     display_name VARCHAR(120) NOT NULL,
     avatar_media_id UUID,
     status VARCHAR(30) NOT NULL DEFAULT 'active'
-        CHECK (status IN ('active', 'deactivated', 'banned')),
+        CHECK (status IN ('active', 'suspended', 'deleted')),
     locale VARCHAR(20),
     country_code CHAR(2),
     preferences_jsonb JSONB NOT NULL DEFAULT '{}'::jsonb CHECK (jsonb_typeof(preferences_jsonb) = 'object'),
@@ -2337,7 +2356,7 @@ CREATE INDEX IF NOT EXISTS idx_iam_users_status ON iam.users(status);
 
 CREATE TABLE IF NOT EXISTS iam.user_roles (
     user_id UUID NOT NULL REFERENCES iam.users(id) ON DELETE CASCADE,
-    role VARCHAR(30) NOT NULL CHECK (role IN ('user', 'moderator', 'admin')),
+    role VARCHAR(30) NOT NULL CHECK (role IN ('USER', 'MODERATOR', 'ADMIN')),
     granted_by_user_id UUID,
     granted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     PRIMARY KEY (user_id, role)
@@ -2356,23 +2375,31 @@ CREATE TABLE IF NOT EXISTS iam.user_bans (
 
 CREATE INDEX IF NOT EXISTS idx_iam_user_bans_active ON iam.user_bans(user_id) WHERE revoked_at IS NULL;
 
-CREATE TABLE IF NOT EXISTS iam.acl_entries (
+CREATE TABLE IF NOT EXISTS iam.user_vehicles (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    resource_type VARCHAR(50) NOT NULL,
-    resource_id UUID NOT NULL,
-    principal_type VARCHAR(20) NOT NULL CHECK (principal_type IN ('user', 'role', 'public')),
-    principal_id VARCHAR(128),
-    permission VARCHAR(30) NOT NULL CHECK (permission IN ('viewer', 'editor', 'owner')),
-    granted_by_user_id UUID NOT NULL,
+    user_id UUID NOT NULL REFERENCES iam.users(id) ON DELETE CASCADE,
+    nickname VARCHAR(100),
+    make VARCHAR(100) NOT NULL,
+    model VARCHAR(100) NOT NULL,
+    year SMALLINT CHECK (year IS NULL OR year BETWEEN 1990 AND 2200),
+    battery_capacity_kwh NUMERIC(8,2) NOT NULL CHECK (battery_capacity_kwh > 0),
+    range_km NUMERIC(8,2) NOT NULL CHECK (range_km > 0),
+    consumption_kwh_per_100km NUMERIC(8,3) CHECK (consumption_kwh_per_100km IS NULL OR consumption_kwh_per_100km > 0),
+    connector_types TEXT[] NOT NULL CHECK (cardinality(connector_types) > 0),
+    is_default BOOLEAN NOT NULL DEFAULT false,
+    metadata_jsonb JSONB NOT NULL DEFAULT '{}'::jsonb CHECK (jsonb_typeof(metadata_jsonb) = 'object'),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    revoked_at TIMESTAMPTZ
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    deleted_at TIMESTAMPTZ
 );
 
-CREATE INDEX IF NOT EXISTS idx_iam_acl_resource ON iam.acl_entries(resource_type, resource_id);
-CREATE INDEX IF NOT EXISTS idx_iam_acl_principal ON iam.acl_entries(principal_type, principal_id);
-CREATE UNIQUE INDEX IF NOT EXISTS uq_iam_acl_active
-ON iam.acl_entries(resource_type, resource_id, principal_type, coalesce(principal_id, ''), permission)
-WHERE revoked_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_iam_user_vehicles_active
+ON iam.user_vehicles(user_id, created_at DESC)
+WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_iam_user_vehicles_default
+ON iam.user_vehicles(user_id)
+WHERE is_default = true AND deleted_at IS NULL;
 
 CREATE TABLE IF NOT EXISTS iam.audit_log (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -2886,6 +2913,7 @@ CREATE TABLE IF NOT EXISTS ai.prompt_configs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
     version INT NOT NULL,
+    provider VARCHAR(50) NOT NULL,
     model_name VARCHAR(100) NOT NULL,
     system_prompt TEXT NOT NULL,
     tool_schema_jsonb JSONB NOT NULL DEFAULT '{}'::jsonb,
@@ -2926,6 +2954,7 @@ CREATE TABLE IF NOT EXISTS ai.usage_logs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     session_id UUID REFERENCES ai.sessions(id) ON DELETE SET NULL,
     user_id UUID NOT NULL,
+    provider VARCHAR(50) NOT NULL,
     model_name VARCHAR(100) NOT NULL,
     operation VARCHAR(80) NOT NULL,
     input_tokens INT NOT NULL DEFAULT 0,
@@ -2994,12 +3023,15 @@ CREATE INDEX IF NOT EXISTS idx_social_outbox_unpublished ON social.outbox(create
 
 # 22. Service-Level Database Access Matrix
 
-| Service                 | Can Read               | Can Write              | Must Not Access                                 |
-| ----------------------- | ---------------------- | ---------------------- | ----------------------------------------------- |
-| Trip & Media Service    | `trip`, `iam`, `media` | `trip`, `iam`, `media` | `ev`, `social`, `notif`, `ai`                   |
-| EV Intelligence Service | `ev`                   | `ev`                   | `trip`, `iam`, `media`, `social`, `notif`, `ai` |
-| Community Service       | `social`, `notif`      | `social`, `notif`      | `trip`, `iam`, `media`, `ev`, `ai`              |
-| AI Orchestrator Service | `ai`                   | `ai`                   | `trip`, `iam`, `media`, `ev`, `social`, `notif` |
+| Service | Can read/write | Must not access directly |
+| --- | --- | --- |
+| User Management Service | `iam` | `trip`, `ev`, `social`, `notif`, `media`, `ai` |
+| Trip Planning Service | `trip` | `iam`, `ev`, `social`, `notif`, `media`, `ai` |
+| Mobility & EV Service | `ev` | `iam`, `trip`, `social`, `notif`, `media`, `ai` |
+| Community Service | `social`, `notif`, `media` | `iam`, `trip`, `ev`, `ai` |
+| AI Planning Service | `ai` | `iam`, `trip`, `ev`, `social`, `notif`, `media` |
+
+API Gateway, Configuration Server, Discovery Server, NGINX, and Grafana Alloy receive no Navio application database credentials. Gateway and discovery use runtime configuration and ephemeral state; centralized telemetry belongs in the observability backend rather than PostgreSQL business schemas.
 
 For cross-service data:
 
@@ -3011,25 +3043,26 @@ For cross-service data:
 
 # 23. Recommended Implementation Order
 
-1. Create database extensions and schemas.
-2. Implement `iam.users`, `iam.user_roles`, and basic user sync from Keycloak.
-3. Implement `trip.trips`, `trip.trip_revisions`, and `trip.share_links`.
-4. Implement OpenAPI v1.1 trip-planning child tables: `trip.trip_sections`, `trip.trip_places`, `trip.trip_notes`, `trip.itinerary_blocks`, `trip.itinerary_items`, `trip.reservations`, `trip.trip_attachments`, `trip.expenses`, `trip.expense_splits`, `trip.trip_vehicles`, and `trip.trip_members`.
-5. Implement copy-trip flow with `trip.trip_copies`, safe child-record copying, and `trip.outbox`.
-6. Implement `media.media_assets` and upload sessions.
-7. Implement `ev.chargers` and PostGIS radius search.
-8. Implement `ev.charger_tiles` and local-first refresh behavior.
-9. Implement charger reviews, reports, and suggestions.
-10. Implement `social.groups`, group profiles/rules/flairs/resources, memberships, posts, comments, post/comment votes, post views, bookmarks, and reports.
-11. Implement `notif.notifications`, preferences, and delivery logs.
-12. Implement outbox publishers and consumer deduplication.
-13. Implement AI tables only after core trip + EV + community flow works.
+1. Establish Config Server, Eureka, Gateway, and centralized telemetry without granting them Navio schema access.
+2. Create database extensions and schemas.
+3. Implement `iam.users`, `iam.user_roles`, `iam.user_bans`, `iam.user_vehicles`, User Management outbox, and Keycloak synchronization.
+4. Implement `trip.trips`, authoritative `trip.trip_members` permissions, `trip.trip_revisions`, and `trip.share_links`.
+5. Implement trip-planning child tables: `trip.trip_sections`, `trip.trip_places`, `trip.trip_notes`, `trip.itinerary_blocks`, `trip.itinerary_items`, `trip.reservations`, `trip.trip_attachments`, `trip.expenses`, `trip.expense_splits`, and `trip.trip_vehicles`.
+6. Implement copy-trip flow with `trip.trip_copies`, safe child-record copying, and `trip.outbox`.
+7. Implement `media.media_assets` and upload sessions.
+8. Implement `ev.chargers` and PostGIS radius search.
+9. Implement `ev.charger_tiles` and local-first refresh behavior.
+10. Implement charger reviews, reports, and suggestions.
+11. Implement `social.groups`, group profiles/rules/flairs/resources, memberships, posts, comments, post/comment votes, post views, bookmarks, and reports.
+12. Implement `notif.notifications`, preferences, and delivery logs.
+13. Implement outbox publishers and consumer deduplication.
+14. Implement provider-neutral AI tables only after the core user + trip + EV + community flow works. The same schema supports Ollama and hosted-provider profiles.
 
 ---
 
 # 24. Final Recommendation
 
-This database design is appropriate for the approved v1.0 architecture. It keeps the operational footprint low by using one PostgreSQL instance, but preserves professional service boundaries through schema ownership rules. It supports the finalized copy-trip model, the OpenAPI v1.1 detailed trip workspace, Thailand-friendly EV charger data strategy, charger community reviews, community trip sharing, PostGIS charger search, Postgres full-text search, notification delivery, media metadata, and optional AI planning assistance.
+This database design is appropriate for the finalized Navio architecture. It keeps the operational footprint low by using one PostgreSQL instance on the application VM while preserving service boundaries through schema ownership and database roles. Mandatory Gateway, Config, Discovery, and observability components do not introduce business schemas. AI Planning owns `ai` even when it runs on the private ML VM; changing between Ollama and a hosted model provider does not change database ownership or public API contracts.
 
 For the capstone, the most important implementation discipline is to avoid shortcut cross-schema joins. Even though all schemas are physically inside one PostgreSQL instance, the codebase should behave as if every schema belongs to a separate database.
 
