@@ -1,10 +1,29 @@
 # ============================================================================
-#  Navio — Docker Compose (Development)
+#  Navio — Docker Compose (Local Development Infrastructure)
 # ============================================================================
-#  Current stack (Phase 0–1):
+#  This file is not the finalized production topology. The target architecture
+#  uses four core domain services, mandatory Spring Cloud Gateway, Config
+#  Server and Eureka, optional AI Planning on either the ML VM (Ollama) or
+#  application VM (hosted API), durable Keycloak PostgreSQL storage, a single
+#  KRaft Kafka broker without ZooKeeper, and Grafana Alloy exporting centralized
+#  telemetry. See README.md and docs/summary/Navio Architecture.md.
+#
+#  Current development-only stack:
 #    • PostgreSQL 16  – Primary database (schemas: iam, trip, media, …)
 #    • Keycloak 26    – Identity Provider (OIDC / JWT)
-#    • Kafka + ZK     – Event backbone for async inter-service communication
+#    • Kafka KRaft    – Single-node event backbone for async communication
+#    • pgAdmin 4      – PostgreSQL management UI (http://localhost:5050)
+#
+#  Observability Stack:
+#    • Zipkin         – Distributed tracing (http://localhost:9411)
+#    • Loki           – Log aggregation (http://localhost:3100)
+#    • Prometheus     – Metrics collection (http://localhost:9090)
+#    • Grafana        – Visualization dashboard (http://localhost:3000)
+#    • Alloy          – Telemetry collector (http://localhost:12345)
+#
+#  Missing mandatory target components: API Gateway :8080, Config Server :8888,
+#  Eureka :8761, and the domain-service containers. Do not use
+#  this file as the final development or production topology.
 #
 #  Usage:
 #    docker compose up -d             # start all infrastructure
@@ -61,22 +80,30 @@ services:
 
   # ---------- Kafka Broker -----------------------------------------------------
   kafka:
-    image: confluentinc/cp-kafka:7.6.0
+    image: confluentinc/cp-kafka:8.3.0
     container_name: navio-kafka
+    hostname: kafka
     ports:
       - "9092:9092"
       - "29092:29092"
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,PLAINTEXT_HOST://0.0.0.0:29092
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-    depends_on:
-      zookeeper:
-        condition: service_healthy
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      CLUSTER_ID: ${KAFKA_CLUSTER_ID:-885sUBCQTzGwY-lF8YV-uQ}
+    volumes:
+      - kafka-data:/var/lib/kafka/data
     healthcheck:
       test:
         [
@@ -91,21 +118,128 @@ services:
       - navio-network
     restart: unless-stopped
 
-  # ---------- Zookeeper (Kafka dependency) ------------------------------------
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.6.0
-    container_name: navio-zookeeper
-    ports:
-      - "2181:2181"
+  # ---------- pgAdmin (PostgreSQL Management UI) ----------------------------------
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: navio-pgadmin
     environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
+      PGADMIN_DEFAULT_EMAIL: admin@navio.example.com
+      PGADMIN_DEFAULT_PASSWORD: admin # override via .env in production
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - navio-network
+    restart: unless-stopped
+
+  # ---------- Zipkin (Distributed Tracing) ----------------------------------------
+  zipkin:
+    image: openzipkin/zipkin:3.5.1
+    container_name: navio-zipkin
+    ports:
+      - "9411:9411"
+    environment:
+      STORAGE_TYPE: mem
+    networks:
+      - navio-network
+    restart: unless-stopped
+
+  # ---------- Loki (Single-node Log Storage) -------------------------------------
+  loki:
+    image: grafana/loki:3.6.4
+    container_name: navio-loki
+    command: -config.file=/etc/loki/config.yaml
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki-config.yaml:/etc/loki/config.yaml:ro
+      - loki-data:/loki
     healthcheck:
-      test: ["CMD-SHELL", "echo ruok | nc localhost 2181 | grep imok"]
+      test: ["CMD", "/usr/bin/loki", "-version"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
+    networks:
+      - navio-network
+    restart: unless-stopped
+
+  # ---------- Prometheus (Metrics Collection) -----------------------------------
+  prometheus:
+    image: prom/prometheus:v3.14.0
+    container_name: navio-prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/rules:/etc/prometheus/rules:ro
+      - prometheus-data:/prometheus
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - navio-network
+    restart: unless-stopped
+
+  # ---------- Grafana (Visualization Dashboard) --------------------------------
+  grafana:
+    image: grafana/grafana:12.3.2
+    container_name: navio-grafana
+    environment:
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    depends_on:
+      loki:
+        condition: service_healthy
+      prometheus:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - navio-network
+    restart: unless-stopped
+
+  # ---------- Grafana Alloy (Telemetry Collector) -----
+  alloy:
+    image: grafana/alloy:v1.12.2
+    container_name: navio-alloy
+    volumes:
+      - ./alloy-config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./server:/var/log/navio/server:ro
+      - alloy-data:/var/lib/alloy/data
+    command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+    ports:
+      - "12345:12345"
+    depends_on:
+      loki:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "/bin/alloy", "--version"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - navio-network
     restart: unless-stopped
@@ -120,5 +254,15 @@ networks:
 volumes:
   pg-data:
     driver: local
+  pgadmin-data:
+    driver: local
   kafka-data:
+    driver: local
+  loki-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+  alloy-data:
     driver: local

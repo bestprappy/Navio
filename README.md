@@ -1,376 +1,353 @@
-<p align="center">
-  <img src="https://img.shields.io/badge/status-in%20development-blue?style=for-the-badge" alt="Status" />
-  <img src="https://img.shields.io/badge/architecture-microservices-informational?style=for-the-badge" alt="Architecture" />
-  <img src="https://img.shields.io/badge/backend-Spring%20Boot%203-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot" />
-  <img src="https://img.shields.io/badge/messaging-Apache%20Kafka-231F20?style=for-the-badge&logo=apachekafka&logoColor=white" alt="Kafka" />
-  <img src="https://img.shields.io/badge/database-PostgreSQL%2016-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
-  <img src="https://img.shields.io/badge/auth-Keycloak%20OIDC-4D4D4D?style=for-the-badge&logo=keycloak&logoColor=white" alt="Keycloak" />
-  <img src="https://img.shields.io/badge/frontend-Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js" />
-</p>
-
 # Navio
 
-> **A distributed, event-driven microservices platform for intelligent trip planning — with built-in EV charging intelligence, a Reddit-like community layer for posting and discussing travel plans, and a forking model to remix itineraries with attribution.**
+> An EV-aware trip-planning platform with itinerary building, public trip discovery, community discussions, and optional local-AI planning assistance.
 
-Navio decomposes a real-world trip-planning product — itinerary creation, EV route optimization, community discussions, media uploads, and itinerary forking — into **4 domain-aligned Spring Boot services** communicating through an **Apache Kafka event backbone**. All traffic enters through a single **NGINX reverse proxy**, data is isolated via **schema-per-service** on a shared PostgreSQL instance, and the entire stack is designed to run on a **single 8 GB university VM** serving ~10 concurrent users.
+Navio uses five domain-oriented Spring Boot services when optional AI is enabled and four when it is disabled. Three additional Spring platform applications are mandatory: Spring Cloud Gateway, Spring Cloud Config Server, and Eureka Discovery Server. Production traffic enters through NGINX and then uses the same Spring Cloud Gateway used in development. AI Planning uses Spring AI with a replaceable provider: it runs beside Ollama on a CPU-only ML VM or on the application VM with a hosted model API.
 
----
+## Final architecture
 
-## Table of Contents
+### Runtime inventory
 
-1. [Business Purpose](#business-purpose)
-2. [Core Features](#core-features)
-3. [System Architecture](#system-architecture)
-4. [Service Inventory](#service-inventory)
-5. [Tech Stack](#tech-stack)
-6. [Data Architecture](#data-architecture)
-7. [Messaging & Events](#messaging--events)
-8. [Service Decoupling Strategy](#service-decoupling-strategy)
-9. [Repository Structure](#repository-structure)
-10. [Getting Started](#getting-started)
-11. [Running the Stack](#running-the-stack)
-12. [Implementation Phases](#implementation-phases)
-13. [License](#license)
+| Component | Type | Port | Deployment |
+| --- | --- | ---: | --- |
+| User Management Service | Spring Boot | 8081 | Application VM |
+| Trip Planning Service | Spring Boot | 8082 | Application VM |
+| Mobility & EV Service | Spring Boot | 8083 | Application VM |
+| Community Service | Spring Boot | 8084 | Application VM |
+| AI Planning Service | Spring Boot + Spring AI | 8085 | ML VM with Ollama, or application VM with hosted provider |
+| API Gateway | Spring Cloud Gateway | 8080 | Application VM; dev and production |
+| Configuration Server | Spring Cloud Config Server | 8888 | Application VM; private only |
+| Discovery Server | Eureka | 8761 | Application VM; private only |
+| Identity Provider | Keycloak | 8180 | Application VM |
+| Production edge proxy | NGINX | 80/443 | Application VM |
+| Model server | Ollama | 11434 | Optional local-inference profile; ML VM loopback only |
+| Primary database | PostgreSQL 16 + PostGIS | 5432 | Application VM; private only |
+| Event broker | Kafka, single KRaft broker | 9092 | Application VM; private only |
+| Telemetry collector | Grafana Alloy | Private management port only | Each active VM |
+| Central observability backend | Hosted logs, metrics, traces, and Grafana | HTTPS | External; required by the 8 GB profile |
 
----
+Only NGINX is publicly reachable in production. Gateway, Config Server, Eureka, backend ports, PostgreSQL, Kafka, Keycloak administration endpoints, telemetry management endpoints, and Ollama remain private.
 
-## Business Purpose
+Self-hosted AI profile:
 
-Modern trip planning is more than plotting waypoints on a map. EV drivers need real-time charging-station availability woven into their routes. Travelers want to share itineraries like social posts, fork and remix them, and discuss logistics in context. **Navio** tackles this complexity with a distributed architecture that mirrors how companies like Airbnb, Uber, and Google Maps engineer their platforms:
+```text
+                              Application VM
+                           Ubuntu Server 24.04
+                         4 vCPU / 8 GB / 60 GB
 
-| Concern                       | How Navio Addresses It                                                                                                                                 |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **High throughput**           | Apache Kafka decouples producers from consumers, enabling non-blocking event processing (route recalculations, notifications, search denormalization). |
-| **Independent deployability** | 4 domain-aligned services, each owning its own Postgres schema and release cycle.                                                                      |
-| **Single entry point**        | NGINX reverse proxy routes, terminates TLS, and rate-limits all inbound traffic. No service is directly exposed.                                       |
-| **Data integrity**            | Transactional Outbox pattern guarantees at-least-once event publishing without distributed transactions.                                               |
-| **Observability**             | Spring Boot Actuator endpoints, structured JSON logging with correlation ID propagation across all services and Kafka headers.                         |
+ Browser ──HTTPS──> NGINX edge ──> Next.js
+                         │
+                         └──> Spring Cloud Gateway :8080
+                                  │ Eureka discovery
+                                  ├──> User Management Service :8081
+                                  ├──> Trip Planning Service    :8082
+                                  ├──> Mobility & EV Service    :8083
+                                  └──> Community Service        :8084
 
----
+ Config Server :8888 ──> Eureka :8761 ──> Gateway + service registrations
+ Keycloak :8180 / PostgreSQL/PostGIS / Kafka / Grafana Alloy
+                         │
+                         │ private network
+                         ▼
+                         Machine-learning VM
+                           Ubuntu Server 24.04
+                         8 vCPU / 8 GB / 80 GB
 
-## Core Features
-
-| Domain                    | Capabilities                                                                                                                                                                                             |
-| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Trips**                 | CRUD with JSONB-embedded stops/routes, revision history & rollback, visibility transitions (private/unlisted/public), share links with expiry, fork with attribution chain                               |
-| **IAM**                   | Keycloak OIDC user sync, three-tier roles (user/mod/admin), ban/unban with history, generic resource-level ACL engine (owner/editor/viewer), append-only audit log for all security-sensitive actions    |
-| **EV Intelligence**       | Vehicle profiles (connector, battery, consumption), charger search via PostGIS geo-queries, EV route feasibility & charge-stop recommendations, scheduled charger data refresh with graceful degradation |
-| **Community**             | Manual "Share to Community" posts, threaded comments, vote/score system (upsert semantics), bookmarks, moderation (report, ban/unban), Postgres full-text search across trips and posts                  |
-| **Notifications**         | In-app inbox, preference management, event-driven dispatch (comments, replies, forks, moderation actions), optional email/push                                                                           |
-| **Media**                 | Signed upload URLs, MIME validation, thumbnail generation, safe rendering URLs                                                                                                                           |
-| **AI Planning** _(bonus)_ | LLM-powered itinerary suggestions, chat-with-plan (streaming SSE), structured edit actions validated server-side, per-user quota/budget enforcement                                                      |
-
----
-
-## System Architecture
-
-```
-                         ┌───────────────┐
-                         │    Client     │
-                         │  (Next.js)    │
-                         │  + Keycloak   │
-                         └──────┬────────┘
-                                │  HTTPS
-                                ▼
-                       ┌─────────────────┐
-                       │     NGINX       │ ◄── Single public entry point
-                       │ (Reverse Proxy) │     TLS termination, rate limiting
-                       └──┬──┬──┬──┬─────┘
-                          │  │  │  │
-          ┌───────────────┘  │  │  └───────────────┐
-          ▼                  │  │                   ▼
- ┌─────────────────┐        │  │        ┌────────────────────┐
- │  Trip & Media   │        │  │        │   AI Orchestrator  │
- │    Service      │        │  │        │     (Bonus)        │
- │   (port 8081)   │        │  │        │   (port 8084)      │
- │                 │        │  │        └────────────────────┘
- │ • Trip Engine   │        ▼  ▼
- │ • IAM Module    │  ┌──────────────┐  ┌───────────────────┐
- │ • Media Module  │  │  EV Intel    │  │  Community        │
- └────────┬────────┘  │  Service     │  │  Service          │
-          │           │ (port 8082)  │  │  (port 8083)      │
-          │           └──────┬───────┘  │                   │
-          │                  │          │ • Social Module    │
-          │                  │          │ • Notifications    │
-          │                  │          │ • Search           │
-          │                  │          └────────┬───────────┘
-          │                  │                   │
-          └──────────┬───────┴───────────────────┘
-                     ▼
-           ┌──────────────────┐
-           │   Apache Kafka   │ ◄── Async event backbone
-           │  (Single Broker) │     JSON serialization
-           └──────────────────┘
-                     │
-                     ▼
-           ┌──────────────────┐
-           │   PostgreSQL 16  │ ◄── Single instance, 7 schemas
-           │  + PostGIS       │     Schema-per-service isolation
-           └──────────────────┘
+                         AI Planning Service :8085 (Eureka registered)
+                                  │
+                                  └──> Ollama :11434 (localhost only)
 ```
 
-**Key architectural decisions:**
+## Service responsibilities
 
-- **NGINX** replaces Spring Cloud Gateway — saves ~300 MB RAM; static routing is sufficient for 4 services on localhost
-- **PostgreSQL + JSONB** replaces MongoDB — one DB engine; JSONB handles nested trip documents; eliminates ~500 MB RAM
-- **Caffeine** replaces Redis — in-process JVM caching with zero network overhead; sufficient for ~10 users
-- **Postgres `tsvector` + `pg_trgm`** replaces Elasticsearch — zero extra RAM; sufficient for < 100K documents
-- **Transactional Outbox** replaces Change Streams — native to Postgres; no separate relay process
+### User Management Service
 
----
+Owns Navio-specific user data and provides an administration facade over Keycloak.
 
-## Service Inventory
+- Local profile created from the Keycloak `sub` claim
+- Display name, handle, avatar, bio, location, privacy, and preferences
+- Saved vehicles and default vehicle
+- User search and administration
+- Suspend/reactivate workflow and administrative audit history
+- Global role grant/revoke operations through the Keycloak Admin API
+- `UserRegistered`, `UserProfileUpdated`, `UserRoleChanged`, `UserSuspended`, and related integration events
 
-### Trip & Media Service _(port 8081)_
+Keycloak remains authoritative for credentials, login, sessions, password reset, email verification, and global `USER`, `MODERATOR`, and `ADMIN` roles. The User Management Service never stores passwords or issues tokens.
 
-The core service — owns trips, user identity, and media.
+### Trip Planning Service
 
-| Module          | Postgres Schema | Responsibilities                                                                                                             |
-| --------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| **Trip Engine** | `trip`          | Trip CRUD, JSONB stops/routes, revisions & rollback, visibility, share links, forking with attribution, Maps API integration |
-| **IAM**         | `iam`           | User profile mirror from Keycloak, roles (user/mod/admin), ban/unban, ACL engine (resource-level permissions), audit logging |
-| **Media**       | `media`         | Pre-signed upload URLs, embedded processing worker (MIME validation, thumbnail generation), safe rendering URLs              |
+Owns trips and every permission scoped to a particular trip.
 
-**Events produced:** `TripCreated.v1`, `TripUpdated.v1`, `TripDeleted.v1`, `TripForked.v1`, `TripVisibilityChanged.v1`, `UserRegistered.v1`, `UserBanned.v1`
+- Trip CRUD, date range, itinerary blocks, lists, places, notes, and checklists
+- Costs, budget, expenses, reservations, attachments, and tripmates
+- Trip-specific vehicle snapshots used for EV calculations
+- Owner/editor/viewer authorization
+- Revision history and rollback
+- Private, unlisted, and public visibility
+- Public Explore catalogue and trip search
+- Share links and independent copy-to-my-trips behavior
+- Route and EV-result snapshots returned by Mobility & EV
 
-### EV Intelligence Service _(port 8082)_
+### Mobility & EV Service
 
-| Postgres Schema | Responsibilities                                                                                                                                                                     |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `ev`            | Charger provider integrations (OCPI/aggregator APIs), PostGIS geo-queries (`ST_DWithin`), EV route feasibility & charge-stop recommendations, embedded refresh worker (`@Scheduled`) |
+Owns external location providers and the charger domain.
 
-**Degradation:** Provider down → serve stale Postgres data marked `"stale"`
+- Place autocomplete, search, details, nearby discovery, and geocoding
+- Google Maps Platform adapter for v1 and optional Mapbox adapter
+- Route geometry, distance, duration, and ETA
+- EV route feasibility and recommended charging stops
+- Charger discovery, PostGIS geo-queries, local cache, and geo-tile refresh
+- Connector compatibility, charging time, confidence, and verification data
+- Charger reviews, reports, corrections, and administrator verification
+- Provider quotas, timeouts, retries, and graceful degradation
 
-### Community Service _(port 8083)_
+### Community Service
 
-| Module            | Postgres Schema                                   | Responsibilities                                                                           |
-| ----------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| **Social**        | `social`                                          | Posts, threaded comments, votes (upsert), bookmarks, moderation, outbox publisher          |
-| **Notifications** | `notif`                                           | In-app inbox, preferences, Kafka consumer dispatcher (reacts to trip/community/IAM events) |
-| **Search**        | _(uses `social` + internal HTTP to Trip service)_ | Postgres full-text search via `tsvector` generated columns + GIN indexes                   |
+Owns social interactions, community media, and the in-app notification module.
 
-### AI Orchestrator _(port 8084, bonus)_
+- Groups, memberships, rules, flairs, and moderators
+- Posts, threaded comments, votes, bookmarks, reports, and feed ranking
+- Community search using PostgreSQL full-text search
+- Trip attachments by `tripId`; it never writes Trip Planning data directly
+- Media upload metadata and safe rendering URLs
+- In-app notifications, unread counts, preferences, and mark-read operations
+- Idempotent consumers for trip and user integration events
 
-| Postgres Schema | Responsibilities                                                                                                                                 |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `ai`            | LLM integration (Gemini), structured plan edit actions, chat-with-plan (streaming SSE), quota/budget enforcement (Postgres + Caffeine fast-path) |
+Notifications remain a module inside Community Service. There is no standalone Notification Service in v1.
 
-**Hard rule:** No direct database access to other services — AI uses internal HTTP APIs only.
+### AI Planning Service
 
----
+Uses Spring AI to keep the agent workflow independent from the inference provider.
 
-## Tech Stack
+- Keycloak JWT validation and AI-specific authorization
+- Chat sessions, prompt versions, quotas, and usage auditing
+- A bounded tool-calling agent loop
+- Structured itinerary and EV-improvement proposals
+- Server-side JSON-schema validation of model output
+- SSE streaming to the frontend
+- Calls Trip Planning and Mobility & EV through allow-listed internal APIs
+- Requires explicit user confirmation before any trip change is applied
 
-### Backend
+Ollama is only the inference engine in the self-hosted profile. The AI Planning Service owns orchestration and must not access another service's schema.
 
-| Layer                | Technology                      | Purpose                                                                   |
-| -------------------- | ------------------------------- | ------------------------------------------------------------------------- |
-| **Runtime**          | Java 21+ / Spring Boot 3        | Service framework, DI, auto-configuration                                 |
-| **Reverse Proxy**    | NGINX                           | Single entry point, static routing to `localhost` ports, TLS termination  |
-| **Auth**             | Keycloak (OIDC/JWT)             | Identity provider, JWKS-based JWT validation in each service              |
-| **Database**         | PostgreSQL 16 + PostGIS         | Single instance, 7 schemas, JSONB for nested structures, geo-queries      |
-| **Messaging**        | Apache Kafka (single broker)    | Async event streaming, JSON serialization, DLQ topics                     |
-| **Caching**          | Caffeine (in-process JVM)       | LRU caches for trips, ACLs, chargers, quotas — no Redis                   |
-| **Search**           | Postgres `tsvector` + `pg_trgm` | Full-text search with weighted ranking — no Elasticsearch                 |
-| **Migrations**       | Flyway                          | Schema versioning, runs on service startup                                |
-| **Resilience**       | Resilience4j                    | Circuit breakers, timeouts, bulkheads on all external calls               |
-| **Configuration**    | Spring Cloud Config Server      | Git-backed centralized config (feature flags, timeouts, topic names)      |
-| **Object Storage**   | MinIO / local filesystem        | Media uploads, thumbnails, exports                                        |
-| **Communication**    | Java HttpClient                 | Synchronous cross-service calls (internal REST APIs)                      |
-| **Event Publishing** | Transactional Outbox            | Domain events written in same DB transaction, polled & published to Kafka |
+AI deployment profiles:
 
-### Frontend
+| Profile | AI location | Inference | Extra VM |
+| --- | --- | --- | --- |
+| Self-hosted | ML VM | Ollama with a small quantized model such as Qwen3 4B or Llama 3.2 3B | Required |
+| Hosted API | Application VM | Spring AI hosted-provider adapter over HTTPS | Not required |
 
-| Layer             | Technology             | Purpose                                    |
-| ----------------- | ---------------------- | ------------------------------------------ |
-| **Framework**     | Next.js                | SSR/SSG, routing, API layer                |
-| **Auth**          | Keycloak JS / NextAuth | OIDC sign-up/sign-in flow                  |
-| **Validation**    | Zod                    | Client-side form validation                |
-| **Rate Limiting** | Arcjet                 | App-level, auth-aware rate limiting        |
-| **Maps**          | Google Maps / Mapbox   | Route rendering, stop placement, polylines |
+Switching profiles must not change `/v1/ai/**`, tool schemas, authorization, session data, or trip-action confirmation. Hosted-provider API keys remain server-side; the frontend never calls a model provider directly.
 
----
+## Gateway, discovery, and configuration
 
-## Data Architecture
+Development uses `Frontend -> Spring Cloud Gateway :8080`. Production uses `Internet -> NGINX :443 -> Spring Cloud Gateway :8080`. The Spring gateway remains present in both environments and resolves explicit service IDs through Eureka.
 
-All 7 schemas reside on a **single PostgreSQL instance**. Each service owns its schemas exclusively — **no cross-schema joins or foreign keys**, preserving microservice data isolation even on a shared instance.
+| Public path | Spring Cloud Gateway target |
+| --- | --- |
+| `/v1/users/**`, `/v1/admin/users/**` | User Management Service |
+| `/v1/trips/**`, `/v1/public-trips/**`, `/v1/share/**` | Trip Planning Service |
+| `/v1/places/**`, `/v1/routes/**`, `/v1/geo/**`, `/v1/ev/**`, `/v1/chargers/**` | Mobility & EV Service |
+| `/v1/community/**`, `/v1/groups/**`, `/v1/posts/**`, `/v1/feed/**`, `/v1/notifications/**`, `/v1/media/**` | Community Service |
+| `/v1/ai/**` | AI Planning Service over the private VM network |
+| `/auth/**` | Keycloak through the configured edge/auth route |
 
-| Schema   | Owner Service   | Key Tables & Patterns                                                                                                             |
-| -------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `trip`   | Trip & Media    | `trips` (JSONB: stops, route_legs, ev_profile, forked_from), `revisions` (JSONB snapshots), `share_tokens`, `outbox`              |
-| `iam`    | Trip & Media    | `users`, `bans`, `acl_entries`, `audit_log`, `outbox`                                                                             |
-| `media`  | Trip & Media    | `media` (upload tracking, status, thumbnail URLs)                                                                                 |
-| `ev`     | EV Intelligence | `chargers` (PostGIS `GEOGRAPHY(POINT, 4326)`, GIST index, `expires_at`), `provider_metadata`, `outbox`                            |
-| `social` | Community       | `posts` (with `search_vector` tsvector), `comments` (threaded via `parent_comment_id`), `votes`, `bookmarks`, `reports`, `outbox` |
-| `notif`  | Community       | `notification_preferences`, `notifications`, `delivery_log`                                                                       |
-| `ai`     | AI Orchestrator | `prompt_configs`, `sessions`, `usage_log`, `quota_counters`                                                                       |
+NGINX performs production TLS termination, request-size limits, basic edge rate limiting, and forwards application traffic to Spring Cloud Gateway. The gateway owns shared CORS, routing, timeouts, trace/request-ID propagation, and Eureka-aware load balancing. It does not own business authorization; each domain service validates the Keycloak JWT and enforces its own resource permissions.
 
----
+Spring Cloud Config Server on port 8888 serves versioned, environment-specific non-secret configuration from a private Git repository. It starts at a fixed private address without depending on Eureka. Secrets remain in environment variables or protected mounted files. Eureka on port 8761 registers the gateway and domain services and is never exposed publicly.
 
-## Messaging & Events
+Startup order is Config Server, Eureka, domain services, Spring Cloud Gateway, then NGINX. PostgreSQL, Kafka, Keycloak, and required network dependencies must already be healthy.
 
-### Event Envelope
+## Data ownership
 
-Every event published to Kafka follows a standard envelope:
+Navio uses one PostgreSQL/PostGIS instance on the application VM. Each service receives a database role limited to its own schemas. Cross-service joins and cross-schema foreign keys are forbidden.
 
-```json
-{
-  "eventId": "evt_01J...ulid",
-  "eventType": "TripForked.v1",
-  "occurredAt": "2026-02-07T12:34:56Z",
-  "producer": "trip-media-service",
-  "partitionKey": "trip_8b1f2c",
-  "trace": { "traceId": "...", "spanId": "..." },
-  "payload": {}
-}
-```
+| Schema | Owner | Purpose |
+| --- | --- | --- |
+| `iam` | User Management | Profiles, preferences, vehicles, ban/audit history, role snapshots, outbox |
+| `trip` | Trip Planning | Trips, itinerary modules, budgets, permissions, revisions, sharing, copy metadata, outbox |
+| `ev` | Mobility & EV | Chargers, tiles, reviews, reports, suggestions, provider metadata, outbox |
+| `social` | Community | Groups, memberships, posts, comments, votes, bookmarks, reports, outbox |
+| `notif` | Community | Notification preferences, inbox, delivery attempts, consumed events |
+| `media` | Community | Upload sessions and media asset metadata |
+| `ai` | AI Planning | Prompt configurations, sessions, messages, quotas, usage, tool audit |
 
-### Kafka Topics
+Keycloak uses its own database/schema and is not counted among the seven Navio application schemas.
 
-| Topic                      | Partition Key | Producers             | Consumers                                   |
-| -------------------------- | ------------- | --------------------- | ------------------------------------------- |
-| `trip.events.v1`           | `tripId`      | Trip & Media (outbox) | Community (notifications, search denorm)    |
-| `iam.events.v1`            | `userId`      | Trip & Media (outbox) | Community (author name sync, notifications) |
-| `community.events.v1`      | `postId`      | Community (outbox)    | Community (notification dispatcher)         |
-| `ev.events.v1`             | `tileKey`     | EV Intelligence       | Observability                               |
-| `notification.commands.v1` | `userId`      | Admin tools           | Community (notification dispatcher)         |
+## Kafka usage
 
-### Transactional Outbox Pattern
+Kafka is used only for asynchronous integration events, never for request/response flows that need an immediate result.
 
-Each service writes domain events to its `outbox` table within the **same database transaction** as the domain write. An embedded `@Scheduled` publisher polls every 500 ms, sends to Kafka, and marks rows published. This guarantees at-least-once delivery without distributed transactions.
+| Topic | Producer | Consumers | Primary purpose |
+| --- | --- | --- | --- |
+| `user.events.v1` | User Management | Trip, Community, Mobility & EV | Profile snapshots, suspension, and role-change propagation |
+| `trip.events.v1` | Trip Planning | Community | Notifications and community-owned public-trip snapshots |
+| `community.events.v1` | Community | Notification/audit module | Comment, reply, report, and score-snapshot events |
+| `mobility.events.v1` | Mobility & EV | Community/admin consumers | Charger verification and material status changes |
 
-All consumers deduplicate on `eventId` (ULID) for idempotency.
+Core operations stay synchronous:
 
----
+- Login and token issuance: Keycloak/OIDC
+- Trip load/save/copy: REST
+- Place, route, and charger queries: REST
+- AI chat and tool calls: HTTP/SSE
 
-## Service Decoupling Strategy
+Producers use a transactional outbox. Consumers deduplicate by `eventId`. A single KRaft broker is sufficient for the capstone workload; ZooKeeper and Schema Registry are not deployed.
 
-Navio enforces **strict service boundaries** — no shared DTOs, no shared libraries, no cross-schema database access.
+## Observability
 
-### Why?
+Centralized observability is mandatory:
 
-Shared data-transfer objects create hidden coupling. Changing a field in a shared DTO forces a coordinated release across every service that depends on it, negating the key benefit of microservices: independent deployability.
+- Every Spring project exposes private Actuator health/readiness and Micrometer metrics.
+- Services write structured JSON logs containing service, environment, request ID, trace ID, and span ID.
+- W3C trace context is propagated through NGINX, Spring Cloud Gateway, REST calls, Kafka headers, and AI tool calls.
+- Grafana Alloy runs on the application VM and optional ML VM, collecting logs, metrics, and sampled OpenTelemetry traces.
+- Alloy exports over HTTPS to a hosted centralized observability backend with Grafana dashboards and alerts.
+- Tokens, cookies, passwords, database credentials, hosted-model keys, and unnecessary personal or prompt data are redacted.
 
-### How Navio handles cross-service communication:
+The hosted backend is required for the current 8 GB application-VM profile. Self-hosting Grafana, Loki, Prometheus, and Tempo requires a separate observability VM or upgrading the application VM to at least 16 GB.
 
-| Pattern                            | Mechanism                             | When Used                                                                                                                                    |
-| ---------------------------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Asynchronous events**            | Kafka topics via Transactional Outbox | Default. Domain events (`TripForked`, `CommentCreated`, etc.) flow through Kafka; each consumer deserializes into its own internal model.    |
-| **Synchronous request / response** | **Java HttpClient** (internal REST)   | Cross-service queries (e.g., Community → Trip for search, AI → Trip/EV for context). All internal endpoints versioned under `/internal/v1/`. |
-| **In-process calls**               | Direct Java method invocation         | Modules within the same JVM (e.g., Trip Engine → IAM ACL checks share the same service, so no HTTP overhead).                                |
+## Deployment constraints
 
-> **Rule:** Every service defines its own internal domain models. Data received from another service is mapped at the boundary — never passed through as a shared class.
+### Application VM
 
-### Security: East–West Communication
+- Ubuntu Server 24.04
+- 4 vCPU, 8 GB RAM, 60 GB storage
+- Runs four domain services plus Spring Cloud Gateway, Config Server, Eureka, Next.js, NGINX, Keycloak, PostgreSQL/PostGIS, Kafka, and Grafana Alloy
+- Uses explicit JVM/container memory limits; this is a tight capstone deployment
+- Non-secret configuration comes from Config Server; secrets come from environment variables or mounted secret files
+- No Redis, Elasticsearch, MinIO, or self-hosted full observability backend
+- Builds run in CI or on a development machine; the VM receives production artifacts
+- Logs are rotated and uploads are capped or stored externally
 
-All services run on **localhost** — no network exposure for internal calls. A shared secret header (`X-Internal-Auth`) is validated on internal endpoints. No mTLS needed (single VM, loopback traffic only).
+### Machine-learning VM
 
----
+- Required only for the self-hosted Ollama profile
+- Ubuntu Server 24.04
+- 8 vCPU, 8 GB RAM, 80 GB storage, no GPU
+- Runs AI Planning Service and Ollama
+- Ollama binds only to loopback
+- One small quantized model is loaded at a time
+- One active generation is allowed initially
+- AI failure does not affect core planning, mobility, community, or authentication
+- Grafana Alloy ships ML-service and Ollama telemetry to the same centralized backend
 
-## Repository Structure
+### Hosted-provider alternative
 
-This is an **umbrella repository** that uses **Git Submodules** to compose independently versioned components into a single, cloneable workspace.
+- Run AI Planning :8085 on the application VM
+- Configure a supported hosted `ChatModel`/`StreamingChatModel` through Spring AI
+- Do not provision the ML VM or Ollama
+- Enforce provider cost quotas, timeouts, data-minimization, and circuit breakers
+- Preserve the same public AI API and server-owned tool registry
+- Upgrade the application VM to 16 GB before sustained production use; the mandatory platform applications leave little safe headroom on 8 GB
 
-```
-Navio/                              ← You are here (umbrella repo)
-├── client/                         ← Git submodule → Navio-Client (Next.js frontend)
-├── server/                         ← Git submodule → Navio-Server (backend ecosystem)
-│   ├── trip-media-service/         ← Submodule – Trip Engine + IAM + Media (port 8081)
-│   ├── ev-intelligence-service/    ← (planned) Submodule – EV charger search & routing (port 8082)
-│   ├── community-service/          ← (planned) Submodule – Social, notifications, search (port 8083)
-│   └── ai-orchestrator/            ← (planned) Submodule – LLM integration (port 8084)
-├── docs/                           ← System design, database design, implementation guide
-├── docker-compose.yml              ← Orchestrates all services locally
+## Technology
+
+| Layer | Technology |
+| --- | --- |
+| Frontend | Next.js 16, React 19, TypeScript |
+| Backend | Java 21+, Spring Boot 3 |
+| Authentication | Keycloak OIDC/OAuth2 |
+| API gateway | Spring Cloud Gateway + Spring Cloud LoadBalancer |
+| Production edge | NGINX |
+| Configuration | Spring Cloud Config Server backed by private Git |
+| Service discovery | Eureka |
+| Database | PostgreSQL 16 + PostGIS |
+| Messaging | Kafka, single KRaft broker |
+| Maps and places | Google Maps Platform; Mapbox adapter optional |
+| AI integration | Spring AI with Ollama or a hosted model provider |
+| Caching | Caffeine in-process caches |
+| Search | PostgreSQL `tsvector` and `pg_trgm` |
+| Migrations | Flyway |
+| Resilience | Resilience4j |
+| Observability | Actuator, Micrometer, OpenTelemetry, Grafana Alloy, hosted centralized backend |
+
+## Repository structure
+
+```text
+Navio/
+├── client/                              # Next.js frontend submodule
+├── server/                              # Backend umbrella submodule
+│   ├── user-management-service/         # Spring Boot :8081
+│   ├── trip-planning-service/           # Spring Boot :8082
+│   ├── mobility-service/                # Spring Boot :8083
+│   ├── community-service/               # Spring Boot :8084
+│   ├── ai-planning-service/             # Spring Boot :8085; selected AI profile
+│   └── platform/
+│       ├── api-gateway/                  # Spring Cloud Gateway :8080
+│       ├── configuration-server/         # Spring Cloud Config :8888
+│       └── discovery-server/             # Eureka :8761
+├── config-repository/                    # Private/non-secret environment configuration
+├── observability/                        # Alloy collection and dashboard definitions
+├── docs/
+│   ├── api/
+│   ├── database/
+│   └── summary/
+├── docker-compose.yml                   # Local development infrastructure
 └── README.md
 ```
 
-> `server/` is itself a Git repository ([Navio-Server](https://github.com/bestprappy/Navio-Server)) that houses each backend microservice as its own submodule. This two-level submodule strategy cleanly separates the frontend and backend ecosystems while keeping every service independently versioned.
-
-> The `client/` and `server/` submodules are private repositories. If you have been granted access, clone with `--recurse-submodules`. Otherwise, the architecture and orchestration are fully documented in this README and the [docs/](docs/) directory.
-
----
-
-## Getting Started
+## Getting started
 
 ### Prerequisites
 
-| Tool                    | Version          |
-| ----------------------- | ---------------- |
-| Git                     | 2.13+            |
-| Docker & Docker Compose | 24+ / v2 plugin  |
-| Java                    | 21+              |
-| Node.js                 | 18+ LTS          |
-| PostgreSQL (local dev)  | 16+ with PostGIS |
-
-### Clone with Submodules
+- Git 2.13+
+- Docker with the Compose v2 plugin
+- Java 21+
+- Node.js 20+
+- PostgreSQL 16 with PostGIS for non-container development
 
 ```bash
-# Clone the umbrella repo AND all submodules in a single command
 git clone --recurse-submodules https://github.com/bestprappy/Navio.git
 cd Navio
 ```
 
-**Already cloned without `--recurse-submodules`?** Initialize retroactively:
+If the repository was cloned without submodules:
 
 ```bash
 git submodule update --init --recursive
 ```
 
-**Pull the latest changes across all submodules:**
+### Local infrastructure
+
+The root Compose file provides local PostgreSQL, Keycloak, Kafka, and observability infrastructure. Kafka runs in KRaft mode without ZooKeeper, using one combined broker/controller node suitable for local development and the non-HA capstone deployment profile.
 
 ```bash
-git submodule update --remote --merge
+docker compose up -d postgres keycloak kafka
+docker compose ps
+docker compose exec kafka kafka-metadata-quorum --bootstrap-server localhost:9092 describe --status
 ```
 
----
+Kafka clients use different bootstrap addresses depending on where they run:
 
-## Running the Stack
+| Client location | Bootstrap server |
+| --- | --- |
+| Spring service running on the host | `localhost:29092` |
+| Container on `navio-network` | `kafka:9092` |
 
-```bash
-# Build and start all services
-docker compose up --build
+Kafka metadata and topic data persist in the `kafka-data` Docker volume. `KAFKA_CLUSTER_ID` may override the development default, but it must remain unchanged for the lifetime of that volume. Existing ZooKeeper-mode clusters are not converted by simply reusing their data directory; migrate valuable clusters with a supported ZooKeeper-to-KRaft bridge release before upgrading to Kafka 4.x or Confluent Platform 8.x.
 
-# Tear down and remove volumes
-docker compose down -v
-```
+The container settings follow Confluent's [KRaft Docker configuration reference](https://docs.confluent.io/platform/current/installation/docker/config-reference.html). Apache Kafka 4.x operates without ZooKeeper; see the [Kafka 4.0 release announcement](https://kafka.apache.org/blog/2025/03/18/apache-kafka-4.0.0-release-announcement/).
 
-| Service                 | Local URL               | Port |
-| ----------------------- | ----------------------- | ---- |
-| NGINX (entry point)     | `http://localhost`      | 80   |
-| Trip & Media Service    | `http://localhost:8081` | 8081 |
-| EV Intelligence Service | `http://localhost:8082` | 8082 |
-| Community Service       | `http://localhost:8083` | 8083 |
-| AI Orchestrator         | `http://localhost:8084` | 8084 |
-| Config Server           | `http://localhost:8888` | 8888 |
-| Keycloak                | `http://localhost:8180` | 8180 |
-| Kafka Broker            | `localhost:9092`        | 9092 |
-| PostgreSQL              | `localhost:5432`        | 5432 |
+The Compose file still does not instantiate the mandatory Gateway, Config Server, Eureka, or domain-service containers. Those Spring applications currently run from their Maven projects. The target development stack calls Spring Cloud Gateway directly; production adds NGINX in front while preserving the same gateway routes.
 
----
+## Implementation order
 
-## Implementation Phases
+| Phase | Deliverable |
+| ---: | --- |
+| 0 | Private network, PostgreSQL/PostGIS, Kafka, Keycloak, and deployment secrets |
+| 1 | Config Server, Eureka, Spring Cloud Gateway, and NGINX production edge |
+| 2 | Grafana Alloy, structured logs, metrics, traces, dashboards, and alerts |
+| 3 | User Management and Keycloak integration |
+| 4 | Trip Planning core, permissions, public Explore, sharing, and copy |
+| 5 | Mobility & EV provider adapters, routing, charger cache, and EV calculations |
+| 6 | Community, media, search, and in-app notifications |
+| 7 | Cross-service outbox events and operational hardening |
+| 8 | AI Planning Service with the selected Ollama or hosted-provider profile |
 
-Development follows a strict dependency-ordered phased approach. Each phase produces a deployable increment.
+## Documentation
 
-| Phase | Name                              | Milestone                                                                                  |
-| ----- | --------------------------------- | ------------------------------------------------------------------------------------------ |
-| **0** | Infrastructure & Platform         | VM, PostgreSQL (7 schemas), Kafka, Config Server, Keycloak, NGINX, MinIO, service template |
-| **1** | Auth & IAM                        | Keycloak OIDC flow, NGINX routing, IAM module (users, roles, ACLs), frontend shell         |
-| **2** | Trip Engine (Core CRUD)           | Trip create/edit/delete with JSONB stops, revision history & rollback, Maps integration    |
-| **3** | Sharing, Forking & Outbox         | Share links, forking with attribution, Transactional Outbox → Kafka events                 |
-| **4** | EV Intelligence                   | Charger search (PostGIS), EV route compute, embedded refresh worker                        |
-| **5** | Community, Search & Notifications | Posts, comments, votes, Postgres FTS, in-app notifications, event-driven dispatcher        |
-| **6** | Media Pipeline                    | Upload, scan, thumbnails, safe URLs (embedded in Trip & Media)                             |
-| **7** | AI Planning _(bonus)_             | LLM suggest, chat-with-plan, quota enforcement                                             |
-
-> Phases 4 & 5 can run in parallel. Phase 6 can run parallel to 4–5 (only depends on Phase 1). Phase 7 starts after 4 & 5.
-
----
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
-
----
-
-<p align="center"><sub>Built by <a href="https://github.com/bestprappy">bestprappy</a> — Navio</sub></p>
+- [Architecture](docs/summary/Navio%20Architecture.md)
+- [API documentation](docs/api/Navio%20Api%20Documentation.md)
+- [OpenAPI specification](docs/api/Navio%20Open%20API.yaml)
+- [Database design](docs/database/Navio%20Database.md)

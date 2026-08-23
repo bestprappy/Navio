@@ -1,0 +1,90 @@
+// ============================================================================
+// Grafana Alloy Configuration for Navio Development
+// ============================================================================
+// Collects Docker and host-run Java service logs and forwards them to Loki.
+
+// Loki Log Collection from Docker
+discovery.docker "containers" {
+	host = "unix:///var/run/docker.sock"
+}
+
+discovery.relabel "containers" {
+	targets = []
+
+	rule {
+		source_labels = ["__meta_docker_container_name"]
+		regex         = "/(.*)"
+		target_label  = "container_name"
+	}
+
+	rule {
+		source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+		target_label  = "service_name"
+	}
+
+	rule {
+		source_labels = ["__meta_docker_container_log_stream"]
+		target_label  = "stream"
+	}
+}
+
+loki.source.docker "containers" {
+	host          = "unix:///var/run/docker.sock"
+	targets       = discovery.docker.containers.targets
+	forward_to    = [loki.write.default.receiver]
+	relabel_rules = discovery.relabel.containers.rules
+	labels        = {
+		cluster     = "navio",
+		environment = "development",
+		platform    = "docker",
+	}
+}
+
+local.file_match "java_services" {
+	path_targets = [
+		{
+			__path__     = "/var/log/navio/server/api-gateway/logs/*.log",
+			service_name = "api-gateway",
+		},
+		{
+			__path__     = "/var/log/navio/server/trip-planning-service/logs/*.log",
+			service_name = "trip-planning-service",
+		},
+		{
+			__path__     = "/var/log/navio/server/configuration-server/logs/*.log",
+			service_name = "config-server",
+		},
+		{
+			__path__     = "/var/log/navio/server/discovery-server/logs/*.log",
+			service_name = "discovery-server",
+		},
+		{
+			__path__     = "/var/log/navio/server/user-management-service/logs/*.log",
+			service_name = "user-management-service",
+		},
+		{
+			__path__     = "/var/log/navio/server/logs/*.log",
+			service_name = "navio-service",
+		},
+	]
+}
+
+loki.source.file "java_services" {
+	targets       = local.file_match.java_services.targets
+	forward_to    = [loki.write.default.receiver]
+	tail_from_end = true
+}
+
+loki.write "default" {
+	endpoint {
+		url = "http://loki:3100/loki/api/v1/push"
+	}
+}
+
+// ============================================================================
+// Alloy Server Configuration
+// ============================================================================
+
+logging {
+	level = "info"
+}

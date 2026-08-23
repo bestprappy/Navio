@@ -1,9 +1,10 @@
-# TripPlanner + EV Community API Documentation
+# Navio API Documentation
 
-**Version:** v1.1  
-**Base URL:** `https://api.tripplanner.local`  
-**Auth:** Bearer JWT from Keycloak for all endpoints except `GET /v1/share/{token}`.  
-**Architecture:** NGINX reverse proxy routes requests to 4 Spring Boot services.
+**Version:** v1.3
+**Base URL:** `https://api.navio.local`
+**Auth:** Bearer JWT from Keycloak for all endpoints except `GET /v1/share/{token}`.
+**Development entry:** `http://localhost:8080` through Spring Cloud Gateway
+**Architecture:** Production NGINX forwards `/v1/**` to the same Spring Cloud Gateway used in development. The gateway resolves four core services and optional AI Planning through Eureka. Non-secret gateway/service configuration comes from Config Server. Keycloak is the Identity Provider. AI inference is selected by configuration: Ollama on the ML VM or a hosted model API through Spring AI.
 
 ## Global API Rules
 
@@ -11,25 +12,31 @@
 - Default response format is JSON.
 - Default authentication is `Authorization: Bearer <access_token>`.
 - Use `X-Request-Id` for frontend-to-backend correlation.
+- Propagate W3C `traceparent`/`tracestate`; responses may expose a safe request ID for support.
 - Error responses use `ErrorResponse`.
-- Admin/moderator endpoints require `mod` or `admin` role.
+- Admin/moderator endpoints require `MODERATOR` or `ADMIN` role.
 - EV charger reads must be local database first; provider refresh happens only on cache miss, stale tile, manual refresh, or low-confidence coverage.
 
 ## Service Routing
 
-| Prefix                                                                    | Service                 | Local Port |
-| ------------------------------------------------------------------------- | ----------------------- | ---------: |
-| `/v1/trips/**`, `/v1/share/**`, `/v1/media/**`, `/v1/mod/**`, `/v1/me/**` | Trip & Media Service    |       8081 |
-| `/v1/geo/**`, `/v1/ev/**`, `/v1/admin/ev/**`                              | EV Intelligence Service |       8082 |
-| `/v1/posts/**`, `/v1/feed/**`, `/v1/search/**`, `/v1/notifications/**`    | Community Service       |       8083 |
-| `/v1/ai/**`                                                               | AI Orchestrator Service |       8084 |
+These are explicit Spring Cloud Gateway routes. Raw Eureka `/serviceId/**` routes and direct service ports are private. NGINX does not maintain a second set of domain routes in production; it forwards application traffic to the gateway.
 
-## Trip & Media Service
+Config Server, Eureka dashboards, Gateway Actuator, service Actuator, and Grafana Alloy management endpoints are observability and operational interfaces intentionally excluded from the public OpenAPI contract. They require private-network and operator access.
+
+| Prefix | Service | Local Port |
+| --- | --- | ---: |
+| `/v1/users/**`, `/v1/admin/users/**` | User Management Service | 8081 |
+| `/v1/trips/**`, `/v1/public-trips/**`, `/v1/share/**` | Trip Planning Service | 8082 |
+| `/v1/geo/**`, `/v1/places/**`, `/v1/routes/**`, `/v1/ev/**`, `/v1/chargers/**`, `/v1/admin/ev/**` | Mobility & EV Service | 8083 |
+| `/v1/posts/**`, `/v1/groups/**`, `/v1/community/**`, `/v1/feed/**`, `/v1/notifications/**`, `/v1/media/**` | Community Service | 8084 |
+| `/v1/ai/**` | AI Planning Service | 8085 |
+
+## Trip Planning Service
 
 ### `POST /v1/trips` — Create trip
 
 **Does:** Creates a new private trip owned by the authenticated user.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `201` `Trip`
 
 **Request body:** `TripRequest`
@@ -117,7 +124,7 @@
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/trips' \
+curl -X POST 'https://api.navio.local/v1/trips' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"title": "Bangkok to Hua Hin EV Weekend", "description": "2-day EV-friendly road trip", "startDate": "2026-06-01", "endDate": "2026-06-02", "stops": [{"name": "Bangkok", "location": {"lat": 13.7563, "lng": 100.5018, "address": "Bangkok"}, "orderIndex": 0}, {"name": "Hua Hin", "location": {"lat": 12.5684, "lng": 99.9577, "address": "Hua Hin"}, "orderIndex": 1}], "evProfile": {"vehicleName": "BYD Atto 3", "batteryCapacityKwh": 60.5, "currentBatteryPercent": 80, "minArrivalBatteryPercent": 15, "consumptionKwhPer100Km": 16.5, "connectorTypes": ["CCS2"]}}'
@@ -126,7 +133,7 @@ curl -X POST 'https://api.tripplanner.local/v1/trips' \
 ### `GET /v1/trips/{tripId}` — Get trip
 
 **Does:** Returns one trip if the user has access or the trip is public.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `Trip`
 
 **Parameters**
@@ -183,14 +190,14 @@ curl -X POST 'https://api.tripplanner.local/v1/trips' \
 **Example usage**
 
 ```bash
-curl 'https://api.tripplanner.local/v1/trips/trip_01HX' \
+curl 'https://api.navio.local/v1/trips/trip_01HX' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
 ### `PATCH /v1/trips/{tripId}` — Update trip
 
 **Does:** Updates title, dates, stops, route legs, EV profile, or notes and writes a revision.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `Trip`
 
 **Parameters**
@@ -284,7 +291,7 @@ curl 'https://api.tripplanner.local/v1/trips/trip_01HX' \
 **Example usage**
 
 ```bash
-curl -X PATCH 'https://api.tripplanner.local/v1/trips/trip_01HX' \
+curl -X PATCH 'https://api.navio.local/v1/trips/trip_01HX' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"title": "Bangkok to Hua Hin EV Weekend", "description": "2-day EV-friendly road trip", "startDate": "2026-06-01", "endDate": "2026-06-02", "stops": [{"name": "Bangkok", "location": {"lat": 13.7563, "lng": 100.5018, "address": "Bangkok"}, "orderIndex": 0}, {"name": "Hua Hin", "location": {"lat": 12.5684, "lng": 99.9577, "address": "Hua Hin"}, "orderIndex": 1}], "evProfile": {"vehicleName": "BYD Atto 3", "batteryCapacityKwh": 60.5, "currentBatteryPercent": 80, "minArrivalBatteryPercent": 15, "consumptionKwhPer100Km": 16.5, "connectorTypes": ["CCS2"]}}'
@@ -293,7 +300,7 @@ curl -X PATCH 'https://api.tripplanner.local/v1/trips/trip_01HX' \
 ### `DELETE /v1/trips/{tripId}` — Delete trip
 
 **Does:** Soft-deletes or deletes a trip owned by the current user.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `204` no body
 
 **Parameters**
@@ -307,14 +314,14 @@ curl -X PATCH 'https://api.tripplanner.local/v1/trips/trip_01HX' \
 **Example usage**
 
 ```bash
-curl -X DELETE 'https://api.tripplanner.local/v1/trips/trip_01HX' \
+curl -X DELETE 'https://api.navio.local/v1/trips/trip_01HX' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
 ### `GET /v1/trips/{tripId}/revisions` — List trip revisions
 
 **Does:** Lists revision history for rollback and audit display.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `RevisionList`
 
 **Parameters**
@@ -353,14 +360,14 @@ curl -X DELETE 'https://api.tripplanner.local/v1/trips/trip_01HX' \
 **Example usage**
 
 ```bash
-curl 'https://api.tripplanner.local/v1/trips/trip_01HX/revisions' \
+curl 'https://api.navio.local/v1/trips/trip_01HX/revisions' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
 ### `POST /v1/trips/{tripId}/rollback` — Rollback trip
 
 **Does:** Restores a trip snapshot from a specific revision and creates a new revision.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `Trip`
 
 **Parameters**
@@ -423,7 +430,7 @@ curl 'https://api.tripplanner.local/v1/trips/trip_01HX/revisions' \
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/trips/trip_01HX/rollback' \
+curl -X POST 'https://api.navio.local/v1/trips/trip_01HX/rollback' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"revisionId": "rev_01HX"}'
@@ -432,7 +439,7 @@ curl -X POST 'https://api.tripplanner.local/v1/trips/trip_01HX/rollback' \
 ### `POST /v1/trips/{tripId}/visibility` — Change visibility
 
 **Does:** Changes visibility between private, unlisted, and public.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `Trip`
 
 **Parameters**
@@ -496,7 +503,7 @@ curl -X POST 'https://api.tripplanner.local/v1/trips/trip_01HX/rollback' \
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/trips/trip_01HX/visibility' \
+curl -X POST 'https://api.navio.local/v1/trips/trip_01HX/visibility' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"visibility": "public", "reason": "Ready to share"}'
@@ -505,7 +512,7 @@ curl -X POST 'https://api.tripplanner.local/v1/trips/trip_01HX/visibility' \
 ### `POST /v1/trips/{tripId}/copy` — Copy trip
 
 **Does:** Copies a public/community/shared trip into the current user's private trip library as an independent snapshot.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `201` `Trip`
 **Implementation note:** Copied trip starts private. Source deletion or edits do not affect the copy.
 **Copy includes:**
@@ -594,7 +601,7 @@ curl -X POST 'https://api.tripplanner.local/v1/trips/trip_01HX/visibility' \
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/trips/trip_01HX/copy' \
+curl -X POST 'https://api.navio.local/v1/trips/trip_01HX/copy' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"sourcePostId": "post_01HX", "newTitle": "My Copy of Hua Hin Trip"}'
@@ -603,7 +610,7 @@ curl -X POST 'https://api.tripplanner.local/v1/trips/trip_01HX/copy' \
 ### `POST /v1/trips/{tripId}/share-links` — Create share link
 
 **Does:** Creates an unlisted share token, optionally expiring and allowing copy.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `201` `ShareLink`
 
 **Parameters**
@@ -628,7 +635,7 @@ curl -X POST 'https://api.tripplanner.local/v1/trips/trip_01HX/copy' \
   "id": "token_01HX",
   "tripId": "trip_01HX",
   "token": "shr_abc",
-  "url": "https://api.tripplanner.local/v1/share/shr_abc",
+  "url": "https://api.navio.local/v1/share/shr_abc",
   "allowCopy": true,
   "expiresAt": "2026-07-01T00:00:00Z",
   "createdAt": "2026-05-07T05:00:00Z"
@@ -638,7 +645,7 @@ curl -X POST 'https://api.tripplanner.local/v1/trips/trip_01HX/copy' \
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/trips/trip_01HX/share-links' \
+curl -X POST 'https://api.navio.local/v1/trips/trip_01HX/share-links' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"expiresAt": "2026-07-01T00:00:00Z", "allowCopy": true}'
@@ -647,7 +654,7 @@ curl -X POST 'https://api.tripplanner.local/v1/trips/trip_01HX/share-links' \
 ### `DELETE /v1/trips/{tripId}/share-links/{tokenId}` — Revoke share link
 
 **Does:** Revokes an existing share token.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `204` no body
 
 **Parameters**
@@ -662,14 +669,14 @@ curl -X POST 'https://api.tripplanner.local/v1/trips/trip_01HX/share-links' \
 **Example usage**
 
 ```bash
-curl -X DELETE 'https://api.tripplanner.local/v1/trips/trip_01HX/share-links/shr_abc_01HX' \
+curl -X DELETE 'https://api.navio.local/v1/trips/trip_01HX/share-links/shr_abc_01HX' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
 ### `GET /v1/share/{token}` — Resolve share link
 
 **Does:** Public endpoint that returns a shareable trip view from a token.
-**Auth:** Public, no JWT  
+**Auth:** Public, no JWT
 **Success:** `200` `ShareResolve`
 
 **Parameters**
@@ -697,13 +704,13 @@ curl -X DELETE 'https://api.tripplanner.local/v1/trips/trip_01HX/share-links/shr
 **Example usage**
 
 ```bash
-curl 'https://api.tripplanner.local/v1/share/shr_abc'
+curl 'https://api.navio.local/v1/share/shr_abc'
 ```
 
 ### `POST /v1/trips/{tripId}/permissions` — Update trip permissions
 
-**Does:** Adds or removes viewer/editor ACL entries for a trip.
-**Auth:** Bearer JWT required  
+**Does:** Adds or removes authoritative viewer/editor permissions owned by Trip Planning.
+**Auth:** Bearer JWT required
 **Success:** `200` `PermissionsResponse`
 
 **Parameters**
@@ -743,7 +750,7 @@ curl 'https://api.tripplanner.local/v1/share/shr_abc'
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/trips/trip_01HX/permissions' \
+curl -X POST 'https://api.navio.local/v1/trips/trip_01HX/permissions' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"add": [{"userId": "user_456", "role": "viewer"}], "removeUserIds": []}'
@@ -751,8 +758,8 @@ curl -X POST 'https://api.tripplanner.local/v1/trips/trip_01HX/permissions' \
 
 ### `GET /v1/trips/{tripId}/permissions` — Get trip permissions
 
-**Does:** Returns current ACL entries for the trip.
-**Auth:** Bearer JWT required  
+**Does:** Returns current trip-scoped permission entries.
+**Auth:** Bearer JWT required
 **Success:** `200` `PermissionsResponse`
 
 **Parameters**
@@ -780,11 +787,21 @@ curl -X POST 'https://api.tripplanner.local/v1/trips/trip_01HX/permissions' \
 **Example usage**
 
 ```bash
-curl 'https://api.tripplanner.local/v1/trips/trip_01HX/permissions' \
+curl 'https://api.navio.local/v1/trips/trip_01HX/permissions' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
-### Trip planning extensions (v1.1)
+### Public Explore catalogue
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/v1/public-trips` | Search/filter public trip templates for Explore. |
+| `GET` | `/v1/public-trips/{tripId}` | Load a public trip template. |
+| `POST` | `/v1/trips/{tripId}/copy` | Copy the public template as an independent private trip. |
+
+Supported catalogue query parameters include `q`, `destination`, `tags`, `sort`, `page`, and `size`. Trip Planning owns this search and enforces visibility.
+
+### Trip planning extensions (v1.3)
 
 These endpoints support detailed trip planning (dates, sections, places, itinerary, reservations, attachments, notes, budgeting, expenses, and tripmates). All endpoints in this section require Bearer JWT.
 
@@ -1025,10 +1042,14 @@ Invite request:
 }
 ```
 
-### `GET /v1/me` — Get current user
+## User Management Service
+
+Keycloak performs login and token issuance. User Management stores Navio-specific profiles, preferences, vehicles, suspension/audit history, and manages global role assignments through the Keycloak Admin API. Keycloak remains authoritative for `USER`, `MODERATOR`, and `ADMIN` roles.
+
+### `GET /v1/users/me` — Get current user
 
 **Does:** Returns the authenticated user's mirrored app profile and preferences.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `UserProfile`
 
 **Request body:** none
@@ -1040,7 +1061,7 @@ Invite request:
   "id": "user_123",
   "displayName": "Somchai",
   "email": "somchai@example.com",
-  "roles": ["user"],
+  "roles": ["USER"],
   "preferences": {
     "language": "en",
     "distanceUnit": "km",
@@ -1053,14 +1074,14 @@ Invite request:
 **Example usage**
 
 ```bash
-curl 'https://api.tripplanner.local/v1/me' \
+curl 'https://api.navio.local/v1/users/me' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
-### `PATCH /v1/me/preferences` — Update preferences
+### `PATCH /v1/users/me/preferences` — Update preferences
 
 **Does:** Updates current user's language, distance, and notification preferences.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `UserProfile`
 
 **Request body:** `UserPreferences`
@@ -1081,7 +1102,7 @@ curl 'https://api.tripplanner.local/v1/me' \
   "id": "user_123",
   "displayName": "Somchai",
   "email": "somchai@example.com",
-  "roles": ["user"],
+  "roles": ["USER"],
   "preferences": {
     "language": "en",
     "distanceUnit": "km",
@@ -1094,16 +1115,16 @@ curl 'https://api.tripplanner.local/v1/me' \
 **Example usage**
 
 ```bash
-curl -X PATCH 'https://api.tripplanner.local/v1/me/preferences' \
+curl -X PATCH 'https://api.navio.local/v1/users/me/preferences' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"language": "en", "distanceUnit": "km", "notificationEmail": true, "notificationPush": false}'
 ```
 
-### `POST /v1/mod/users/{userId}/ban` — Ban user
+### `POST /v1/admin/users/{userId}/suspend` — Suspend user
 
-**Does:** Moderator/admin endpoint to ban a user.
-**Auth:** Bearer JWT required; requires `mod` or `admin` role  
+**Does:** Disables the account through Keycloak, records the Navio suspension/audit entry, and publishes `UserSuspended.v1` through the user outbox.
+**Auth:** Bearer JWT required; requires `MODERATOR` or `ADMIN` role
 **Success:** `200` `ModerationResponse`
 
 **Parameters**
@@ -1126,7 +1147,7 @@ curl -X PATCH 'https://api.tripplanner.local/v1/me/preferences' \
 ```json
 {
   "userId": "user_456",
-  "status": "banned",
+  "status": "suspended",
   "reason": "Spam reports confirmed",
   "updatedAt": "2026-05-07T05:00:00Z"
 }
@@ -1135,16 +1156,16 @@ curl -X PATCH 'https://api.tripplanner.local/v1/me/preferences' \
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/mod/users/user_01HX/ban' \
+curl -X POST 'https://api.navio.local/v1/admin/users/user_01HX/suspend' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"reason": "Spam reports confirmed", "expiresAt": "2026-06-01T00:00:00Z"}'
 ```
 
-### `POST /v1/mod/users/{userId}/unban` — Unban user
+### `POST /v1/admin/users/{userId}/reactivate` — Reactivate user
 
-**Does:** Moderator/admin endpoint to remove a ban.
-**Auth:** Bearer JWT required; requires `mod` or `admin` role  
+**Does:** Re-enables an eligible account through Keycloak, closes the active suspension record, records the audit action, and publishes `UserReactivated.v1`.
+**Auth:** Bearer JWT required; requires `MODERATOR` or `ADMIN` role
 **Success:** `200` `ModerationResponse`
 
 **Parameters**
@@ -1167,7 +1188,7 @@ curl -X POST 'https://api.tripplanner.local/v1/mod/users/user_01HX/ban' \
 ```json
 {
   "userId": "user_456",
-  "status": "banned",
+  "status": "active",
   "reason": "Spam reports confirmed",
   "updatedAt": "2026-05-07T05:00:00Z"
 }
@@ -1176,16 +1197,42 @@ curl -X POST 'https://api.tripplanner.local/v1/mod/users/user_01HX/ban' \
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/mod/users/user_01HX/unban' \
+curl -X POST 'https://api.navio.local/v1/admin/users/user_01HX/reactivate' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"reason": "Spam reports confirmed", "expiresAt": "2026-06-01T00:00:00Z"}'
 ```
+
+### User and role management extensions
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/v1/users/{userId}` | Get a public Navio profile. |
+| `GET` | `/v1/users/me/vehicles` | List the current user's saved vehicles. |
+| `POST` | `/v1/users/me/vehicles` | Add a saved vehicle. |
+| `PATCH` | `/v1/users/me/vehicles/{vehicleId}` | Update nickname, battery defaults, or default selection. |
+| `DELETE` | `/v1/users/me/vehicles/{vehicleId}` | Remove a saved vehicle. |
+| `GET` | `/v1/admin/users` | Search and administer users. |
+| `POST` | `/v1/admin/users/{userId}/roles` | Grant a global Keycloak role and write an audit record. |
+| `DELETE` | `/v1/admin/users/{userId}/roles/{role}` | Revoke a global Keycloak role and write an audit record. |
+
+Role request:
+
+```json
+{
+  "role": "MODERATOR",
+  "reason": "Approved community moderator"
+}
+```
+
+Resource roles such as trip editor or group moderator are not global roles and remain in the owning domain service.
+
+## Community Service — Media
 
 ### `POST /v1/media/upload-url` — Request media upload URL
 
 **Does:** Creates a media record and returns a pre-signed upload URL.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `201` `MediaUploadUrlResponse`
 
 **Request body:** `MediaUploadUrlRequest`
@@ -1204,7 +1251,7 @@ curl -X POST 'https://api.tripplanner.local/v1/mod/users/user_01HX/unban' \
 ```json
 {
   "mediaId": "media_01HX",
-  "uploadUrl": "https://minio.local/presigned",
+  "uploadUrl": "https://uploads.navio.local/presigned",
   "method": "PUT",
   "headers": {
     "Content-Type": "image/jpeg"
@@ -1216,7 +1263,7 @@ curl -X POST 'https://api.tripplanner.local/v1/mod/users/user_01HX/unban' \
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/media/upload-url' \
+curl -X POST 'https://api.navio.local/v1/media/upload-url' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"filename": "charger-photo.jpg", "contentType": "image/jpeg", "sizeBytes": 524288, "purpose": "charger_review_image"}'
@@ -1225,7 +1272,7 @@ curl -X POST 'https://api.tripplanner.local/v1/media/upload-url' \
 ### `POST /v1/media/complete` — Complete media upload
 
 **Does:** Signals upload completion so the embedded media worker can scan and prepare safe URLs.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `Media`
 
 **Request body:** `MediaCompleteRequest`
@@ -1255,7 +1302,7 @@ curl -X POST 'https://api.tripplanner.local/v1/media/upload-url' \
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/media/complete' \
+curl -X POST 'https://api.navio.local/v1/media/complete' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"mediaId": "media_01HX", "objectKey": "uploads/user_123/media_01HX.jpg"}'
@@ -1264,7 +1311,7 @@ curl -X POST 'https://api.tripplanner.local/v1/media/complete' \
 ### `GET /v1/media/{mediaId}` — Get media metadata
 
 **Does:** Returns media processing status and safe rendering URLs.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `Media`
 
 **Parameters**
@@ -1293,16 +1340,16 @@ curl -X POST 'https://api.tripplanner.local/v1/media/complete' \
 **Example usage**
 
 ```bash
-curl 'https://api.tripplanner.local/v1/media/media_01HX' \
+curl 'https://api.navio.local/v1/media/media_01HX' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
-## EV Intelligence Service
+## Mobility & EV Service
 
 ### `GET /v1/geo/places/autocomplete` — Autocomplete place search
 
 **Does:** Autocomplete place search with backend-controlled provider adapters.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `PlaceAutocompleteResponse`
 
 **Parameters**
@@ -1334,14 +1381,14 @@ curl 'https://api.tripplanner.local/v1/media/media_01HX' \
 **Example usage**
 
 ```bash
-curl 'https://api.tripplanner.local/v1/geo/places/autocomplete?query=central%20park&lat=40.7&lng=-73.9' \
+curl 'https://api.navio.local/v1/geo/places/autocomplete?query=central%20park&lat=40.7&lng=-73.9' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
 ### `GET /v1/geo/places/{providerPlaceId}` — Get place details
 
 **Does:** Returns normalized place details before saving.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `PlaceDetails`
 
 **Parameters**
@@ -1372,14 +1419,14 @@ curl 'https://api.tripplanner.local/v1/geo/places/autocomplete?query=central%20p
 **Example usage**
 
 ```bash
-curl 'https://api.tripplanner.local/v1/geo/places/ChIJ4zGFAZpYwokRGUGph3Mf37k?provider=GOOGLE' \
+curl 'https://api.navio.local/v1/geo/places/ChIJ4zGFAZpYwokRGUGph3Mf37k?provider=GOOGLE' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
 ### `POST /v1/geo/geocode` — Geocode place
 
 **Does:** Provider-hidden geocoding endpoint for address/place search.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `GeocodeResponse`
 
 **Request body:** `GeocodeRequest`
@@ -1413,7 +1460,7 @@ curl 'https://api.tripplanner.local/v1/geo/places/ChIJ4zGFAZpYwokRGUGph3Mf37k?pr
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/geo/geocode' \
+curl -X POST 'https://api.navio.local/v1/geo/geocode' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"query": "CentralWorld Bangkok", "countryBias": "TH"}'
@@ -1422,7 +1469,7 @@ curl -X POST 'https://api.tripplanner.local/v1/geo/geocode' \
 ### `POST /v1/geo/route` — Compute map route
 
 **Does:** Provider-hidden route endpoint using Google Maps v1.0 adapter.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `RouteResponse`
 
 **Request body:** `RouteRequest`
@@ -1457,7 +1504,7 @@ curl -X POST 'https://api.tripplanner.local/v1/geo/geocode' \
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/geo/route' \
+curl -X POST 'https://api.navio.local/v1/geo/route' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"origin": {"lat": 13.7563, "lng": 100.5018}, "destination": {"lat": 12.5684, "lng": 99.9577}, "waypoints": [], "travelMode": "DRIVE"}'
@@ -1466,7 +1513,7 @@ curl -X POST 'https://api.tripplanner.local/v1/geo/route' \
 ### `POST /v1/ev/route/compute` — Compute EV-aware route
 
 **Does:** Calculates EV feasibility and recommends charging stops.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `EvRouteResponse`
 
 **Request body:** `EvRouteRequest`
@@ -1519,7 +1566,7 @@ curl -X POST 'https://api.tripplanner.local/v1/geo/route' \
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/ev/route/compute' \
+curl -X POST 'https://api.navio.local/v1/ev/route/compute' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"origin": {"lat": 13.7563, "lng": 100.5018}, "destination": {"lat": 12.5684, "lng": 99.9577}, "waypoints": [], "evProfile": {"vehicleName": "BYD Atto 3", "batteryCapacityKwh": 60.5, "currentBatteryPercent": 80, "minArrivalBatteryPercent": 15, "consumptionKwhPer100Km": 16.5, "connectorTypes": ["CCS2"]}, "preferredConnectors": ["CCS2"], "minChargerKw": 50}'
@@ -1528,7 +1575,7 @@ curl -X POST 'https://api.tripplanner.local/v1/ev/route/compute' \
 ### `GET /v1/ev/chargers/near` — Search chargers near point
 
 **Does:** Returns charger markers from local Postgres/PostGIS first; external provider refresh only on cache miss/stale/low confidence.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `ChargerList`
 
 **Parameters**
@@ -1561,14 +1608,14 @@ curl -X POST 'https://api.tripplanner.local/v1/ev/route/compute' \
 **Example usage**
 
 ```bash
-curl 'https://api.tripplanner.local/v1/ev/chargers/near?lat=13.7563&lng=100.5018' \
+curl 'https://api.navio.local/v1/ev/chargers/near?lat=13.7563&lng=100.5018' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
 ### `GET /v1/ev/chargers/{chargerId}` — Get charger detail
 
 **Does:** Returns charger details, ratings, confidence, and verification status. May lazy-refresh stale details.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `Charger`
 
 **Parameters**
@@ -1607,14 +1654,14 @@ curl 'https://api.tripplanner.local/v1/ev/chargers/near?lat=13.7563&lng=100.5018
 **Example usage**
 
 ```bash
-curl 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX' \
+curl 'https://api.navio.local/v1/ev/chargers/charger_01HX' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
 ### `POST /v1/ev/chargers/suggest` — Suggest missing charger
 
 **Does:** Creates a pending verification charger suggestion.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `201` `Charger`
 
 **Request body:** `SuggestChargerRequest`
@@ -1663,7 +1710,7 @@ curl 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX' \
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/ev/chargers/suggest' \
+curl -X POST 'https://api.navio.local/v1/ev/chargers/suggest' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"name": "New EV Station Sukhumvit", "operatorName": "EA Anywhere", "location": {"lat": 13.736, "lng": 100.56, "address": "Sukhumvit Rd"}, "connectorTypes": ["CCS2"], "maxKw": 120, "notes": "Located behind the mall", "mediaIds": []}'
@@ -1672,7 +1719,7 @@ curl -X POST 'https://api.tripplanner.local/v1/ev/chargers/suggest' \
 ### `GET /v1/ev/chargers/{chargerId}/reviews` — List charger reviews
 
 **Does:** Lists reviews for one charger.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `ReviewList`
 
 **Parameters**
@@ -1703,14 +1750,14 @@ curl -X POST 'https://api.tripplanner.local/v1/ev/chargers/suggest' \
 **Example usage**
 
 ```bash
-curl 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/reviews' \
+curl 'https://api.navio.local/v1/ev/chargers/charger_01HX/reviews' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
 ### `POST /v1/ev/chargers/{chargerId}/reviews` — Create or replace review
 
 **Does:** Creates or replaces the current user's review. Enforces one review per user per charger.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `201` `Review`
 
 **Parameters**
@@ -1752,7 +1799,7 @@ curl 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/reviews' \
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/reviews' \
+curl -X POST 'https://api.navio.local/v1/ev/chargers/charger_01HX/reviews' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"rating": 5, "reviewText": "Worked well, easy parking.", "visitDate": "2026-05-01", "chargingSuccessful": true, "waitTimeMinutes": 5, "connectorUsed": "CCS2", "mediaIds": []}'
@@ -1761,7 +1808,7 @@ curl -X POST 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/reviews'
 ### `PATCH /v1/ev/chargers/{chargerId}/reviews/{reviewId}` — Edit charger review
 
 **Does:** Edits the current user's review, or moderator/admin can edit if policy allows.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `Review`
 
 **Parameters**
@@ -1804,7 +1851,7 @@ curl -X POST 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/reviews'
 **Example usage**
 
 ```bash
-curl -X PATCH 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/reviews/review_01HX' \
+curl -X PATCH 'https://api.navio.local/v1/ev/chargers/charger_01HX/reviews/review_01HX' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"rating": 5, "reviewText": "Worked well, easy parking.", "visitDate": "2026-05-01", "chargingSuccessful": true, "waitTimeMinutes": 5, "connectorUsed": "CCS2", "mediaIds": []}'
@@ -1813,7 +1860,7 @@ curl -X PATCH 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/reviews
 ### `DELETE /v1/ev/chargers/{chargerId}/reviews/{reviewId}` — Delete charger review
 
 **Does:** Deletes own review or moderator/admin deletes inappropriate review.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `204` no body
 
 **Parameters**
@@ -1828,14 +1875,14 @@ curl -X PATCH 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/reviews
 **Example usage**
 
 ```bash
-curl -X DELETE 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/reviews/review_01HX' \
+curl -X DELETE 'https://api.navio.local/v1/ev/chargers/charger_01HX/reviews/review_01HX' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
 ### `GET /v1/ev/chargers/{chargerId}/comments` — List charger comments
 
 **Does:** Lists charger discussion comments. Omit parentId for top level; provide parentId for replies.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `CommentList`
 
 **Parameters**
@@ -1865,14 +1912,14 @@ curl -X DELETE 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/review
 **Example usage**
 
 ```bash
-curl 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/comments' \
+curl 'https://api.navio.local/v1/ev/chargers/charger_01HX/comments' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
 ### `POST /v1/ev/chargers/{chargerId}/comments` — Create charger comment
 
 **Does:** Creates a charger discussion comment or reply.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `201` `Comment`
 
 **Parameters**
@@ -1906,7 +1953,7 @@ curl 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/comments' \
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/comments' \
+curl -X POST 'https://api.navio.local/v1/ev/chargers/charger_01HX/comments' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"parentCommentId": null, "commentText": "Is this charger open after midnight?"}'
@@ -1915,7 +1962,7 @@ curl -X POST 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/comments
 ### `DELETE /v1/ev/chargers/{chargerId}/comments/{commentId}` — Delete charger comment
 
 **Does:** Deletes own charger comment or moderator/admin deletes it.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `204` no body
 
 **Parameters**
@@ -1930,14 +1977,14 @@ curl -X POST 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/comments
 **Example usage**
 
 ```bash
-curl -X DELETE 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/comments/comment_01HX' \
+curl -X DELETE 'https://api.navio.local/v1/ev/chargers/charger_01HX/comments/comment_01HX' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
 ### `POST /v1/ev/chargers/{chargerId}/report` — Report charger
 
 **Does:** Reports incorrect charger information.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `201` `Report`
 
 **Parameters**
@@ -1972,7 +2019,7 @@ curl -X DELETE 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/commen
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/report' \
+curl -X POST 'https://api.navio.local/v1/ev/chargers/charger_01HX/report' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"reportType": "wrong_connector", "description": "App shows CCS2 but only Type2 is available."}'
@@ -1981,7 +2028,7 @@ curl -X POST 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/report' 
 ### `POST /v1/ev/chargers/{chargerId}/suggest-edit` — Suggest charger edit
 
 **Does:** Suggests edits to charger name, address, location, connectors, power, or opening hours.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `201` `Suggestion`
 
 **Parameters**
@@ -2014,7 +2061,7 @@ curl -X POST 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/report' 
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/suggest-edit' \
+curl -X POST 'https://api.navio.local/v1/ev/chargers/charger_01HX/suggest-edit' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"suggestedMaxKw": 150, "description": "Power upgraded to 150 kW."}'
@@ -2023,7 +2070,7 @@ curl -X POST 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/suggest-
 ### `GET /v1/admin/ev/charger-reports` — List charger reports
 
 **Does:** Admin/moderator list of charger reports.
-**Auth:** Bearer JWT required; requires `mod` or `admin` role  
+**Auth:** Bearer JWT required; requires `MODERATOR` or `ADMIN` role
 **Success:** `200` `CommentList`
 
 **Parameters**
@@ -2054,14 +2101,14 @@ curl -X POST 'https://api.tripplanner.local/v1/ev/chargers/charger_01HX/suggest-
 **Example usage**
 
 ```bash
-curl 'https://api.tripplanner.local/v1/admin/ev/charger-reports' \
+curl 'https://api.navio.local/v1/admin/ev/charger-reports' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
 ### `POST /v1/admin/ev/chargers/{chargerId}/approve` — Approve charger
 
 **Does:** Admin approves a pending/user-submitted charger.
-**Auth:** Bearer JWT required; requires `mod` or `admin` role  
+**Auth:** Bearer JWT required; requires `MODERATOR` or `ADMIN` role
 **Success:** `200` `AdminDecisionResponse`
 
 **Parameters**
@@ -2092,7 +2139,7 @@ curl 'https://api.tripplanner.local/v1/admin/ev/charger-reports' \
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/admin/ev/chargers/charger_01HX/approve' \
+curl -X POST 'https://api.navio.local/v1/admin/ev/chargers/charger_01HX/approve' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"reason": "Verified by admin from submitted photo"}'
@@ -2101,7 +2148,7 @@ curl -X POST 'https://api.tripplanner.local/v1/admin/ev/chargers/charger_01HX/ap
 ### `POST /v1/admin/ev/chargers/{chargerId}/reject` — Reject charger
 
 **Does:** Admin rejects a pending/user-submitted charger.
-**Auth:** Bearer JWT required; requires `mod` or `admin` role  
+**Auth:** Bearer JWT required; requires `MODERATOR` or `ADMIN` role
 **Success:** `200` `AdminDecisionResponse`
 
 **Parameters**
@@ -2132,7 +2179,7 @@ curl -X POST 'https://api.tripplanner.local/v1/admin/ev/chargers/charger_01HX/ap
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/admin/ev/chargers/charger_01HX/reject' \
+curl -X POST 'https://api.navio.local/v1/admin/ev/chargers/charger_01HX/reject' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"reason": "Verified by admin from submitted photo"}'
@@ -2141,7 +2188,7 @@ curl -X POST 'https://api.tripplanner.local/v1/admin/ev/chargers/charger_01HX/re
 ### `POST /v1/admin/ev/charger-suggestions/{suggestionId}/approve` — Approve charger edit
 
 **Does:** Admin approves a suggested charger edit and applies it.
-**Auth:** Bearer JWT required; requires `mod` or `admin` role  
+**Auth:** Bearer JWT required; requires `MODERATOR` or `ADMIN` role
 **Success:** `200` `AdminDecisionResponse`
 
 **Parameters**
@@ -2172,7 +2219,7 @@ curl -X POST 'https://api.tripplanner.local/v1/admin/ev/chargers/charger_01HX/re
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/admin/ev/charger-suggestions/suggestion_01HX/approve' \
+curl -X POST 'https://api.navio.local/v1/admin/ev/charger-suggestions/suggestion_01HX/approve' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"reason": "Verified by admin from submitted photo"}'
@@ -2181,7 +2228,7 @@ curl -X POST 'https://api.tripplanner.local/v1/admin/ev/charger-suggestions/sugg
 ### `POST /v1/admin/ev/charger-suggestions/{suggestionId}/reject` — Reject charger edit
 
 **Does:** Admin rejects a suggested charger edit.
-**Auth:** Bearer JWT required; requires `mod` or `admin` role  
+**Auth:** Bearer JWT required; requires `MODERATOR` or `ADMIN` role
 **Success:** `200` `AdminDecisionResponse`
 
 **Parameters**
@@ -2212,7 +2259,7 @@ curl -X POST 'https://api.tripplanner.local/v1/admin/ev/charger-suggestions/sugg
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/admin/ev/charger-suggestions/suggestion_01HX/reject' \
+curl -X POST 'https://api.navio.local/v1/admin/ev/charger-suggestions/suggestion_01HX/reject' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"reason": "Verified by admin from submitted photo"}'
@@ -2221,7 +2268,7 @@ curl -X POST 'https://api.tripplanner.local/v1/admin/ev/charger-suggestions/sugg
 ### `POST /v1/admin/ev/tiles/{tileKey}/refresh` — Refresh EV geo-tile
 
 **Does:** Manually triggers charger refresh for one geo-tile.
-**Auth:** Bearer JWT required; requires `mod` or `admin` role  
+**Auth:** Bearer JWT required; requires `MODERATOR` or `ADMIN` role
 **Success:** `202` `TileRefreshResponse`
 
 **Parameters**
@@ -2252,7 +2299,7 @@ curl -X POST 'https://api.tripplanner.local/v1/admin/ev/charger-suggestions/sugg
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/admin/ev/tiles/tileKey/refresh' \
+curl -X POST 'https://api.navio.local/v1/admin/ev/tiles/tileKey/refresh' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"reason": "Verified by admin from submitted photo"}'
@@ -2263,7 +2310,7 @@ curl -X POST 'https://api.tripplanner.local/v1/admin/ev/tiles/tileKey/refresh' \
 ### `POST /v1/posts` — Create post
 
 **Does:** Creates a community post, optionally linked to a trip for manual share-to-community flow.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `201` `Post`
 
 **Request body:** `PostRequest`
@@ -2300,7 +2347,7 @@ curl -X POST 'https://api.tripplanner.local/v1/admin/ev/tiles/tileKey/refresh' \
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/posts' \
+curl -X POST 'https://api.navio.local/v1/posts' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"tripId": "trip_01HX", "title": "Bangkok to Hua Hin EV Weekend", "body": "Sharing my EV-friendly route with one charging stop.", "tags": ["ev-trip", "hua-hin"], "visibility": "public"}'
@@ -2309,7 +2356,7 @@ curl -X POST 'https://api.tripplanner.local/v1/posts' \
 ### `GET /v1/feed` — Get feed
 
 **Does:** Returns community feed sorted by new or top and optionally filtered by tag.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `PostList`
 
 **Parameters**
@@ -2341,14 +2388,14 @@ curl -X POST 'https://api.tripplanner.local/v1/posts' \
 **Example usage**
 
 ```bash
-curl 'https://api.tripplanner.local/v1/feed' \
+curl 'https://api.navio.local/v1/feed' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
 ### `GET /v1/posts/{postId}` — Get post
 
 **Does:** Returns a community post by ID.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `Post`
 
 **Parameters**
@@ -2381,14 +2428,14 @@ curl 'https://api.tripplanner.local/v1/feed' \
 **Example usage**
 
 ```bash
-curl 'https://api.tripplanner.local/v1/posts/post_01HX' \
+curl 'https://api.navio.local/v1/posts/post_01HX' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
 ### `GET /v1/posts/{postId}/comments` — List post comments
 
 **Does:** Lists top-level comments or replies by parentId.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `CommentList`
 
 **Parameters**
@@ -2418,14 +2465,14 @@ curl 'https://api.tripplanner.local/v1/posts/post_01HX' \
 **Example usage**
 
 ```bash
-curl 'https://api.tripplanner.local/v1/posts/post_01HX/comments' \
+curl 'https://api.navio.local/v1/posts/post_01HX/comments' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
 ### `POST /v1/posts/{postId}/comments` — Create post comment
 
 **Does:** Creates a top-level comment or nested reply on a post.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `201` `Comment`
 
 **Parameters**
@@ -2459,7 +2506,7 @@ curl 'https://api.tripplanner.local/v1/posts/post_01HX/comments' \
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/posts/post_01HX/comments' \
+curl -X POST 'https://api.navio.local/v1/posts/post_01HX/comments' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"parentCommentId": null, "body": "Can I copy this trip for my own route?"}'
@@ -2468,7 +2515,7 @@ curl -X POST 'https://api.tripplanner.local/v1/posts/post_01HX/comments' \
 ### `DELETE /v1/posts/{postId}/comments/{commentId}` — Delete post comment
 
 **Does:** Deletes own comment or moderator/admin deletes it.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `204` no body
 
 **Parameters**
@@ -2483,14 +2530,14 @@ curl -X POST 'https://api.tripplanner.local/v1/posts/post_01HX/comments' \
 **Example usage**
 
 ```bash
-curl -X DELETE 'https://api.tripplanner.local/v1/posts/post_01HX/comments/comment_01HX' \
+curl -X DELETE 'https://api.navio.local/v1/posts/post_01HX/comments/comment_01HX' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
 ### `PUT /v1/posts/{postId}/vote` — Vote on post
 
 **Does:** Upserts current user's vote. direction=1 upvote, -1 downvote, 0 retract.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `VoteResponse`
 
 **Parameters**
@@ -2520,7 +2567,7 @@ curl -X DELETE 'https://api.tripplanner.local/v1/posts/post_01HX/comments/commen
 **Example usage**
 
 ```bash
-curl -X PUT 'https://api.tripplanner.local/v1/posts/post_01HX/vote' \
+curl -X PUT 'https://api.navio.local/v1/posts/post_01HX/vote' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"direction": 1}'
@@ -2529,7 +2576,7 @@ curl -X PUT 'https://api.tripplanner.local/v1/posts/post_01HX/vote' \
 ### `POST /v1/posts/{postId}/report` — Report post
 
 **Does:** Reports a post for moderation.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `201` `Report`
 
 **Parameters**
@@ -2564,7 +2611,7 @@ curl -X PUT 'https://api.tripplanner.local/v1/posts/post_01HX/vote' \
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/posts/post_01HX/report' \
+curl -X POST 'https://api.navio.local/v1/posts/post_01HX/report' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"reportType": "wrong_connector", "description": "App shows CCS2 but only Type2 is available."}'
@@ -2573,7 +2620,7 @@ curl -X POST 'https://api.tripplanner.local/v1/posts/post_01HX/report' \
 ### `DELETE /v1/posts/{postId}` — Delete post
 
 **Does:** Moderator/admin deletes a post.
-**Auth:** Bearer JWT required; requires `mod` or `admin` role  
+**Auth:** Bearer JWT required; requires `MODERATOR` or `ADMIN` role
 **Success:** `204` no body
 
 **Parameters**
@@ -2587,14 +2634,14 @@ curl -X POST 'https://api.tripplanner.local/v1/posts/post_01HX/report' \
 **Example usage**
 
 ```bash
-curl -X DELETE 'https://api.tripplanner.local/v1/posts/post_01HX' \
+curl -X DELETE 'https://api.navio.local/v1/posts/post_01HX' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
 ### `POST /v1/posts/{postId}/bookmark` — Bookmark post
 
 **Does:** Bookmarks a post for the current user.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `BookmarkResponse`
 
 **Parameters**
@@ -2617,14 +2664,14 @@ curl -X DELETE 'https://api.tripplanner.local/v1/posts/post_01HX' \
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/posts/post_01HX/bookmark' \
+curl -X POST 'https://api.navio.local/v1/posts/post_01HX/bookmark' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
 ### `DELETE /v1/posts/{postId}/bookmark` — Remove bookmark
 
 **Does:** Removes a bookmark from the current user.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `BookmarkResponse`
 
 **Parameters**
@@ -2647,14 +2694,14 @@ curl -X POST 'https://api.tripplanner.local/v1/posts/post_01HX/bookmark' \
 **Example usage**
 
 ```bash
-curl -X DELETE 'https://api.tripplanner.local/v1/posts/post_01HX/bookmark' \
+curl -X DELETE 'https://api.navio.local/v1/posts/post_01HX/bookmark' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
-### `GET /v1/me/bookmarks` — List bookmarks
+### `GET /v1/community/bookmarks` — List bookmarks
 
 **Does:** Lists current user's bookmarked posts.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `PostList`
 
 **Parameters**
@@ -2684,14 +2731,14 @@ curl -X DELETE 'https://api.tripplanner.local/v1/posts/post_01HX/bookmark' \
 **Example usage**
 
 ```bash
-curl 'https://api.tripplanner.local/v1/me/bookmarks' \
+curl 'https://api.navio.local/v1/community/bookmarks' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
-### `GET /v1/search` — Search trips/posts
+### `GET /v1/community/search` — Search community
 
-**Does:** Searches posts and/or visible trips using Postgres full-text search with visibility enforcement.
-**Auth:** Bearer JWT required  
+**Does:** Searches community groups and posts using PostgreSQL full-text search. Attached public-trip snapshot text may improve post matching, but Trip Planning remains authoritative for public-trip search.
+**Auth:** Bearer JWT required
 **Success:** `200` `SearchResponse`
 
 **Parameters**
@@ -2699,7 +2746,7 @@ curl 'https://api.tripplanner.local/v1/me/bookmarks' \
 | Name   | In    | Required | Type      | Notes        |
 | ------ | ----- | -------: | --------- | ------------ |
 | `q`    | query |     true | `string`  | Search query |
-| `type` | query |    false | `string`  | Search type  |
+| `type` | query |    false | `string`  | `posts`, `groups`, or `all` |
 | `page` | query |    false | `integer` |              |
 | `size` | query |    false | `integer` |              |
 
@@ -2731,14 +2778,14 @@ curl 'https://api.tripplanner.local/v1/me/bookmarks' \
 **Example usage**
 
 ```bash
-curl 'https://api.tripplanner.local/v1/search?q=hua hin ev' \
+curl 'https://api.navio.local/v1/community/search?q=hua hin ev' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
 ### `GET /v1/notifications` — List notifications
 
 **Does:** Returns current user's in-app notification inbox.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `NotificationList`
 
 **Parameters**
@@ -2781,14 +2828,14 @@ curl 'https://api.tripplanner.local/v1/search?q=hua hin ev' \
 **Example usage**
 
 ```bash
-curl 'https://api.tripplanner.local/v1/notifications' \
+curl 'https://api.navio.local/v1/notifications' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
 ### `POST /v1/notifications/{id}/read` — Mark notification read
 
 **Does:** Marks one notification as read.
-**Auth:** Bearer JWT required  
+**Auth:** Bearer JWT required
 **Success:** `200` `Notification`
 
 **Parameters**
@@ -2808,16 +2855,23 @@ curl 'https://api.tripplanner.local/v1/notifications' \
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/notifications/id/read' \
+curl -X POST 'https://api.navio.local/v1/notifications/id/read' \
   -H 'Authorization: Bearer <JWT>'
 ```
 
-## AI Orchestrator Service
+## AI Planning Service
+
+AI Planning uses Spring AI's portable chat and streaming abstractions. Deployment selects one provider profile without changing these public contracts:
+
+- `ollama`: AI Planning and Ollama run on the ML VM; Ollama is loopback-only.
+- `hosted`: AI Planning runs on the application VM and calls a hosted model API; no ML VM or Ollama is required.
+
+The model provider never receives database credentials and cannot call arbitrary URLs. All tools are server-owned and allow-listed.
 
 ### `POST /v1/ai/plan/suggest` — Suggest plan changes
 
-**Does:** Uses Gemini through AI Orchestrator to produce structured itinerary and EV improvement actions. Does not apply unless apply=true.
-**Auth:** Bearer JWT required  
+**Does:** Uses the configured Spring AI provider to produce schema-validated itinerary and EV improvement proposals. This endpoint never applies changes directly; it returns a preview that must be confirmed separately.
+**Auth:** Bearer JWT required
 **Success:** `200` `AiPlanSuggestResponse`
 
 **Request body:** `AiPlanSuggestRequest`
@@ -2826,8 +2880,7 @@ curl -X POST 'https://api.tripplanner.local/v1/notifications/id/read' \
 {
   "tripId": "trip_01HX",
   "goal": "Make this trip safer for an EV with fewer low-battery segments.",
-  "constraints": ["Prefer CCS2 chargers above 50 kW"],
-  "apply": false
+  "constraints": ["Prefer CCS2 chargers above 50 kW"]
 }
 ```
 
@@ -2854,16 +2907,16 @@ curl -X POST 'https://api.tripplanner.local/v1/notifications/id/read' \
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/ai/plan/suggest' \
+curl -X POST 'https://api.navio.local/v1/ai/plan/suggest' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
-  -d '{"tripId": "trip_01HX", "goal": "Make this trip safer for an EV with fewer low-battery segments.", "constraints": ["Prefer CCS2 chargers above 50 kW"], "apply": false}'
+  -d '{"tripId": "trip_01HX", "goal": "Make this trip safer for an EV with fewer low-battery segments.", "constraints": ["Prefer CCS2 chargers above 50 kW"]}'
 ```
 
 ### `POST /v1/ai/plan/chat` — Chat with plan
 
-**Does:** Conversational plan assistance. Supports JSON response in this spec; implementation may stream text/event-stream.
-**Auth:** Bearer JWT required  
+**Does:** Conversational plan assistance with a bounded tool loop. Supports JSON for non-streaming clients and `text/event-stream` for the frontend. Any returned actions remain proposals until explicitly confirmed.
+**Auth:** Bearer JWT required
 **Success:** `200` `AiPlanChatResponse`
 
 **Request body:** `AiPlanChatRequest`
@@ -2888,7 +2941,7 @@ curl -X POST 'https://api.tripplanner.local/v1/ai/plan/suggest' \
 **Example usage**
 
 ```bash
-curl -X POST 'https://api.tripplanner.local/v1/ai/plan/chat' \
+curl -X POST 'https://api.navio.local/v1/ai/plan/chat' \
   -H 'Authorization: Bearer <JWT>' \
   -H 'Content-Type: application/json' \
   -d '{"tripId": "trip_01HX", "message": "Can you make day 2 less tiring?"}'
@@ -2897,15 +2950,19 @@ curl -X POST 'https://api.tripplanner.local/v1/ai/plan/chat' \
 ## Suggested Spring Controller Packages
 
 ```txt
-trip-media-service
+user-management-service
+  controller/CurrentUserController.java
+  controller/UserVehicleController.java
+  controller/AdminUserController.java
+  controller/AdminUserRoleController.java
+
+trip-planning-service
   controller/TripController.java
   controller/ShareController.java
-  controller/MeController.java
-  controller/ModerationUserController.java
-  controller/MediaController.java
 
-ev-intelligence-service
+mobility-service
   controller/GeoController.java
+  controller/RouteController.java
   controller/EvRouteController.java
   controller/ChargerController.java
   controller/ChargerReviewController.java
@@ -2914,22 +2971,40 @@ ev-intelligence-service
 
 community-service
   controller/PostController.java
+  controller/GroupController.java
   controller/FeedController.java
   controller/SearchController.java
   controller/NotificationController.java
+  controller/MediaController.java
 
-ai-orchestrator-service
+ai-planning-service
   controller/AiPlanController.java
+  configuration/AiProviderConfiguration.java
+  tool/TripPlanningTools.java
+  tool/MobilityTools.java
+
+platform/api-gateway
+  configuration/GatewayRoutes.java
+  filter/CorrelationFilter.java
+
+platform/configuration-server
+  ConfigurationServerApplication.java
+
+platform/discovery-server
+  DiscoveryServerApplication.java
 ```
 
 ## Implementation Priority
 
-1. Auth + `GET /v1/me`
-2. Trip CRUD + revisions + visibility
-3. Share link + copy trip
-4. EV charger local DB search + charger detail
-5. Charger reviews/reports/suggestions/admin verification
-6. Community posts/comments/votes/bookmarks
-7. Search + notifications
-8. Media upload pipeline
-9. AI plan suggest/chat
+1. Config Server, Eureka, Spring Cloud Gateway, and production NGINX edge
+2. Actuator, structured logs, Micrometer metrics, trace propagation, and Grafana Alloy export
+3. Keycloak + User Management + `GET /v1/users/me`
+4. User profiles, saved vehicles, role administration, and suspensions
+5. Trip CRUD + resource permissions + revisions + visibility
+6. Share link + public Explore + copy trip
+7. Place/routing APIs + EV charger local DB search + charger detail
+8. Charger reviews/reports/suggestions/admin verification
+9. Community groups/posts/comments/votes/bookmarks
+10. Community media + search + in-app notification module
+11. Kafka outbox integration events
+12. AI Planning with Spring AI using either Ollama or a hosted provider

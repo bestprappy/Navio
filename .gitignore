@@ -1,0 +1,21 @@
+### IDE ###
+.idea/
+*.iws
+*.iml
+*.ipr
+
+### Planning / scratch ###
+.planning/
+
+### Logs ###
+logs/
+*.log
+
+### Environment / secrets ###
+.env
+.env.*
+!.env.example
+
+### OS ###
+.DS_Store
+Thumbs.db
