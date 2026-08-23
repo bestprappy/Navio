@@ -1,0 +1,1006 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": { "type": "grafana", "uid": "-- Grafana --" },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      },
+      {
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "enable": true,
+        "expr": "ALERTS{alertstate=\"firing\",cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\"}",
+        "iconColor": "red",
+        "name": "Firing alerts",
+        "tagKeys": "alertname,severity,service",
+        "textFormat": "{{alertname}}: {{service}}",
+        "titleFormat": "Firing alert"
+      }
+    ]
+  },
+  "description": "Production operations dashboard for Navio services. RED, SLO, JVM, database, Kafka, and correlated Loki log signals.",
+  "editable": true,
+  "graphTooltip": 1,
+  "links": [
+    {
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": true,
+      "title": "Prometheus targets",
+      "type": "link",
+      "url": "http://localhost:9090/targets"
+    },
+    {
+      "icon": "external link",
+      "includeVars": false,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": true,
+      "title": "Zipkin traces",
+      "type": "link",
+      "url": "http://localhost:9411/zipkin/"
+    }
+  ],
+  "panels": [
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Percentage of selected Navio service scrape targets currently reachable by Prometheus.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "decimals": 1,
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 80 },
+              { "color": "green", "value": 100 }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 4, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "expr": "100 * sum(up{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service\"} == 1) / count(up{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service\"})",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Services healthy",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Application request throughput. Actuator traffic is excluded.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "decimals": 2,
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] },
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 4, "x": 4, "y": 0 },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(http_server_requests_seconds_count{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",uri!~\"/actuator.*\"}[$__rate_interval]))",
+          "refId": "A"
+        }
+      ],
+      "title": "Request rate",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Share of application requests returning an HTTP 5xx response.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "decimals": 2,
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 5 }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 4, "x": 8, "y": 0 },
+      "id": 3,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "expr": "100 * (sum(rate(http_server_requests_seconds_count{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",status=~\"5..\",uri!~\"/actuator.*\"}[$__rate_interval])) or vector(0)) / sum(rate(http_server_requests_seconds_count{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",uri!~\"/actuator.*\"}[$__rate_interval]))",
+          "refId": "A"
+        }
+      ],
+      "title": "Server error rate",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "95th-percentile application request duration from Micrometer histogram buckets.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "decimals": 3,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 0.5 },
+              { "color": "red", "value": 1 }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 4, "x": 12, "y": 0 },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_requests_seconds_bucket{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",uri!~\"/actuator.*\"}[$__rate_interval])))",
+          "refId": "A"
+        }
+      ],
+      "title": "p95 latency",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Remaining error budget for a 99.9% availability objective over the selected dashboard time range.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "decimals": 1,
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 25 },
+              { "color": "green", "value": 50 }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 4, "x": 16, "y": 0 },
+      "id": 5,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "expr": "clamp_max(clamp_min(100 * (1 - ((((sum(increase(http_server_requests_seconds_count{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",status=~\"5..\",uri!~\"/actuator.*\"}[$__range]))) or vector(0)) / sum(increase(http_server_requests_seconds_count{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",uri!~\"/actuator.*\"}[$__range]))) / 0.001)), 0), 100)",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Error budget remaining",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Prometheus alert rules currently firing for the selected Navio services.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "decimals": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 5, "w": 4, "x": 20, "y": 0 },
+      "id": 6,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "expr": "count(ALERTS{alertstate=\"firing\",cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\"}) or vector(0)",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Active alerts",
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "id": 100,
+      "panels": [],
+      "title": "Availability and SLO (99.9%)",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "A value of 1 is reachable and 0 is unreachable. Gaps mean Prometheus has no series for the selected service.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 20, "lineInterpolation": "stepAfter", "lineWidth": 2, "pointSize": 3, "showPoints": "never", "spanNulls": false },
+          "max": 1,
+          "min": 0,
+          "unit": "bool_on_off"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 6 },
+      "id": 7,
+      "options": {
+        "legend": { "calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "expr": "up{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service\"}",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Service health",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Availability is the percentage of non-5xx application requests, grouped by service.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 8, "lineWidth": 2, "pointSize": 3, "showPoints": "never", "spanNulls": false },
+          "decimals": 3,
+          "max": 100,
+          "min": 99,
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 99.9 }] },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 6 },
+      "id": 8,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "min"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "asc" }
+      },
+      "targets": [
+        {
+          "expr": "100 * (1 - (((sum by (service) (rate(http_server_requests_seconds_count{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",status=~\"5..\",uri!~\"/actuator.*\"}[$__rate_interval]))) or on (service) (0 * sum by (service) (rate(http_server_requests_seconds_count{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",uri!~\"/actuator.*\"}[$__rate_interval])))) / sum by (service) (rate(http_server_requests_seconds_count{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",uri!~\"/actuator.*\"}[$__rate_interval]))))",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Request availability",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Error rate divided by the 0.1% budget. A sustained value above 1 consumes budget faster than the 99.9% SLO allows.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 2, "pointSize": 3, "showPoints": "never", "spanNulls": false },
+          "decimals": 2,
+          "min": 0,
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 14.4 }] },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 6 },
+      "id": 9,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "expr": "(((sum by (service) (rate(http_server_requests_seconds_count{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",status=~\"5..\",uri!~\"/actuator.*\"}[1h]))) or on (service) (0 * sum by (service) (rate(http_server_requests_seconds_count{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",uri!~\"/actuator.*\"}[1h])))) / sum by (service) (rate(http_server_requests_seconds_count{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",uri!~\"/actuator.*\"}[1h]))) / 0.001",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
+      "title": "1h error-budget burn rate",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 },
+      "id": 101,
+      "panels": [],
+      "title": "Traffic, errors, and critical routes",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Application request throughput by service; health and metrics endpoints are excluded.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 15, "lineWidth": 2, "pointSize": 3, "showPoints": "never", "stacking": { "group": "A", "mode": "normal" } },
+          "min": 0,
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 15 },
+      "id": 10,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "expr": "sum by (service) (rate(http_server_requests_seconds_count{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",uri!~\"/actuator.*\"}[$__rate_interval]))",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Requests by service",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Application requests split by HTTP response status.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 25, "lineWidth": 1, "pointSize": 3, "showPoints": "never", "stacking": { "group": "A", "mode": "normal" } },
+          "min": 0,
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 15 },
+      "id": 11,
+      "options": {
+        "legend": { "calcs": ["lastNotNull"], "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "expr": "sum by (status) (rate(http_server_requests_seconds_count{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",uri!~\"/actuator.*\"}[$__rate_interval]))",
+          "legendFormat": "HTTP {{status}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Response status distribution",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Requests handled by Spring Cloud Gateway routes. This highlights traffic reaching Navio's user-facing backend routes.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 2, "pointSize": 3, "showPoints": "never" },
+          "min": 0,
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 15 },
+      "id": 12,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "expr": "sum by (routeId, httpStatusCode) (rate(spring_cloud_gateway_requests_seconds_count{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\"}[$__rate_interval]))",
+          "legendFormat": "{{routeId}} · {{httpStatusCode}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Gateway routes",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Highest-volume application endpoints in the selected period.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 8, "lineWidth": 2, "pointSize": 3, "showPoints": "never" },
+          "min": 0,
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 23 },
+      "id": 13,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "expr": "topk(10, sum by (service, method, uri) (rate(http_server_requests_seconds_count{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",uri!~\"/actuator.*|UNKNOWN|NOT_FOUND\"}[$__rate_interval])))",
+          "legendFormat": "{{service}} · {{method}} {{uri}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Top endpoints",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "5xx response rate by application endpoint. A blank chart means no server errors were observed.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 15, "lineWidth": 2, "pointSize": 3, "showPoints": "never" },
+          "min": 0,
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 23 },
+      "id": 14,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "expr": "sum by (service, method, uri, status) (rate(http_server_requests_seconds_count{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",status=~\"5..\",uri!~\"/actuator.*\"}[$__rate_interval]))",
+          "legendFormat": "{{service}} · {{method}} {{uri}} · {{status}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Failing endpoints",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 31 },
+      "id": 102,
+      "panels": [],
+      "title": "Latency",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Overall application latency distribution. Percentiles require Micrometer histogram buckets.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 5, "lineWidth": 2, "pointSize": 3, "showPoints": "never" },
+          "decimals": 3,
+          "min": 0,
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 32 },
+      "id": 15,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum by (le) (rate(http_server_requests_seconds_bucket{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",uri!~\"/actuator.*\"}[$__rate_interval])))",
+          "legendFormat": "p50",
+          "refId": "A"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_server_requests_seconds_bucket{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",uri!~\"/actuator.*\"}[$__rate_interval])))",
+          "legendFormat": "p95",
+          "refId": "B"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum by (le) (rate(http_server_requests_seconds_bucket{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",uri!~\"/actuator.*\"}[$__rate_interval])))",
+          "legendFormat": "p99",
+          "refId": "C"
+        }
+      ],
+      "title": "Latency percentiles",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "95th-percentile application request duration by service.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 8, "lineWidth": 2, "pointSize": 3, "showPoints": "never" },
+          "decimals": 3,
+          "min": 0,
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.5 }, { "color": "red", "value": 1 }] },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 32 },
+      "id": 16,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (service, le) (rate(http_server_requests_seconds_bucket{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",uri!~\"/actuator.*\"}[$__rate_interval])))",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
+      "title": "p95 latency by service",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Current p95 latency by endpoint, ordered from slowest to fastest.",
+      "fieldConfig": {
+        "defaults": { "decimals": 3, "unit": "s" },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 40 },
+      "id": 17,
+      "options": {
+        "cellHeight": "sm",
+        "footer": { "countRows": false, "enablePagination": true, "fields": "", "reducer": ["sum"], "show": false },
+        "showHeader": true,
+        "sortBy": [{ "desc": true, "displayName": "Value" }]
+      },
+      "targets": [
+        {
+          "expr": "sort_desc(histogram_quantile(0.95, sum by (service, method, uri, le) (rate(http_server_requests_seconds_bucket{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",uri!~\"/actuator.*|UNKNOWN|NOT_FOUND\"}[$__rate_interval]))))",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "{{service}} · {{method}} {{uri}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Slow endpoints",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": { "Time": true, "cluster": true, "environment": true, "job": true, "instance": true, "le": true },
+            "indexByName": { "service": 0, "method": 1, "uri": 2, "Value": 3 },
+            "renameByName": { "Value": "p95", "method": "Method", "service": "Service", "uri": "Endpoint" }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 48 },
+      "id": 103,
+      "panels": [],
+      "title": "Runtime saturation",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "CPU consumed by each JVM process.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 2, "pointSize": 3, "showPoints": "never" },
+          "max": 100,
+          "min": 0,
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 49 },
+      "id": 18,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "expr": "100 * process_cpu_usage{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\"}",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Process CPU",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "JVM heap usage as a percentage of configured maximum heap.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 2, "pointSize": 3, "showPoints": "never" },
+          "max": 100,
+          "min": 0,
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 75 }, { "color": "red", "value": 90 }] },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 49 },
+      "id": 19,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "expr": "100 * sum by (service) (jvm_memory_used_bytes{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",area=\"heap\"}) / sum by (service) (jvm_memory_max_bytes{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",area=\"heap\"})",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
+      "title": "JVM heap utilization",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Average stop-the-world garbage-collection pause duration.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 2, "pointSize": 3, "showPoints": "never" },
+          "min": 0,
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 49 },
+      "id": 20,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "expr": "sum by (service) (rate(jvm_gc_pause_seconds_sum{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\"}[$__rate_interval])) / sum by (service) (rate(jvm_gc_pause_seconds_count{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\"}[$__rate_interval]))",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Average GC pause",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Live JVM thread count by service.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 2, "pointSize": 3, "showPoints": "never" },
+          "min": 0,
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 49 },
+      "id": 21,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "expr": "jvm_threads_live_threads{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\"}",
+          "legendFormat": "{{service}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Live JVM threads",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 57 },
+      "id": 104,
+      "panels": [],
+      "title": "Database and messaging dependencies",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Percentage of each Hikari connection pool currently in use.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 2, "pointSize": 3, "showPoints": "never" },
+          "max": 100,
+          "min": 0,
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 75 }, { "color": "red", "value": 90 }] },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 58 },
+      "id": 22,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "expr": "100 * hikaricp_connections_active{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\"} / hikaricp_connections_max{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\"}",
+          "legendFormat": "{{service}} · {{pool}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Database pool utilization",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Threads waiting for a database connection and connection acquisition timeouts.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 2, "pointSize": 3, "showPoints": "never" },
+          "min": 0,
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 58 },
+      "id": 23,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "expr": "hikaricp_connections_pending{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\"}",
+          "legendFormat": "{{service}} · pending",
+          "refId": "A"
+        },
+        {
+          "expr": "rate(hikaricp_connections_timeout_total{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\"}[$__rate_interval])",
+          "legendFormat": "{{service}} · timeouts/s",
+          "refId": "B"
+        }
+      ],
+      "title": "Database pool pressure",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "description": "Kafka producer errors and retries emitted by Navio services.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 2, "pointSize": 3, "showPoints": "never" },
+          "min": 0,
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 58 },
+      "id": 24,
+      "options": {
+        "legend": { "calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "expr": "sum by (service) (rate(kafka_producer_record_error_total{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\"}[$__rate_interval]))",
+          "legendFormat": "{{service}} · errors/s",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (service) (rate(kafka_producer_record_retry_total{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\"}[$__rate_interval]))",
+          "legendFormat": "{{service}} · retries/s",
+          "refId": "B"
+        }
+      ],
+      "title": "Kafka producer reliability",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 66 },
+      "id": 105,
+      "panels": [],
+      "title": "Logs",
+      "type": "row"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "loki" },
+      "description": "Log lines containing error, exception, or fatal, grouped by service.",
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "custom": { "drawStyle": "bars", "fillOpacity": 35, "lineWidth": 1, "pointSize": 3, "showPoints": "never", "stacking": { "group": "A", "mode": "normal" } },
+          "min": 0,
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": { "h": 12, "w": 8, "x": 0, "y": 67 },
+      "id": 25,
+      "options": {
+        "legend": { "calcs": ["sum", "max"], "displayMode": "table", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "expr": "sum by (service_name) (count_over_time({cluster=~\"$cluster\",environment=~\"$environment\",service_name=~\"$service\"} |~ `(?i)(error|exception|fatal)` [$__interval]))",
+          "legendFormat": "{{service_name}}",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Error log volume",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "loki" },
+      "description": "Newest logs for the selected services and environment. Use the panel menu to open a query in Explore.",
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "gridPos": { "h": 12, "w": 16, "x": 8, "y": 67 },
+      "id": 26,
+      "options": {
+        "dedupStrategy": "none",
+        "enableInfiniteScrolling": false,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "targets": [
+        {
+          "expr": "{cluster=~\"$cluster\",environment=~\"$environment\",service_name=~\"$service\"}",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "Recent service logs",
+      "type": "logs"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 42,
+  "tags": ["navio", "production", "slo", "observability"],
+  "templating": {
+    "list": [
+      {
+        "current": { "selected": false, "text": "navio", "value": "navio" },
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "definition": "label_values(up{job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service\"}, cluster)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Cluster",
+        "multi": false,
+        "name": "cluster",
+        "options": [],
+        "query": { "query": "label_values(up{job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service\"}, cluster)", "refId": "VariableQuery-Cluster" },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": { "selected": false, "text": "development", "value": "development" },
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "definition": "label_values(up{cluster=~\"$cluster\",job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service\"}, environment)",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Environment",
+        "multi": false,
+        "name": "environment",
+        "options": [],
+        "query": { "query": "label_values(up{cluster=~\"$cluster\",job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service\"}, environment)", "refId": "VariableQuery-Environment" },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": { "selected": false, "text": "api-gateway", "value": "api-gateway" },
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "definition": "label_values(up{cluster=~\"$cluster\",environment=~\"$environment\",job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service\"}, service)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Service",
+        "multi": true,
+        "name": "service",
+        "options": [],
+        "query": { "query": "label_values(up{cluster=~\"$cluster\",environment=~\"$environment\",job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service\"}, service)", "refId": "VariableQuery-Service" },
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {
+    "refresh_intervals": ["5s", "10s", "30s", "1m", "5m"],
+    "time_options": ["15m", "1h", "6h", "12h", "24h", "2d", "7d", "30d"]
+  },
+  "timezone": "browser",
+  "title": "Navio Production Overview",
+  "uid": "navio-observability",
+  "version": 2,
+  "weekStart": ""
+}

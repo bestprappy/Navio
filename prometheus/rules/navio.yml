@@ -1,0 +1,143 @@
+groups:
+  - name: navio-recording
+    interval: 30s
+    rules:
+      - record: navio:http_requests:rate5m
+        expr: |
+          sum by (cluster, environment, service) (
+            rate(http_server_requests_seconds_count{
+              service=~"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service",
+              uri!~"/actuator.*"
+            }[5m])
+          )
+
+      - record: navio:http_5xx:rate5m
+        expr: |
+          (
+            sum by (cluster, environment, service) (
+              rate(http_server_requests_seconds_count{
+                service=~"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service",
+                status=~"5..",
+                uri!~"/actuator.*"
+              }[5m])
+            )
+          )
+          or
+          (
+            0 * sum by (cluster, environment, service) (
+              rate(http_server_requests_seconds_count{
+                service=~"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service",
+                uri!~"/actuator.*"
+              }[5m])
+            )
+          )
+
+      - record: navio:http_availability:ratio5m
+        expr: |
+          1 - (
+            navio:http_5xx:rate5m
+            /
+            navio:http_requests:rate5m
+          )
+
+      - record: navio:http_request_duration:p95_5m
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (cluster, environment, service, le) (
+              rate(http_server_requests_seconds_bucket{
+                service=~"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service",
+                uri!~"/actuator.*"
+              }[5m])
+            )
+          )
+
+  - name: navio-alerts
+    interval: 30s
+    rules:
+      - alert: NavioServiceDown
+        expr: |
+          up{service=~"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "{{ $labels.service }} is unavailable"
+          description: "Prometheus has been unable to scrape {{ $labels.service }} in {{ $labels.environment }} for at least two minutes."
+
+      - alert: NavioHighServerErrorRate
+        expr: |
+          (
+            navio:http_5xx:rate5m
+            /
+            navio:http_requests:rate5m
+          ) > 0.05
+          and
+          navio:http_requests:rate5m > 0.1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High 5xx rate on {{ $labels.service }}"
+          description: "More than 5% of application requests have returned 5xx responses for at least five minutes."
+
+      - alert: NavioHighP95Latency
+        expr: |
+          navio:http_request_duration:p95_5m > 1
+          and
+          navio:http_requests:rate5m > 0.1
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High p95 latency on {{ $labels.service }}"
+          description: "The p95 application-request latency has exceeded one second for at least ten minutes."
+
+      - alert: NavioJvmHeapNearlyFull
+        expr: |
+          (
+            sum by (cluster, environment, service) (jvm_memory_used_bytes{area="heap"})
+            /
+            sum by (cluster, environment, service) (jvm_memory_max_bytes{area="heap"})
+          ) > 0.90
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "JVM heap is nearly full on {{ $labels.service }}"
+          description: "Heap utilization has remained above 90% for at least ten minutes."
+
+      - alert: NavioDatabasePoolSaturated
+        expr: |
+          (
+            hikaricp_connections_active
+            /
+            hikaricp_connections_max
+          ) > 0.90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Database pool is saturated on {{ $labels.service }}"
+          description: "More than 90% of the Hikari connection pool has been active for at least five minutes."
+
+      - alert: NavioDatabaseConnectionTimeouts
+        expr: rate(hikaricp_connections_timeout_total[5m]) > 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Database connection timeouts on {{ $labels.service }}"
+          description: "The service has continuously recorded Hikari connection timeouts during the last five minutes."
+
+      - alert: NavioKafkaProducerErrors
+        expr: |
+          sum by (cluster, environment, service) (
+            rate(kafka_producer_record_error_total[5m])
+          ) > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Kafka producer errors on {{ $labels.service }}"
+          description: "The service has continuously recorded Kafka producer errors during the last five minutes."
