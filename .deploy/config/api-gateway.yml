@@ -1,0 +1,65 @@
+spring:
+  cloud:
+    gateway:
+      server:
+        webflux:
+          default-filters:
+            - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+          globalcors:
+            corsConfigurations:
+              '[/**]':
+                allowedOrigins:
+                  - "http://navio.sit.kmutt.ac.th"
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                  - PATCH
+                  - OPTIONS
+                allowedHeaders: "*"
+                allowCredentials: true
+          routes:
+            - id: trip-planning-service
+              uri: http://trip-planning-service:8082
+              predicates:
+                - Path=/v1/trips/**,/v1/public-trips/**,/v1/share/**
+            - id: user-management-service
+              uri: http://user-management-service:8081
+              predicates:
+                - Path=/v1/users/**,/v1/admin/users/**
+            - id: mobility-and-ev-service
+              uri: http://mobility-and-ev-service:8083
+              predicates:
+                - Path=/v1/places/**,/v1/routes/**,/v1/geo/**,/v1/ev/**,/v1/chargers/**,/v1/admin/ev/**
+            - id: community-service
+              uri: http://community-service:8084
+              predicates:
+                - Path=/v1/community/**,/v1/groups/**,/v1/posts/**,/v1/feed/**,/v1/notifications/**,/v1/media/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://discovery-server:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+server:
+  port: 8080
+
