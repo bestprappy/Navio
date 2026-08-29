@@ -19,7 +19,7 @@ if [[ ! -f "${ENV_FILE}" ]]; then
   exit 2
 fi
 
-install -d -m 0750 \
+install -d -m 0755 \
   "${DEPLOY_ROOT}/config" \
   "${DEPLOY_ROOT}/nginx" \
   "${DEPLOY_ROOT}/postgres"
@@ -43,16 +43,22 @@ compose() {
 }
 
 rollback() {
+  local previous_image
+  local previous_prefix
   local previous_tag
+  previous_prefix="$(sed -n 's/^NAVIO_IMAGE_PREFIX=//p' "${PREVIOUS_ENV_FILE}" | tail -n 1)"
   previous_tag="$(sed -n 's/^NAVIO_IMAGE_TAG=//p' "${PREVIOUS_ENV_FILE}" | tail -n 1)"
+  previous_image="${previous_prefix}-configuration-server:${previous_tag}"
 
-  if [[ "${previous_tag}" =~ ^[0-9a-f]{40}$ ]] && [[ "${previous_tag}" != "${IMAGE_TAG}" ]]; then
+  if [[ "${previous_tag}" =~ ^[0-9a-f]{40}$ ]] \
+    && [[ "${previous_tag}" != "${IMAGE_TAG}" ]] \
+    && docker image inspect "${previous_image}" >/dev/null 2>&1; then
     echo "Deployment failed; rolling back to ${previous_tag}." >&2
     cp "${PREVIOUS_ENV_FILE}" "${ENV_FILE}"
     chmod 0600 "${ENV_FILE}"
     compose up -d --remove-orphans --wait --wait-timeout 420 || true
   else
-    echo "Deployment failed during bootstrap; no prior release is available." >&2
+    echo "Deployment failed; no runnable prior release is available." >&2
   fi
 }
 
@@ -60,6 +66,8 @@ trap rollback ERR
 
 compose config --quiet
 compose pull
+compose run --rm --no-deps --user 0:0 --entrypoint chown \
+  user-management-service -R 10001:10001 /data
 compose up -d --remove-orphans --wait --wait-timeout 420
 
 curl --fail --silent --show-error \
@@ -72,4 +80,3 @@ compose ps
 docker image prune --all --force --filter "until=168h" >/dev/null
 
 echo "Navio backend deployed successfully at ${IMAGE_TAG}."
-
