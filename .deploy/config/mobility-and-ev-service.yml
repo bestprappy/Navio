@@ -1,0 +1,97 @@
+spring:
+  datasource:
+    url: ${MOBILITY_DB_URL:jdbc:postgresql://postgres:5432/tripplanner}
+    username: ${MOBILITY_DB_USERNAME:tripplanner}
+    password: ${MOBILITY_DB_PASSWORD}
+  jpa:
+    database: POSTGRESQL
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    database-platform: org.hibernate.spatial.dialect.postgis.PostgisPG10Dialect
+    properties:
+      hibernate:
+        default_schema: ev
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    schemas: ev
+    default-schema: ev
+    create-schemas: true
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=10000,expireAfterWrite=15m
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
+    consumer:
+      group-id: mobility-and-ev-service
+      auto-offset-reset: earliest
+    producer:
+      acks: all
+  cloud:
+    bus:
+      destination: navio-config-bus
+    stream:
+      kafka:
+        binder:
+          brokers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://discovery-server:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
+    healthcheck:
+      enabled: true
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+server:
+  port: 8083
+
+navio:
+  mobility:
+    providers:
+      google-maps:
+        api-key: ${GOOGLE_MAPS_SERVER_API_KEY:}
+        places:
+          base-url: ${GOOGLE_PLACES_BASE_URL:https://places.googleapis.com/v1}
+          connect-timeout: ${GOOGLE_PLACES_CONNECT_TIMEOUT:2s}
+          read-timeout: ${GOOGLE_PLACES_READ_TIMEOUT:4s}
+        routes:
+          base-url: ${GOOGLE_ROUTES_BASE_URL:https://routes.googleapis.com/directions/v2:computeRoutes}
+          connect-timeout: ${GOOGLE_ROUTES_CONNECT_TIMEOUT:2s}
+          read-timeout: ${GOOGLE_ROUTES_READ_TIMEOUT:8s}
+        cache:
+          place-fresh-ttl: ${GOOGLE_PLACES_CACHE_FRESH_TTL:15m}
+          place-stale-ttl: ${GOOGLE_PLACES_CACHE_STALE_TTL:24h}
+          route-fresh-ttl: ${GOOGLE_ROUTES_CACHE_FRESH_TTL:5m}
+          route-stale-ttl: ${GOOGLE_ROUTES_CACHE_STALE_TTL:30m}
+          maximum-size: ${GOOGLE_PROVIDER_CACHE_MAXIMUM_SIZE:10000}
+      mapbox:
+        access-token: ${MAPBOX_ACCESS_TOKEN:}
+
+resilience4j:
+  timelimiter:
+    instances:
+      googlePlaces:
+        timeout-duration: ${GOOGLE_PLACES_CALL_TIMEOUT:7s}
+      googleRoutes:
+        timeout-duration: ${GOOGLE_ROUTES_CALL_TIMEOUT:11s}
+

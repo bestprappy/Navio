@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: ${USER_DB_URL:jdbc:postgresql://postgres:5432/tripplanner}
+    username: ${USER_DB_USERNAME:tripplanner}
+    password: ${USER_DB_PASSWORD}
+  jpa:
+    database: POSTGRESQL
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+server:
+  port: 8081
+
