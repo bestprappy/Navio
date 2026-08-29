@@ -175,6 +175,7 @@ services:
         condition: service_healthy
     environment:
       <<: *common-java-environment
+      CONFIG_SERVER_URL: http://config-server:8888
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
       TRIP_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-tripplanner}
       TRIP_DB_USERNAME: ${POSTGRES_USER:-tripplanner}
@@ -262,6 +263,7 @@ services:
         condition: service_healthy
     environment:
       <<: *common-java-environment
+      CONFIG_SERVER_URL: http://config-server:8888
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
     healthcheck:
       test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8080/actuator/health"]
@@ -302,4 +304,3 @@ volumes:
   kafka-data:
   user-data:
   community-media:
-
