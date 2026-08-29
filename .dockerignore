@@ -1,0 +1,15 @@
+.git
+.github
+.claude
+.planning
+.idea
+.vscode
+client
+docs
+**/.env
+**/.env.*
+**/logs
+**/target
+**/node_modules
+*.log
+

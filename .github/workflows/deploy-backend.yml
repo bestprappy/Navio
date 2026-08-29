@@ -1,0 +1,111 @@
+name: Deploy backend
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: navio-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_PREFIX: ghcr.io/bestprappy/navio
+
+jobs:
+  build:
+    name: Build ${{ matrix.image }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        include:
+          - image: configuration-server
+            service_path: server/configuration-server
+          - image: discovery-server
+            service_path: server/discovery-server
+          - image: api-gateway
+            service_path: server/api-gateway
+          - image: user-management-service
+            service_path: server/user-management-service
+          - image: trip-planning-service
+            service_path: server/trip-planning-service
+          - image: mobility-and-ev-service
+            service_path: server/mobility-and-ev-service
+          - image: community-service
+            service_path: server/community-service
+
+    steps:
+      - name: Check out deployment repository
+        uses: actions/checkout@v7
+
+      - name: Check out backend submodules
+        shell: bash
+        run: |
+          git submodule sync -- server
+          git submodule update --init --depth 1 server
+          git -C server submodule sync --recursive
+          git -C server submodule update --init --recursive --depth 1
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build and publish image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: .deploy/docker/java-service.Dockerfile
+          build-args: |
+            SERVICE_PATH=${{ matrix.service_path }}
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}-${{ matrix.image }}:${{ github.sha }}
+            ${{ env.IMAGE_PREFIX }}-${{ matrix.image }}:latest
+          cache-from: type=gha,scope=${{ matrix.image }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.image }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+
+  deploy:
+    name: Deploy to Navio VM
+    needs: build
+    if: github.repository == 'bestprappy/Navio'
+    runs-on: [self-hosted, Linux, X64, navio-production]
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+      - name: Check out deployment files
+        uses: actions/checkout@v7
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy release
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          chmod +x .deploy/scripts/deploy.sh
+          .deploy/scripts/deploy.sh
+
