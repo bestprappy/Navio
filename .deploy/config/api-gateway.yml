@@ -1,5 +1,13 @@
 spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
   cloud:
+    bus:
+      destination: navio-config-bus
+    stream:
+      kafka:
+        binder:
+          brokers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
     gateway:
       server:
         webflux:
@@ -62,4 +70,3 @@ management:
 
 server:
   port: 8080
-
