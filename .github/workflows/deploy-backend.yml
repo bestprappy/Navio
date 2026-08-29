@@ -18,8 +18,53 @@ env:
   IMAGE_PREFIX: ghcr.io/bestprappy/navio
 
 jobs:
+  verify-backend-revisions:
+    name: Verify backend revisions are current
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out deployment repository
+        uses: actions/checkout@v7
+
+      - name: Check out backend submodules
+        shell: bash
+        run: |
+          git submodule sync -- server
+          git submodule update --init --depth 1 server
+          git -C server submodule sync --recursive
+          git -C server submodule update --init --recursive --depth 1
+
+      - name: Compare pinned revisions with backend main branches
+        shell: bash
+        run: |
+          repositories=(
+            server
+            server/user-management-service
+            server/trip-planning-service
+            server/mobility-and-ev-service
+            server/community-service
+          )
+
+          for repository in "${repositories[@]}"; do
+            pinned_revision="$(git -C "${repository}" rev-parse HEAD)"
+            latest_revision="$(git -C "${repository}" ls-remote origin refs/heads/main | awk '{print $1}')"
+
+            if [[ -z "${latest_revision}" ]]; then
+              echo "Unable to resolve ${repository} origin/main." >&2
+              exit 1
+            fi
+
+            if [[ "${pinned_revision}" != "${latest_revision}" ]]; then
+              echo "${repository} is stale: pinned=${pinned_revision}, main=${latest_revision}" >&2
+              exit 1
+            fi
+
+            echo "${repository} is current at ${pinned_revision}."
+          done
+
   build:
     name: Build ${{ matrix.image }}
+    needs: verify-backend-revisions
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
