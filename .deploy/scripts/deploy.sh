@@ -27,6 +27,7 @@ install -d -m 0755 \
   "${DEPLOY_ROOT}/nginx" \
   "${DEPLOY_ROOT}/postgres" \
   "${DEPLOY_ROOT}/tls" \
+  "${DEPLOY_ROOT}/certbot-webroot" \
   "${DEPLOY_ROOT}/observability" \
   "${DEPLOY_ROOT}/observability/prometheus/rules" \
   "${DEPLOY_ROOT}/observability/grafana/provisioning/datasources" \

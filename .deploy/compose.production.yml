@@ -431,6 +431,49 @@ services:
       retries: 5
       start_period: 20s
 
+  navio-web:
+    image: ${NAVIO_IMAGE_PREFIX:?NAVIO_IMAGE_PREFIX is required}-web-client:${NAVIO_IMAGE_TAG:?NAVIO_IMAGE_TAG is required}
+    restart: unless-stopped
+    init: true
+    mem_limit: 512m
+    networks:
+      - backend
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    environment:
+      # Public origin the browser sees. Auth.js builds its callback URL from
+      # this, and it must match the redirect URI Keycloak imported.
+      AUTH_URL: ${NAVIO_WEB_ORIGIN:?NAVIO_WEB_ORIGIN is required}
+      AUTH_TRUST_HOST: 'true'
+      AUTH_SECRET: ${AUTH_SECRET:?AUTH_SECRET is required}
+      AUTH_KEYCLOAK_ID: ${KEYCLOAK_WEB_CLIENT_ID:-navio-web}
+      AUTH_KEYCLOAK_SECRET: ${KEYCLOAK_WEB_CLIENT_SECRET:?KEYCLOAK_WEB_CLIENT_SECRET is required}
+      # Must be the PUBLIC issuer, not an internal address: the browser is
+      # redirected here to log in, and every token's 'iss' claim carries this
+      # value. An internal URL would make issuer validation fail.
+      AUTH_KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER_URI:?KEYCLOAK_ISSUER_URI is required}
+      # Application API calls stay on the Docker network — they never leave the
+      # host, so they skip NGINX, TLS, and the campus network entirely.
+      NAVIO_API_BASE_URL: http://api-gateway:8080
+      # Server-side OIDC calls go out to the public HTTPS issuer above. Trust
+      # the deployed certificate explicitly so a KMUTT-internal or self-signed
+      # chain does not fail Node's verification.
+      NODE_EXTRA_CA_CERTS: /etc/ssl/navio/fullchain.pem
+      TZ: Asia/Bangkok
+    volumes:
+      - ./tls/fullchain.pem:/etc/ssl/navio/fullchain.pem:ro
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--output", "/dev/null", "http://localhost:3000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
   nginx:
     image: nginx:1.29-alpine
     restart: unless-stopped
@@ -445,12 +488,19 @@ services:
         condition: service_healthy
       keycloak:
         condition: service_healthy
+      navio-web:
+        condition: service_healthy
       grafana:
         condition: service_started
     volumes:
       - ./nginx/navio.conf:/etc/nginx/conf.d/default.conf:ro
+      # Bind-mounted as files, not symlinks: Docker resolves a symlink to its
+      # target inode at mount time, so certbot repointing live/ on renewal would
+      # leave this container serving the old certificate until it restarts.
+      # The renewal deploy hook copies fresh files here and reloads nginx.
       - ./tls/fullchain.pem:/etc/nginx/tls/fullchain.pem:ro
       - ./tls/privkey.pem:/etc/nginx/tls/privkey.pem:ro
+      - ./certbot-webroot:/var/www/certbot:ro
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--no-check-certificate", "--tries=1", "--spider", "https://localhost/health"]
       interval: 10s
