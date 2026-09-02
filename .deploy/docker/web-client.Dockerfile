@@ -22,10 +22,16 @@ COPY client/ ./
 # (AUTH_SECRET, AUTH_KEYCLOAK_SECRET) are runtime environment, never build args.
 ARG NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=""
 ARG NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID=""
-ARG NEXT_PUBLIC_MAP_PROVIDER="google"
+ARG NEXT_PUBLIC_MAP_PROVIDER=""
+# :- rather than a plain ARG default on purpose. A workflow passes
+# --build-arg NAME=<secret>, and an unset repository secret expands to an empty
+# string, which OVERRIDES an ARG default. The app reads these with ?? , which
+# falls back only on undefined and not on "", so an empty value would reach
+# Google Maps as mapId="" and break Advanced Markers. Coercing here keeps a
+# missing secret equivalent to never setting the variable.
 ENV NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${NEXT_PUBLIC_GOOGLE_MAPS_API_KEY} \
-    NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID=${NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID} \
-    NEXT_PUBLIC_MAP_PROVIDER=${NEXT_PUBLIC_MAP_PROVIDER} \
+    NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID=${NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID:-DEMO_MAP_ID} \
+    NEXT_PUBLIC_MAP_PROVIDER=${NEXT_PUBLIC_MAP_PROVIDER:-google} \
     NEXT_TELEMETRY_DISABLED=1
 
 RUN npm run build
