@@ -4,12 +4,16 @@
 .planning
 .idea
 .vscode
-client
+# client/ is NOT ignored: .deploy/docker/web-client.Dockerfile builds from it.
+# It costs the Java service builds a few MB of context, which is cheaper than
+# maintaining a second ignore file. node_modules and .next are excluded below,
+# so only sources are sent.
 docs
 **/.env
 **/.env.*
 **/logs
 **/target
 **/node_modules
+**/.next
 *.log
 
