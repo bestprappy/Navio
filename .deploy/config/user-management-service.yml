@@ -20,6 +20,10 @@ navio:
   security:
     keycloak:
       issuer-uri: ${KEYCLOAK_ISSUER_URI}
+      # Keys are fetched from Keycloak directly rather than by discovering the
+      # public issuer, which resolves through NGINX — and NGINX only starts once
+      # this service is healthy. 'iss' is still validated against issuer-uri.
+      jwk-set-uri: ${KEYCLOAK_JWK_SET_URI:}
       audiences: ${KEYCLOAK_AUDIENCES:navio-api}
       admin:
         base-url: ${KEYCLOAK_BASE_URL}

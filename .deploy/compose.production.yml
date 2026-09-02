@@ -188,6 +188,7 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
       # Token validation. The issuer must match Keycloak's 'iss' claim exactly.
       KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:?KEYCLOAK_ISSUER_URI is required}
+      KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/${KEYCLOAK_REALM:-navio}/protocol/openid-connect/certs
       KEYCLOAK_AUDIENCES: ${KEYCLOAK_AUDIENCES:-navio-api}
       # Admin API service account. Reached over the internal network rather than
       # the public hostname, so admin calls never leave the backend network.
@@ -312,6 +313,7 @@ services:
       # The gateway is the trust boundary: it validates every inbound token and
       # replaces client-supplied X-User-Id with the verified subject.
       KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:?KEYCLOAK_ISSUER_URI is required}
+      KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/${KEYCLOAK_REALM:-navio}/protocol/openid-connect/certs
       KEYCLOAK_AUDIENCES: ${KEYCLOAK_AUDIENCES:-navio-api}
       NAVIO_CORS_ALLOWED_ORIGINS: ${NAVIO_CORS_ALLOWED_ORIGINS:-http://navio.sit.kmutt.ac.th}
     healthcheck:

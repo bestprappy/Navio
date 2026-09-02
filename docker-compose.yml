@@ -55,15 +55,31 @@ services:
 
   # ---------- Keycloak (Identity Provider) ------------------------------------
   keycloak:
-    image: quay.io/keycloak/keycloak:26.1
+    # Pinned to the same version as production so local auth behaviour matches.
+    image: quay.io/keycloak/keycloak:26.7.3
     container_name: navio-keycloak
-    command: start-dev
+    # --import-realm loads the SAME realm definition production uses, so the
+    # navio-web client, audience mapper, and default USER role are identical
+    # here. KC_DB is in-memory, so the realm is re-imported clean on every
+    # start — console edits do not survive a restart by design.
+    command: start-dev --import-realm
     ports:
       - "8180:8080"
+    volumes:
+      - ./.deploy/keycloak/navio-realm.json:/opt/keycloak/data/import/navio-realm.json:ro
     environment:
       KC_DB: dev-mem # H2 in-memory for dev
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin # change in production
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin # local only
+      # The realm ships production-safe defaults; both are relaxed only here.
+      # sslRequired=all would reject plain HTTP on localhost, and verifyEmail
+      # would strand every local signup because there is no SMTP server.
+      KEYCLOAK_SSL_REQUIRED: none
+      KEYCLOAK_VERIFY_EMAIL: "false"
+      # Substituted into the realm's redirect URIs and client secret.
+      NAVIO_WEB_ORIGIN: http://localhost:3000
+      KEYCLOAK_WEB_CLIENT_SECRET: local-dev-web-secret
+      KEYCLOAK_ADMIN_CLIENT_SECRET: local-dev-admin-secret
     healthcheck:
       test:
         [
