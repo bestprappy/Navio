@@ -16,8 +16,7 @@ spring:
           globalcors:
             corsConfigurations:
               '[/**]':
-                allowedOrigins:
-                  - "http://navio.sit.kmutt.ac.th"
+                allowedOrigins: ${NAVIO_CORS_ALLOWED_ORIGINS:https://navio.sit.kmutt.ac.th}
                 allowedMethods:
                   - GET
                   - POST

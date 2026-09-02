@@ -73,28 +73,44 @@ services:
       start_period: 45s
 
   keycloak:
-    image: quay.io/keycloak/keycloak:26.7.1
+    image: quay.io/keycloak/keycloak:26.7.3
     command:
       - start
       - --http-enabled=true
       - --proxy-headers=xforwarded
+      # Imports the Navio realm on first start only; an existing realm is left
+      # untouched, so operator changes made in the console are not overwritten
+      # on every deploy.
+      - --import-realm
     restart: unless-stopped
     mem_limit: 900m
     networks:
       - backend
+    volumes:
+      # The realm defines the USER/MODERATOR/ADMIN roles and, critically, the
+      # Audience protocol mapper. Without that mapper Keycloak emits only
+      # "aud": "account" and every service rejects every token.
+      - ./keycloak/navio-realm.json:/opt/keycloak/data/import/navio-realm.json:ro
     depends_on:
       postgres:
         condition: service_healthy
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USERNAME:-admin}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?KEYCLOAK_ADMIN_PASSWORD is required}
+      # Used by the realm-import environment placeholder so Keycloak and the
+      # user-management service share the exact same service-account secret.
+      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET:?KEYCLOAK_ADMIN_CLIENT_SECRET is required}
+      # Auth.js runs server-side and exchanges authorization codes as this
+      # confidential client. The secret is never shipped to browser JavaScript.
+      KEYCLOAK_WEB_CLIENT_SECRET: ${KEYCLOAK_WEB_CLIENT_SECRET:?KEYCLOAK_WEB_CLIENT_SECRET is required}
+      NAVIO_WEB_ORIGIN: ${NAVIO_WEB_ORIGIN:?NAVIO_WEB_ORIGIN is required}
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-tripplanner}
       KC_DB_SCHEMA: keycloak
       KC_DB_USERNAME: ${POSTGRES_USER:-tripplanner}
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
       KC_HEALTH_ENABLED: "true"
-      KC_HOSTNAME: http://navio.sit.kmutt.ac.th
+      KC_HOSTNAME: ${KEYCLOAK_PUBLIC_URL:?KEYCLOAK_PUBLIC_URL is required}
       KC_HOSTNAME_STRICT: "true"
       KC_PROXY_TRUSTED_ADDRESSES: 127.0.0.0/8,172.16.0.0/12
       JAVA_OPTS_KC_HEAP: -Xms256m -Xmx640m
@@ -143,22 +159,48 @@ services:
   user-management-service:
     <<: *java-service
     image: ${NAVIO_IMAGE_PREFIX:?NAVIO_IMAGE_PREFIX is required}-user-management-service:${NAVIO_IMAGE_TAG:?NAVIO_IMAGE_TAG is required}
-    mem_limit: 400m
+    mem_limit: 500m
+    # Moved from an embedded H2 file to PostgreSQL. The iam schema uses JSONB,
+    # TEXT[], partial unique indexes and an append-only trigger on the audit
+    # table — H2 supports none of them, so the security model could not actually
+    # be enforced there. This also matches docs/database/Navio Database.md,
+    # which places iam in PostgreSQL alongside the other service schemas.
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
     environment:
       <<: *common-java-environment
       SERVER_PORT: "8081"
-      SPRING_DATASOURCE_URL: jdbc:h2:file:/data/navio-users;DB_CLOSE_ON_EXIT=FALSE
-      SPRING_DATASOURCE_USERNAME: navio
-      SPRING_DATASOURCE_PASSWORD: ${USER_DB_PASSWORD:?USER_DB_PASSWORD is required}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-    volumes:
-      - user-data:/data
+      CONFIG_SERVER_URL: http://config-server:8888
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      USER_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-tripplanner}
+      USER_DB_USERNAME: ${POSTGRES_USER:-tripplanner}
+      USER_DB_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+      # Flyway owns the schema; Hibernate only verifies the mapping matches.
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      # Token validation. The issuer must match Keycloak's 'iss' claim exactly.
+      KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:?KEYCLOAK_ISSUER_URI is required}
+      KEYCLOAK_AUDIENCES: ${KEYCLOAK_AUDIENCES:-navio-api}
+      # Admin API service account. Reached over the internal network rather than
+      # the public hostname, so admin calls never leave the backend network.
+      KEYCLOAK_BASE_URL: http://keycloak:8080
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM:-navio}
+      KEYCLOAK_ADMIN_CLIENT_ID: ${KEYCLOAK_ADMIN_CLIENT_ID:-navio-user-management}
+      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET:?KEYCLOAK_ADMIN_CLIENT_SECRET is required}
     healthcheck:
       test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8081/actuator/health"]
       interval: 10s
       timeout: 5s
       retries: 15
-      start_period: 45s
+      start_period: 60s
 
   trip-planning-service:
     <<: *java-service
@@ -261,16 +303,176 @@ services:
         condition: service_healthy
       community-service:
         condition: service_healthy
+      keycloak:
+        condition: service_healthy
     environment:
       <<: *common-java-environment
       CONFIG_SERVER_URL: http://config-server:8888
       SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      # The gateway is the trust boundary: it validates every inbound token and
+      # replaces client-supplied X-User-Id with the verified subject.
+      KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:?KEYCLOAK_ISSUER_URI is required}
+      KEYCLOAK_AUDIENCES: ${KEYCLOAK_AUDIENCES:-navio-api}
+      NAVIO_CORS_ALLOWED_ORIGINS: ${NAVIO_CORS_ALLOWED_ORIGINS:-http://navio.sit.kmutt.ac.th}
     healthcheck:
       test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8080/actuator/health"]
       interval: 10s
       timeout: 5s
       retries: 15
       start_period: 60s
+
+  prometheus:
+    image: prom/prometheus:v3.14.0
+    restart: unless-stopped
+    mem_limit: 400m
+    networks:
+      - backend
+    security_opt:
+      - no-new-privileges:true
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+      - '--storage.tsdb.retention.size=2GB'
+      - '--web.listen-address=0.0.0.0:9090'
+    volumes:
+      - ./observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./observability/prometheus/rules:/etc/prometheus/rules:ro
+      - prometheus-data:/prometheus
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  loki:
+    image: grafana/loki:3.6.4
+    restart: unless-stopped
+    mem_limit: 350m
+    networks:
+      - backend
+    security_opt:
+      - no-new-privileges:true
+    command: -config.file=/etc/loki/config.yaml
+    volumes:
+      - ./observability/loki-config.yaml:/etc/loki/config.yaml:ro
+      - loki-data:/loki
+    healthcheck:
+      test: ["CMD", "/usr/bin/loki", "-version"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  grafana:
+    image: grafana/grafana:12.3.2
+    restart: unless-stopped
+    mem_limit: 300m
+    networks:
+      - backend
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      prometheus:
+        condition: service_healthy
+      loki:
+        condition: service_healthy
+    environment:
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://navio.sit.kmutt.ac.th/grafana/}
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USERNAME:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD is required}
+      GF_SECURITY_COOKIE_SECURE: "true"
+      GF_SECURITY_COOKIE_SAMESITE: lax
+      GF_SECURITY_DISABLE_GRAVATAR: "true"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_AUTH_BASIC_ENABLED: "true"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_USERS_ALLOW_ORG_CREATE: "false"
+      GF_USERS_VIEWERS_CAN_EDIT: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_LOG_LEVEL: warn
+      TZ: Asia/Bangkok
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./observability/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./observability/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/grafana/api/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  alloy:
+    image: grafana/alloy:v1.12.2
+    restart: unless-stopped
+    mem_limit: 250m
+    networks:
+      - backend
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      loki:
+        condition: service_healthy
+    command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+    volumes:
+      - ./observability/alloy-config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - alloy-data:/var/lib/alloy/data
+    healthcheck:
+      test: ["CMD", "/bin/alloy", "--version"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  navio-web:
+    image: ${NAVIO_IMAGE_PREFIX:?NAVIO_IMAGE_PREFIX is required}-web-client:${NAVIO_IMAGE_TAG:?NAVIO_IMAGE_TAG is required}
+    restart: unless-stopped
+    init: true
+    mem_limit: 512m
+    networks:
+      - backend
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      api-gateway:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    environment:
+      # Public origin the browser sees. Auth.js builds its callback URL from
+      # this, and it must match the redirect URI Keycloak imported.
+      AUTH_URL: ${NAVIO_WEB_ORIGIN:?NAVIO_WEB_ORIGIN is required}
+      AUTH_TRUST_HOST: 'true'
+      AUTH_SECRET: ${AUTH_SECRET:?AUTH_SECRET is required}
+      AUTH_KEYCLOAK_ID: ${KEYCLOAK_WEB_CLIENT_ID:-navio-web}
+      AUTH_KEYCLOAK_SECRET: ${KEYCLOAK_WEB_CLIENT_SECRET:?KEYCLOAK_WEB_CLIENT_SECRET is required}
+      # Must be the PUBLIC issuer, not an internal address: the browser is
+      # redirected here to log in, and every token's 'iss' claim carries this
+      # value. An internal URL would make issuer validation fail.
+      AUTH_KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER_URI:?KEYCLOAK_ISSUER_URI is required}
+      # Application API calls stay on the Docker network — they never leave the
+      # host, so they skip NGINX, TLS, and the campus network entirely.
+      NAVIO_API_BASE_URL: http://api-gateway:8080
+      # Server-side OIDC calls go out to the public HTTPS issuer above. Trust
+      # the deployed certificate explicitly so a KMUTT-internal or self-signed
+      # chain does not fail Node's verification.
+      NODE_EXTRA_CA_CERTS: /etc/ssl/navio/fullchain.pem
+      TZ: Asia/Bangkok
+    volumes:
+      - ./tls/fullchain.pem:/etc/ssl/navio/fullchain.pem:ro
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--output", "/dev/null", "http://localhost:3000/"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
 
   nginx:
     image: nginx:1.29-alpine
@@ -280,15 +482,27 @@ services:
       - backend
     ports:
       - "80:80"
+      - "443:443"
     depends_on:
       api-gateway:
         condition: service_healthy
       keycloak:
         condition: service_healthy
+      navio-web:
+        condition: service_healthy
+      grafana:
+        condition: service_started
     volumes:
       - ./nginx/navio.conf:/etc/nginx/conf.d/default.conf:ro
+      # Bind-mounted as files, not symlinks: Docker resolves a symlink to its
+      # target inode at mount time, so certbot repointing live/ on renewal would
+      # leave this container serving the old certificate until it restarts.
+      # The renewal deploy hook copies fresh files here and reloads nginx.
+      - ./tls/fullchain.pem:/etc/nginx/tls/fullchain.pem:ro
+      - ./tls/privkey.pem:/etc/nginx/tls/privkey.pem:ro
+      - ./certbot-webroot:/var/www/certbot:ro
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      test: ["CMD", "wget", "--quiet", "--no-check-certificate", "--tries=1", "--spider", "https://localhost/health"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -302,5 +516,11 @@ networks:
 volumes:
   postgres-data:
   kafka-data:
-  user-data:
+  # user-data removed: user management moved off embedded H2 onto PostgreSQL.
+  # Drop the old volume with `docker volume rm navio_user-data` once any data
+  # still in it has been migrated or confirmed disposable.
   community-media:
+  prometheus-data:
+  loki-data:
+  grafana-data:
+  alloy-data:

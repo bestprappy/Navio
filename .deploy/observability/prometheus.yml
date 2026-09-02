@@ -3,7 +3,7 @@ global:
   evaluation_interval: 15s
   external_labels:
     cluster: 'navio'
-    environment: 'development'
+    environment: 'production'
 
 rule_files:
   - /etc/prometheus/rules/*.yml
@@ -14,7 +14,7 @@ scrape_configs:
       - targets: ['localhost:9090']
         labels:
           cluster: 'navio'
-          environment: 'development'
+          environment: 'production'
           service: 'prometheus'
 
   - job_name: 'loki'
@@ -23,92 +23,83 @@ scrape_configs:
       - targets: ['loki:3100']
         labels:
           cluster: 'navio'
-          environment: 'development'
+          environment: 'production'
           service: 'loki'
-
-  - job_name: 'zipkin'
-    metrics_path: '/prometheus'
-    static_configs:
-      - targets: ['zipkin:9411']
-        labels:
-          cluster: 'navio'
-          environment: 'development'
-          service: 'zipkin'
 
   - job_name: 'alloy'
     static_configs:
       - targets: ['alloy:12345']
         labels:
           cluster: 'navio'
-          environment: 'development'
+          environment: 'production'
           service: 'alloy'
 
   - job_name: 'api-gateway'
     metrics_path: '/actuator/prometheus'
-    scrape_interval: 10s
+    scrape_interval: 15s
     static_configs:
-      - targets: ['host.docker.internal:8080']
+      - targets: ['api-gateway:8080']
         labels:
           cluster: 'navio'
-          environment: 'development'
+          environment: 'production'
           service: 'api-gateway'
 
   - job_name: 'config-server'
     metrics_path: '/actuator/prometheus'
-    scrape_interval: 10s
+    scrape_interval: 15s
     static_configs:
-      - targets: ['host.docker.internal:8888']
+      - targets: ['config-server:8888']
         labels:
           cluster: 'navio'
-          environment: 'development'
+          environment: 'production'
           service: 'config-server'
 
   - job_name: 'discovery-server'
     metrics_path: '/actuator/prometheus'
-    scrape_interval: 10s
+    scrape_interval: 15s
     static_configs:
-      - targets: ['host.docker.internal:8761']
+      - targets: ['discovery-server:8761']
         labels:
           cluster: 'navio'
-          environment: 'development'
+          environment: 'production'
           service: 'discovery-server'
-
-  - job_name: 'trip-planning-service'
-    metrics_path: '/actuator/prometheus'
-    scrape_interval: 10s
-    static_configs:
-      - targets: ['host.docker.internal:8082']
-        labels:
-          cluster: 'navio'
-          environment: 'development'
-          service: 'trip-planning-service'
 
   - job_name: 'user-management-service'
     metrics_path: '/actuator/prometheus'
-    scrape_interval: 10s
+    scrape_interval: 15s
     static_configs:
-      - targets: ['host.docker.internal:8081']
+      - targets: ['user-management-service:8081']
         labels:
           cluster: 'navio'
-          environment: 'development'
+          environment: 'production'
           service: 'user-management-service'
+
+  - job_name: 'trip-planning-service'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['trip-planning-service:8082']
+        labels:
+          cluster: 'navio'
+          environment: 'production'
+          service: 'trip-planning-service'
 
   - job_name: 'mobility-and-ev-service'
     metrics_path: '/actuator/prometheus'
-    scrape_interval: 10s
+    scrape_interval: 15s
     static_configs:
-      - targets: ['host.docker.internal:8083']
+      - targets: ['mobility-and-ev-service:8083']
         labels:
           cluster: 'navio'
-          environment: 'development'
+          environment: 'production'
           service: 'mobility-and-ev-service'
 
   - job_name: 'community-service'
     metrics_path: '/actuator/prometheus'
-    scrape_interval: 10s
+    scrape_interval: 15s
     static_configs:
-      - targets: ['host.docker.internal:8084']
+      - targets: ['community-service:8084']
         labels:
           cluster: 'navio'
-          environment: 'development'
+          environment: 'production'
           service: 'community-service'

@@ -1,6 +1,8 @@
 # Navio Observability Stack
 
-Local observability stack for distributed tracing, metrics collection, log aggregation, and a production-operations dashboard.
+Observability stack for distributed tracing, metrics collection, log aggregation, and a production-operations dashboard.
+
+Sections below cover the **local** stack (`docker-compose.yml`) unless stated otherwise. For the VM deployment, see [Production (VM) Deployment](#production-vm-deployment).
 
 ## Components
 
@@ -163,7 +165,7 @@ These data sources and the `Navio Observability Overview` dashboard are provisio
 2. Query metric: `jvm_memory_used{job="api-gateway"}`
 3. Or use Grafana dashboards
 
-## Configuration Files
+## Configuration Files (local stack)
 
 | File | Purpose |
 |------|---------|
@@ -191,17 +193,57 @@ These data sources and the `Navio Observability Overview` dashboard are provisio
 - Check provisioning logs: `docker compose logs grafana`
 - Confirm `http://localhost:3000/api/datasources` lists three sources
 
-## Production Considerations
+## Production (VM) Deployment
 
-The dashboard is designed for production operations, but this Docker Compose deployment intentionally uses development defaults. Before production deployment:
+The VM stack runs Prometheus, Loki, Grafana, and Alloy alongside the backend services. Zipkin is not deployed there: `compose.production.yml` sets `MANAGEMENT_TRACING_EXPORT_ZIPKIN_ENABLED=false`, so production has metrics and logs but no traces.
 
-1. Disable anonymous Grafana Admin access and configure SSO/RBAC.
+### Access
+
+| Component | Reachable from | URL |
+|-----------|----------------|-----|
+| **Grafana** | Public, behind nginx | http://navio.sit.kmutt.ac.th/grafana/ |
+| **Prometheus** | Internal only (`navio-backend` network) | — |
+| **Loki** | Internal only | — |
+| **Alloy** | Internal only | — |
+
+Grafana requires a login: anonymous access is disabled and sign-up is off. Credentials come from `GRAFANA_ADMIN_USERNAME` / `GRAFANA_ADMIN_PASSWORD` in `/opt/navio/.env`. `GRAFANA_ADMIN_PASSWORD` is mandatory — deployment fails fast if it is unset.
+
+Only Grafana is proxied. Prometheus, Loki, and Alloy publish no host ports and are reachable only from inside the Docker network, so `/metrics`, the Loki push/query API, and the Alloy UI are not exposed to the internet.
+
+### Production configuration files
+
+| File | Purpose |
+|------|---------|
+| `.deploy/observability/prometheus.yml` | Production scrape config — container DNS targets, `environment: production` |
+| `.deploy/observability/loki-config.yaml` | Loki with 14-day retention and compaction enabled |
+| `.deploy/observability/alloy-config.alloy` | Docker-only log collection (no host log directory on the VM) |
+| `.deploy/observability/grafana/datasources.yml` | Prometheus + Loki datasources (no Zipkin) |
+| `.deploy/observability/grafana/dashboards.yml` | Read-only dashboard provider |
+
+Alert rules (`prometheus/rules/`) and dashboard JSON (`grafana/dashboards/`) are shared with the local stack — `deploy.sh` installs them onto the VM from the repository root, so there is one source of truth for both environments.
+
+### Resource footprint
+
+The four observability containers add roughly **1.3 GB** of memory limits (Prometheus 400 MB, Loki 350 MB, Grafana 300 MB, Alloy 250 MB) on top of the ~6.1 GB already allocated to the backend services. Confirm the VM has headroom before deploying. Prometheus retains 15 days or 2 GB, whichever comes first; Loki retains 14 days.
+
+### Verifying after deploy
+
+```bash
+docker compose -f /opt/navio/compose.production.yml ps
+docker compose -f /opt/navio/compose.production.yml exec prometheus \
+  wget -qO- http://localhost:9090/api/v1/targets | grep -o '"health":"[a-z]*"' | sort | uniq -c
+```
+
+Then open http://navio.sit.kmutt.ac.th/grafana/ and confirm the **Navio Production Overview** dashboard shows `environment = production`.
+
+## Remaining Production Considerations
+
+1. Terminate TLS in front of nginx. Grafana currently rides plain HTTP, so login credentials and session cookies cross the network unencrypted; once HTTPS is in place set `GF_SECURITY_COOKIE_SECURE=true`.
 2. Connect Prometheus alerts to Alertmanager or another notification route; rules alone do not page anyone.
-3. Replace local Prometheus/Loki storage with durable storage and configure retention.
-4. Set a lower trace sampling rate based on traffic and investigation needs.
-5. Put cluster and environment labels on every production scrape target and log stream.
-6. Store credentials in a secret manager and set container resource limits.
-7. Monitor Prometheus, Loki, Alloy, and Grafana as production services themselves.
+3. Replace single-node Prometheus/Loki filesystem storage with durable storage if the retention windows above are not enough.
+4. Alloy mounts `/var/run/docker.sock` read-only to discover container logs. This is effectively host-root access — consider a logging driver or a socket proxy if that is unacceptable.
+5. Move Grafana to SSO/RBAC instead of a single shared admin account.
+6. Store credentials in a secret manager rather than `/opt/navio/.env`.
 
 ## Docker Compose Commands
 

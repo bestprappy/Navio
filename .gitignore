@@ -7,6 +7,9 @@
 ### Planning / scratch ###
 .planning/
 
+### Claude local settings (personal, never committed) ###
+.claude/settings.local.json
+
 ### Logs ###
 logs/
 *.log

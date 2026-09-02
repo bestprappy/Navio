@@ -26,11 +26,11 @@ jobs:
       - name: Check out deployment repository
         uses: actions/checkout@v7
 
-      - name: Check out backend submodules
+      - name: Check out submodules
         shell: bash
         run: |
-          git submodule sync -- server
-          git submodule update --init --depth 1 server
+          git submodule sync -- client server
+          git submodule update --init --depth 1 client server
           git -C server submodule sync --recursive
           git -C server submodule update --init --recursive --depth 1
 
@@ -38,6 +38,7 @@ jobs:
         shell: bash
         run: |
           repositories=(
+            client
             server
             server/user-management-service
             server/trip-planning-service
@@ -85,16 +86,19 @@ jobs:
             service_path: server/mobility-and-ev-service
           - image: community-service
             service_path: server/community-service
+          - image: web-client
+            service_path: client
+            dockerfile: .deploy/docker/web-client.Dockerfile
 
     steps:
       - name: Check out deployment repository
         uses: actions/checkout@v7
 
-      - name: Check out backend submodules
+      - name: Check out submodules
         shell: bash
         run: |
-          git submodule sync -- server
-          git submodule update --init --depth 1 server
+          git submodule sync -- client server
+          git submodule update --init --depth 1 client server
           git -C server submodule sync --recursive
           git -C server submodule update --init --recursive --depth 1
 
@@ -112,9 +116,17 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
-          file: .deploy/docker/java-service.Dockerfile
+          file: ${{ matrix.dockerfile || '.deploy/docker/java-service.Dockerfile' }}
+          # SERVICE_PATH is consumed by the Java image only. The web client
+          # ignores it and instead needs its NEXT_PUBLIC_* values at BUILD time,
+          # because next build inlines them into the browser bundle — they
+          # cannot be supplied as runtime environment. Only public,
+          # referrer-restricted keys may be passed here; they end up readable
+          # inside the published image.
           build-args: |
             SERVICE_PATH=${{ matrix.service_path }}
+            NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
+            NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID=${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID }}
           platforms: linux/amd64
           push: true
           tags: |

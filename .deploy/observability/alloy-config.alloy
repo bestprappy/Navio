@@ -1,0 +1,55 @@
+// ============================================================================
+// Grafana Alloy Configuration for Navio Production
+// ============================================================================
+// Every Navio service runs as a container on this VM, so container stdout is
+// the only log source. There is no host-run Java service log directory here.
+
+discovery.docker "containers" {
+	host = "unix:///var/run/docker.sock"
+}
+
+discovery.relabel "containers" {
+	targets = []
+
+	rule {
+		source_labels = ["__meta_docker_container_name"]
+		regex         = "/(.*)"
+		target_label  = "container_name"
+	}
+
+	rule {
+		source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+		target_label  = "service_name"
+	}
+
+	rule {
+		source_labels = ["__meta_docker_container_log_stream"]
+		target_label  = "stream"
+	}
+}
+
+loki.source.docker "containers" {
+	host          = "unix:///var/run/docker.sock"
+	targets       = discovery.docker.containers.targets
+	forward_to    = [loki.write.default.receiver]
+	relabel_rules = discovery.relabel.containers.rules
+	labels        = {
+		cluster     = "navio",
+		environment = "production",
+		platform    = "docker",
+	}
+}
+
+loki.write "default" {
+	endpoint {
+		url = "http://loki:3100/loki/api/v1/push"
+	}
+}
+
+// ============================================================================
+// Alloy Server Configuration
+// ============================================================================
+
+logging {
+	level = "warn"
+}

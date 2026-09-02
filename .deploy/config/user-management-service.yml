@@ -6,15 +6,39 @@ spring:
   jpa:
     database: POSTGRESQL
     hibernate:
-      ddl-auto: update
+      # Flyway owns the schema. 'update' would let Hibernate silently alter
+      # production tables to match whatever the running JAR expects.
+      ddl-auto: validate
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+  flyway:
+    enabled: true
+    schemas: iam
+    default-schema: iam
+
+navio:
+  security:
+    keycloak:
+      issuer-uri: ${KEYCLOAK_ISSUER_URI}
+      audiences: ${KEYCLOAK_AUDIENCES:navio-api}
+      admin:
+        base-url: ${KEYCLOAK_BASE_URL}
+        realm: ${KEYCLOAK_REALM:navio}
+        client-id: ${KEYCLOAK_ADMIN_CLIENT_ID:navio-user-management}
+        client-secret: ${KEYCLOAK_ADMIN_CLIENT_SECRET}
 
 management:
   endpoints:
     web:
       exposure:
         include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: never
 
 server:
   port: 8081
-
+  forward-headers-strategy: framework
+  error:
+    include-message: never
+    include-stacktrace: never

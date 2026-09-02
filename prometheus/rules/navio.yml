@@ -6,7 +6,7 @@ groups:
         expr: |
           sum by (cluster, environment, service) (
             rate(http_server_requests_seconds_count{
-              service=~"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service",
+              service=~"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service|mobility-and-ev-service|community-service",
               uri!~"/actuator.*"
             }[5m])
           )
@@ -16,7 +16,7 @@ groups:
           (
             sum by (cluster, environment, service) (
               rate(http_server_requests_seconds_count{
-                service=~"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service",
+                service=~"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service|mobility-and-ev-service|community-service",
                 status=~"5..",
                 uri!~"/actuator.*"
               }[5m])
@@ -26,7 +26,7 @@ groups:
           (
             0 * sum by (cluster, environment, service) (
               rate(http_server_requests_seconds_count{
-                service=~"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service",
+                service=~"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service|mobility-and-ev-service|community-service",
                 uri!~"/actuator.*"
               }[5m])
             )
@@ -46,7 +46,7 @@ groups:
             0.95,
             sum by (cluster, environment, service, le) (
               rate(http_server_requests_seconds_bucket{
-                service=~"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service",
+                service=~"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service|mobility-and-ev-service|community-service",
                 uri!~"/actuator.*"
               }[5m])
             )
@@ -57,7 +57,7 @@ groups:
     rules:
       - alert: NavioServiceDown
         expr: |
-          up{service=~"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service"} == 0
+          up{service=~"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service|mobility-and-ev-service|community-service"} == 0
         for: 2m
         labels:
           severity: critical
