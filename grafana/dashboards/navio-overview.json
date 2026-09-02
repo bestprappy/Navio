@@ -83,7 +83,7 @@
       },
       "targets": [
         {
-          "expr": "100 * sum(up{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service\"} == 1) / count(up{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service\"})",
+          "expr": "100 * sum(up{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service|mobility-and-ev-service|community-service\"} == 1) / count(up{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service|mobility-and-ev-service|community-service\"})",
           "instant": true,
           "refId": "A"
         }
@@ -312,7 +312,7 @@
       },
       "targets": [
         {
-          "expr": "up{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service\"}",
+          "expr": "up{cluster=~\"$cluster\",environment=~\"$environment\",service=~\"$service\",job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service|mobility-and-ev-service|community-service\"}",
           "legendFormat": "{{service}}",
           "refId": "A"
         }
@@ -942,14 +942,14 @@
       {
         "current": { "selected": false, "text": "navio", "value": "navio" },
         "datasource": { "type": "prometheus", "uid": "prometheus" },
-        "definition": "label_values(up{job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service\"}, cluster)",
+        "definition": "label_values(up{job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service|mobility-and-ev-service|community-service\"}, cluster)",
         "hide": 0,
         "includeAll": false,
         "label": "Cluster",
         "multi": false,
         "name": "cluster",
         "options": [],
-        "query": { "query": "label_values(up{job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service\"}, cluster)", "refId": "VariableQuery-Cluster" },
+        "query": { "query": "label_values(up{job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service|mobility-and-ev-service|community-service\"}, cluster)", "refId": "VariableQuery-Cluster" },
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -959,14 +959,14 @@
       {
         "current": { "selected": false, "text": "development", "value": "development" },
         "datasource": { "type": "prometheus", "uid": "prometheus" },
-        "definition": "label_values(up{cluster=~\"$cluster\",job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service\"}, environment)",
+        "definition": "label_values(up{cluster=~\"$cluster\",job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service|mobility-and-ev-service|community-service\"}, environment)",
         "hide": 0,
         "includeAll": false,
         "label": "Environment",
         "multi": false,
         "name": "environment",
         "options": [],
-        "query": { "query": "label_values(up{cluster=~\"$cluster\",job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service\"}, environment)", "refId": "VariableQuery-Environment" },
+        "query": { "query": "label_values(up{cluster=~\"$cluster\",job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service|mobility-and-ev-service|community-service\"}, environment)", "refId": "VariableQuery-Environment" },
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -977,14 +977,14 @@
         "allValue": ".*",
         "current": { "selected": false, "text": "api-gateway", "value": "api-gateway" },
         "datasource": { "type": "prometheus", "uid": "prometheus" },
-        "definition": "label_values(up{cluster=~\"$cluster\",environment=~\"$environment\",job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service\"}, service)",
+        "definition": "label_values(up{cluster=~\"$cluster\",environment=~\"$environment\",job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service|mobility-and-ev-service|community-service\"}, service)",
         "hide": 0,
         "includeAll": true,
         "label": "Service",
         "multi": true,
         "name": "service",
         "options": [],
-        "query": { "query": "label_values(up{cluster=~\"$cluster\",environment=~\"$environment\",job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service\"}, service)", "refId": "VariableQuery-Service" },
+        "query": { "query": "label_values(up{cluster=~\"$cluster\",environment=~\"$environment\",job=~\"api-gateway|config-server|discovery-server|trip-planning-service|user-management-service|mobility-and-ev-service|community-service\"}, service)", "refId": "VariableQuery-Service" },
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,

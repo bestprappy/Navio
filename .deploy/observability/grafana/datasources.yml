@@ -1,0 +1,24 @@
+apiVersion: 1
+
+prune: true
+
+# Zipkin is intentionally absent: the production stack sets
+# MANAGEMENT_TRACING_EXPORT_ZIPKIN_ENABLED=false and runs no Zipkin container.
+datasources:
+  - name: Prometheus
+    uid: prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
+    editable: false
+    jsonData:
+      httpMethod: POST
+      timeInterval: 15s
+
+  - name: Loki
+    uid: loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    editable: false
