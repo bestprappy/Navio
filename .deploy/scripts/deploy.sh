@@ -157,6 +157,7 @@ compose up -d --remove-orphans --wait --wait-timeout 420
 
 curl --fail --silent --show-error \
   --retry 10 --retry-delay 3 --retry-connrefused \
+  --cacert "${TLS_CERT_FILE}" \
   --resolve navio.sit.kmutt.ac.th:443:127.0.0.1 \
   https://navio.sit.kmutt.ac.th/health >/dev/null
 
@@ -165,11 +166,13 @@ curl --fail --silent --show-error \
 # and not accidentally public) before declaring the release successful.
 curl --fail --silent --show-error \
   --retry 10 --retry-delay 3 --retry-connrefused \
+  --cacert "${TLS_CERT_FILE}" \
   --resolve navio.sit.kmutt.ac.th:443:127.0.0.1 \
   https://navio.sit.kmutt.ac.th/realms/navio/.well-known/openid-configuration >/dev/null
 
 readonly USER_ROUTE_STATUS="$(curl --silent --show-error \
   --output /dev/null --write-out '%{http_code}' \
+  --cacert "${TLS_CERT_FILE}" \
   --resolve navio.sit.kmutt.ac.th:443:127.0.0.1 \
   https://navio.sit.kmutt.ac.th/v1/users/me)"
 if [[ "${USER_ROUTE_STATUS}" != "401" ]]; then
