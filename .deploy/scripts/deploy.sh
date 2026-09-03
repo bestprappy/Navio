@@ -21,6 +21,18 @@ if [[ ! -f "${ENV_FILE}" ]]; then
   exit 2
 fi
 
+google_maps_server_key="$(sed -n 's/^GOOGLE_MAPS_SERVER_API_KEY=//p' "${ENV_FILE}" | tail -n 1)"
+google_maps_server_key="${google_maps_server_key//$'\r'/}"
+google_maps_server_key="${google_maps_server_key//[[:space:]]/}"
+google_maps_server_key="${google_maps_server_key//\"/}"
+google_maps_server_key="${google_maps_server_key//\'/}"
+if [[ -z "${google_maps_server_key}" ]]; then
+  echo "Missing non-empty GOOGLE_MAPS_SERVER_API_KEY in ${ENV_FILE}." >&2
+  echo "Provision a server-side key for Places API (New) and Routes API before deploying." >&2
+  exit 2
+fi
+unset google_maps_server_key
+
 install -d -m 0755 \
   "${DEPLOY_ROOT}/config" \
   "${DEPLOY_ROOT}/keycloak" \
@@ -82,7 +94,7 @@ deployment_diagnostics() {
   compose ps --all >&2 || true
 
   while IFS= read -r service; do
-    container_id="$(compose ps -q "${service}" 2>/dev/null || true)"
+    container_id="$(compose ps --all -q "${service}" 2>/dev/null || true)"
     [[ -n "${container_id}" ]] || continue
 
     state="$(docker inspect --format '{{.State.Status}}' "${container_id}" 2>/dev/null || true)"
