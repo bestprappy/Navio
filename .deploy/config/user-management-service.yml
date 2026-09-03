@@ -15,6 +15,16 @@ spring:
     enabled: true
     schemas: iam
     default-schema: iam
+  kafka:
+    # Use the Docker-network broker. Without this explicit binding Spring
+    # falls back to localhost:9092 inside the service container, which makes
+    # the Kafka health contributor keep the otherwise-started service DOWN.
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
+    consumer:
+      group-id: user-management-service
+      auto-offset-reset: earliest
+    producer:
+      acks: all
 
 navio:
   security:
@@ -30,6 +40,13 @@ navio:
         realm: ${KEYCLOAK_REALM:navio}
         client-id: ${KEYCLOAK_ADMIN_CLIENT_ID:navio-user-management}
         client-secret: ${KEYCLOAK_ADMIN_CLIENT_SECRET}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://discovery-server:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
 
 management:
   endpoints:
