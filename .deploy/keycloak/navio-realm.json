@@ -3,7 +3,7 @@
   "enabled": true,
   "displayName": "Navio",
   "sslRequired": "${KEYCLOAK_SSL_REQUIRED:all}",
-  "registrationAllowed": true,
+  "registrationAllowed": false,
   "registrationEmailAsUsername": true,
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,
@@ -144,6 +144,28 @@
       "serviceAccountsEnabled": true,
       "fullScopeAllowed": false,
       "secret": "${KEYCLOAK_ADMIN_CLIENT_SECRET}"
+    }
+  ],
+
+  "identityProviders": [
+    {
+      "alias": "google",
+      "displayName": "Google",
+      "providerId": "google",
+      "enabled": true,
+      "trustEmail": true,
+      "storeToken": false,
+      "addReadTokenRoleOnCreate": false,
+      "linkOnly": false,
+      "hideOnLogin": true,
+      "firstBrokerLoginFlowAlias": "first broker login",
+      "config": {
+        "clientId": "${GOOGLE_OAUTH_CLIENT_ID}",
+        "clientSecret": "${GOOGLE_OAUTH_CLIENT_SECRET}",
+        "defaultScope": "openid profile email",
+        "syncMode": "IMPORT",
+        "useJwksUrl": "true"
+      }
     }
   ],
 

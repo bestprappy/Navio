@@ -21,17 +21,33 @@ if [[ ! -f "${ENV_FILE}" ]]; then
   exit 2
 fi
 
-google_maps_server_key="$(sed -n 's/^GOOGLE_MAPS_SERVER_API_KEY=//p' "${ENV_FILE}" | tail -n 1)"
-google_maps_server_key="${google_maps_server_key//$'\r'/}"
-google_maps_server_key="${google_maps_server_key//[[:space:]]/}"
-google_maps_server_key="${google_maps_server_key//\"/}"
-google_maps_server_key="${google_maps_server_key//\'/}"
-if [[ -z "${google_maps_server_key}" ]]; then
-  echo "Missing non-empty GOOGLE_MAPS_SERVER_API_KEY in ${ENV_FILE}." >&2
-  echo "Provision a server-side key for Places API (New) and Routes API before deploying." >&2
-  exit 2
-fi
-unset google_maps_server_key
+require_env_value() {
+  local description="$2"
+  local variable_name="$1"
+  local value
+
+  value="$(sed -n "s/^${variable_name}=//p" "${ENV_FILE}" | tail -n 1)"
+  value="${value//$'\r'/}"
+  value="${value//[[:space:]]/}"
+  value="${value//\"/}"
+  value="${value//\'/}"
+
+  if [[ -z "${value}" ]]; then
+    echo "Missing non-empty ${variable_name} in ${ENV_FILE}." >&2
+    echo "${description}" >&2
+    exit 2
+  fi
+}
+
+require_env_value \
+  "GOOGLE_MAPS_SERVER_API_KEY" \
+  "Provision a server-side key for Places API (New) and Routes API before deploying."
+require_env_value \
+  "GOOGLE_OAUTH_CLIENT_ID" \
+  "Provision a Google OAuth web client for Navio sign-in before deploying."
+require_env_value \
+  "GOOGLE_OAUTH_CLIENT_SECRET" \
+  "Provision the matching Google OAuth client secret before deploying."
 
 install -d -m 0755 \
   "${DEPLOY_ROOT}/config" \
@@ -82,6 +98,46 @@ fi
 
 compose() {
   docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" "$@"
+}
+
+configure_google_identity_provider() {
+  compose exec -T keycloak bash -euc '
+    kcadm="/opt/keycloak/bin/kcadm.sh"
+    "${kcadm}" config credentials \
+      --server http://localhost:8080 \
+      --realm master \
+      --user "${KC_BOOTSTRAP_ADMIN_USERNAME}" \
+      --password "${KC_BOOTSTRAP_ADMIN_PASSWORD}" >/dev/null
+
+    provider_path="identity-provider/instances/google"
+    provider_settings=(
+      -r "${KEYCLOAK_REALM}"
+      -s alias=google
+      -s displayName=Google
+      -s providerId=google
+      -s enabled=true
+      -s trustEmail=true
+      -s storeToken=false
+      -s addReadTokenRoleOnCreate=false
+      -s linkOnly=false
+      -s hideOnLogin=true
+      -s "firstBrokerLoginFlowAlias=first broker login"
+      -s "config.clientId=${GOOGLE_OAUTH_CLIENT_ID}"
+      -s "config.clientSecret=${GOOGLE_OAUTH_CLIENT_SECRET}"
+      -s "config.defaultScope=openid profile email"
+      -s "config.syncMode=IMPORT"
+      -s "config.useJwksUrl=\"true\""
+    )
+
+    if "${kcadm}" get "${provider_path}" -r "${KEYCLOAK_REALM}" >/dev/null 2>&1; then
+      "${kcadm}" update "${provider_path}" "${provider_settings[@]}" >/dev/null
+    else
+      "${kcadm}" create identity-provider/instances "${provider_settings[@]}" >/dev/null
+    fi
+
+    "${kcadm}" update "realms/${KEYCLOAK_REALM}" \
+      -s registrationAllowed=false >/dev/null
+  '
 }
 
 deployment_diagnostics() {
@@ -154,6 +210,7 @@ compose exec -T postgres sh -ec \
   'psql --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" --set ON_ERROR_STOP=1 --command "CREATE SCHEMA IF NOT EXISTS keycloak AUTHORIZATION CURRENT_USER"'
 
 compose up -d --remove-orphans --wait --wait-timeout 420
+configure_google_identity_provider
 
 curl --fail --silent --show-error \
   --retry 10 --retry-delay 3 --retry-connrefused \
@@ -179,6 +236,53 @@ if [[ "${USER_ROUTE_STATUS}" != "401" ]]; then
   echo "Expected anonymous /v1/users/me to return 401; got ${USER_ROUTE_STATUS}." >&2
   exit 1
 fi
+
+for auth_path in sign-in sign-up; do
+  if ! curl --fail --silent --show-error \
+    --cacert "${TLS_CERT_FILE}" \
+    --resolve navio.sit.kmutt.ac.th:443:127.0.0.1 \
+    "https://navio.sit.kmutt.ac.th/${auth_path}" | grep -q 'Continue with Google'; then
+    echo "Expected /${auth_path} to render the Google authentication action." >&2
+    exit 1
+  fi
+done
+
+readonly GOOGLE_OAUTH_COOKIE_JAR="$(mktemp)"
+trap 'rm -f "${GOOGLE_OAUTH_COOKIE_JAR}"' EXIT
+
+readonly GOOGLE_BROKER_REDIRECT="$(curl --fail --silent --show-error \
+  --output /dev/null --write-out '%{redirect_url}' \
+  --cookie-jar "${GOOGLE_OAUTH_COOKIE_JAR}" \
+  --cacert "${TLS_CERT_FILE}" \
+  --resolve navio.sit.kmutt.ac.th:443:127.0.0.1 \
+  --get \
+  --data-urlencode 'client_id=navio-web' \
+  --data-urlencode 'redirect_uri=https://navio.sit.kmutt.ac.th/api/auth/callback/keycloak' \
+  --data-urlencode 'response_type=code' \
+  --data-urlencode 'scope=openid email profile' \
+  --data-urlencode 'state=deployment-smoke' \
+  --data-urlencode 'nonce=deployment-smoke' \
+  --data-urlencode 'code_challenge_method=S256' \
+  --data-urlencode 'code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM' \
+  --data-urlencode 'kc_idp_hint=google' \
+  'https://navio.sit.kmutt.ac.th/realms/navio/protocol/openid-connect/auth')"
+if [[ ! "${GOOGLE_BROKER_REDIRECT}" =~ ^https://navio\.sit\.kmutt\.ac\.th/realms/navio/broker/google/login ]]; then
+  echo "Google OAuth broker was not selected by the Navio authorization request." >&2
+  exit 1
+fi
+
+readonly GOOGLE_AUTH_REDIRECT="$(curl --fail --silent --show-error \
+  --output /dev/null --write-out '%{redirect_url}' \
+  --cookie "${GOOGLE_OAUTH_COOKIE_JAR}" \
+  --cacert "${TLS_CERT_FILE}" \
+  --resolve navio.sit.kmutt.ac.th:443:127.0.0.1 \
+  "${GOOGLE_BROKER_REDIRECT}")"
+if [[ ! "${GOOGLE_AUTH_REDIRECT}" =~ ^https://accounts\.google\.com/ ]]; then
+  echo "Google OAuth broker did not redirect to accounts.google.com." >&2
+  exit 1
+fi
+rm -f "${GOOGLE_OAUTH_COOKIE_JAR}"
+trap - EXIT
 
 trap - ERR
 

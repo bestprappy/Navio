@@ -103,6 +103,11 @@ services:
       # Auth.js runs server-side and exchanges authorization codes as this
       # confidential client. The secret is never shipped to browser JavaScript.
       KEYCLOAK_WEB_CLIENT_SECRET: ${KEYCLOAK_WEB_CLIENT_SECRET:?KEYCLOAK_WEB_CLIENT_SECRET is required}
+      # Google remains behind the identity broker so Navio services receive
+      # the same issuer, audience, roles, and refresh-token semantics.
+      GOOGLE_OAUTH_CLIENT_ID: ${GOOGLE_OAUTH_CLIENT_ID:?GOOGLE_OAUTH_CLIENT_ID is required}
+      GOOGLE_OAUTH_CLIENT_SECRET: ${GOOGLE_OAUTH_CLIENT_SECRET:?GOOGLE_OAUTH_CLIENT_SECRET is required}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM:-navio}
       NAVIO_WEB_ORIGIN: ${NAVIO_WEB_ORIGIN:?NAVIO_WEB_ORIGIN is required}
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-tripplanner}
