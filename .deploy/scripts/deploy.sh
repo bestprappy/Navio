@@ -72,6 +72,31 @@ compose() {
   docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" "$@"
 }
 
+deployment_diagnostics() {
+  local container_id
+  local health
+  local service
+  local state
+
+  echo "Deployment diagnostics:" >&2
+  compose ps --all >&2 || true
+
+  while IFS= read -r service; do
+    container_id="$(compose ps -q "${service}" 2>/dev/null || true)"
+    [[ -n "${container_id}" ]] || continue
+
+    state="$(docker inspect --format '{{.State.Status}}' "${container_id}" 2>/dev/null || true)"
+    health="$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' \
+      "${container_id}" 2>/dev/null || true)"
+
+    if [[ "${state}" != "running" || "${health}" == "unhealthy" ]]; then
+      echo "Diagnostics for ${service} (state=${state:-unknown}, health=${health:-unknown}):" >&2
+      docker inspect --format '{{json .State}}' "${container_id}" >&2 || true
+      compose logs --no-color --tail 200 "${service}" >&2 || true
+    fi
+  done < <(compose config --services)
+}
+
 rollback() {
   local previous_image
   local previous_prefix
@@ -86,13 +111,25 @@ rollback() {
     echo "Deployment failed; rolling back to ${previous_tag}." >&2
     cp "${PREVIOUS_ENV_FILE}" "${ENV_FILE}"
     chmod 0600 "${ENV_FILE}"
-    compose up -d --remove-orphans --wait --wait-timeout 420 || true
+    if ! compose up -d --remove-orphans --wait --wait-timeout 420; then
+      echo "Rollback did not restore a healthy stack." >&2
+      deployment_diagnostics
+    fi
   else
     echo "Deployment failed; no runnable prior release is available." >&2
   fi
 }
 
-trap rollback ERR
+handle_deploy_error() {
+  local exit_code=$?
+
+  trap - ERR
+  deployment_diagnostics
+  rollback
+  exit "${exit_code}"
+}
+
+trap handle_deploy_error ERR
 
 compose config --quiet
 compose pull
