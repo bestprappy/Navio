@@ -140,6 +140,14 @@ configure_google_identity_provider() {
   '
 }
 
+reload_edge_proxy() {
+  # NGINX resolves Docker service names when its configuration is loaded. The
+  # application containers are recreated for every image tag, while NGINX can
+  # stay running with their old addresses and return 502 for a healthy stack.
+  compose exec -T nginx nginx -t
+  compose exec -T nginx nginx -s reload
+}
+
 deployment_diagnostics() {
   local container_id
   local health
@@ -182,6 +190,9 @@ rollback() {
     if ! compose up -d --remove-orphans --wait --wait-timeout 420; then
       echo "Rollback did not restore a healthy stack." >&2
       deployment_diagnostics
+    elif ! reload_edge_proxy; then
+      echo "Rollback restored the stack, but NGINX could not reload its upstream addresses." >&2
+      deployment_diagnostics
     fi
   else
     echo "Deployment failed; no runnable prior release is available." >&2
@@ -211,6 +222,7 @@ compose exec -T postgres sh -ec \
 
 compose up -d --remove-orphans --wait --wait-timeout 420
 configure_google_identity_provider
+reload_edge_proxy
 
 curl --fail --silent --show-error \
   --retry 10 --retry-delay 3 --retry-connrefused \
