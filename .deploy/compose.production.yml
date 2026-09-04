@@ -467,6 +467,11 @@ services:
       # redirected here to log in, and every token's 'iss' claim carries this
       # value. An internal URL would make issuer validation fail.
       AUTH_KEYCLOAK_ISSUER: ${KEYCLOAK_ISSUER_URI:?KEYCLOAK_ISSUER_URI is required}
+      # Discovery/token/userinfo/logout are server-to-server calls. Keep them
+      # on Docker's private network instead of hairpinning through the public
+      # hostname, while the public issuer above remains what tokens contain and
+      # where browsers are sent for authorization.
+      AUTH_KEYCLOAK_INTERNAL_ISSUER: http://keycloak:8080/realms/${KEYCLOAK_REALM:-navio}
       # Application API calls stay on the Docker network — they never leave the
       # host, so they skip NGINX, TLS, and the campus network entirely.
       NAVIO_API_BASE_URL: http://api-gateway:8080

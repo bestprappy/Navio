@@ -156,6 +156,86 @@ reload_edge_proxy() {
   compose exec -T nginx nginx -s reload
 }
 
+verify_authjs_keycloak_start() {
+  # Exercise the request path that the browser buttons use, from inside the
+  # web container. Host-level Keycloak probes cannot catch broken container
+  # DNS, certificate trust, or server-to-server OIDC routing.
+  compose exec -T navio-web node <<'NODE'
+const localWebOrigin = "http://127.0.0.1:3000";
+const internalIssuer = process.env.AUTH_KEYCLOAK_INTERNAL_ISSUER;
+const publicIssuer = process.env.AUTH_KEYCLOAK_ISSUER;
+
+if (!internalIssuer || !publicIssuer) {
+  throw new Error("Keycloak issuer environment is incomplete in navio-web.");
+}
+
+const discoveryResponse = await fetch(
+  `${internalIssuer}/.well-known/openid-configuration`,
+);
+if (!discoveryResponse.ok) {
+  throw new Error(
+    `Internal Keycloak discovery failed with status ${discoveryResponse.status}.`,
+  );
+}
+
+const csrfResponse = await fetch(`${localWebOrigin}/api/auth/csrf`);
+if (!csrfResponse.ok) {
+  throw new Error(`Auth.js CSRF request failed with status ${csrfResponse.status}.`);
+}
+
+const csrfBody = await csrfResponse.json();
+const csrfCookie = csrfResponse.headers
+  .getSetCookie()
+  .find((value) => value.includes("authjs.csrf-token="))
+  ?.split(";", 1)[0];
+
+if (typeof csrfBody.csrfToken !== "string" || !csrfCookie) {
+  throw new Error("Auth.js did not issue a CSRF token and matching cookie.");
+}
+
+const signInResponse = await fetch(
+  `${localWebOrigin}/api/auth/signin/keycloak`,
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      Cookie: csrfCookie,
+      "X-Auth-Return-Redirect": "1",
+    },
+    body: new URLSearchParams({
+      callbackUrl: "/planner",
+      csrfToken: csrfBody.csrfToken,
+    }),
+  },
+);
+const signInBody = await signInResponse.json();
+const authorizationUrl =
+  typeof signInBody.url === "string" ? new URL(signInBody.url) : null;
+const expectedAuthorizationUrl = new URL(
+  `${publicIssuer}/protocol/openid-connect/auth`,
+);
+const expectedCallbackUrl =
+  `${process.env.AUTH_URL.replace(/\/$/, "")}/api/auth/callback/keycloak`;
+
+if (
+  !signInResponse.ok ||
+  !authorizationUrl ||
+  authorizationUrl.origin !== expectedAuthorizationUrl.origin ||
+  authorizationUrl.pathname !== expectedAuthorizationUrl.pathname ||
+  authorizationUrl.searchParams.get("client_id") !==
+    process.env.AUTH_KEYCLOAK_ID ||
+  authorizationUrl.searchParams.get("redirect_uri") !== expectedCallbackUrl ||
+  authorizationUrl.searchParams.get("code_challenge_method") !== "S256"
+) {
+  throw new Error(
+    `Auth.js did not return the Keycloak authorization URL (status ${signInResponse.status}).`,
+  );
+}
+
+console.log("Auth.js Keycloak authorization start verified from navio-web.");
+NODE
+}
+
 deployment_diagnostics() {
   local container_id
   local health
@@ -233,6 +313,7 @@ compose exec -T postgres sh -ec \
 compose up -d --remove-orphans --wait --wait-timeout 420
 configure_keycloak_authentication
 reload_edge_proxy
+verify_authjs_keycloak_start
 
 curl --fail --silent --show-error \
   --retry 10 --retry-delay 3 --retry-connrefused \
