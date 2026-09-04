@@ -50,6 +50,12 @@
 
   "defaultRoles": ["USER"],
 
+  "scopeMappings": [
+    {
+      "client": "navio-web",
+      "roles": ["USER", "MODERATOR", "ADMIN"]
+    }
+  ],
   "clients": [
     {
       "clientId": "navio-web",

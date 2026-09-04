@@ -140,6 +140,28 @@ configure_keycloak_authentication() {
       "${kcadm}" create identity-provider/instances "${provider_settings[@]}" >/dev/null
     fi
 
+    # navio-web keeps fullScopeAllowed=false, so a realm role reaches the token
+    # only if it is in the client'"'"'s scope. With that list empty Keycloak omits
+    # realm_access entirely and every token looks unprivileged: the gateway lets
+    # plain authenticated calls through, so this surfaces only as empty roles and
+    # silently unreachable MODERATOR/ADMIN features. Grant exactly the three
+    # Navio roles rather than turning full scope on.
+    client_id="$("${kcadm}" get clients -r "${KEYCLOAK_REALM}" \
+      -q clientId=navio-web --fields id --format csv --noquotes)"
+    for role_name in USER MODERATOR ADMIN; do
+      if ! "${kcadm}" get "clients/${client_id}/scope-mappings/realm" \
+        -r "${KEYCLOAK_REALM}" --fields name --format csv --noquotes \
+        | grep -qx "${role_name}"; then
+        role_id="$("${kcadm}" get "roles/${role_name}" -r "${KEYCLOAK_REALM}" \
+          --fields id --format csv --noquotes)"
+        printf '[{"id":"%s","name":"%s"}]' "${role_id}" "${role_name}" \
+          > /tmp/navio-scope-mapping.json
+        "${kcadm}" create "clients/${client_id}/scope-mappings/realm" \
+          -r "${KEYCLOAK_REALM}" -f /tmp/navio-scope-mapping.json
+      fi
+    done
+    rm -f /tmp/navio-scope-mapping.json
+
     # verifyEmail must stay off until an SMTP server is configured. With it on,
     # Keycloak defers the password to a post-verification required action, so the
     # registration form ships without password fields and every sign-up dead-ends

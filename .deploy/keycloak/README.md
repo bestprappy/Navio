@@ -20,6 +20,25 @@ deliberately generic.
 Verify after import: decode an access token and confirm `aud` contains
 `navio-api`.
 
+## The second setting that breaks everything if missed
+
+`navio-web` sets `fullScopeAllowed: false`, which is correct — but it means a
+realm role reaches the token **only if that role is in the client's scope**. The
+realm-level `scopeMappings` entry grants exactly `USER`, `MODERATOR` and `ADMIN`,
+and `deploy.sh` reasserts it on every run.
+
+Miss it and Keycloak omits `realm_access` from the access token entirely. Nothing
+returns an error: the gateway still admits plain authenticated calls, so sign-in
+works, `/v1/users/me` returns 200, and the only symptom is `"roles": []` on every
+profile with every MODERATOR and ADMIN feature silently unreachable.
+
+Do not "fix" this by setting `fullScopeAllowed: true`. That puts every role the
+user holds — including `realm-management` roles on an operator account — into a
+token held by browser-facing infrastructure.
+
+Verify after import: decode an access token and confirm `realm_access.roles`
+contains `USER`.
+
 ## Service account permissions
 
 `navio-user-management` is a confidential client whose service account performs
@@ -110,7 +129,8 @@ already issued. Three controls close that gap together:
 ## Post-import checklist
 
 - [ ] `aud` contains `navio-api` in a freshly issued access token
-- [ ] `realm_access.roles` contains `USER` for a normal account
+- [ ] `realm_access.roles` contains `USER` for a normal account — if the claim is
+      missing entirely, the `navio-web` scope mappings are empty (see above)
 - [ ] `KEYCLOAK_WEB_CLIENT_SECRET` matches the Next.js `AUTH_KEYCLOAK_SECRET`
 - [ ] `KEYCLOAK_ADMIN_CLIENT_SECRET` is random, environment-specific, and only in `.env`
 - [ ] Service account has `manage-users` + `view-users` only — not `realm-admin`
