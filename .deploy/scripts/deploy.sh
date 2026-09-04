@@ -207,16 +207,18 @@ rollback() {
   fi
 }
 
-handle_deploy_error() {
+handle_deploy_exit() {
   local exit_code=$?
 
-  trap - ERR
-  deployment_diagnostics
-  rollback
+  trap - EXIT
+  if [[ "${exit_code}" -ne 0 ]]; then
+    deployment_diagnostics
+    rollback
+  fi
   exit "${exit_code}"
 }
 
-trap handle_deploy_error ERR
+trap handle_deploy_exit EXIT
 
 compose config --quiet
 compose pull
@@ -282,9 +284,9 @@ readonly KEYCLOAK_REGISTRATION_HTML="$(curl --fail --silent --show-error \
   --data-urlencode 'prompt=create' \
   'https://navio.sit.kmutt.ac.th/realms/navio/protocol/openid-connect/auth')"
 if [[ "${KEYCLOAK_REGISTRATION_HTML}" != *'name="email"'* ]] \
-  || [[ "${KEYCLOAK_REGISTRATION_HTML}" != *'name="password"'* ]] \
-  || [[ "${KEYCLOAK_REGISTRATION_HTML}" != *'name="password-confirm"'* ]]; then
-  echo "Expected the Keycloak email/password registration form." >&2
+  || [[ "${KEYCLOAK_REGISTRATION_HTML}" != *'kc-register-form'* ]] \
+  || [[ "${KEYCLOAK_REGISTRATION_HTML}" != *'navio.css'* ]]; then
+  echo "Expected the themed Keycloak email registration form." >&2
   exit 1
 fi
 
@@ -303,8 +305,12 @@ for auth_path in sign-in sign-up; do
     --cacert "${TLS_CERT_FILE}" \
     --resolve navio.sit.kmutt.ac.th:443:127.0.0.1 \
     "https://navio.sit.kmutt.ac.th/${auth_path}")"
+  expected_email_action='Continue with email &amp; password'
+  if [[ "${auth_path}" == "sign-up" ]]; then
+    expected_email_action='Sign up with email'
+  fi
   if [[ "${auth_page_html}" != *'Continue with Google'* ]] \
-    || [[ "${auth_page_html}" != *'email &amp; password'* ]]; then
+    || [[ "${auth_page_html}" != *"${expected_email_action}"* ]]; then
     echo "Expected /${auth_path} to render email/password and Google authentication actions." >&2
     exit 1
   fi
@@ -347,7 +353,7 @@ fi
 rm -f "${GOOGLE_OAUTH_COOKIE_JAR}"
 trap - EXIT
 
-trap - ERR
+trap - EXIT
 
 compose ps
 docker image prune --all --force --filter "until=168h" >/dev/null

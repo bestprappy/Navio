@@ -63,9 +63,11 @@ and direct access grants require the app to handle the user's password.
 
 Email/password login and self-registration use Keycloak's browser-based
 Authorization Code flow. The client starts that flow from its `/sign-in` and
-`/sign-up` pages; it never receives or proxies a password. Keycloak renders the
-credential fields, validates the email and password confirmation, applies the
-realm's brute-force controls, and enforces this server-side password policy:
+`/sign-up` pages; it never receives or proxies a password. With email
+verification enabled, Keycloak first collects the profile and verifies email
+ownership, then lets the user create a password. Keycloak validates the password
+confirmation, applies the realm's brute-force controls, and enforces this
+server-side password policy:
 
 - at least 12 characters;
 - must not contain the username or email address; and
