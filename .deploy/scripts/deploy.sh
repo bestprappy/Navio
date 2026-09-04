@@ -52,6 +52,7 @@ require_env_value \
 install -d -m 0755 \
   "${DEPLOY_ROOT}/config" \
   "${DEPLOY_ROOT}/keycloak" \
+  "${DEPLOY_ROOT}/keycloak/themes/navio/login/resources/css" \
   "${DEPLOY_ROOT}/nginx" \
   "${DEPLOY_ROOT}/postgres" \
   "${DEPLOY_ROOT}/tls" \
@@ -72,6 +73,10 @@ install -m 0644 "${SOURCE_ROOT}/.deploy/compose.production.yml" "${COMPOSE_FILE}
 install -m 0644 "${SOURCE_ROOT}/.deploy/config/"*.yml "${DEPLOY_ROOT}/config/"
 install -m 0644 "${SOURCE_ROOT}/.deploy/keycloak/navio-realm.json" \
   "${DEPLOY_ROOT}/keycloak/navio-realm.json"
+install -m 0644 "${SOURCE_ROOT}/.deploy/keycloak/themes/navio/login/theme.properties" \
+  "${DEPLOY_ROOT}/keycloak/themes/navio/login/theme.properties"
+install -m 0644 "${SOURCE_ROOT}/.deploy/keycloak/themes/navio/login/resources/css/navio.css" \
+  "${DEPLOY_ROOT}/keycloak/themes/navio/login/resources/css/navio.css"
 install -m 0644 "${SOURCE_ROOT}/.deploy/nginx/navio.conf" "${DEPLOY_ROOT}/nginx/navio.conf"
 install -m 0644 "${SOURCE_ROOT}/.deploy/postgres/init-keycloak.sql" "${DEPLOY_ROOT}/postgres/init-keycloak.sql"
 
@@ -100,7 +105,7 @@ compose() {
   docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" "$@"
 }
 
-configure_google_identity_provider() {
+configure_keycloak_authentication() {
   compose exec -T keycloak bash -euc '
     kcadm="/opt/keycloak/bin/kcadm.sh"
     "${kcadm}" config credentials \
@@ -136,7 +141,10 @@ configure_google_identity_provider() {
     fi
 
     "${kcadm}" update "realms/${KEYCLOAK_REALM}" \
-      -s registrationAllowed=false >/dev/null
+      -s registrationAllowed=true \
+      -s loginTheme=navio \
+      -s "passwordPolicy=length(12) and notUsername and notEmail and passwordHistory(3)" \
+      >/dev/null
   '
 }
 
@@ -221,7 +229,7 @@ compose exec -T postgres sh -ec \
   'psql --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" --set ON_ERROR_STOP=1 --command "CREATE SCHEMA IF NOT EXISTS keycloak AUTHORIZATION CURRENT_USER"'
 
 compose up -d --remove-orphans --wait --wait-timeout 420
-configure_google_identity_provider
+configure_keycloak_authentication
 reload_edge_proxy
 
 curl --fail --silent --show-error \
@@ -239,6 +247,47 @@ curl --fail --silent --show-error \
   --resolve navio.sit.kmutt.ac.th:443:127.0.0.1 \
   https://navio.sit.kmutt.ac.th/realms/navio/.well-known/openid-configuration >/dev/null
 
+readonly KEYCLOAK_LOGIN_HTML="$(curl --fail --silent --show-error \
+  --cacert "${TLS_CERT_FILE}" \
+  --resolve navio.sit.kmutt.ac.th:443:127.0.0.1 \
+  --get \
+  --data-urlencode 'client_id=navio-web' \
+  --data-urlencode 'redirect_uri=https://navio.sit.kmutt.ac.th/api/auth/callback/keycloak' \
+  --data-urlencode 'response_type=code' \
+  --data-urlencode 'scope=openid email profile' \
+  --data-urlencode 'state=deployment-email-login' \
+  --data-urlencode 'nonce=deployment-email-login' \
+  --data-urlencode 'code_challenge_method=S256' \
+  --data-urlencode 'code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM' \
+  'https://navio.sit.kmutt.ac.th/realms/navio/protocol/openid-connect/auth')"
+if [[ "${KEYCLOAK_LOGIN_HTML}" != *'name="username"'* ]] \
+  || [[ "${KEYCLOAK_LOGIN_HTML}" != *'name="password"'* ]] \
+  || [[ "${KEYCLOAK_LOGIN_HTML}" != *'navio.css'* ]]; then
+  echo "Expected the themed Keycloak email/password login form." >&2
+  exit 1
+fi
+
+readonly KEYCLOAK_REGISTRATION_HTML="$(curl --fail --silent --show-error \
+  --cacert "${TLS_CERT_FILE}" \
+  --resolve navio.sit.kmutt.ac.th:443:127.0.0.1 \
+  --get \
+  --data-urlencode 'client_id=navio-web' \
+  --data-urlencode 'redirect_uri=https://navio.sit.kmutt.ac.th/api/auth/callback/keycloak' \
+  --data-urlencode 'response_type=code' \
+  --data-urlencode 'scope=openid email profile' \
+  --data-urlencode 'state=deployment-email-registration' \
+  --data-urlencode 'nonce=deployment-email-registration' \
+  --data-urlencode 'code_challenge_method=S256' \
+  --data-urlencode 'code_challenge=E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM' \
+  --data-urlencode 'prompt=create' \
+  'https://navio.sit.kmutt.ac.th/realms/navio/protocol/openid-connect/auth')"
+if [[ "${KEYCLOAK_REGISTRATION_HTML}" != *'name="email"'* ]] \
+  || [[ "${KEYCLOAK_REGISTRATION_HTML}" != *'name="password"'* ]] \
+  || [[ "${KEYCLOAK_REGISTRATION_HTML}" != *'name="password-confirm"'* ]]; then
+  echo "Expected the Keycloak email/password registration form." >&2
+  exit 1
+fi
+
 readonly USER_ROUTE_STATUS="$(curl --silent --show-error \
   --output /dev/null --write-out '%{http_code}' \
   --cacert "${TLS_CERT_FILE}" \
@@ -250,11 +299,13 @@ if [[ "${USER_ROUTE_STATUS}" != "401" ]]; then
 fi
 
 for auth_path in sign-in sign-up; do
-  if ! curl --fail --silent --show-error \
+  auth_page_html="$(curl --fail --silent --show-error \
     --cacert "${TLS_CERT_FILE}" \
     --resolve navio.sit.kmutt.ac.th:443:127.0.0.1 \
-    "https://navio.sit.kmutt.ac.th/${auth_path}" | grep -q 'Continue with Google'; then
-    echo "Expected /${auth_path} to render the Google authentication action." >&2
+    "https://navio.sit.kmutt.ac.th/${auth_path}")"
+  if [[ "${auth_page_html}" != *'Continue with Google'* ]] \
+    || [[ "${auth_page_html}" != *'email &amp; password'* ]]; then
+    echo "Expected /${auth_path} to render email/password and Google authentication actions." >&2
     exit 1
   fi
 done

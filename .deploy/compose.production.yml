@@ -91,6 +91,9 @@ services:
       # Audience protocol mapper. Without that mapper Keycloak emits only
       # "aud": "account" and every service rejects every token.
       - ./keycloak/navio-realm.json:/opt/keycloak/data/import/navio-realm.json:ro
+      # Keep credential entry inside Keycloak's authorization-code flow while
+      # presenting the same visual language as the Navio frontend.
+      - ./keycloak/themes/navio:/opt/keycloak/themes/navio:ro
     depends_on:
       postgres:
         condition: service_healthy

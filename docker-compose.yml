@@ -67,6 +67,7 @@ services:
       - "8180:8080"
     volumes:
       - ./.deploy/keycloak/navio-realm.json:/opt/keycloak/data/import/navio-realm.json:ro
+      - ./.deploy/keycloak/themes/navio:/opt/keycloak/themes/navio:ro
     environment:
       KC_DB: dev-mem # H2 in-memory for dev
       KC_BOOTSTRAP_ADMIN_USERNAME: admin

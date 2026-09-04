@@ -1,0 +1,161 @@
+:root {
+  --navio-bg: #101524;
+  --navio-card: #171c2b;
+  --navio-card-muted: #1d2335;
+  --navio-border: #30384f;
+  --navio-text: #f7f8fc;
+  --navio-muted: #aeb7d0;
+  --navio-primary: #45a9c6;
+  --navio-primary-hover: #58bad5;
+  --navio-danger: #ff5c68;
+  --keycloak-card-top-color: transparent;
+}
+
+html,
+body,
+.login-pf body,
+.pf-v5-c-login {
+  min-height: 100%;
+  background:
+    radial-gradient(circle at 15% 18%, rgb(69 169 198 / 12%), transparent 30rem),
+    radial-gradient(circle at 88% 82%, rgb(21 128 61 / 10%), transparent 28rem),
+    var(--navio-bg);
+  color: var(--navio-text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+}
+
+.pf-v5-c-login__container {
+  grid-template-columns: minmax(0, 32rem);
+  padding: 1.5rem;
+}
+
+.pf-v5-c-login__main {
+  overflow: hidden;
+  border: 1px solid var(--navio-border);
+  border-radius: 1.75rem;
+  background: rgb(23 28 43 / 96%);
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 35%);
+}
+
+.pf-v5-c-login__main-header {
+  border-top: 0;
+  padding: 2rem 2rem 1.25rem;
+}
+
+.pf-v5-c-login__main-body,
+.pf-v5-c-login__main-footer,
+.pf-v5-c-login__main-footer-band {
+  background: transparent;
+  color: var(--navio-muted);
+}
+
+.pf-v5-c-login__main-body {
+  padding: 1rem 2rem 2rem;
+}
+
+#kc-header-wrapper {
+  color: var(--navio-text) !important;
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  text-transform: none;
+}
+
+#kc-header-wrapper::before {
+  display: block;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin: 0 auto 1rem;
+  border: 1px solid rgb(69 169 198 / 22%);
+  border-radius: 1rem;
+  background:
+    radial-gradient(circle at 36% 36%, #15803d 0 12%, transparent 13%),
+    radial-gradient(circle at 64% 36%, rgb(21 128 61 / 55%) 0 12%, transparent 13%),
+    radial-gradient(circle at 36% 64%, #15803d 0 12%, transparent 13%),
+    radial-gradient(circle at 64% 64%, #15803d 0 12%, transparent 13%),
+    #172938;
+  content: "";
+}
+
+.pf-v5-c-title,
+.pf-v5-c-form__label,
+.pf-v5-c-check__label {
+  color: var(--navio-text);
+}
+
+.pf-v5-c-form__label-text {
+  font-weight: 650;
+}
+
+.pf-v5-c-form-control,
+input[type="email"],
+input[type="text"],
+input[type="password"] {
+  min-height: 3rem;
+  border-color: var(--navio-border);
+  border-radius: 0.75rem;
+  background: var(--navio-card-muted);
+  color: var(--navio-text);
+  box-shadow: none;
+}
+
+.pf-v5-c-form-control:focus-within,
+input[type="email"]:focus,
+input[type="text"]:focus,
+input[type="password"]:focus {
+  border-color: var(--navio-primary);
+  outline: 3px solid rgb(69 169 198 / 22%);
+  outline-offset: 1px;
+}
+
+.pf-v5-c-button {
+  min-height: 3rem;
+  border-radius: 0.75rem;
+  font-weight: 700;
+}
+
+.pf-v5-c-button.pf-m-primary {
+  background: var(--navio-primary);
+  color: #0d1820;
+}
+
+.pf-v5-c-button.pf-m-primary:hover,
+.pf-v5-c-button.pf-m-primary:focus-visible {
+  background: var(--navio-primary-hover);
+}
+
+.pf-v5-c-button.pf-m-link,
+a {
+  color: var(--navio-primary);
+}
+
+.pf-v5-c-helper-text__item.pf-m-error,
+.kc-feedback-text,
+.pf-v5-c-alert.pf-m-danger {
+  color: var(--navio-danger);
+}
+
+.pf-v5-c-alert {
+  border: 1px solid rgb(255 92 104 / 35%);
+  border-radius: 0.75rem;
+  background: rgb(255 92 104 / 10%);
+}
+
+#kc-info-wrapper,
+.pf-v5-c-login__main-footer-band {
+  border-color: var(--navio-border);
+  background: rgb(29 35 53 / 70%);
+}
+
+@media (max-width: 480px) {
+  .pf-v5-c-login__container {
+    padding: 0.75rem;
+  }
+
+  .pf-v5-c-login__main-header,
+  .pf-v5-c-login__main-body {
+    padding-right: 1.25rem;
+    padding-left: 1.25rem;
+  }
+}
