@@ -8,7 +8,7 @@
   "registrationEmailAsUsername": true,
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,
-  "verifyEmail": "${KEYCLOAK_VERIFY_EMAIL:true}",
+  "verifyEmail": "${KEYCLOAK_VERIFY_EMAIL:false}",
   "resetPasswordAllowed": true,
   "editUsernameAllowed": false,
 

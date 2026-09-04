@@ -140,8 +140,15 @@ configure_keycloak_authentication() {
       "${kcadm}" create identity-provider/instances "${provider_settings[@]}" >/dev/null
     fi
 
+    # verifyEmail must stay off until an SMTP server is configured. With it on,
+    # Keycloak defers the password to a post-verification required action, so the
+    # registration form ships without password fields and every sign-up dead-ends
+    # at SEND_VERIFY_EMAIL_ERROR ("Invalid sender address null"), leaving accounts
+    # with no credential at all. Turn this back on in the same change that adds
+    # smtpServer, never before.
     "${kcadm}" update "realms/${KEYCLOAK_REALM}" \
       -s registrationAllowed=true \
+      -s verifyEmail=false \
       -s loginTheme=navio \
       -s "passwordPolicy=length(12) and notUsername and notEmail and passwordHistory(3)" \
       >/dev/null
@@ -368,6 +375,14 @@ if [[ "${KEYCLOAK_REGISTRATION_HTML}" != *'name="email"'* ]] \
   || [[ "${KEYCLOAK_REGISTRATION_HTML}" != *'kc-register-form'* ]] \
   || [[ "${KEYCLOAK_REGISTRATION_HTML}" != *'navio.css'* ]]; then
   echo "Expected the themed Keycloak email registration form." >&2
+  exit 1
+fi
+# The password fields are the regression canary for verifyEmail. Keycloak drops
+# them from this form the moment email verification is switched on, which is
+# silent until a real user registers and ends up with no credential.
+if [[ "${KEYCLOAK_REGISTRATION_HTML}" != *'name="password"'* ]] \
+  || [[ "${KEYCLOAK_REGISTRATION_HTML}" != *'name="password-confirm"'* ]]; then
+  echo "Registration form has no password fields; verifyEmail is on without SMTP." >&2
   exit 1
 fi
 

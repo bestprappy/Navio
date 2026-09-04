@@ -63,11 +63,9 @@ and direct access grants require the app to handle the user's password.
 
 Email/password login and self-registration use Keycloak's browser-based
 Authorization Code flow. The client starts that flow from its `/sign-in` and
-`/sign-up` pages; it never receives or proxies a password. With email
-verification enabled, Keycloak first collects the profile and verifies email
-ownership, then lets the user create a password. Keycloak validates the password
-confirmation, applies the realm's brute-force controls, and enforces this
-server-side password policy:
+`/sign-up` pages; it never receives or proxies a password. Keycloak validates the
+password confirmation, applies the realm's brute-force controls, and enforces
+this server-side password policy:
 
 - at least 12 characters;
 - must not contain the username or email address; and
@@ -79,6 +77,21 @@ validation and accessibility fixes continue to come from Keycloak while
 replace this flow with Direct Access Grants: that would make the web app handle
 raw passwords and would bypass browser-flow capabilities such as required
 actions and identity brokering.
+
+### Why `verifyEmail` is off
+
+`verifyEmail` is deliberately `false` and `deploy.sh` reasserts that on every
+run. It is not a convenience setting: with it on, Keycloak 26 removes the
+password fields from the registration form entirely and defers credential
+creation to an `UPDATE_PASSWORD` required action that only runs *after* the user
+clicks a verification link. Without an `smtpServer` that link is never sent, so
+registration ends at `SEND_VERIFY_EMAIL_ERROR` and leaves an account with no
+credential — unable to log in, and holding its email address against a retry
+because `duplicateEmailsAllowed` is false.
+
+Turn it back on only in the same change that configures `smtpServer`. The deploy
+smoke test asserts `name="password"` is present on the registration form, so
+flipping one without the other fails the deploy rather than production.
 
 ## Token lifetimes and suspension
 
@@ -103,5 +116,9 @@ already issued. Three controls close that gap together:
 - [ ] Service account has `manage-users` + `view-users` only — not `realm-admin`
 - [ ] New users receive the `USER` role (the import assigns it through
       `defaultRoles`; confirm it appears under `default-roles-navio`)
-- [ ] SMTP configured, since `verifyEmail` is on and unverified users cannot log in
+- [ ] Registration form still renders `password` and `password-confirm` — if not,
+      `verifyEmail` has been switched on without SMTP (see above)
+- [ ] The Google OAuth client authorises exactly
+      `https://navio.sit.kmutt.ac.th/realms/navio/broker/google/endpoint`;
+      anything else fails at Google with `redirect_uri_mismatch`
 - [ ] `sslRequired` remains `all`, and the public issuer is reachable only over HTTPS
