@@ -181,8 +181,22 @@ reload_edge_proxy() {
   # NGINX resolves Docker service names when its configuration is loaded. The
   # application containers are recreated for every image tag, while NGINX can
   # stay running with their old addresses and return 502 for a healthy stack.
-  compose exec -T nginx nginx -t
-  compose exec -T nginx nginx -s reload
+  #
+  # A reload alone is not always enough. NGINX is the one service whose image
+  # never changes, so Compose leaves the container running across every deploy,
+  # and navio.conf is bind-mounted as a single file — which Docker pins by inode
+  # at mount time. install(1) unlinks and recreates the file, so the container
+  # keeps reading the old, now-orphaned inode and `nginx -s reload` silently
+  # re-reads stale configuration. Compare what the container actually has
+  # against what was just installed, and recreate it when they differ. The same
+  # cmp also covers the container being absent on a first deploy.
+  if compose exec -T nginx cmp -s /etc/nginx/conf.d/default.conf - \
+    < "${DEPLOY_ROOT}/nginx/navio.conf"; then
+    compose exec -T nginx nginx -t
+    compose exec -T nginx nginx -s reload
+  else
+    compose up -d --force-recreate --no-deps nginx
+  fi
 }
 
 verify_authjs_keycloak_start() {
