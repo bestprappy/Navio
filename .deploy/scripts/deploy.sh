@@ -432,6 +432,27 @@ if [[ "${USER_ROUTE_STATUS}" != "401" ]]; then
   exit 1
 fi
 
+# Verify the group migration and public/protected routing through the production edge.
+verify_group_route() {
+  local method="$1"
+  local path="$2"
+  local expected_status="$3"
+  local actual_status
+  actual_status="$(curl --silent --show-error \
+    --request "${method}" --output /dev/null --write-out '%{http_code}' \
+    --cacert "${TLS_CERT_FILE}" \
+    --resolve navio.sit.kmutt.ac.th:443:127.0.0.1 \
+    "https://navio.sit.kmutt.ac.th${path}")"
+  if [[ "${actual_status}" != "${expected_status}" ]]; then
+    echo "Expected ${method} ${path} to return ${expected_status}; got ${actual_status}." >&2
+    exit 1
+  fi
+}
+verify_group_route GET '/v1/groups?size=1' 200
+verify_group_route GET '/v1/groups/search?q=ev&size=1' 200
+verify_group_route GET '/v1/groups/mine' 401
+verify_group_route POST '/v1/groups' 401
+
 for auth_path in sign-in sign-up; do
   auth_page_html="$(curl --fail --silent --show-error \
     --cacert "${TLS_CERT_FILE}" \

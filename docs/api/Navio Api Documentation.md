@@ -2,7 +2,7 @@
 
 **Version:** v1.3
 **Base URL:** `https://api.navio.local`
-**Auth:** Bearer JWT from Keycloak for all endpoints except `GET /v1/share/{token}`.
+**Auth:** Bearer JWT from Keycloak by default. Exceptions: `GET /v1/share/{token}` and public group discovery, detail, and search reads.
 **Development entry:** `http://localhost:8080` through Spring Cloud Gateway
 **Architecture:** Production NGINX forwards `/v1/**` to the same Spring Cloud Gateway used in development. The gateway resolves four core services and optional AI Planning through Eureka. Non-secret gateway/service configuration comes from Config Server. Keycloak is the Identity Provider. AI inference is selected by configuration: Ollama on the ML VM or a hosted model API through Spring AI.
 
@@ -14,7 +14,7 @@
 - Use `X-Request-Id` for frontend-to-backend correlation.
 - Propagate W3C `traceparent`/`tracestate`; responses may expose a safe request ID for support.
 - Error responses use `ErrorResponse`.
-- Admin/moderator endpoints require `MODERATOR` or `ADMIN` role.
+- Platform admin/moderator endpoints require `MODERATOR` or `ADMIN` role. Group moderator operations require an active `moderator` or `admin` membership in that group; global roles do not grant these resource-scoped rights.
 - EV charger reads must be local database first; provider refresh happens only on cache miss, stale tile, manual refresh, or low-confidence coverage.
 
 ## Service Routing
@@ -2306,6 +2306,30 @@ curl -X POST 'https://api.navio.local/v1/admin/ev/tiles/tileKey/refresh' \
 ```
 
 ## Community Service
+
+### Group module
+
+The implemented group API, its request/response examples, immutable name/slug contract,
+membership rules, and errors are documented in [Community group API](../../server/community-service/GROUP_API.md).
+Public reads accept optional identity; all writes, mine, and member lists require identity.
+
+| Method | Path | Identity | Group moderator | Purpose |
+| --- | --- | --- | --- | --- |
+| `POST` | `/v1/groups` | Required | No | Create a group |
+| `GET` | `/v1/groups` | Optional | No | Discover active groups |
+| `GET` | `/v1/groups/mine` | Required | No | List caller joined/muted groups |
+| `GET` | `/v1/groups/search?q=ev%20charging` | Optional | No | Search active groups |
+| `GET` | `/v1/groups/{slug}` | Optional | No | Read detail and caller membership |
+| `POST` | `/v1/groups/{slug}/members/me` | Required | No | Join idempotently |
+| `DELETE` | `/v1/groups/{slug}/members/me` | Required | No | Leave idempotently |
+| `PATCH` | `/v1/groups/{slug}/members/me` | Required | No | Mute or unmute |
+| `GET` | `/v1/groups/{slug}/members` | Required | Yes | List active members |
+| `PUT` | `/v1/groups/{slug}/moderators` | Required | Yes | Replace moderator set |
+| `PATCH` | `/v1/groups/{slug}/profile` | Required | Yes | Update supplied profile fields |
+| `PUT` | `/v1/groups/{slug}/rules` | Required | Yes | Replace ordered rules |
+| `PUT` | `/v1/groups/{slug}/flairs` | Required | Yes | Replace both flair collections |
+| `PUT` | `/v1/groups/{slug}/resources` | Required | Yes | Replace sidebar resources |
+
 
 ### `POST /v1/posts` — Create post
 
