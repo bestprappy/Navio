@@ -285,9 +285,16 @@ services:
       COMMUNITY_DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-tripplanner}
       COMMUNITY_DB_USERNAME: ${POSTGRES_USER:-tripplanner}
       COMMUNITY_DB_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
-      COMMUNITY_MEDIA_STORAGE_PATH: /data/community-media
-    volumes:
-      - community-media:/data/community-media
+      KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI:?KEYCLOAK_ISSUER_URI is required}
+      KEYCLOAK_JWK_SET_URI: http://keycloak:8080/realms/${KEYCLOAK_REALM:-navio}/protocol/openid-connect/certs
+      KEYCLOAK_AUDIENCES: ${KEYCLOAK_AUDIENCES:-navio-api}
+      COMMUNITY_S3_ENDPOINT: ${COMMUNITY_S3_ENDPOINT:-}
+      COMMUNITY_S3_REGION: ${COMMUNITY_S3_REGION:-us-east-1}
+      COMMUNITY_S3_BUCKET: ${COMMUNITY_S3_BUCKET:-navio-community}
+      COMMUNITY_S3_PATH_STYLE: ${COMMUNITY_S3_PATH_STYLE:-false}
+      COMMUNITY_PUBLIC_BASE_URL: ${COMMUNITY_PUBLIC_BASE_URL:-https://navio.sit.kmutt.ac.th}
+      AWS_ACCESS_KEY_ID: ${COMMUNITY_S3_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${COMMUNITY_S3_SECRET_ACCESS_KEY:-}
     healthcheck:
       test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8084/actuator/health"]
       interval: 10s

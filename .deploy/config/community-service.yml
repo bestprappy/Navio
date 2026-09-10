@@ -31,8 +31,8 @@ spring:
       spec: maximumSize=10000,expireAfterWrite=10m
   servlet:
     multipart:
-      max-file-size: ${COMMUNITY_MAX_FILE_SIZE:10MB}
-      max-request-size: ${COMMUNITY_MAX_REQUEST_SIZE:12MB}
+      max-file-size: 5MB
+      max-request-size: 6MB
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka:9092}
     consumer:
@@ -79,5 +79,9 @@ server:
 navio:
   community:
     media:
-      storage-path: ${COMMUNITY_MEDIA_STORAGE_PATH:/data/community-media}
+      endpoint: ${COMMUNITY_S3_ENDPOINT:}
+      region: ${COMMUNITY_S3_REGION:us-east-1}
+      bucket: ${COMMUNITY_S3_BUCKET:navio-community}
+      path-style: ${COMMUNITY_S3_PATH_STYLE:false}
+      public-base-url: ${COMMUNITY_PUBLIC_BASE_URL:https://navio.sit.kmutt.ac.th}
 
