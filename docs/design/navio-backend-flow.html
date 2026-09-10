@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Navio — Backend System Design</title>
+<style>
+  /* ============================================================
+     Navio — Backend System Design (light mode only)
+     Tokens mirror client/app/globals.css (OKLCH brand palette)
+     ============================================================ */
+  :root {
+    --bg:            oklch(0.985 0.010 273.5);
+    --bg-grid:       oklch(0.945 0.016 273.5);
+    --surface:       oklch(1 0 0);
+    --surface-raise: oklch(0.988 0.006 273.5);
+
+    --fg:            oklch(0.358 0.041 273.6);
+    --fg-muted:      oklch(0.545 0.048 285);
+    --fg-faint:      oklch(0.660 0.035 285);
+
+    --border:        oklch(0.895 0.030 267.6);
+    --border-soft:   oklch(0.935 0.020 267.6);
+
+    --primary:       oklch(0.612 0.098 216.65);
+    --accent:        oklch(0.470 0.150 293.2);
+    --success:       oklch(0.548 0.124 141.6);
+    --warning:       oklch(0.612 0.160 48.6);
+    --info:          oklch(0.514 0.141 261.2);
+
+    --line:          oklch(0.780 0.045 250);
+    --line-soft:     oklch(0.850 0.030 250);
+
+    --radius:     1rem;
+    --radius-sm:  0.625rem;
+
+    --space-xs: 0.25rem; --space-sm: 0.5rem; --space-md: 1rem;
+    --space-lg: 1.5rem; --space-xl: 2rem;  --space-2xl: 3rem;
+
+    --text-xs: 0.75rem;  --text-sm: 0.8125rem; --text-base: 0.9375rem;
+    --text-md: 1.0625rem; --text-lg: 1.5rem;   --text-xl: 2.25rem;
+
+    --shadow-sm: 0 1px 2px oklch(0.358 0.041 273.6 / 0.06);
+    --shadow-md: 0 1px 0 oklch(1 0 0 / 0.9) inset,
+                 0 2px 6px oklch(0.358 0.041 273.6 / 0.07),
+                 0 14px 30px -18px oklch(0.358 0.041 273.6 / 0.30);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    color: var(--fg);
+    background-color: var(--bg);
+    background-image:
+      linear-gradient(to right, var(--bg-grid) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--bg-grid) 1px, transparent 1px);
+    background-size: 2rem 2rem;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: var(--text-base);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 82rem;
+    margin: 0 auto;
+    padding: var(--space-2xl) var(--space-lg) var(--space-xl);
+  }
+
+  /* ---------- header ---------- */
+  .page-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+  }
+  .head-text { flex: 1 1 22rem; min-width: 0; }
+  .eyebrow {
+    margin: 0 0 var(--space-xs);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--primary);
+  }
+  h1 {
+    margin: 0;
+    font-size: var(--text-xl);
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .subtitle {
+    margin: var(--space-sm) 0 0;
+    max-width: 46rem;
+    color: var(--fg-muted);
+    font-size: var(--text-sm);
+  }
+
+  .controls { display: flex; gap: var(--space-sm); flex: 0 0 auto; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: linear-gradient(to bottom, var(--surface), var(--surface-raise));
+    box-shadow: var(--shadow-sm);
+    color: var(--fg);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: box-shadow 140ms ease, border-color 140ms ease, transform 140ms ease;
+  }
+  .btn:hover { box-shadow: var(--shadow-md); border-color: var(--line); }
+  .btn:active { transform: translateY(1px); }
+  .btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+  .btn .dot {
+    width: 0.5rem; height: 0.5rem; border-radius: 50%;
+    background: var(--success);
+  }
+  .paused .btn .dot { background: var(--fg-faint); }
+
+  /* ---------- diagram shell ---------- */
+  .stage {
+    padding: var(--space-lg) var(--space-md);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: linear-gradient(to bottom, var(--surface), var(--surface-raise));
+    box-shadow: var(--shadow-md);
+  }
+  .stage-scroll { overflow-x: auto; overflow-y: hidden; }
+  .stage-scroll > svg { display: block; width: 100%; min-width: 60rem; height: auto; }
+
+  /* ---------- svg primitives ---------- */
+  .card {
+    fill: var(--surface);
+    stroke: var(--border);
+    stroke-width: 1;
+    filter: drop-shadow(0 6px 12px oklch(0.358 0.041 273.6 / 0.08));
+  }
+  .card-plain { fill: var(--surface); stroke: var(--border-soft); stroke-width: 1; }
+  .card-store {
+    fill: var(--surface);
+    stroke: var(--border);
+    stroke-width: 1;
+    stroke-dasharray: none;
+    filter: drop-shadow(0 6px 12px oklch(0.358 0.041 273.6 / 0.07));
+  }
+
+  .n-title { font-size: 14.5px; font-weight: 650; fill: var(--fg); text-anchor: middle; }
+  .n-title-sm { font-size: 12.5px; font-weight: 650; fill: var(--fg); text-anchor: middle; }
+  .n-sub   { font-size: 10.5px; font-weight: 500; fill: var(--fg-muted); text-anchor: middle; }
+  .n-tiny  { font-size: 9.5px;  font-weight: 500; fill: var(--fg-faint); text-anchor: middle; }
+  .tab-primary { fill: var(--primary); }
+  .tab-accent  { fill: var(--accent); }
+  .tab-info    { fill: var(--info); }
+  .tab-success { fill: var(--success); }
+  .tab-warning { fill: var(--warning); }
+
+  .chip    { fill: oklch(0.965 0.012 273.5); stroke: var(--border-soft); stroke-width: 1; }
+  .chip-t  { font-size: 10px; font-weight: 600; fill: var(--fg-muted); text-anchor: middle; }
+  .lane    { font-size: 9.5px; font-weight: 600; fill: var(--fg-faint); letter-spacing: 0.04em; }
+
+  .edge      { fill: none; stroke: var(--line); stroke-width: 1.75; stroke-linecap: round; }
+  .edge-soft { fill: none; stroke: var(--line-soft); stroke-width: 1.5; stroke-linecap: round; }
+  .edge-async {
+    fill: none; stroke: var(--line); stroke-width: 1.6; stroke-linecap: round;
+    stroke-dasharray: 5 7;
+    animation: dashflow 1s linear infinite;
+  }
+  .edge-async.faint { stroke: var(--line-soft); stroke-width: 1.4; }
+  @keyframes dashflow { to { stroke-dashoffset: -24; } }
+
+  /* travelling packets */
+  .pkt   { fill: var(--primary); filter: drop-shadow(0 0 5px oklch(0.612 0.098 216.65 / 0.55)); }
+  .pkt-r { fill: var(--accent);  filter: drop-shadow(0 0 5px oklch(0.470 0.150 293.2 / 0.45)); }
+  .pkt-e { fill: var(--warning); filter: drop-shadow(0 0 5px oklch(0.612 0.160 48.6 / 0.50)); }
+  .pkt-t { fill: var(--fg-faint); opacity: 0.75; }
+
+  .stage.paused .edge-async { animation-play-state: paused; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .edge-async { animation: none; }
+  }
+
+  /* ---------- legend ---------- */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-md) var(--space-xl);
+    margin-top: var(--space-lg);
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--border-soft);
+  }
+  .legend-item {
+    display: inline-flex; align-items: center; gap: var(--space-sm);
+    font-size: var(--text-sm); color: var(--fg-muted);
+  }
+  .swatch { width: 0.625rem; height: 0.625rem; border-radius: 50%; flex: 0 0 auto; }
+  .swatch.req { background: var(--primary); }
+  .swatch.res { background: var(--accent); }
+  .swatch.evt { background: var(--warning); }
+  .rule { width: 1.75rem; height: 0; border-top: 2px solid var(--line); flex: 0 0 auto; }
+  .rule.dashed { border-top-style: dashed; }
+
+  /* ---------- notes ---------- */
+  .notes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: var(--space-md);
+    margin-top: var(--space-xl);
+  }
+  .note {
+    padding: var(--space-md);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+  .note h2 {
+    margin: 0 0 var(--space-xs);
+    font-size: var(--text-sm);
+    font-weight: 650;
+    letter-spacing: 0.02em;
+  }
+  .note p { margin: 0; font-size: var(--text-sm); color: var(--fg-muted); }
+
+  footer {
+    margin-top: var(--space-xl);
+    font-size: var(--text-xs);
+    color: var(--fg-faint);
+  }
+
+  @media (max-width: 40rem) {
+    .page { padding: var(--space-xl) var(--space-md) var(--space-lg); }
+    h1 { font-size: var(--text-lg); }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="page-head">
+    <div class="head-text">
+      <p class="eyebrow">Navio Capstone</p>
+      <h1>Backend System Design</h1>
+      <p class="subtitle">
+        One request path, edge to database. Solid lines are synchronous HTTP; dashed lines are
+        asynchronous events and external calls. Watch a request travel the graph.
+      </p>
+    </div>
+    <div class="controls">
+      <button id="toggle" class="btn" type="button" aria-pressed="false">
+        <span class="dot" aria-hidden="true"></span>
+        <span id="toggle-label">Pause flow</span>
+      </button>
+    </div>
+  </header>
+
+  <section id="stage" class="stage">
+    <div class="stage-scroll">
+      <svg id="diagram" viewBox="0 0 1280 812" xmlns="http://www.w3.org/2000/svg"
+           xmlns:xlink="http://www.w3.org/1999/xlink" role="img"
+           aria-labelledby="dg-title dg-desc">
+        <title id="dg-title">Navio backend system design</title>
+        <desc id="dg-desc">
+          The web app calls NGINX at the edge, which forwards to the API Gateway. The gateway
+          validates identity with Keycloak, resolves instances through Discovery and Config, and
+          routes to five Spring Boot services: User Management, Trip Planning, Community,
+          Mobility and EV, and AI Planning. Each service owns its own schema in PostgreSQL with
+          PostGIS. Services write an outbox row that is published to Kafka, and consume those
+          integration events back. Mobility and EV calls a maps provider, AI Planning calls a
+          model provider, and all services export telemetry to observability.
+        </desc>
+
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,1 L9,5 L0,9 z" fill="oklch(0.780 0.045 250)" />
+          </marker>
+          <marker id="arrow-soft" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,1 L9,5 L0,9 z" fill="oklch(0.850 0.030 250)" />
+          </marker>
+
+          <!-- invisible journey paths that the packets travel along -->
+          <path id="j-user"  d="M480 84 V302 C480 348 138 344 138 392 V566" />
+          <path id="j-trip"  d="M480 84 V302 C480 348 309 348 309 392 V566" />
+          <path id="j-comm"  d="M480 84 V566" />
+          <path id="j-mob"   d="M480 84 V302 C480 348 651 348 651 392 V566" />
+          <path id="j-ai"    d="M480 84 V302 C480 348 822 344 822 392 V566" />
+          <path id="j-event" d="M480 654 V745 H44 Q26 745 26 727 V453 Q26 435 44 435 H60" />
+          <path id="j-maps"  d="M651 470 V356 H1095 V400" />
+          <path id="j-model" d="M860 452 H900 C930 452 930 474 960 474 H1095" />
+          <path id="j-telem" d="M822 478 V530 H1095 V596" />
+        </defs>
+
+        <!-- ============ 1. edges (painted first, packets pass behind cards) ============ -->
+        <g id="edges">
+          <!-- north-south request spine -->
+          <path class="edge" d="M480 84 V128"  marker-end="url(#arrow)" />
+          <path class="edge" d="M480 190 V234" marker-end="url(#arrow)" />
+
+          <!-- browser signs in with Keycloak directly -->
+          <path class="edge-async" d="M380 56 H173 Q155 56 155 74 V236" marker-end="url(#arrow)" />
+          <text class="lane" x="164" y="160">sign in</text>
+
+          <!-- gateway side links -->
+          <path class="edge-soft" d="M330 270 H254" marker-end="url(#arrow-soft)" />
+          <text class="lane" x="292" y="262" text-anchor="middle">verify JWT</text>
+          <path class="edge-soft" d="M630 270 H706" marker-end="url(#arrow-soft)" />
+          <text class="lane" x="668" y="262" text-anchor="middle">resolve</text>
+
+          <!-- gateway fans out to the five services -->
+          <path class="edge" d="M480 302 C480 348 138 344 138 388" marker-end="url(#arrow)" />
+          <path class="edge" d="M480 302 C480 348 309 348 309 388" marker-end="url(#arrow)" />
+          <path class="edge" d="M480 302 V388"                      marker-end="url(#arrow)" />
+          <path class="edge" d="M480 302 C480 348 651 348 651 388" marker-end="url(#arrow)" />
+          <path class="edge" d="M480 302 C480 348 822 344 822 388" marker-end="url(#arrow)" />
+
+          <!-- services own their schema -->
+          <path class="edge" d="M138 478 V562" marker-end="url(#arrow)" />
+          <path class="edge" d="M309 478 V562" marker-end="url(#arrow)" />
+          <path class="edge" d="M480 478 V562" marker-end="url(#arrow)" />
+          <path class="edge" d="M651 478 V562" marker-end="url(#arrow)" />
+          <path class="edge" d="M822 478 V562" marker-end="url(#arrow)" />
+
+          <!-- outbox to Kafka, and events consumed back -->
+          <path class="edge-async" d="M480 654 V720" marker-end="url(#arrow)" />
+          <text class="lane" x="492" y="694">outbox publish</text>
+          <path class="edge-async"
+                d="M60 758 H44 Q26 758 26 740 V453 Q26 435 44 435 H56"
+                marker-end="url(#arrow)" />
+          <text class="lane" x="18" y="600" text-anchor="middle"
+                transform="rotate(-90 18 600)">consume events</text>
+
+          <!-- external providers -->
+          <path class="edge-async" d="M651 392 V356 H1095 V374" marker-end="url(#arrow)" />
+          <path class="edge-async" d="M900 452 C930 452 930 474 960 474" marker-end="url(#arrow)" />
+
+          <!-- telemetry -->
+          <path class="edge-async faint" d="M822 478 V530 H1095 V562" marker-end="url(#arrow-soft)" />
+          <text class="lane" x="1010" y="522" text-anchor="middle">telemetry</text>
+        </g>
+
+        <!-- ============ 2. travelling packets ============ -->
+        <g id="packets">
+          <!-- Every duration divides the 6s master loop and every begin is a negative
+               offset, so the whole graph is mid-flight at t=0 and loops seamlessly. -->
+
+          <!-- requests down the graph -->
+          <circle class="pkt" r="4.5">
+            <animateMotion dur="3s" begin="0s" repeatCount="indefinite">
+              <mpath href="#j-user" xlink:href="#j-user" />
+            </animateMotion>
+          </circle>
+          <circle class="pkt" r="4.5">
+            <animateMotion dur="3s" begin="-0.6s" repeatCount="indefinite">
+              <mpath href="#j-trip" xlink:href="#j-trip" />
+            </animateMotion>
+          </circle>
+          <circle class="pkt" r="4.5">
+            <animateMotion dur="3s" begin="-1.2s" repeatCount="indefinite">
+              <mpath href="#j-comm" xlink:href="#j-comm" />
+            </animateMotion>
+          </circle>
+          <circle class="pkt" r="4.5">
+            <animateMotion dur="3s" begin="-1.8s" repeatCount="indefinite">
+              <mpath href="#j-mob" xlink:href="#j-mob" />
+            </animateMotion>
+          </circle>
+          <circle class="pkt" r="4.5">
+            <animateMotion dur="3s" begin="-2.4s" repeatCount="indefinite">
+              <mpath href="#j-ai" xlink:href="#j-ai" />
+            </animateMotion>
+          </circle>
+
+          <!-- responses back up the graph -->
+          <circle class="pkt-r" r="4">
+            <animateMotion dur="3s" begin="-1.5s" repeatCount="indefinite"
+                           keyPoints="1;0" keyTimes="0;1" calcMode="linear">
+              <mpath href="#j-trip" xlink:href="#j-trip" />
+            </animateMotion>
+          </circle>
+          <circle class="pkt-r" r="4">
+            <animateMotion dur="3s" begin="-2.1s" repeatCount="indefinite"
+                           keyPoints="1;0" keyTimes="0;1" calcMode="linear">
+              <mpath href="#j-mob" xlink:href="#j-mob" />
+            </animateMotion>
+          </circle>
+
+          <!-- integration events: outbox -> Kafka -> consumers -->
+          <circle class="pkt-e" r="4.5">
+            <animateMotion dur="6s" begin="0s" repeatCount="indefinite">
+              <mpath href="#j-event" xlink:href="#j-event" />
+            </animateMotion>
+          </circle>
+          <circle class="pkt-e" r="4.5">
+            <animateMotion dur="6s" begin="-3s" repeatCount="indefinite">
+              <mpath href="#j-event" xlink:href="#j-event" />
+            </animateMotion>
+          </circle>
+
+          <!-- external provider calls -->
+          <circle class="pkt" r="4">
+            <animateMotion dur="3s" begin="-1.2s" repeatCount="indefinite">
+              <mpath href="#j-maps" xlink:href="#j-maps" />
+            </animateMotion>
+          </circle>
+          <circle class="pkt" r="4">
+            <animateMotion dur="3s" begin="-2.4s" repeatCount="indefinite">
+              <mpath href="#j-model" xlink:href="#j-model" />
+            </animateMotion>
+          </circle>
+
+          <!-- telemetry drip -->
+          <circle class="pkt-t" r="3.5">
+            <animateMotion dur="6s" begin="-0.5s" repeatCount="indefinite">
+              <mpath href="#j-telem" xlink:href="#j-telem" />
+            </animateMotion>
+          </circle>
+        </g>
+
+        <!-- ============ 3. nodes ============ -->
+        <g id="nodes">
+          <!-- client -->
+          <g>
+            <rect class="card" x="380" y="28" width="200" height="56" rx="14" />
+            <text class="n-title" x="480" y="54">Web App</text>
+            <text class="n-sub"   x="480" y="71">Next.js frontend</text>
+          </g>
+
+          <!-- edge -->
+          <g>
+            <rect class="card" x="350" y="132" width="260" height="58" rx="14" />
+            <rect class="tab-info" x="466" y="142" width="28" height="4" rx="2" />
+            <text class="n-title" x="480" y="167">NGINX Edge</text>
+            <text class="n-sub"   x="480" y="183">TLS · rate limit</text>
+          </g>
+
+          <!-- gateway -->
+          <g>
+            <rect class="card" x="330" y="238" width="300" height="64" rx="16" />
+            <rect class="tab-primary" x="466" y="248" width="28" height="4" rx="2" />
+            <text class="n-title" x="480" y="275">API Gateway</text>
+            <text class="n-sub"   x="480" y="291">routing · load balance</text>
+          </g>
+
+          <!-- identity -->
+          <g>
+            <rect class="card-plain" x="60" y="240" width="194" height="60" rx="14" />
+            <text class="n-title-sm" x="157" y="269">Keycloak</text>
+            <text class="n-sub"      x="157" y="285">identity · tokens · roles</text>
+          </g>
+
+          <!-- platform -->
+          <g>
+            <rect class="card-plain" x="706" y="240" width="194" height="60" rx="14" />
+            <text class="n-title-sm" x="803" y="269">Discovery &amp; Config</text>
+            <text class="n-sub"      x="803" y="285">Eureka · Config Server</text>
+          </g>
+
+          <!-- services lane label -->
+          <text class="lane" x="60" y="378">SPRING BOOT SERVICES</text>
+
+          <!-- service: user management -->
+          <g>
+            <rect class="card" x="60" y="392" width="156" height="86" rx="14" />
+            <rect class="tab-info" x="124" y="404" width="28" height="4" rx="2" />
+            <text class="n-title-sm" x="138" y="434">User Management</text>
+            <text class="n-sub"      x="138" y="452">profiles · vehicles</text>
+            <text class="n-sub"      x="138" y="466">roles · admin</text>
+          </g>
+
+          <!-- service: trip planning -->
+          <g>
+            <rect class="card" x="231" y="392" width="156" height="86" rx="14" />
+            <rect class="tab-primary" x="295" y="404" width="28" height="4" rx="2" />
+            <text class="n-title-sm" x="309" y="434">Trip Planning</text>
+            <text class="n-sub"      x="309" y="452">itineraries · explore</text>
+            <text class="n-sub"      x="309" y="466">sharing · copy</text>
+          </g>
+
+          <!-- service: community -->
+          <g>
+            <rect class="card" x="402" y="392" width="156" height="86" rx="14" />
+            <rect class="tab-accent" x="466" y="404" width="28" height="4" rx="2" />
+            <text class="n-title-sm" x="480" y="434">Community</text>
+            <text class="n-sub"      x="480" y="452">groups · posts · media</text>
+            <text class="n-sub"      x="480" y="466">notifications</text>
+          </g>
+
+          <!-- service: mobility & ev -->
+          <g>
+            <rect class="card" x="573" y="392" width="156" height="86" rx="14" />
+            <rect class="tab-success" x="637" y="404" width="28" height="4" rx="2" />
+            <text class="n-title-sm" x="651" y="434">Mobility &amp; EV</text>
+            <text class="n-sub"      x="651" y="452">places · routes</text>
+            <text class="n-sub"      x="651" y="466">chargers · EV range</text>
+          </g>
+
+          <!-- service: ai planning -->
+          <g>
+            <rect class="card" x="744" y="392" width="156" height="86" rx="14" />
+            <rect class="tab-warning" x="808" y="404" width="28" height="4" rx="2" />
+            <text class="n-title-sm" x="822" y="434">AI Planning</text>
+            <text class="n-sub"      x="822" y="452">chat · tool calls</text>
+            <text class="n-sub"      x="822" y="466">proposed changes</text>
+          </g>
+
+          <!-- database -->
+          <g>
+            <rect class="card-store" x="60" y="566" width="840" height="88" rx="16" />
+            <text class="n-title" x="480" y="596">PostgreSQL + PostGIS</text>
+            <rect class="chip" x="79"  y="612" width="118" height="26" rx="8" />
+            <text class="chip-t" x="138" y="629">iam</text>
+            <rect class="chip" x="250" y="612" width="118" height="26" rx="8" />
+            <text class="chip-t" x="309" y="629">trip</text>
+            <rect class="chip" x="421" y="612" width="118" height="26" rx="8" />
+            <text class="chip-t" x="480" y="629">social · notif · media</text>
+            <rect class="chip" x="592" y="612" width="118" height="26" rx="8" />
+            <text class="chip-t" x="651" y="629">ev</text>
+            <rect class="chip" x="763" y="612" width="118" height="26" rx="8" />
+            <text class="chip-t" x="822" y="629">ai</text>
+          </g>
+
+          <!-- kafka -->
+          <g>
+            <rect class="card-store" x="60" y="724" width="840" height="68" rx="16" />
+            <rect class="tab-warning" x="466" y="736" width="28" height="4" rx="2" />
+            <text class="n-title" x="480" y="762">Kafka</text>
+            <text class="n-sub"   x="480" y="778">integration events between services</text>
+          </g>
+
+          <!-- external: maps -->
+          <g>
+            <rect class="card-plain" x="960" y="378" width="270" height="56" rx="14" />
+            <text class="n-title-sm" x="1095" y="404">Maps Provider</text>
+            <text class="n-sub"      x="1095" y="421">places · routes · geocoding</text>
+          </g>
+
+          <!-- external: model -->
+          <g>
+            <rect class="card-plain" x="960" y="446" width="270" height="56" rx="14" />
+            <text class="n-title-sm" x="1095" y="472">Model Provider</text>
+            <text class="n-sub"      x="1095" y="489">self-hosted or hosted API</text>
+          </g>
+
+          <!-- observability -->
+          <g>
+            <rect class="card-plain" x="960" y="566" width="270" height="88" rx="16" />
+            <text class="n-title-sm" x="1095" y="600">Observability</text>
+            <text class="n-sub"      x="1095" y="619">collector → hosted backend</text>
+            <text class="n-tiny"     x="1095" y="636">logs · metrics · traces</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <div class="legend">
+      <span class="legend-item"><span class="swatch req" aria-hidden="true"></span>Request</span>
+      <span class="legend-item"><span class="swatch res" aria-hidden="true"></span>Response</span>
+      <span class="legend-item"><span class="swatch evt" aria-hidden="true"></span>Integration event</span>
+      <span class="legend-item"><span class="rule" aria-hidden="true"></span>Synchronous HTTP</span>
+      <span class="legend-item"><span class="rule dashed" aria-hidden="true"></span>Async or external call</span>
+    </div>
+  </section>
+
+  <div class="notes">
+    <article class="note">
+      <h2>One way in</h2>
+      <p>Every application request enters through NGINX and is routed by the API Gateway. Services
+         are never reachable from the internet.</p>
+    </article>
+    <article class="note">
+      <h2>One schema per service</h2>
+      <p>Each service owns its schema and no service reads another's tables. Cross-domain data moves
+         through APIs and events only.</p>
+    </article>
+    <article class="note">
+      <h2>Events, not calls</h2>
+      <p>A service commits its data and an outbox row together, then publishes to Kafka. Consumers
+         stay eventually consistent and idempotent.</p>
+    </article>
+    <article class="note">
+      <h2>Failure stays local</h2>
+      <p>If AI, Kafka, a provider, or observability is down, the core planning and community flows
+         keep working.</p>
+    </article>
+  </div>
+
+  <footer>Navio capstone — backend architecture overview. Component names follow the architecture contract.</footer>
+</div>
+
+<script>
+  (function () {
+    var stage  = document.getElementById('stage');
+    var svg    = document.getElementById('diagram');
+    var btn    = document.getElementById('toggle');
+    var label  = document.getElementById('toggle-label');
+    var paused = false;
+
+    function apply(next) {
+      paused = next;
+      stage.classList.toggle('paused', paused);
+      btn.setAttribute('aria-pressed', String(paused));
+      label.textContent = paused ? 'Resume flow' : 'Pause flow';
+      try {
+        if (paused) { svg.pauseAnimations(); } else { svg.unpauseAnimations(); }
+      } catch (err) {
+        /* SMIL control unsupported: CSS dash flow still toggles via the class */
+        console.warn('Navio diagram: animation control unavailable', err);
+      }
+    }
+
+    btn.addEventListener('click', function () { apply(!paused); });
+
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (reduce && reduce.matches) { apply(true); }
+  })();
+</script>
+</body>
+</html>

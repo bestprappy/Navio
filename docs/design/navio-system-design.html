@@ -1,0 +1,1127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Navio System Design</title>
+<style>
+  /* ============================================================
+     Navio — System Design
+     Tokens mirror client/app/globals.css (OKLCH, brand palette)
+     ============================================================ */
+  :root {
+    --bg:            oklch(0.98 0.013 273.5);
+    --bg-grid:       oklch(0.93 0.02 273.5);
+    --surface:       oklch(1 0 0);
+    --surface-raise: oklch(0.985 0.008 273.5);
+    --fg:            oklch(0.358 0.041 273.6);
+    --fg-muted:      oklch(0.50 0.111 291.59);
+    --fg-faint:      oklch(0.62 0.05 285);
+    --border:        oklch(0.89 0.035 267.6);
+    --border-soft:   oklch(0.93 0.025 267.6);
+
+    --primary:       oklch(0.669 0.094 216.65);
+    --primary-soft:  oklch(0.94 0.03 210);
+    --accent:        oklch(0.376 0.125 293.2);
+    --accent-soft:   oklch(0.92 0.04 285);
+    --mint:          oklch(0.916 0.024 191.8);
+
+    --success:       oklch(0.548 0.124 141.6);
+    --warning:       oklch(0.654 0.174 48.6);
+    --info:          oklch(0.514 0.141 261.2);
+    --danger:        oklch(0.499 0.174 25.2);
+
+    --radius:        1rem;
+    --radius-sm:     0.6rem;
+    --radius-lg:     1.4rem;
+
+    --space-xs: 0.25rem; --space-sm: 0.5rem;  --space-md: 1rem;
+    --space-lg: 1.5rem;  --space-xl: 2rem;    --space-2xl: 3rem;
+
+    --text-xs: 0.75rem; --text-sm: 0.8125rem; --text-base: 0.9375rem;
+    --text-md: 1.0625rem; --text-lg: 1.375rem; --text-xl: 2rem; --text-2xl: 2.75rem;
+
+    --shadow-sm: 0 1px 2px oklch(0.358 0.041 273.6 / 0.06),
+                 0 1px 1px oklch(0.358 0.041 273.6 / 0.04);
+    --shadow-md: 0 1px 0 oklch(1 0 0 / 0.8) inset,
+                 0 2px 4px oklch(0.358 0.041 273.6 / 0.06),
+                 0 8px 20px -8px oklch(0.358 0.041 273.6 / 0.14);
+    --shadow-lg: 0 1px 0 oklch(1 0 0 / 0.9) inset,
+                 0 4px 10px oklch(0.358 0.041 273.6 / 0.08),
+                 0 20px 44px -18px oklch(0.358 0.041 273.6 / 0.28);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:            oklch(0.169 0.024 273.4);
+      --bg-grid:       oklch(0.24 0.03 273.4);
+      --surface:       oklch(0.22 0.024 273.4);
+      --surface-raise: oklch(0.255 0.026 273.4);
+      --fg:            oklch(0.957 0.013 273.5);
+      --fg-muted:      oklch(0.72 0.022 273.8);
+      --fg-faint:      oklch(0.60 0.025 273.8);
+      --border:        oklch(0.358 0.041 273.6);
+      --border-soft:   oklch(0.30 0.033 273.6);
+
+      --primary:       oklch(0.637 0.095 221.7);
+      --primary-soft:  oklch(0.30 0.05 221);
+      --accent:        oklch(0.593 0.178 276.6);
+      --accent-soft:   oklch(0.30 0.06 276);
+      --mint:          oklch(0.42 0.055 200);
+
+      --success:       oklch(0.60 0.14 141.6);
+      --warning:       oklch(0.72 0.16 55);
+      --info:          oklch(0.62 0.14 261);
+      --danger:        oklch(0.638 0.208 25.1);
+
+      --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.4);
+      --shadow-md: 0 1px 0 oklch(1 0 0 / 0.05) inset,
+                   0 2px 6px oklch(0 0 0 / 0.35),
+                   0 10px 24px -10px oklch(0 0 0 / 0.6);
+      --shadow-lg: 0 1px 0 oklch(1 0 0 / 0.06) inset,
+                   0 6px 14px oklch(0 0 0 / 0.4),
+                   0 24px 50px -20px oklch(0 0 0 / 0.75);
+    }
+  }
+  :root[data-theme="dark"] {
+      --bg:            oklch(0.169 0.024 273.4);
+      --bg-grid:       oklch(0.24 0.03 273.4);
+      --surface:       oklch(0.22 0.024 273.4);
+      --surface-raise: oklch(0.255 0.026 273.4);
+      --fg:            oklch(0.957 0.013 273.5);
+      --fg-muted:      oklch(0.72 0.022 273.8);
+      --fg-faint:      oklch(0.60 0.025 273.8);
+      --border:        oklch(0.358 0.041 273.6);
+      --border-soft:   oklch(0.30 0.033 273.6);
+      --primary:       oklch(0.637 0.095 221.7);
+      --primary-soft:  oklch(0.30 0.05 221);
+      --accent:        oklch(0.593 0.178 276.6);
+      --accent-soft:   oklch(0.30 0.06 276);
+      --mint:          oklch(0.42 0.055 200);
+      --success:       oklch(0.60 0.14 141.6);
+      --warning:       oklch(0.72 0.16 55);
+      --info:          oklch(0.62 0.14 261);
+      --danger:        oklch(0.638 0.208 25.1);
+      --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.4);
+      --shadow-md: 0 1px 0 oklch(1 0 0 / 0.05) inset,
+                   0 2px 6px oklch(0 0 0 / 0.35),
+                   0 10px 24px -10px oklch(0 0 0 / 0.6);
+      --shadow-lg: 0 1px 0 oklch(1 0 0 / 0.06) inset,
+                   0 6px 14px oklch(0 0 0 / 0.4),
+                   0 24px 50px -20px oklch(0 0 0 / 0.75);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; }
+
+  body {
+    margin: 0;
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(circle at 12% -10%, oklch(from var(--primary) l c h / 0.10), transparent 45%),
+      radial-gradient(circle at 88% 4%, oklch(from var(--accent) l c h / 0.10), transparent 42%),
+      linear-gradient(var(--bg-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--bg-grid) 1px, transparent 1px);
+    background-size: auto, auto, 3rem 3rem, 3rem 3rem;
+    background-attachment: fixed;
+    color: var(--fg);
+    font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system,
+                 "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: var(--text-base);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .mono { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+  /* ---------- layout shell ---------- */
+  .shell { max-width: 76rem; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 2.5rem); }
+
+  /* ---------- header ---------- */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: blur(14px) saturate(1.4);
+    background: oklch(from var(--bg) l c h / 0.82);
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .topbar__inner {
+    display: flex; align-items: center; gap: var(--space-md);
+    height: 4rem; max-width: 76rem; margin: 0 auto;
+    padding: 0 clamp(1rem, 4vw, 2.5rem);
+  }
+  .brand { display: flex; align-items: center; gap: 0.6rem; font-weight: 800; letter-spacing: -0.02em; font-size: var(--text-md); }
+  .brand__mark {
+    width: 1.8rem; height: 1.8rem; border-radius: 0.6rem; display: grid; place-items: center;
+    background: linear-gradient(150deg, var(--primary), var(--accent));
+    color: white; font-size: 0.85rem; font-weight: 800;
+    box-shadow: var(--shadow-sm);
+  }
+  .brand__sub { color: var(--fg-muted); font-weight: 500; font-size: var(--text-sm); }
+
+  .topnav { display: flex; gap: 0.15rem; margin-left: auto; overflow-x: auto; scrollbar-width: none; }
+  .topnav::-webkit-scrollbar { display: none; }
+  .topnav a {
+    color: var(--fg-muted); text-decoration: none; font-size: var(--text-sm); font-weight: 600;
+    padding: 0.4rem 0.7rem; border-radius: 999px; white-space: nowrap;
+    transition: color .18s ease, background-color .18s ease;
+  }
+  .topnav a:hover { color: var(--fg); background: var(--surface); }
+  .topnav a.is-active { color: var(--primary); background: var(--primary-soft); }
+
+  .iconbtn {
+    flex: 0 0 auto;
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    height: 2.25rem; padding: 0 0.8rem;
+    border: 1px solid var(--border); border-radius: 999px;
+    background: var(--surface); color: var(--fg-muted);
+    font: inherit; font-size: var(--text-xs); font-weight: 700; cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    transition: color .18s, border-color .18s, transform .18s;
+  }
+  .iconbtn:hover { color: var(--fg); border-color: var(--primary); transform: translateY(-1px); }
+  .iconbtn:focus-visible, a:focus-visible, .card-btn:focus-visible {
+    outline: 2px solid var(--primary); outline-offset: 2px;
+  }
+
+  /* ---------- hero ---------- */
+  .hero { padding: clamp(2.5rem, 7vw, 5rem) 0 var(--space-xl); }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-size: var(--text-xs); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--primary); background: var(--primary-soft);
+    padding: 0.3rem 0.75rem; border-radius: 999px; margin-bottom: var(--space-md);
+  }
+  .hero h1 {
+    margin: 0 0 var(--space-md); font-size: clamp(2rem, 6vw, var(--text-2xl));
+    line-height: 1.08; letter-spacing: -0.035em; font-weight: 800; max-width: 22ch;
+  }
+  .hero h1 em {
+    font-style: normal;
+    background: linear-gradient(100deg, var(--primary), var(--accent));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero p { margin: 0; max-width: 62ch; color: var(--fg-muted); font-size: var(--text-md); }
+
+  .stats { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-top: var(--space-xl); }
+  .stat {
+    flex: 1 1 8.5rem; min-width: 8.5rem;
+    background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--radius);
+    padding: var(--space-md); box-shadow: var(--shadow-md);
+  }
+  .stat__n { font-size: var(--text-lg); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
+  .stat__l { font-size: var(--text-xs); color: var(--fg-muted); font-weight: 600; }
+
+  /* ---------- sections ---------- */
+  section { padding: clamp(2rem, 5vw, 3.5rem) 0; }
+  .sec-head { margin-bottom: var(--space-xl); }
+  .sec-head h2 {
+    margin: 0 0 0.35rem; font-size: clamp(1.35rem, 3.4vw, 1.85rem);
+    letter-spacing: -0.03em; font-weight: 800;
+  }
+  .sec-head p { margin: 0; color: var(--fg-muted); max-width: 68ch; }
+  .sec-num {
+    font-size: var(--text-xs); font-weight: 800; color: var(--primary);
+    letter-spacing: 0.14em; text-transform: uppercase; display: block; margin-bottom: 0.3rem;
+  }
+
+  .panel {
+    background: var(--surface); border: 1px solid var(--border-soft);
+    border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+    padding: clamp(1rem, 3vw, var(--space-xl));
+  }
+
+  /* ---------- diagram ---------- */
+  .diagram { width: 100%; overflow-x: auto; }
+  .diagram svg { width: 100%; min-width: 44rem; height: auto; display: block; }
+
+  .n-box { fill: var(--surface-raise); stroke: var(--border); stroke-width: 1.5; }
+  .n-box--edge    { stroke: var(--accent); }
+  .n-box--gate    { stroke: var(--primary); stroke-width: 2; }
+  .n-box--svc     { stroke: var(--primary); }
+  .n-box--data    { stroke: var(--info); }
+  .n-box--auth    { stroke: var(--warning); }
+  .n-box--plat    { stroke: var(--border); stroke-dasharray: 0; }
+  .n-box--planned { stroke: var(--fg-faint); stroke-dasharray: 6 5; fill: transparent; }
+
+  .n-title { fill: var(--fg); font-size: 15px; font-weight: 700; letter-spacing: -0.01em; }
+  .n-sub   { fill: var(--fg-muted); font-size: 11.5px; font-weight: 600; }
+  .n-port  { fill: var(--primary); font-size: 11.5px; font-weight: 700; }
+  .p-label { fill: var(--fg-faint); font-size: 11px; font-weight: 700; letter-spacing: 0.02em; }
+
+  .wire       { fill: none; stroke: var(--border); stroke-width: 2; }
+  .wire--flow { stroke: var(--primary); stroke-width: 2.25; stroke-dasharray: 7 7; animation: march 1.1s linear infinite; }
+  .wire--ctrl { stroke: var(--fg-faint); stroke-width: 1.5; stroke-dasharray: 3 6; opacity: .75; }
+  .wire--data { stroke: var(--info); stroke-width: 1.75; stroke-dasharray: 5 6; animation: march 1.6s linear infinite; opacity: .8; }
+  .wire--auth { stroke: var(--warning); stroke-width: 2; stroke-dasharray: 6 6; animation: march 1.4s linear infinite; }
+  .wire--planned { stroke: var(--fg-faint); stroke-width: 1.75; stroke-dasharray: 4 7; opacity: .55; }
+
+  @keyframes march { to { stroke-dashoffset: -28; } }
+
+  .pkt   { fill: var(--primary); }
+  .pkt--glow { fill: var(--primary); opacity: .25; }
+  .pkt--auth { fill: var(--warning); }
+
+  .svc-hit { cursor: pointer; }
+  .svc-hit rect { transition: filter .2s ease, stroke-width .2s ease; }
+  .svc-hit:hover rect, .svc-hit:focus-visible rect { stroke-width: 3; filter: drop-shadow(0 4px 10px oklch(from var(--primary) l c h / .35)); }
+
+  .legend { display: flex; flex-wrap: wrap; gap: var(--space-md); margin-top: var(--space-lg); padding-top: var(--space-md); border-top: 1px dashed var(--border); }
+  .legend span { display: inline-flex; align-items: center; gap: 0.45rem; font-size: var(--text-xs); color: var(--fg-muted); font-weight: 600; }
+  .swatch { width: 1.5rem; height: 0; border-top: 2.5px solid; border-radius: 2px; }
+  .swatch--flow { border-color: var(--primary); border-top-style: dashed; }
+  .swatch--auth { border-color: var(--warning); border-top-style: dashed; }
+  .swatch--data { border-color: var(--info); border-top-style: dashed; }
+  .swatch--ctrl { border-color: var(--fg-faint); border-top-style: dotted; }
+  .swatch--plan { border-color: var(--fg-faint); border-top-style: dashed; opacity: .6; }
+
+  /* ---------- service grid (interactive) ---------- */
+  .grid { display: grid; gap: var(--space-md); }
+  .grid--svc { grid-template-columns: repeat(auto-fit, minmax(15.5rem, 1fr)); }
+  .grid--2   { grid-template-columns: repeat(auto-fit, minmax(19rem, 1fr)); }
+  .grid--3   { grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); }
+
+  .card-btn {
+    text-align: left; font: inherit; color: inherit; cursor: pointer;
+    background: var(--surface); border: 1px solid var(--border-soft);
+    border-radius: var(--radius); padding: var(--space-md);
+    box-shadow: var(--shadow-md);
+    display: flex; flex-direction: column; gap: 0.55rem;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, opacity .2s ease;
+  }
+  .card-btn:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
+  .card-btn[aria-pressed="true"] { border-color: var(--primary); box-shadow: var(--shadow-lg), 0 0 0 2px var(--primary-soft); }
+
+  .card__top { display: flex; align-items: center; gap: 0.55rem; }
+  .card__ico {
+    width: 2.1rem; height: 2.1rem; flex: 0 0 auto; border-radius: 0.65rem; display: grid; place-items: center;
+    background: var(--primary-soft); color: var(--primary); font-weight: 800; font-size: var(--text-xs);
+  }
+  .card__ico--accent { background: var(--accent-soft); color: var(--accent); }
+  .card__ico--info   { background: oklch(from var(--info) l c h / .14); color: var(--info); }
+  .card__ico--warn   { background: oklch(from var(--warning) l c h / .16); color: var(--warning); }
+  .card__name { font-weight: 700; letter-spacing: -0.015em; line-height: 1.25; }
+  .card__port { font-size: var(--text-xs); color: var(--fg-muted); font-weight: 600; }
+  .card__desc { font-size: var(--text-sm); color: var(--fg-muted); margin: 0; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: auto; }
+  .chip {
+    font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.01em;
+    padding: 0.18rem 0.5rem; border-radius: 999px;
+    background: var(--surface-raise); border: 1px solid var(--border-soft); color: var(--fg-muted);
+  }
+  .chip--schema { color: var(--info); border-color: oklch(from var(--info) l c h / .35); background: oklch(from var(--info) l c h / .08); }
+  .chip--ok     { color: var(--success); border-color: oklch(from var(--success) l c h / .35); background: oklch(from var(--success) l c h / .08); }
+  .chip--plan   { color: var(--warning); border-color: oklch(from var(--warning) l c h / .35); background: oklch(from var(--warning) l c h / .08); }
+
+  /* focus/dim interaction */
+  .dim { opacity: .32; filter: saturate(.55); }
+  .hit { position: relative; }
+
+  /* ---------- tables ---------- */
+  .table-wrap { overflow-x: auto; border: 1px solid var(--border-soft); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow-md); }
+  table { border-collapse: collapse; width: 100%; min-width: 34rem; font-size: var(--text-sm); }
+  thead th {
+    text-align: left; font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.07em;
+    color: var(--fg-muted); font-weight: 800; padding: 0.75rem var(--space-md);
+    border-bottom: 1px solid var(--border); background: var(--surface-raise);
+    position: sticky; top: 0;
+  }
+  tbody td { padding: 0.7rem var(--space-md); border-bottom: 1px solid var(--border-soft); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: 0; }
+  tbody tr { transition: background-color .18s ease, opacity .2s ease; }
+  tbody tr:hover { background: var(--surface-raise); }
+  td code, .code {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.8125rem; background: var(--surface-raise); border: 1px solid var(--border-soft);
+    padding: 0.1rem 0.38rem; border-radius: 0.4rem; color: var(--accent); white-space: nowrap;
+  }
+
+  /* ---------- flow steps ---------- */
+  .steps { counter-reset: step; display: grid; gap: 0.6rem; }
+  .step {
+    display: grid; grid-template-columns: 2rem 1fr; gap: var(--space-md); align-items: start;
+    padding: 0.7rem 0.85rem; border-radius: var(--radius-sm);
+    border: 1px solid var(--border-soft); background: var(--surface);
+    transition: border-color .2s ease, transform .2s ease;
+  }
+  .step:hover { border-color: var(--primary); transform: translateX(3px); }
+  .step::before {
+    counter-increment: step; content: counter(step);
+    width: 2rem; height: 2rem; border-radius: 0.6rem; display: grid; place-items: center;
+    background: linear-gradient(150deg, var(--primary), var(--accent)); color: white;
+    font-weight: 800; font-size: var(--text-xs);
+  }
+  .step b { display: block; font-weight: 700; }
+  .step span { color: var(--fg-muted); font-size: var(--text-sm); }
+
+  /* ---------- pill rows ---------- */
+  .rules { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; }
+  .rules li {
+    display: grid; grid-template-columns: 1.1rem 1fr; gap: 0.7rem; align-items: start;
+    font-size: var(--text-sm); color: var(--fg-muted);
+  }
+  .rules li::before {
+    content: ""; width: 0.55rem; height: 0.55rem; margin-top: 0.45rem; border-radius: 999px;
+    background: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft);
+  }
+  .rules li b { color: var(--fg); font-weight: 700; }
+  .rules--deny li::before { background: var(--danger); box-shadow: 0 0 0 3px oklch(from var(--danger) l c h / .16); }
+
+  /* ---------- reveal ---------- */
+  .reveal { opacity: 0; transform: translateY(14px); transition: opacity .55s ease, transform .55s cubic-bezier(.22,1,.36,1); }
+  .reveal.is-in { opacity: 1; transform: none; }
+
+  /* ---------- footer ---------- */
+  footer { padding: var(--space-2xl) 0 var(--space-xl); color: var(--fg-muted); font-size: var(--text-sm); border-top: 1px solid var(--border-soft); margin-top: var(--space-xl); }
+  footer a { color: var(--primary); }
+
+  /* ---------- motion off ---------- */
+  body.no-motion .wire--flow, body.no-motion .wire--data, body.no-motion .wire--auth { animation: none; }
+  body.no-motion .pulse { animation: none; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .wire--flow, .wire--data, .wire--auth, .pulse { animation: none !important; }
+    .reveal { opacity: 1; transform: none; transition: none; }
+  }
+
+  .pulse { animation: pulse 2.6s ease-in-out infinite; transform-origin: center; }
+  @keyframes pulse { 0%,100% { opacity: .35; } 50% { opacity: 1; } }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar__inner">
+    <div class="brand">
+      <span class="brand__mark" aria-hidden="true">N</span>
+      Navio <span class="brand__sub">System Design</span>
+    </div>
+    <nav class="topnav" aria-label="Sections">
+      <a href="#topology">Topology</a>
+      <a href="#services">Services</a>
+      <a href="#routing">Routing</a>
+      <a href="#data">Data</a>
+      <a href="#events">Events</a>
+      <a href="#observability">Observability</a>
+      <a href="#failure">Failure</a>
+    </nav>
+    <button class="iconbtn" id="motionBtn" type="button" aria-pressed="false">Pause motion</button>
+    <button class="iconbtn" id="themeBtn" type="button">Theme</button>
+  </div>
+</header>
+
+<main class="shell">
+
+  <!-- ══════════════ HERO ══════════════ -->
+  <div class="hero">
+    <span class="eyebrow">Architecture v1.3 &middot; current state</span>
+    <h1>An EV-aware trip planner built as <em>seven Spring apps</em> behind one gateway.</h1>
+    <p>
+      Four domain services own their own schemas and never touch each other's tables. A Spring Cloud Gateway
+      is the only application entry point, Keycloak is the only credential authority, and Kafka carries
+      integration events only — written through a transactional outbox so a broker outage never blocks a commit.
+    </p>
+
+    <div class="stats">
+      <div class="stat"><div class="stat__n">7</div><div class="stat__l">Spring Boot apps running</div></div>
+      <div class="stat"><div class="stat__n">4</div><div class="stat__l">Domain services</div></div>
+      <div class="stat"><div class="stat__n">7</div><div class="stat__l">Isolated Postgres schemas</div></div>
+      <div class="stat"><div class="stat__n">4</div><div class="stat__l">Kafka event topics</div></div>
+      <div class="stat"><div class="stat__n">8&nbsp;GB</div><div class="stat__l">Application VM budget</div></div>
+    </div>
+  </div>
+
+  <!-- ══════════════ TOPOLOGY ══════════════ -->
+  <section id="topology" class="reveal">
+    <div class="sec-head">
+      <span class="sec-num">01 — Runtime topology</span>
+      <h2>How a request actually travels</h2>
+      <p>
+        Production ingress is <b>NGINX → Spring Cloud Gateway → Eureka-resolved service</b>. Development skips only the
+        NGINX hop. The gateway holds no domain schema and no business authorization — every service re-validates the
+        Keycloak JWT and enforces its own resource permissions.
+      </p>
+    </div>
+
+    <div class="panel">
+      <div class="diagram">
+        <svg id="flowSvg" viewBox="0 0 1120 470" role="img"
+             aria-label="Request flow: browser to NGINX to Spring Cloud Gateway, fanning out to four domain services plus a planned AI service, then to PostgreSQL and Kafka. Keycloak handles auth, Config Server and Eureka form the control plane.">
+
+          <!-- ---------- wires (drawn first, packets ride on top, boxes cover them) ---------- -->
+          <!-- main spine: client -> nginx -> gateway -> fan-out -->
+          <path class="wire wire--flow" d="M 24 236 H 612" />
+
+          <!-- gateway -> services -->
+          <path id="b1" class="wire wire--flow" d="M 612 236 C 638 236 640 53 672 53" />
+          <path id="b2" class="wire wire--flow" d="M 612 236 C 638 236 642 125 672 125" />
+          <path id="b3" class="wire wire--flow" d="M 612 236 C 640 236 646 197 672 197" />
+          <path id="b4" class="wire wire--flow" d="M 612 236 C 640 236 646 269 672 269" />
+          <path id="b5" class="wire wire--planned" d="M 612 236 C 640 236 646 341 672 341" />
+
+          <!-- auth branch -->
+          <path class="wire wire--auth" d="M 311 204 V 148" />
+
+          <!-- service bus -> data -->
+          <path class="wire wire--data" d="M 882 53 H 910" />
+          <path class="wire wire--data" d="M 882 125 H 910" />
+          <path class="wire wire--data" d="M 882 197 H 910" />
+          <path class="wire wire--data" d="M 882 269 H 910" />
+          <path class="wire wire--data" d="M 910 53 V 269" />
+          <path class="wire wire--data" d="M 910 128 H 942" />
+          <path class="wire wire--data" d="M 910 224 H 942" />
+
+          <!-- control plane -->
+          <path class="wire wire--ctrl" d="M 437 372 V 300 H 500 V 268" />
+          <path class="wire wire--ctrl" d="M 645 372 V 300 H 556 V 268" />
+          <path class="wire wire--ctrl" d="M 700 372 V 320 H 777 V 296" />
+
+          <!-- ---------- packets ---------- -->
+          <g id="packets">
+            <circle class="pkt--glow" r="9"><animateMotion dur="2.8s" repeatCount="indefinite" path="M 24 236 H 612" /></circle>
+            <circle class="pkt" r="4.5"><animateMotion dur="2.8s" repeatCount="indefinite" path="M 24 236 H 612" /></circle>
+            <circle class="pkt" r="4.5"><animateMotion dur="2.8s" begin="0.95s" repeatCount="indefinite" path="M 24 236 H 612" /></circle>
+            <circle class="pkt" r="4.5"><animateMotion dur="2.8s" begin="1.9s" repeatCount="indefinite" path="M 24 236 H 612" /></circle>
+
+            <circle class="pkt" r="4"><animateMotion dur="1.7s" begin="0.2s" repeatCount="indefinite" path="M 612 236 C 638 236 640 53 672 53" /></circle>
+            <circle class="pkt" r="4"><animateMotion dur="1.7s" begin="0.9s" repeatCount="indefinite" path="M 612 236 C 638 236 642 125 672 125" /></circle>
+            <circle class="pkt" r="4"><animateMotion dur="1.7s" begin="0.5s" repeatCount="indefinite" path="M 612 236 C 640 236 646 197 672 197" /></circle>
+            <circle class="pkt" r="4"><animateMotion dur="1.7s" begin="1.3s" repeatCount="indefinite" path="M 612 236 C 640 236 646 269 672 269" /></circle>
+
+            <circle class="pkt--auth" r="4"><animateMotion dur="1.5s" repeatCount="indefinite" path="M 311 204 V 148" /></circle>
+          </g>
+
+          <!-- ---------- path labels ---------- -->
+          <text class="p-label" x="190" y="226">https</text>
+          <text class="p-label" x="396" y="226">/v1/**</text>
+          <text class="p-label" x="322" y="176">/auth/**</text>
+          <text class="p-label" x="624" y="196" text-anchor="end">Eureka&nbsp;ID</text>
+          <text class="p-label" x="921" y="46" text-anchor="middle">jdbc</text>
+
+          <!-- ---------- nodes ---------- -->
+          <!-- client -->
+          <g>
+            <rect class="n-box n-box--edge" x="24" y="204" width="156" height="64" rx="14" />
+            <text class="n-title" x="42" y="232">Next.js 16</text>
+            <text class="n-sub"   x="42" y="250">browser + RSC proxy</text>
+          </g>
+
+          <!-- keycloak -->
+          <g>
+            <rect class="n-box n-box--auth" x="236" y="86" width="150" height="62" rx="14" />
+            <text class="n-title" x="252" y="114">Keycloak</text>
+            <text class="n-sub"   x="252" y="132">OIDC · roles · JWT</text>
+          </g>
+
+          <!-- nginx -->
+          <g>
+            <rect class="n-box n-box--edge" x="236" y="204" width="150" height="64" rx="14" />
+            <text class="n-title" x="252" y="232">NGINX</text>
+            <text class="n-sub"   x="252" y="250">TLS · :80/:443 · rate limit</text>
+          </g>
+
+          <!-- gateway -->
+          <g>
+            <rect class="n-box n-box--gate" x="442" y="204" width="170" height="64" rx="14" />
+            <text class="n-title" x="460" y="230">Cloud Gateway</text>
+            <text class="n-port"  x="460" y="250">:8080 · routes + CORS</text>
+          </g>
+
+          <!-- services -->
+          <g class="svc-hit" tabindex="0" role="button" data-svc="user" aria-label="User Management Service, port 8081">
+            <rect class="n-box n-box--svc" x="672" y="26" width="210" height="54" rx="13" />
+            <text class="n-title" x="690" y="50">User Management</text>
+            <text class="n-port"  x="690" y="68">:8081 · iam</text>
+          </g>
+          <g class="svc-hit" tabindex="0" role="button" data-svc="trip" aria-label="Trip Planning Service, port 8082">
+            <rect class="n-box n-box--svc" x="672" y="98" width="210" height="54" rx="13" />
+            <text class="n-title" x="690" y="122">Trip Planning</text>
+            <text class="n-port"  x="690" y="140">:8082 · trip</text>
+          </g>
+          <g class="svc-hit" tabindex="0" role="button" data-svc="ev" aria-label="Mobility and EV Service, port 8083">
+            <rect class="n-box n-box--svc" x="672" y="170" width="210" height="54" rx="13" />
+            <text class="n-title" x="690" y="194">Mobility &amp; EV</text>
+            <text class="n-port"  x="690" y="212">:8083 · ev</text>
+          </g>
+          <g class="svc-hit" tabindex="0" role="button" data-svc="community" aria-label="Community Service, port 8084">
+            <rect class="n-box n-box--svc" x="672" y="242" width="210" height="54" rx="13" />
+            <text class="n-title" x="690" y="266">Community</text>
+            <text class="n-port"  x="690" y="284">:8084 · social notif media</text>
+          </g>
+          <g class="svc-hit" tabindex="0" role="button" data-svc="ai" aria-label="AI Planning Service, planned, port 8085">
+            <rect class="n-box n-box--planned" x="672" y="314" width="210" height="54" rx="13" />
+            <text class="n-title" x="690" y="338" style="fill:var(--fg-faint)">AI Planning</text>
+            <text class="n-sub"   x="690" y="356">:8085 · planned</text>
+          </g>
+
+          <!-- data -->
+          <g>
+            <rect class="n-box n-box--data" x="942" y="96" width="154" height="64" rx="14" />
+            <text class="n-title" x="958" y="124">PostgreSQL</text>
+            <text class="n-sub"   x="958" y="142">16 + PostGIS · 7 schemas</text>
+          </g>
+          <g>
+            <rect class="n-box n-box--data" x="942" y="196" width="154" height="56" rx="14" />
+            <text class="n-title" x="958" y="220">Kafka</text>
+            <text class="n-sub"   x="958" y="238">single KRaft broker</text>
+          </g>
+
+          <!-- control plane -->
+          <g>
+            <rect class="n-box n-box--plat" x="352" y="372" width="170" height="52" rx="13" />
+            <text class="n-title" x="368" y="396">Config Server</text>
+            <text class="n-sub"   x="368" y="413">:8888 · git-backed</text>
+          </g>
+          <g>
+            <rect class="n-box n-box--plat" x="560" y="372" width="170" height="52" rx="13" />
+            <text class="n-title" x="576" y="396">Eureka</text>
+            <text class="n-sub"   x="576" y="413">:8761 · discovery</text>
+          </g>
+
+          <text class="p-label" x="352" y="446">control plane — boots before every domain service</text>
+        </svg>
+      </div>
+
+      <div class="legend">
+        <span><i class="swatch swatch--flow"></i> Application traffic <code class="code">/v1/**</code></span>
+        <span><i class="swatch swatch--auth"></i> Auth traffic <code class="code">/auth/**</code></span>
+        <span><i class="swatch swatch--data"></i> Owned persistence</span>
+        <span><i class="swatch swatch--ctrl"></i> Config &amp; discovery</span>
+        <span><i class="swatch swatch--plan"></i> Planned, not deployed</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ SERVICES ══════════════ -->
+  <section id="services" class="reveal">
+    <div class="sec-head">
+      <span class="sec-num">02 — Domain services</span>
+      <h2>Click a service to trace it end to end</h2>
+      <p>
+        Selecting a service dims everything it does not own — its gateway routes, its schemas, and the topics it
+        produces or consumes stay lit. Click again to clear.
+      </p>
+    </div>
+
+    <div class="grid grid--svc" id="svcGrid">
+
+      <button class="card-btn hit" data-svc="user" aria-pressed="false" type="button">
+        <div class="card__top">
+          <span class="card__ico" aria-hidden="true">UM</span>
+          <span><span class="card__name">User Management</span><br /><span class="card__port">:8081</span></span>
+        </div>
+        <p class="card__desc">
+          Creates the Navio profile from the Keycloak subject on first login. Owns profiles, handles, preferences,
+          saved vehicles, suspensions, and the audited admin facade over the Keycloak Admin API.
+        </p>
+        <div class="chips">
+          <span class="chip chip--schema">iam</span>
+          <span class="chip">never stores passwords</span>
+          <span class="chip chip--ok">running</span>
+        </div>
+      </button>
+
+      <button class="card-btn hit" data-svc="trip" aria-pressed="false" type="button">
+        <div class="card__top">
+          <span class="card__ico" aria-hidden="true">TP</span>
+          <span><span class="card__name">Trip Planning</span><br /><span class="card__port">:8082</span></span>
+        </div>
+        <p class="card__desc">
+          Trips, itinerary blocks, places, checklists, reservations, budget and expenses. Owns owner/editor/viewer
+          permissions, revision history, share links, the public Explore catalogue, and copy-to-my-trips.
+        </p>
+        <div class="chips">
+          <span class="chip chip--schema">trip</span>
+          <span class="chip">owner / editor / viewer</span>
+          <span class="chip chip--ok">running</span>
+        </div>
+      </button>
+
+      <button class="card-btn hit" data-svc="ev" aria-pressed="false" type="button">
+        <div class="card__top">
+          <span class="card__ico card__ico--info" aria-hidden="true">EV</span>
+          <span><span class="card__name">Mobility &amp; EV</span><br /><span class="card__port">:8083</span></span>
+        </div>
+        <p class="card__desc">
+          Place search and geocoding through the Maps adapter, route geometry and ETA, EV feasibility and charging
+          stops, plus a PostGIS charger read model with tile refresh, quotas and a Caffeine hot cache.
+        </p>
+        <div class="chips">
+          <span class="chip chip--schema">ev</span>
+          <span class="chip">provider calls on cache miss only</span>
+          <span class="chip chip--ok">running</span>
+        </div>
+      </button>
+
+      <button class="card-btn hit" data-svc="community" aria-pressed="false" type="button">
+        <div class="card__top">
+          <span class="card__ico card__ico--accent" aria-hidden="true">CO</span>
+          <span><span class="card__name">Community</span><br /><span class="card__port">:8084</span></span>
+        </div>
+        <p class="card__desc">
+          Groups, posts, threaded comments, votes, bookmarks, moderation and feed ranking — plus media upload
+          sessions and the embedded notification inbox. There is no standalone Notification service in v1.
+        </p>
+        <div class="chips">
+          <span class="chip chip--schema">social</span>
+          <span class="chip chip--schema">notif</span>
+          <span class="chip chip--schema">media</span>
+          <span class="chip chip--ok">running</span>
+        </div>
+      </button>
+
+      <button class="card-btn hit" data-svc="ai" aria-pressed="false" type="button">
+        <div class="card__top">
+          <span class="card__ico card__ico--warn" aria-hidden="true">AI</span>
+          <span><span class="card__name">AI Planning</span><br /><span class="card__port">:8085</span></span>
+        </div>
+        <p class="card__desc">
+          Provider-agnostic Spring AI service. Runs a bounded tool loop, streams over SSE, and returns
+          schema-validated <em>proposed</em> trip actions — Trip Planning still validates and applies them after
+          explicit user confirmation.
+        </p>
+        <div class="chips">
+          <span class="chip chip--schema">ai</span>
+          <span class="chip">Ollama or hosted provider</span>
+          <span class="chip chip--plan">planned</span>
+        </div>
+      </button>
+
+      <button class="card-btn hit" data-svc="platform" aria-pressed="false" type="button">
+        <div class="card__top">
+          <span class="card__ico" aria-hidden="true">PL</span>
+          <span><span class="card__name">Platform trio</span><br /><span class="card__port">:8080 · :8888 · :8761</span></span>
+        </div>
+        <p class="card__desc">
+          Gateway, Config Server and Eureka. Config Server boots first and never depends on Eureka, so the platform
+          always comes up in a deterministic order. All three are private; only NGINX is publicly reachable.
+        </p>
+        <div class="chips">
+          <span class="chip">no domain schema</span>
+          <span class="chip chip--ok">running</span>
+        </div>
+      </button>
+
+    </div>
+  </section>
+
+  <!-- ══════════════ ROUTING ══════════════ -->
+  <section id="routing" class="reveal">
+    <div class="sec-head">
+      <span class="sec-num">03 — Routing</span>
+      <h2>Stable public prefixes, explicit service IDs</h2>
+      <p>
+        Every public API lives under <code class="code">/v1</code>. Raw <code class="code">/serviceId/**</code>
+        discovery routes are never exposed. Only the share-token resolver may be anonymous.
+      </p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th scope="col">Public prefix</th><th scope="col">Gateway target</th><th scope="col">Owns</th></tr>
+        </thead>
+        <tbody id="routeTable">
+          <tr class="hit" data-svc="user">
+            <td><code>/v1/users/**</code> <code>/v1/admin/users/**</code></td>
+            <td>User Management :8081</td>
+            <td>Profiles, vehicles, role facade</td>
+          </tr>
+          <tr class="hit" data-svc="trip">
+            <td><code>/v1/trips/**</code> <code>/v1/public-trips/**</code> <code>/v1/share/**</code></td>
+            <td>Trip Planning :8082</td>
+            <td>Itineraries, Explore, share &amp; copy</td>
+          </tr>
+          <tr class="hit" data-svc="ev">
+            <td><code>/v1/places/**</code> <code>/v1/routes/**</code> <code>/v1/geo/**</code> <code>/v1/ev/**</code> <code>/v1/chargers/**</code></td>
+            <td>Mobility &amp; EV :8083</td>
+            <td>Discovery, routing, chargers</td>
+          </tr>
+          <tr class="hit" data-svc="community">
+            <td><code>/v1/community/**</code> <code>/v1/groups/**</code> <code>/v1/posts/**</code> <code>/v1/feed/**</code> <code>/v1/notifications/**</code> <code>/v1/media/**</code></td>
+            <td>Community :8084</td>
+            <td>Groups, feed, media, inbox</td>
+          </tr>
+          <tr class="hit" data-svc="ai">
+            <td><code>/v1/ai/**</code></td>
+            <td>AI Planning :8085 <span class="chip chip--plan">planned</span></td>
+            <td>Agent sessions, proposals</td>
+          </tr>
+          <tr class="hit" data-svc="platform">
+            <td><code>/auth/**</code></td>
+            <td>Keycloak through the edge auth route</td>
+            <td>Login, tokens, global roles</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══════════════ DATA ══════════════ -->
+  <section id="data" class="reveal">
+    <div class="sec-head">
+      <span class="sec-num">04 — Data ownership</span>
+      <h2>One database, seven walled schemas</h2>
+      <p>
+        A single PostgreSQL 16 + PostGIS instance keeps the 8&nbsp;GB VM affordable, but each service connects with a
+        database role scoped to the schemas it owns. Sharing an instance is an operational choice, not a licence to
+        share tables.
+      </p>
+    </div>
+
+    <div class="grid grid--2">
+      <div class="panel">
+        <div class="table-wrap" style="box-shadow:none;border:0">
+          <table>
+            <thead><tr><th scope="col">Schema</th><th scope="col">Owner</th><th scope="col">Holds</th></tr></thead>
+            <tbody id="schemaTable">
+              <tr class="hit" data-svc="user"><td><code>iam</code></td><td>User Management</td><td>Profiles, vehicles, suspensions, outbox</td></tr>
+              <tr class="hit" data-svc="trip"><td><code>trip</code></td><td>Trip Planning</td><td>Trips, permissions, revisions, outbox</td></tr>
+              <tr class="hit" data-svc="ev"><td><code>ev</code></td><td>Mobility &amp; EV</td><td>Chargers, geo tiles, reviews, outbox</td></tr>
+              <tr class="hit" data-svc="community"><td><code>social</code></td><td>Community</td><td>Groups, posts, votes, reports</td></tr>
+              <tr class="hit" data-svc="community"><td><code>notif</code></td><td>Community</td><td>Notifications, preferences, delivery log</td></tr>
+              <tr class="hit" data-svc="community"><td><code>media</code></td><td>Community</td><td>Assets and upload sessions</td></tr>
+              <tr class="hit" data-svc="ai"><td><code>ai</code></td><td>AI Planning</td><td>Prompts, sessions, usage, tool calls</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin:0 0 var(--space-md);font-size:var(--text-md);letter-spacing:-.02em">Boundary rules</h3>
+        <ul class="rules rules--deny">
+          <li><b>No cross-schema joins</b> — and no cross-schema foreign keys, reads or writes.</li>
+          <li><b>No shared tables</b> — Community never writes the <code class="code">trip</code> schema, even for a trip attachment.</li>
+          <li><b>No resource roles in Keycloak</b> — a <code class="code">trip-123-editor</code> realm role would be unbounded.</li>
+        </ul>
+        <h3 style="margin:var(--space-lg) 0 var(--space-md);font-size:var(--text-md);letter-spacing:-.02em">What replaces them</h3>
+        <ul class="rules">
+          <li><b>Soft references</b> — cross-domain IDs are validated through APIs or events, never FKs.</li>
+          <li><b>Disposable projections</b> — a consumer's copy of a public trip is a cache, not a second authority.</li>
+          <li><b>Local authorization</b> — the service that owns the resource owns the permission check.</li>
+          <li><b>Local search</b> — Trip owns Explore search, Community owns post search, EV owns geo search. No Elasticsearch in v1.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════ EVENTS ══════════════ -->
+  <section id="events" class="reveal">
+    <div class="sec-head">
+      <span class="sec-num">05 — Messaging</span>
+      <h2>The outbox is the source of truth, not Kafka</h2>
+      <p>
+        Kafka carries asynchronous integration events only — never logins, route calculations or AI streaming. One
+        KRaft broker is not highly available, so the domain transaction must survive without it.
+      </p>
+    </div>
+
+    <div class="panel">
+      <div class="diagram">
+        <svg viewBox="0 0 1120 250" role="img"
+             aria-label="Transactional outbox: one transaction writes domain state and an outbox row, a publisher relays unpublished rows to Kafka, marks them published after acknowledgement, and consumers deduplicate by event ID.">
+
+          <!-- transaction envelope -->
+          <rect x="20" y="34" width="290" height="150" rx="18"
+                fill="none" stroke="var(--primary)" stroke-width="1.5" stroke-dasharray="7 6" class="pulse" />
+          <text class="p-label" x="34" y="24" style="fill:var(--primary)">ONE TRANSACTION — commits or rolls back together</text>
+
+          <path class="wire wire--flow" d="M 310 109 H 380" />
+          <path class="wire wire--flow" d="M 570 109 H 640" />
+          <path class="wire wire--flow" d="M 830 109 H 900" />
+          <path class="wire" d="M 715 152 V 196 H 340 V 152" stroke-dasharray="4 6" stroke="var(--success)" />
+
+          <g id="packets2">
+            <circle class="pkt" r="4.5"><animateMotion dur="1.4s" repeatCount="indefinite" path="M 310 109 H 380" /></circle>
+            <circle class="pkt" r="4.5"><animateMotion dur="1.4s" begin=".45s" repeatCount="indefinite" path="M 570 109 H 640" /></circle>
+            <circle class="pkt" r="4.5"><animateMotion dur="1.4s" begin=".9s" repeatCount="indefinite" path="M 830 109 H 900" /></circle>
+          </g>
+
+          <g>
+            <rect class="n-box" x="40" y="52" width="250" height="52" rx="13" />
+            <text class="n-title" x="58" y="76">1 · Domain state</text>
+            <text class="n-sub"   x="58" y="94">trip / social / ev rows</text>
+          </g>
+          <g>
+            <rect class="n-box n-box--svc" x="40" y="116" width="250" height="52" rx="13" />
+            <text class="n-title" x="58" y="140">2 · Outbox row</text>
+            <text class="n-sub"   x="58" y="158">same schema, unpublished</text>
+          </g>
+          <g>
+            <rect class="n-box n-box--gate" x="380" y="80" width="190" height="58" rx="14" />
+            <text class="n-title" x="398" y="106">3 · Publisher</text>
+            <text class="n-sub"   x="398" y="124">relays unpublished rows</text>
+          </g>
+          <g>
+            <rect class="n-box n-box--data" x="640" y="80" width="190" height="58" rx="14" />
+            <text class="n-title" x="658" y="106">4 · Kafka topic</text>
+            <text class="n-sub"   x="658" y="124">acknowledged, short retention</text>
+          </g>
+          <g>
+            <rect class="n-box n-box--svc" x="900" y="80" width="196" height="58" rx="14" />
+            <text class="n-title" x="918" y="106">5 · Consumer</text>
+            <text class="n-sub"   x="918" y="124">records eventId, drops dupes</text>
+          </g>
+
+          <text class="p-label" x="340" y="216" style="fill:var(--success)">
+            marked published only after broker ack — Kafka down means backlog, never a failed commit
+          </text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="table-wrap" style="margin-top:var(--space-lg)">
+      <table>
+        <thead><tr><th scope="col">Topic</th><th scope="col">Producer</th><th scope="col">Consumers</th><th scope="col">Examples</th></tr></thead>
+        <tbody id="topicTable">
+          <tr class="hit" data-svc="user">
+            <td><code>user.events.v1</code></td><td>User Management</td><td>Trip · Community · Mobility &amp; EV</td>
+            <td class="mono" style="font-size:var(--text-xs)">UserRegistered · UserRoleChanged · UserSuspended</td>
+          </tr>
+          <tr class="hit" data-svc="trip">
+            <td><code>trip.events.v1</code></td><td>Trip Planning</td><td>Community</td>
+            <td class="mono" style="font-size:var(--text-xs)">TripPublished · TripUpdated · TripDeleted · TripCopied</td>
+          </tr>
+          <tr class="hit" data-svc="community">
+            <td><code>community.events.v1</code></td><td>Community</td><td>Notification / audit module</td>
+            <td class="mono" style="font-size:var(--text-xs)">PostCreated · CommentCreated · PostReported</td>
+          </tr>
+          <tr class="hit" data-svc="ev">
+            <td><code>mobility.events.v1</code></td><td>Mobility &amp; EV</td><td>Community / admin consumers</td>
+            <td class="mono" style="font-size:var(--text-xs)">ChargerSubmitted · ChargerVerified · ChargerStatusChanged</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p style="color:var(--fg-muted);font-size:var(--text-sm);margin-top:var(--space-md)">
+      Every event carries the same envelope: <span class="mono" style="font-size:var(--text-xs)">eventId · eventType ·
+      occurredAt · producer · partitionKey · traceId · payload</span>. Votes never emit per-action events — only
+      aggregate score snapshots, and only when another bounded context needs them.
+    </p>
+  </section>
+
+  <!-- ══════════════ OBSERVABILITY ══════════════ -->
+  <section id="observability" class="reveal">
+    <div class="sec-head">
+      <span class="sec-num">06 — Observability</span>
+      <h2>Mandatory, and deliberately not self-hosted in production</h2>
+      <p>
+        Logs, metrics and sampled traces all leave the VM through one Grafana Alloy collector. The full
+        Grafana/Loki/Prometheus stack runs locally in Compose for development — the 8&nbsp;GB application VM ships to a
+        hosted backend instead.
+      </p>
+    </div>
+
+    <div class="grid grid--3">
+      <div class="panel">
+        <div class="card__top"><span class="card__ico" aria-hidden="true">1</span><span class="card__name">Emit</span></div>
+        <p class="card__desc" style="margin-top:.6rem">
+          Structured JSON to stdout with service, environment, instance, request ID, trace ID and span ID.
+          Actuator exposes health, liveness, readiness and Prometheus metrics.
+        </p>
+      </div>
+      <div class="panel">
+        <div class="card__top"><span class="card__ico card__ico--accent" aria-hidden="true">2</span><span class="card__name">Collect</span></div>
+        <p class="card__desc" style="margin-top:.6rem">
+          Grafana Alloy tails container and system logs, scrapes metrics and exports sampled OTLP traces.
+          Local files are a short outage buffer only.
+        </p>
+      </div>
+      <div class="panel">
+        <div class="card__top"><span class="card__ico card__ico--info" aria-hidden="true">3</span><span class="card__name">Correlate</span></div>
+        <p class="card__desc" style="margin-top:.6rem">
+          W3C trace context is propagated through NGINX, the gateway, REST calls, Kafka headers and AI tool calls,
+          so one request ID stitches the whole path together.
+        </p>
+      </div>
+    </div>
+
+    <p style="color:var(--fg-muted);font-size:var(--text-sm);margin-top:var(--space-md)">
+      Logs redact bearer tokens, passwords, cookies, database credentials and model-provider keys.
+      Alerts watch HTTP latency and error rate, JVM and container resources, gateway failures, Eureka registrations,
+      <b>outbox backlog</b>, Kafka consumer lag, provider failures and disk space.
+    </p>
+  </section>
+
+  <!-- ══════════════ FAILURE ══════════════ -->
+  <section id="failure" class="reveal">
+    <div class="sec-head">
+      <span class="sec-num">07 — Failure behaviour</span>
+      <h2>What still works when something breaks</h2>
+      <p>
+        The design rule is blunt: failure of AI or observability must never disable a core Navio workflow.
+      </p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th scope="col">When this fails</th><th scope="col">The system does this</th></tr></thead>
+        <tbody>
+          <tr><td><b>NGINX</b></td><td>Public ingress stops; the private gateway stays healthy and reachable internally.</td></tr>
+          <tr><td><b>Spring Cloud Gateway</b></td><td>Public APIs fail; domain services keep running privately.</td></tr>
+          <tr><td><b>Config Server</b></td><td>Running services keep their loaded configuration; only new starts and refresh fail — and alert.</td></tr>
+          <tr><td><b>Eureka</b></td><td>Cached discovery works briefly; new registrations fail and alert.</td></tr>
+          <tr><td><b>Keycloak</b></td><td>Unexpired JWTs keep working; new logins, refreshes and role changes fail.</td></tr>
+          <tr><td><b>Kafka</b></td><td>Transactions still commit. Outbox rows queue up; projections and notifications lag.</td></tr>
+          <tr><td><b>Maps / charger provider</b></td><td>Serve cached or stale data, or return a controlled partial result.</td></tr>
+          <tr><td><b>AI Planning or Ollama</b></td><td>AI endpoints degrade through the circuit breaker. All four core domains are unaffected.</td></tr>
+          <tr><td><b>Hosted observability backend</b></td><td>Traffic continues; Alloy retries from bounded local buffers without blocking requests.</td></tr>
+          <tr><td><b>PostgreSQL</b></td><td>Stateful operations are unavailable. Alert and restore — this is the one hard single point of failure.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel" style="margin-top:var(--space-lg)">
+      <h3 style="margin:0 0 var(--space-md);font-size:var(--text-md);letter-spacing:-.02em">Startup order</h3>
+      <div class="steps">
+        <div class="step"><div><b>Infrastructure</b><span>PostgreSQL/PostGIS, Kafka, Keycloak, secrets, private network.</span></div></div>
+        <div class="step"><div><b>Config Server</b><span>Fixed private address, git-backed, never depends on Eureka.</span></div></div>
+        <div class="step"><div><b>Eureka</b><span>Loads its own configuration, then accepts registrations.</span></div></div>
+        <div class="step"><div><b>Domain services</b><span>Load configuration, register, expose health.</span></div></div>
+        <div class="step"><div><b>Gateway, then NGINX</b><span>Routes resolve through Eureka; the edge goes last.</span></div></div>
+        <div class="step"><div><b>Telemetry verification</b><span>Confirm logs, metrics and traces are arriving before declaring the deploy good.</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p style="margin:0 0 .4rem">
+      <b>Source of truth:</b> <span class="mono" style="font-size:var(--text-xs)">docs/summary/Navio Architecture.md</span> (v1.3),
+      the deployed <span class="mono" style="font-size:var(--text-xs)">server/</span> modules, and
+      <span class="mono" style="font-size:var(--text-xs)">docker-compose.yml</span>.
+    </p>
+    <p style="margin:0">
+      Frontend: Next.js 16 · React 19 · TanStack Query · Jotai · Auth.js + Keycloak · shadcn/Base UI · Tailwind v4 tokens.
+      Backend: Java 21+ · Spring Boot 3 · Spring Cloud Gateway, Config, Eureka.
+    </p>
+  </footer>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- theme ---------- */
+  var root = document.documentElement;
+  var themeBtn = document.getElementById("themeBtn");
+  var stored = null;
+  try { stored = localStorage.getItem("navio-design-theme"); } catch (e) { /* storage blocked */ }
+  if (stored === "dark" || stored === "light") root.setAttribute("data-theme", stored);
+
+  themeBtn.addEventListener("click", function () {
+    var isDark = root.getAttribute("data-theme") === "dark" ||
+      (!root.hasAttribute("data-theme") && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    var next = isDark ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("navio-design-theme", next); } catch (e) { /* ignore */ }
+  });
+
+  /* ---------- motion toggle ---------- */
+  var motionBtn = document.getElementById("motionBtn");
+  var svgs = Array.prototype.slice.call(document.querySelectorAll("svg"));
+  var paused = false;
+
+  function setMotion(off) {
+    paused = off;
+    document.body.classList.toggle("no-motion", off);
+    svgs.forEach(function (svg) {
+      if (typeof svg.pauseAnimations !== "function") return;
+      try { off ? svg.pauseAnimations() : svg.unpauseAnimations(); } catch (e) { /* SMIL unsupported */ }
+    });
+    motionBtn.textContent = off ? "Play motion" : "Pause motion";
+    motionBtn.setAttribute("aria-pressed", String(off));
+  }
+
+  motionBtn.addEventListener("click", function () { setMotion(!paused); });
+
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) setMotion(true);
+
+  /* ---------- service focus ---------- */
+  var cards = Array.prototype.slice.call(document.querySelectorAll(".card-btn[data-svc]"));
+  var targets = Array.prototype.slice.call(document.querySelectorAll(".hit[data-svc]"));
+  var svcNodes = Array.prototype.slice.call(document.querySelectorAll(".svc-hit[data-svc]"));
+  var active = null;
+
+  /* platform selection should also light up every infrastructure row */
+  function matches(el, svc) {
+    return el.getAttribute("data-svc") === svc;
+  }
+
+  function applyFocus(svc) {
+    active = svc;
+    targets.forEach(function (el) {
+      var on = !svc || matches(el, svc);
+      el.classList.toggle("dim", !on);
+    });
+    svcNodes.forEach(function (el) {
+      el.classList.toggle("dim", !!svc && !matches(el, svc));
+    });
+    cards.forEach(function (c) {
+      c.setAttribute("aria-pressed", String(c.getAttribute("data-svc") === svc));
+    });
+  }
+
+  cards.forEach(function (card) {
+    card.addEventListener("click", function () {
+      var svc = card.getAttribute("data-svc");
+      applyFocus(active === svc ? null : svc);
+    });
+  });
+
+  svcNodes.forEach(function (node) {
+    function pick() {
+      var svc = node.getAttribute("data-svc");
+      applyFocus(active === svc ? null : svc);
+      var card = document.querySelector('.card-btn[data-svc="' + svc + '"]');
+      if (card) card.scrollIntoView({ block: "center", behavior: paused ? "auto" : "smooth" });
+    }
+    node.addEventListener("click", pick);
+    node.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); }
+    });
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && active) applyFocus(null);
+  });
+
+  /* ---------- scroll reveal ---------- */
+  var sections = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+  if (!("IntersectionObserver" in window)) {
+    sections.forEach(function (s) { s.classList.add("is-in"); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) { entry.target.classList.add("is-in"); io.unobserve(entry.target); }
+      });
+    }, { rootMargin: "0px 0px -12% 0px", threshold: 0.08 });
+    sections.forEach(function (s) { io.observe(s); });
+  }
+
+  /* ---------- active nav link ---------- */
+  var links = Array.prototype.slice.call(document.querySelectorAll(".topnav a"));
+  var byId = {};
+  links.forEach(function (a) { byId[a.getAttribute("href").slice(1)] = a; });
+
+  if ("IntersectionObserver" in window) {
+    var navIo = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var link = byId[entry.target.id];
+        if (!link) return;
+        if (entry.isIntersecting) {
+          links.forEach(function (l) { l.classList.remove("is-active"); });
+          link.classList.add("is-active");
+        }
+      });
+    }, { rootMargin: "-45% 0px -50% 0px" });
+    Object.keys(byId).forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) navIo.observe(el);
+    });
+  }
+})();
+</script>
+</body>
+</html>
