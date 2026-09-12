@@ -252,6 +252,7 @@ erDiagram
 | `iam`    | `user_roles`               | Read-only synchronized snapshot of Keycloak global roles                                                                |
 | `iam`    | `user_bans`                | Suspension history coordinated with Keycloak account disablement                                                        |
 | `iam`    | `user_vehicles`            | Reusable saved EV/vehicle profiles and default selection                                                                |
+| `iam`    | `user_saved_places`        | Reusable personal start/end anchors (home, work, custom) — never published                                              |
 | `iam`    | `audit_log`                | User/role/suspension security audit                                                                                      |
 | `iam`    | `outbox`                   | Transactional event outbox for `user.events.v1`                                                                         |
 | `media`  | `media_assets`             | Uploaded file metadata and processing status                                                                            |
@@ -993,6 +994,38 @@ Reusable vehicle profiles belonging to a user. Trip Planning copies the selected
 
 - `(user_id, deleted_at)` for the garage listing.
 - Partial unique index enforcing at most one active default vehicle per user.
+
+---
+
+## 8.4a `iam.user_saved_places`
+
+### Purpose
+
+Reusable personal anchors — where a user's travel days start and end (home, work, anywhere recurring). Trip Planning copies the resolved name and coordinates into the day anchor on `trip.list_block` rather than referencing this row, so correcting an address later never rewrites a trip that was already planned.
+
+**These rows can hold a real home address.** They are owner-only, are never exposed on a public profile, and a day anchor derived from one (`kind = 'SAVED_PLACE'`) must be stripped from any shared or published trip snapshot rather than serialised.
+
+| Column | Type | Required | Description |
+| --- | ---: | ---: | --- |
+| `id` | `UUID` | Yes | Saved place ID |
+| `user_id` | `UUID` | Yes | FK to `iam.users` |
+| `label` | `VARCHAR(80)` | Yes | What the user calls it |
+| `kind` | `VARCHAR(20)` | Yes | `HOME`, `WORK` or `CUSTOM` |
+| `name` | `VARCHAR(255)` | Yes | Resolved place name |
+| `address` | `VARCHAR(512)` | No | Formatted address |
+| `lat` | `DOUBLE PRECISION` | Yes | Latitude, checked to ±90 |
+| `lng` | `DOUBLE PRECISION` | Yes | Longitude, checked to ±180 |
+| `provider_place_id` | `VARCHAR(512)` | No | Provider id when resolved from a search |
+| `is_default` | `BOOLEAN` | Yes | The user's default start point |
+| `created_at` | `TIMESTAMPTZ` | Yes | Creation time |
+| `updated_at` | `TIMESTAMPTZ` | Yes | Last update time |
+| `deleted_at` | `TIMESTAMPTZ` | No | Soft removal timestamp |
+
+### Indexes
+
+- `(user_id, deleted_at)` for the listing.
+- Partial unique index enforcing at most one active default per user.
+- Partial unique index on `(user_id, kind)` for `HOME` and `WORK`, which are singletons.
 
 ---
 

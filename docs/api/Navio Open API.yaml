@@ -40,6 +40,267 @@ tags:
 - name: Geo Provider
 - name: Budgeting
 paths:
+  /v1/groups/{slug}/banner:
+    parameters:
+    - name: slug
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - Community Service
+      summary: Read a visible group banner
+      security:
+      - {}
+      responses:
+        '200':
+          description: 'Validated, re-encoded image; Cache-Control: no-store and X-Content-Type-Options:
+            nosniff.'
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags:
+      - Community Service
+      summary: Upload a group banner as an authorized content editor
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '413':
+          description: Picture too large
+        '503':
+          description: Picture storage unavailable
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupDetailResponse'
+    delete:
+      tags:
+      - Community Service
+      summary: Remove a group banner as an authorized content editor
+      responses:
+        '204':
+          description: Banner and stored image removed
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /v1/users/by-subject/{subject}:
+    parameters:
+    - name: subject
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      tags:
+      - User Management Service
+      summary: Resolve a community author sign-in subject to their public profile
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicUserProfile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/users/{userId}/picture:
+    parameters:
+    - name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      tags:
+      - User Management Service
+      summary: Read a public-profile picture as a signed-in user
+      responses:
+        '200':
+          description: 'Validated, re-encoded image; Cache-Control: no-store and X-Content-Type-Options: nosniff.'
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/users/me/picture:
+    post:
+      tags:
+      - User Management Service
+      summary: Upload your profile picture (PNG/JPEG, maximum 5 MiB)
+      description: Target is derived from the validated session. Server decodes pixels, enforces 4096 per side and
+        12 megapixel limits, and re-encodes the picture. Client filenames, MIME types and media IDs grant no authority.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '413':
+          description: Picture too large
+    get:
+      tags:
+      - User Management Service
+      summary: Read your stored profile picture
+      responses:
+        '200':
+          description: 'Validated, re-encoded image; Cache-Control: no-store and X-Content-Type-Options: nosniff.'
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+      - Community Service
+      summary: Remove your profile picture
+      responses:
+        '204':
+          description: Removed
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/posts/{postId}/image:
+    parameters:
+    - name: postId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      tags:
+      - Community Service
+      summary: Read the post picture with the same visibility checks as the post
+      security:
+      - {}
+      responses:
+        '200':
+          description: 'Validated, re-encoded image; Cache-Control: no-store and X-Content-Type-Options: nosniff.'
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/posts/{postId}/comments/{commentId}/vote:
+    parameters:
+    - name: postId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: commentId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      tags:
+      - Community Service
+      summary: Set a comment vote as an active member
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityCommentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunityVoteRequest'
   /v1/trips:
     post:
       tags:
@@ -982,7 +1243,82 @@ paths:
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
+  /v1/users/me/vehicles/catalog:
+    get:
+      tags: [User Management Service]
+      summary: List the bounded, curated Thailand EV catalogue
+      operationId: listVehicleCatalog
+      responses:
+        '200':
+          description: Official specifications with source URLs and verification dates; unknown values are null
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VehicleCatalogEntry'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/users/me/vehicles/catalog/{catalogId}:
+    post:
+      tags: [User Management Service]
+      summary: Save and select an official catalogue vehicle
+      description: Specifications are resolved server-side and snapshotted. Repeated selection reuses the saved entry. Consumption is supplied by the driver, not derived from test range.
+      operationId: addCatalogVehicle
+      parameters:
+      - name: catalogId
+        in: path
+        required: true
+        schema: {type: string}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [consumptionKwhPer100km]
+              properties:
+                nickname: {type: string, maxLength: 100}
+                consumptionKwhPer100km: {type: number, exclusiveMinimum: 0, maximum: 99999.999}
+                startingBatteryPct: {type: integer, minimum: 0, maximum: 100, default: 80}
+      responses:
+        '201':
+          description: Saved vehicle, also returned when an existing catalogue entry is selected again
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserVehicle'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          description: Catalogue entry unavailable or garage full
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
   /v1/users/me/vehicles/{vehicleId}:
+    get:
+      tags: [User Management Service]
+      summary: Get an owned vehicle
+      operationId: getCurrentUserVehicle
+      parameters:
+      - name: vehicleId
+        in: path
+        required: true
+        schema: {type: string, format: uuid}
+      responses:
+        '200':
+          description: Saved vehicle
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserVehicle'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
     patch:
       tags:
       - User Management Service
@@ -999,7 +1335,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserVehicleInput'
+              $ref: '#/components/schemas/UserVehiclePatch'
       responses:
         '200':
           description: Vehicle updated
@@ -1007,6 +1343,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserVehicle'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1025,6 +1363,122 @@ paths:
       responses:
         '204':
           description: Vehicle removed
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/users/me/places:
+    get:
+      tags: [User Management Service]
+      summary: List saved personal anchors
+      description: >-
+        The caller's reusable start and end points (home, work, anywhere they
+        travel from often). Owner-only; these rows can hold a home address and
+        are never exposed on a profile, a share link, or a published template.
+      operationId: listCurrentUserSavedPlaces
+      responses:
+        '200':
+          description: Saved places
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserSavedPlace'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags: [User Management Service]
+      summary: Add a saved personal anchor
+      description: >-
+        HOME and WORK are singletons per user; CUSTOM is unconstrained up to 50
+        saved places. The first place saved becomes the default start point.
+      operationId: addCurrentUserSavedPlace
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSavedPlaceInput'
+      responses:
+        '201':
+          description: Saved place created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSavedPlace'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/users/me/places/{placeId}:
+    get:
+      tags: [User Management Service]
+      summary: Get an owned saved place
+      operationId: getCurrentUserSavedPlace
+      parameters:
+      - name: placeId
+        in: path
+        required: true
+        schema: {type: string, format: uuid}
+      responses:
+        '200':
+          description: Saved place
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSavedPlace'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: >-
+            Returned both when the place does not exist and when it belongs to
+            another user; the two are deliberately indistinguishable.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      tags: [User Management Service]
+      summary: Update a saved place
+      description: lat and lng must be supplied together; one without the other is rejected.
+      operationId: updateCurrentUserSavedPlace
+      parameters:
+      - name: placeId
+        in: path
+        required: true
+        schema: {type: string, format: uuid}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSavedPlacePatch'
+      responses:
+        '200':
+          description: Saved place updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSavedPlace'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags: [User Management Service]
+      summary: Remove a saved place
+      operationId: deleteCurrentUserSavedPlace
+      parameters:
+      - name: placeId
+        in: path
+        required: true
+        schema: {type: string, format: uuid}
+      responses:
+        '204':
+          description: Saved place removed
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2445,57 +2899,109 @@ paths:
                 value:
                   reason: Verified by admin from submitted photo
   /v1/posts:
+    get:
+      tags:
+      - Community Service
+      summary: List or search persistent community posts
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityPostPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - {}
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        schema:
+          type: integer
+          default: 20
+          minimum: 1
+          maximum: 100
+      - name: group
+        in: query
+        description: Optional group slug; omitted lists active groups and excludes the caller's muted groups.
+        schema:
+          type: string
+      - name: q
+        in: query
+        schema:
+          type: string
+          maxLength: 200
+      - name: sort
+        in: query
+        schema:
+          type: string
+          enum:
+          - new
+          - top
+          - best
+          default: new
     post:
       tags:
       - Community Service
-      summary: Create post
-      description: Creates a community post, optionally linked to a trip for manual share-to-community flow.
-      operationId: postPosts
+      summary: Publish a post as an active group member
       responses:
         '201':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Post'
-              examples:
-                default:
-                  value:
-                    id: post_01HX
-                    tripId: trip_01HX
-                    authorUserId: user_123
-                    authorDisplayName: Somchai
-                    title: Bangkok to Hua Hin EV Weekend
-                    body: Sharing my EV-friendly route with one charging stop.
-                    tags:
-                    - ev-trip
-                    score: 18
-                    commentCount: 5
-                    bookmarkedByMe: false
-                    createdAt: '2026-05-07T05:00:00Z'
-                    updatedAt: '2026-05-07T05:00:00Z'
+                $ref: '#/components/schemas/CommunityPostResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '400':
-          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '413':
+          description: Picture exceeds 5 MiB
+        '503':
+          description: Picture storage unavailable
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostRequest'
-            examples:
-              default:
-                value:
-                  tripId: trip_01HX
-                  title: Bangkok to Hua Hin EV Weekend
-                  body: Sharing my EV-friendly route with one charging stop.
-                  tags:
-                  - ev-trip
-                  - hua-hin
-                  visibility: public
+              $ref: '#/components/schemas/CommunityCreatePostRequest'
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - post
+              - file
+              properties:
+                post:
+                  $ref: '#/components/schemas/CommunityCreatePostRequest'
+                file:
+                  type: string
+                  format: binary
+            encoding:
+              post:
+                contentType: application/json
+              file:
+                contentType: image/png, image/jpeg
+      description: Group status and active membership are checked in the write transaction. Optional PNG/JPEG is decoded
+        and re-encoded before storage. Unsupported files return 400; files above 5 MiB return 413; unavailable object
+        storage returns 503.
   /v1/feed:
     get:
       tags:
@@ -2567,246 +3073,200 @@ paths:
           default:
             value: 20
   /v1/posts/{postId}:
+    parameters:
+    - name: postId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
     get:
       tags:
       - Community Service
-      summary: Get post
-      description: Returns a community post by ID.
-      operationId: getPostsPostId
+      summary: Read a visible post
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Post'
-              examples:
-                default:
-                  value:
-                    id: post_01HX
-                    tripId: trip_01HX
-                    authorUserId: user_123
-                    authorDisplayName: Somchai
-                    title: Bangkok to Hua Hin EV Weekend
-                    body: Sharing my EV-friendly route with one charging stop.
-                    tags:
-                    - ev-trip
-                    score: 18
-                    commentCount: 5
-                    bookmarkedByMe: false
-                    createdAt: '2026-05-07T05:00:00Z'
-                    updatedAt: '2026-05-07T05:00:00Z'
+                $ref: '#/components/schemas/CommunityPostResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
-      parameters:
-      - name: postId
-        in: path
+      security:
+      - {}
+    patch:
+      tags:
+      - Community Service
+      summary: Edit your own post
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityPostResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      requestBody:
         required: true
-        schema:
-          type: string
-        description: postId path parameter
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunityUpdatePostRequest'
     delete:
       tags:
       - Community Service
-      summary: Delete post
-      description: 'Moderator/admin deletes a post.
-
-
-        Requires `MODERATOR` or `ADMIN` role.'
-      operationId: deletePostsPostId
+      summary: Delete your post or moderate a post in your group
       responses:
         '204':
-          description: Success - no response body
+          description: Removed
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
-      parameters:
-      - name: postId
-        in: path
-        required: true
-        schema:
-          type: string
-        description: postId path parameter
   /v1/posts/{postId}/comments:
+    parameters:
+    - name: postId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
     get:
       tags:
       - Community Service
-      summary: List post comments
-      description: Lists top-level comments or replies by parentId.
-      operationId: getPostsPostIdComments
+      summary: Read paginated comments, including deleted parent placeholders
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CommentList'
-              examples:
-                default:
-                  value:
-                    items: []
-                    meta:
-                      page: 0
-                      size: 20
-                      totalItems: 0
-                      totalPages: 0
-                      hasNext: false
+                $ref: '#/components/schemas/CommunityCommentPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
+      security:
+      - {}
       parameters:
-      - name: postId
-        in: path
-        required: true
-        schema:
-          type: string
-        description: postId path parameter
-      - name: parentId
+      - name: page
         in: query
-        required: false
         schema:
-          type: string
-        description: Parent comment ID
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        schema:
+          type: integer
+          default: 20
+          minimum: 1
+          maximum: 100
     post:
       tags:
       - Community Service
-      summary: Create post comment
-      description: Creates a top-level comment or nested reply on a post.
-      operationId: postPostsPostIdComments
+      summary: Add a comment or reply as an active group member
       responses:
         '201':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Comment'
-              examples:
-                default:
-                  value:
-                    id: cmt_01HX
-                    resourceId: chg_01HX
-                    userId: user_123
-                    parentCommentId: null
-                    body: Is this charger open after midnight?
-                    createdAt: '2026-05-07T05:00:00Z'
+                $ref: '#/components/schemas/CommunityCommentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
-      parameters:
-      - name: postId
-        in: path
-        required: true
-        schema:
-          type: string
-        description: postId path parameter
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PostCommentRequest'
-            examples:
-              default:
-                value:
-                  parentCommentId: null
-                  body: Can I copy this trip for my own route?
+              $ref: '#/components/schemas/CommunityCommentRequest'
   /v1/posts/{postId}/comments/{commentId}:
+    parameters:
+    - name: postId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: commentId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
     delete:
       tags:
       - Community Service
-      summary: Delete post comment
-      description: Deletes own comment or moderator/admin deletes it.
-      operationId: deletePostsPostIdCommentsCommentId
+      summary: Remove your comment or moderate it; retain replies
       responses:
         '204':
-          description: Success - no response body
+          description: Removed
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
-      parameters:
-      - name: postId
-        in: path
-        required: true
-        schema:
-          type: string
-        description: postId path parameter
-      - name: commentId
-        in: path
-        required: true
-        schema:
-          type: string
-        description: commentId path parameter
   /v1/posts/{postId}/vote:
+    parameters:
+    - name: postId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
     put:
       tags:
       - Community Service
-      summary: Vote on post
-      description: Upserts current user's vote. direction=1 upvote, -1 downvote, 0 retract.
-      operationId: putPostsPostIdVote
+      summary: Set your vote to -1, 0 or 1; repeated values are idempotent
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/VoteResponse'
-              examples:
-                default:
-                  value:
-                    postId: post_01HX
-                    myVote: 1
-                    score: 19
+                $ref: '#/components/schemas/CommunityPostResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
-        '400':
-          $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
-      parameters:
-      - name: postId
-        in: path
-        required: true
-        schema:
-          type: string
-        description: postId path parameter
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VoteRequest'
-            examples:
-              default:
-                value:
-                  direction: 1
+              $ref: '#/components/schemas/CommunityVoteRequest'
   /v1/posts/{postId}/report:
     post:
       tags:
@@ -4769,6 +5229,213 @@ components:
       name: X-Internal-Auth
       description: Shared secret for service-to-service calls on localhost
   schemas:
+    GroupDetailResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+        bannerUrl:
+          type:
+          - string
+          - 'null'
+        bannerMediaId:
+          type:
+          - string
+          - 'null'
+          format: uuid
+      additionalProperties: true
+    CommunityPostResponse:
+      type: object
+      required:
+      - id
+      - groupId
+      - authorId
+      - groupSlug
+      - groupName
+      - title
+      - body
+      - linkUrl
+      - sharedTripId
+      - imageUrl
+      - flairId
+      - createdAt
+      - updatedAt
+      - upvotes
+      - commentCount
+      - viewerVote
+      properties:
+        id: &id001
+          type: string
+          format: uuid
+        groupId: *id001
+        authorId: *id001
+        groupSlug:
+          type: string
+        groupName:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        linkUrl: &id002
+          type:
+          - string
+          - 'null'
+        sharedTripId: *id002
+        imageUrl: *id002
+        flairId: &id003
+          type:
+          - string
+          - 'null'
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        upvotes:
+          type: integer
+        commentCount:
+          type: integer
+        viewerVote:
+          type: integer
+    CommunityCommentResponse:
+      type: object
+      required:
+      - id
+      - postId
+      - authorId
+      - parentCommentId
+      - body
+      - deleted
+      - createdAt
+      - upvotes
+      - viewerVote
+      properties:
+        id: *id001
+        postId: *id001
+        authorId: *id001
+        parentCommentId: *id003
+        body:
+          type: string
+        deleted:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        upvotes:
+          type: integer
+        viewerVote:
+          type: integer
+    CommunityUpdatePostRequest:
+      type: object
+      required:
+      - title
+      - body
+      properties:
+        title: &id004
+          type: string
+          minLength: 1
+          maxLength: 300
+        body: &id005
+          type: string
+          maxLength: 40000
+    CommunityCreatePostRequest:
+      type: object
+      required:
+      - groupSlug
+      - title
+      - body
+      properties:
+        requestId:
+          type: string
+          format: uuid
+          description: Stable identifier for retrying an unchanged publish request.
+        title: *id004
+        body: *id005
+        groupSlug:
+          type: string
+          minLength: 1
+          maxLength: 140
+        linkUrl:
+          type:
+          - string
+          - 'null'
+          maxLength: 2048
+          pattern: ^https?://[^\s]+$
+        flairId: *id003
+        sharedTripId:
+          type:
+          - string
+          - 'null'
+          maxLength: 160
+    CommunityVoteRequest:
+      type: object
+      required:
+      - value
+      properties:
+        value:
+          type: integer
+          minimum: -1
+          maximum: 1
+    CommunityCommentRequest:
+      type: object
+      required:
+      - body
+      properties:
+        body:
+          type: string
+          minLength: 1
+          maxLength: 10000
+        parentCommentId: *id003
+    CommunityPostPage:
+      type: object
+      required:
+      - content
+      - number
+      - totalElements
+      - totalPages
+      - last
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommunityPostResponse'
+        number:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+        last:
+          type: boolean
+    CommunityCommentPage:
+      type: object
+      required:
+      - content
+      - number
+      - totalElements
+      - totalPages
+      - last
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommunityCommentResponse'
+        number:
+          type: integer
+        totalElements:
+          type: integer
+        totalPages:
+          type: integer
+        last:
+          type: boolean
     ErrorResponse:
       type: object
       properties:
@@ -5202,14 +5869,9 @@ components:
           type: string
           minLength: 1
           maxLength: 500
-    UserVehicleInput:
+    UserVehiclePatch:
       type: object
-      required:
-      - make
-      - model
-      - batteryCapacityKwh
-      - rangeKm
-      - connectorTypes
+      description: All fields are optional on PATCH. Null leaves the existing value unchanged. Editing official specifications converts the vehicle to a custom entry.
       properties:
         nickname:
           type: [string, "null"]
@@ -5221,38 +5883,139 @@ components:
           type: [integer, "null"]
         batteryCapacityKwh:
           type: number
-          minimum: 1
+          minimum: 0.1
+          maximum: 999999.99
         rangeKm:
           type: number
-          minimum: 1
-        consumptionKwhPer100Km:
+          minimum: 0.1
+          maximum: 999999.99
+        consumptionKwhPer100km:
           type: [number, "null"]
+          exclusiveMinimum: 0
+          maximum: 99999.999
         connectorTypes:
           type: array
           minItems: 1
           items:
             type: string
-        defaultVehicle:
+        isDefault:
           type: boolean
           default: false
+        settings:
+          $ref: '#/components/schemas/VehicleSettings'
+    UserVehicleInput:
+      allOf:
+      - $ref: '#/components/schemas/UserVehiclePatch'
+      - type: object
+        required: [make, model, batteryCapacityKwh, rangeKm, connectorTypes]
     UserVehicle:
       allOf:
       - $ref: '#/components/schemas/UserVehicleInput'
       - type: object
         required:
         - id
-        - userId
+        - isDefault
+        - settings
         properties:
           id:
             type: string
-          userId:
-            type: string
+            format: uuid
+          catalog:
+            oneOf:
+            - $ref: '#/components/schemas/VehicleCatalogEntry'
+            - type: 'null'
           createdAt:
             type: string
             format: date-time
           updatedAt:
             type: string
             format: date-time
+    UserSavedPlacePatch:
+      type: object
+      description: >-
+        All fields are optional on PATCH; null leaves the existing value
+        unchanged. lat and lng must be sent together — one without the other is
+        rejected, because a half-move would leave the row naming a place at
+        coordinates that belong to a different one.
+      properties:
+        label:
+          type: string
+          maxLength: 80
+          description: What the user calls it — "Home", "Mum's house".
+        kind:
+          type: string
+          enum: [HOME, WORK, CUSTOM]
+          description: HOME and WORK are singletons per user.
+        name:
+          type: string
+          maxLength: 255
+          description: The resolved place name, which may differ from the label.
+        address:
+          type: [string, 'null']
+          maxLength: 512
+        lat:
+          type: number
+          minimum: -90
+          maximum: 90
+        lng:
+          type: number
+          minimum: -180
+          maximum: 180
+        providerPlaceId:
+          type: [string, 'null']
+          maxLength: 512
+        isDefault:
+          type: boolean
+    UserSavedPlaceInput:
+      allOf:
+      - $ref: '#/components/schemas/UserSavedPlacePatch'
+      - type: object
+        required: [label, name, lat, lng]
+    UserSavedPlace:
+      allOf:
+      - $ref: '#/components/schemas/UserSavedPlaceInput'
+      - type: object
+        required: [id, kind, isDefault]
+        properties:
+          id:
+            type: string
+            format: uuid
+          createdAt:
+            type: string
+            format: date-time
+          updatedAt:
+            type: string
+            format: date-time
+    VehicleSettings:
+      type: object
+      description: Settings are merged on PATCH. Unknown limits and images are null; zero means unsupported charging.
+      properties:
+        maxAcKw: {type: [number, 'null'], minimum: 0, maximum: 1000}
+        maxDcKw: {type: [number, 'null'], minimum: 0, maximum: 2000}
+        startingBatteryPct: {type: integer, minimum: 0, maximum: 100, default: 80}
+        imageUrl: {type: [string, 'null'], maxLength: 2048, description: 'HTTPS image URL or /images/vehicles/<name>.png or .webp; empty string clears the image'}
+    VehicleCatalogEntry:
+      type: object
+      required: [id, make, model, trim, market, batteryCapacityKwh, batteryCapacityBasis, rangeKm, rangeStandard, connectorTypes, imageUrl, sourceUrl, verifiedAt]
+      properties:
+        id: {type: string}
+        make: {type: string}
+        model: {type: string}
+        trim: {type: string}
+        year: {type: [integer, 'null'], description: 'Null when the source does not establish a model year'}
+        market: {type: string, enum: [TH]}
+        batteryCapacityKwh: {type: number}
+        batteryCapacityBasis: {type: string, enum: [MANUFACTURER_DECLARED]}
+        rangeKm: {type: number}
+        rangeStandard: {type: string, enum: [NEDC, WLTP, EPA, CLTC]}
+        connectorTypes:
+          type: array
+          items: {type: string}
+        maxAcKw: {type: [number, 'null']}
+        maxDcKw: {type: [number, 'null']}
+        imageUrl: {type: string, description: 'AI illustration stored in the frontend public assets'}
+        sourceUrl: {type: string, format: uri}
+        verifiedAt: {type: string, format: date}
     UserPreferences:
       type: object
       properties:

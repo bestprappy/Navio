@@ -818,6 +818,37 @@ Request body: `TripDatesRequest`
 }
 ```
 
+#### Day start and end anchors
+
+Each itinerary day carries an optional `startAnchor` and `endAnchor` on its block in the planner snapshot (`GET`/`PUT /v1/trips/{tripId}/planner`, gated by the `day-anchors` capability in the snapshot response).
+
+```json
+{
+  "id": "places/ChIJ...",
+  "kind": "PLACE",
+  "name": "Hua Hin Resort",
+  "address": "Phetkasem Rd, Hua Hin",
+  "lat": 12.57,
+  "lng": 99.95
+}
+```
+
+**A day's start is derived, not stored.** You wake up where you went to sleep, so day *n* starts at day *n−1*'s `endAnchor`. `startAnchor` is written only when that is not true — on day one, where it is the trip origin, and on any day the traveller sets out from somewhere other than last night's stop. Storing both ends on every day would let them drift apart the moment a hotel changes.
+
+An anchor is written in full or not at all; a partly-filled anchor is rejected with `400`, because a named place at null coordinates skews drive time and EV state-of-charge silently instead of failing.
+
+`kind` decides what happens when the trip is shared:
+
+| kind | source | travels with a shared or published trip |
+| --- | --- | --- |
+| `SAVED_PLACE` | the owner's `/v1/users/me/places` | **no** — strip it server-side and substitute a placeholder anchor |
+| `PLACE` | a provider place, e.g. a hotel | yes — this is what makes a template useful |
+| `MANUAL` | an ad-hoc pin | yes |
+
+The kind set is closed and validated on write. An unrecognised kind would otherwise be published by default, which is the unsafe direction.
+
+Day one's derived distance, drive time, and state-of-charge are computed from the owner's own origin, so a copy must recompute them after the new traveller sets their start point rather than presenting the original figures.
+
 #### Trip sections / custom lists
 
 | Method   | Endpoint                                  | Purpose                           |
@@ -1203,6 +1234,28 @@ curl -X POST 'https://api.navio.local/v1/admin/users/user_01HX/reactivate' \
   -d '{"reason": "Spam reports confirmed", "expiresAt": "2026-06-01T00:00:00Z"}'
 ```
 
+#### Saved personal anchors
+
+`/v1/users/me/places` holds the places a traveller starts and ends days from — home, work, anywhere recurring. They are **owner-only**: the route carries no user id, so it cannot be pointed at anyone else, and a `404` is returned both for a missing place and for someone else's place so ids cannot be enumerated.
+
+```json
+{
+  "id": "b8f0c2a4-0000-4000-8000-000000000001",
+  "label": "Home",
+  "kind": "HOME",
+  "name": "Sukhumvit 24",
+  "address": "Khlong Toei, Bangkok",
+  "lat": 13.75,
+  "lng": 100.5,
+  "providerPlaceId": "places/ChIJ...",
+  "isDefault": true
+}
+```
+
+`HOME` and `WORK` are singletons per user; `CUSTOM` is unconstrained up to 50 saved places. The first place saved becomes the default start point.
+
+Trip Planning **copies** the resolved name and coordinates into a day anchor rather than referencing this row, so correcting an address later never rewrites a trip that was already planned. Because a row here can be a home address, a day anchor whose `kind` is `SAVED_PLACE` must be stripped from any published or shared trip snapshot and replaced with a placeholder — see the day-anchor notes under Trip Planning.
+
 ### User and role management extensions
 
 | Method | Endpoint | Purpose |
@@ -1212,6 +1265,11 @@ curl -X POST 'https://api.navio.local/v1/admin/users/user_01HX/reactivate' \
 | `POST` | `/v1/users/me/vehicles` | Add a saved vehicle. |
 | `PATCH` | `/v1/users/me/vehicles/{vehicleId}` | Update nickname, battery defaults, or default selection. |
 | `DELETE` | `/v1/users/me/vehicles/{vehicleId}` | Remove a saved vehicle. |
+| `GET` | `/v1/users/me/places` | List the current user's saved personal anchors. |
+| `POST` | `/v1/users/me/places` | Save a personal anchor (home, work, or custom). |
+| `GET` | `/v1/users/me/places/{placeId}` | Get one owned saved place. |
+| `PATCH` | `/v1/users/me/places/{placeId}` | Rename, move, or re-default a saved place. |
+| `DELETE` | `/v1/users/me/places/{placeId}` | Remove a saved place. |
 | `GET` | `/v1/admin/users` | Search and administer users. |
 | `POST` | `/v1/admin/users/{userId}/roles` | Grant a global Keycloak role and write an audit record. |
 | `DELETE` | `/v1/admin/users/{userId}/roles/{role}` | Revoke a global Keycloak role and write an audit record. |
