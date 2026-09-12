@@ -70,6 +70,7 @@ if [[ ! -r "${TLS_CERT_FILE}" || ! -r "${TLS_KEY_FILE}" ]]; then
 fi
 
 install -m 0644 "${SOURCE_ROOT}/.deploy/compose.production.yml" "${COMPOSE_FILE}"
+install -m 0644 "${SOURCE_ROOT}/.deploy/compose.storage.yml" "${DEPLOY_ROOT}/compose.storage.yml"
 install -m 0644 "${SOURCE_ROOT}/.deploy/config/"*.yml "${DEPLOY_ROOT}/config/"
 install -m 0644 "${SOURCE_ROOT}/.deploy/keycloak/navio-realm.json" \
   "${DEPLOY_ROOT}/keycloak/navio-realm.json"
@@ -352,6 +353,14 @@ compose pull
 compose up -d --wait --wait-timeout 120 postgres
 compose exec -T postgres sh -ec \
   'psql --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" --set ON_ERROR_STOP=1 --command "CREATE SCHEMA IF NOT EXISTS keycloak AUTHORIZATION CURRENT_USER"'
+
+# The VM storage stack has its own project so application releases never remove
+# its persistent data or restart it. External S3 providers keep their own setup.
+if grep -Eq '^COMMUNITY_S3_ENDPOINT=http://community-storage:9000[[:space:]]*$' "${ENV_FILE}"; then
+  storage_compose=(docker compose --env-file "${ENV_FILE}" -f "${DEPLOY_ROOT}/compose.storage.yml")
+  "${storage_compose[@]}" up -d --wait --wait-timeout 120 community-storage
+  "${storage_compose[@]}" run --rm --no-deps community-storage-init
+fi
 
 compose up -d --remove-orphans --wait --wait-timeout 420
 configure_keycloak_authentication

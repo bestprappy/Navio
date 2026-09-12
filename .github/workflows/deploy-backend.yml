@@ -89,6 +89,8 @@ jobs:
           - image: web-client
             service_path: client
             dockerfile: .deploy/docker/web-client.Dockerfile
+          - image: community-storage
+            dockerfile: .deploy/docker/community-storage.Dockerfile
 
     steps:
       - name: Check out deployment repository
