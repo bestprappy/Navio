@@ -56,8 +56,13 @@ services:
         trap 'mc rm "$$probe" >/dev/null' EXIT
         printf '%s' 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=' | base64 -d > /tmp/picture.png
         mc cp /tmp/picture.png "$$probe" >/dev/null
-        mc cat "$$probe" > /tmp/picture-read.png
-        cmp /tmp/picture.png /tmp/picture-read.png
+        # The mc image carries no diffutils, so cmp(1) is unavailable. Compare
+        # through base64 instead: both sides run the same encoder, so any line
+        # wrapping is identical and this stays a byte-for-byte check.
+        if [ "$$(mc cat "$$probe" | base64)" != "$$(base64 < /tmp/picture.png)" ]; then
+          echo 'Stored picture did not read back byte-for-byte.' >&2
+          exit 1
+        fi
         mc rm "$$probe" >/dev/null
         trap - EXIT
         echo 'Community picture storage: private bucket and service write/read/delete verified.'
