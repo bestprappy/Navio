@@ -3221,10 +3221,36 @@ paths:
       schema:
         type: string
         format: uuid
+    patch:
+      tags:
+      - Community Service
+      summary: Edit the text of your own comment; deleted comments cannot be edited
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityCommentResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunityUpdateCommentRequest'
     delete:
       tags:
       - Community Service
-      summary: Remove your comment or moderate it; retain replies
+      summary: Remove your comment or moderate it. A comment with replies stays as an unavailable placeholder
+        (deleted=true); a comment without replies is removed along with deleted ancestors left without replies.
       responses:
         '204':
           description: Removed
@@ -5314,6 +5340,7 @@ components:
       - parentCommentId
       - body
       - deleted
+      - edited
       - createdAt
       - upvotes
       - viewerVote
@@ -5326,6 +5353,9 @@ components:
           type: string
         deleted:
           type: boolean
+        edited:
+          type: boolean
+          description: True when the author changed the text after posting; always false for deleted comments.
         createdAt:
           type: string
           format: date-time
@@ -5394,6 +5424,15 @@ components:
           minLength: 1
           maxLength: 10000
         parentCommentId: *id003
+    CommunityUpdateCommentRequest:
+      type: object
+      required:
+      - body
+      properties:
+        body:
+          type: string
+          minLength: 1
+          maxLength: 10000
     CommunityPostPage:
       type: object
       required:

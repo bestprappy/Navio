@@ -2594,9 +2594,39 @@ curl -X POST 'https://api.navio.local/v1/posts/post_01HX/comments' \
   -d '{"parentCommentId": null, "body": "Can I copy this trip for my own route?"}'
 ```
 
+### `PATCH /v1/posts/{postId}/comments/{commentId}` — Edit post comment
+
+**Does:** Replaces the text of your own comment. Only the author can edit; deleted comments cannot be edited (`400`), other users get `403`. The response marks the comment `edited: true`.
+**Auth:** Bearer JWT required, active group member
+**Success:** `200` `Comment`
+
+**Parameters**
+
+| Name        | In   | Required | Type     | Notes                    |
+| ----------- | ---- | -------: | -------- | ------------------------ |
+| `postId`    | path |     true | `string` | postId path parameter    |
+| `commentId` | path |     true | `string` | commentId path parameter |
+
+**Request body:** `UpdateCommentRequest`
+
+```json
+{
+  "body": "Can I copy this trip for a two-day route?"
+}
+```
+
+**Example usage**
+
+```bash
+curl -X PATCH 'https://api.navio.local/v1/posts/post_01HX/comments/comment_01HX' \
+  -H 'Authorization: Bearer <JWT>' \
+  -H 'Content-Type: application/json' \
+  -d '{"body": "Can I copy this trip for a two-day route?"}'
+```
+
 ### `DELETE /v1/posts/{postId}/comments/{commentId}` — Delete post comment
 
-**Does:** Deletes own comment or moderator/admin deletes it.
+**Does:** Deletes own comment or moderator/admin deletes it. If the comment has replies it stays in the thread as a placeholder (`deleted: true`, empty body) shown as "Comment unavailable". If it has no replies it is removed entirely, together with any deleted parent comments that no longer have replies.
 **Auth:** Bearer JWT required
 **Success:** `204` no body
 
