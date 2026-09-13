@@ -22,3 +22,7 @@ logs/
 ### OS ###
 .DS_Store
 Thumbs.db
+
+### AI ###
+AGENTS.md
+CLAUDE.md
