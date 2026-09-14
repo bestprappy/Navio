@@ -50,10 +50,15 @@ Always check the folder for the current highest version; this table goes stale.
 - Mockito unit tests and `@WebMvcTest` slices never run Flyway or schema validation.
 - mobility-and-ev-service and community-service default tests use **H2 with Flyway disabled**. Green there says nothing about Postgres.
 - user-management-service's full-context test is `@Disabled` (it needs Keycloak).
+- `PostgresSchemaTests` is the only test that covers the real schema for every service, and it is skipped unless `NAVIO_TEST_DB_URL` is set.
 
 ## Verify against real Postgres before releasing
 
-Run the owning service's startup check against a disposable Postgres. Never point it at a shared or personal database (for example a local `navio-postgres` dev container).
+Every JPA service has `PostgresSchemaTests`: a `@DataJpaTest` that runs all migrations on real PostgreSQL and starts JPA with `ddl-auto=validate`, the same startup production performs. It is skipped unless `NAVIO_TEST_DB_URL` is set, so normal `./mvnw test` runs are unaffected.
+
+**CI runs it automatically.** The `verify-database-schema` job in `.github/workflows/deploy-backend.yml` runs it for all four services before any image is built; a failure stops the release. Still run it locally before merging so the failure reaches you, not the release.
+
+Use a disposable database. Never point it at a shared or personal database (for example a local `navio-postgres` dev container).
 
 ```powershell
 # 1. Disposable Postgres matching production
@@ -61,24 +66,20 @@ docker run -d --rm --name navio-verify-pg -p 5432:5432 `
   -e POSTGRES_DB=tripplanner -e POSTGRES_USER=tripplanner -e POSTGRES_PASSWORD=tripplanner `
   postgis/postgis:16-3.5-alpine
 
-# 2. Local configuration server (serves localhost:5432 / tripplanner settings)
+# 2. Configuration server (needed by trip-planning-service and user-management-service)
 cd server/configuration-server; ./mvnw -o spring-boot:run   # keep running, port 8888
 
-# 3a. trip-planning-service: full context = Flyway + validate
-cd server/trip-planning-service; ./mvnw -o test -Dtest=TripPlanningServiceApplicationTests
-
-# 3b. community-service: Postgres integration tests
-$env:COMMUNITY_TEST_DB_URL = "jdbc:postgresql://localhost:5432/tripplanner"
-$env:COMMUNITY_TEST_DB_USERNAME = "tripplanner"; $env:COMMUNITY_TEST_DB_PASSWORD = "tripplanner"
-cd server/community-service; ./mvnw -o test -Dtest='*PostgresIntegration*'
+# 3. Schema test for the service you changed (run from that service's directory)
+$env:NAVIO_TEST_DB_URL = "jdbc:postgresql://localhost:5432/tripplanner"
+./mvnw -o test -Dtest=PostgresSchemaTests
 
 # 4. Clean up
 docker stop navio-verify-pg
 ```
 
-Eureka "connection refused" noise during step 3a is expected and harmless. A real failure looks like `SchemaManagementException: Schema validation: wrong column type ...` or a Flyway error.
+A real failure looks like `SchemaManagementException: Schema validation: wrong column type ...` or a Flyway error. Reuse the container for several services; each uses its own schema.
 
-To prove a test actually guards the change, revert the fix and confirm the test fails.
+To prove a test guards your change, temporarily revert the fix and confirm `PostgresSchemaTests` fails.
 
 ## Checklist
 

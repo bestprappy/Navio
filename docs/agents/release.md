@@ -4,11 +4,12 @@
 
 Every push to root `main` runs `.github/workflows/deploy-backend.yml`. There is no path filter: a docs-only push to root `main` also rebuilds and redeploys everything. Merge documentation-only changes to `dev` and let them ride along with the next release.
 
-The workflow has three stages:
+The workflow has four stages:
 
 1. **Verify backend revisions are current.** `client`, `server`, and every `server/<service>` pin must equal that repository's `origin/main`. A pin that points at `dev` or a feature branch fails here.
-2. **Build.** Nine images are built and pushed to `ghcr.io/bestprappy/navio-*` tagged with the root commit SHA.
-3. **Deploy to Navio VM.** A self-hosted runner executes `.deploy/scripts/deploy.sh`.
+2. **Verify migrations and entity mappings on PostgreSQL.** Runs each service's `PostgresSchemaTests` against a PostGIS service container (plus a local configuration server). A schema mismatch fails here, before anything is built or deployed.
+3. **Build.** Nine images are built and pushed to `ghcr.io/bestprappy/navio-*` tagged with the root commit SHA.
+4. **Deploy to Navio VM.** A self-hosted runner executes `.deploy/scripts/deploy.sh`.
 
 ## Release order
 
@@ -50,6 +51,7 @@ Step logs require a signed-in GitHub account. If the deploy job fails, ask the u
 | Symptom in the log | Likely cause | First move |
 | --- | --- | --- |
 | `<service> is stale: pinned=..., main=...` | A pin is not on that repo's `main` | Merge that repo to `main`, re-pin the parent |
+| `verify-database-schema` fails in `PostgresSchemaTests` | Migration error or entity/column type mismatch | Read the `Caused by` line; follow [database-changes.md](database-changes.md) |
 | `container navio-<service>-1 is unhealthy` and `Restarting (1)` | Service crashes on startup | Reproduce locally: real Postgres + config server + `*ApplicationTests`. Schema validation and Flyway errors are the usual cause |
 | `Expected ... to return 401; got ...` | Gateway routing or security change | Check `api-gateway` routes and `IdentityPropagationFilter` |
 | Keycloak / Google OAuth smoke checks | Realm or theme config | Check `.deploy/keycloak` |

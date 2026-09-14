@@ -11,10 +11,10 @@ Root `3fb68c4` (deploy run 34826778768, success).
 - **Structured trip location.** Trips store `destinationCity`, `destinationRegion`, `destinationCountryCode`, and `destinationCountry`, resolved server-side from `destinationId` through mobility-and-ev-service. `displayName` is optional; responses include a derived `title` (name -> city -> country). Clients send only `destinationId` (plus dates/name).
 - Copying a premade plan resolves a place id from the destination name before creating the trip (`resolveDestinationPlaceId` in `client/app/feature/planner/_components/destination-api.ts`).
 
-## In progress
+## Recently added (not in production code paths)
 
-- **Shared agent context** (this setup): `AGENTS.md`, `docs/agents/*`.
-- **Pre-deploy database check**: a CI job that runs migrations and Hibernate validation against real Postgres before images are built. Not merged yet.
+- **Shared agent context**: `AGENTS.md` (committed; Codex loads it, Claude loads it via local `CLAUDE.md` = `@AGENTS.md`) and `docs/agents/*`. Every session must update this file and the session log.
+- **Pre-deploy database check**: `PostgresSchemaTests` in all four JPA services plus the `verify-database-schema` job in `deploy-backend.yml`, which must pass before images build. Verified locally against PostGIS 16, including that it fails on the 2026-09-14 `char(2)` bug. Its first CI run happens with the release that ships it; if that run fails, check `actions/setup-java@v5` and the configuration server start step first.
 
 ## Uncommitted work in `client/` (not mine — review before committing)
 
@@ -38,6 +38,6 @@ The user has not yet decided whether to commit these on their own branch.
 
 ## Next steps
 
-1. Finish and merge the pre-deploy database check.
+1. Confirm the first `verify-database-schema` CI run passed.
 2. Decide what to do with the uncommitted client work.
 3. Run the trip location backfill in production once, then verify a sample of old trips.
