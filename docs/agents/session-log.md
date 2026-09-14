@@ -30,7 +30,7 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 - Added `AGENTS.md` (now committed), `docs/agents/database-changes.md`, `release.md`, `handoff.md`, this log.
 - Added `PostgresSchemaTests` to user-management, trip-planning, mobility, and community (skipped unless `NAVIO_TEST_DB_URL` is set) and a `verify-database-schema` job that gates image builds in `deploy-backend.yml`.
 
-**Verified:** mobility 19/19 tests; trip-planning 45/45 including full context against disposable Postgres 16 + PostGIS; reproduced the production failure without the fix. Client type-check and lint pass on the committed file set in isolation. All four `PostgresSchemaTests` pass on PostGIS 16; the trip-planning one fails when the `@JdbcTypeCode` fix is removed. Full suites still pass with the test skipped (user-management 95, trip-planning 46, mobility 20, community 74). Workflow YAML parsed locally; the new CI job has not run on GitHub yet. Premade plan copy not tested in a browser.
+**Verified:** mobility 19/19 tests; trip-planning 45/45 including full context against disposable Postgres 16 + PostGIS; reproduced the production failure without the fix. Client type-check and lint pass on the committed file set in isolation. All four `PostgresSchemaTests` pass on PostGIS 16; the trip-planning one fails when the `@JdbcTypeCode` fix is removed. Full suites still pass with the test skipped (user-management 95, trip-planning 46, mobility 20, community 74). The new `verify-database-schema` job passed its first GitHub run (deploy run 34829001804, root `0a4acc4`), and the deploy succeeded. Premade plan copy not tested in a browser.
 
 **Not done / left uncommitted:** ~57 client files from the Codex session (see handoff).
 

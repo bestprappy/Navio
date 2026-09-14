@@ -6,7 +6,7 @@ Current state for the next agent. Overwrite sections as they change; keep it sho
 
 ## Live in production
 
-Root `3fb68c4` (deploy run 34826778768, success).
+Root `0a4acc4` (deploy run 34829001804, success). Application code is unchanged since root `3fb68c4`; later releases added only tests, CI, and docs.
 
 - **Structured trip location.** Trips store `destinationCity`, `destinationRegion`, `destinationCountryCode`, and `destinationCountry`, resolved server-side from `destinationId` through mobility-and-ev-service. `displayName` is optional; responses include a derived `title` (name -> city -> country). Clients send only `destinationId` (plus dates/name).
 - Copying a premade plan resolves a place id from the destination name before creating the trip (`resolveDestinationPlaceId` in `client/app/feature/planner/_components/destination-api.ts`).
@@ -14,7 +14,7 @@ Root `3fb68c4` (deploy run 34826778768, success).
 ## Recently added (not in production code paths)
 
 - **Shared agent context**: `AGENTS.md` (committed; Codex loads it, Claude loads it via local `CLAUDE.md` = `@AGENTS.md`) and `docs/agents/*`. Every session must update this file and the session log.
-- **Pre-deploy database check**: `PostgresSchemaTests` in all four JPA services plus the `verify-database-schema` job in `deploy-backend.yml`, which must pass before images build. Verified locally against PostGIS 16, including that it fails on the 2026-09-14 `char(2)` bug. Its first CI run happens with the release that ships it; if that run fails, check `actions/setup-java@v5` and the configuration server start step first.
+- **Pre-deploy database check**: `PostgresSchemaTests` in all four JPA services plus the `verify-database-schema` job in `deploy-backend.yml`, which must pass before images build. Verified locally against PostGIS 16, including that it fails on the 2026-09-14 `char(2)` bug, and passed its first CI run (deploy run 34829001804, root `0a4acc4`, success).
 
 ## Uncommitted work in `client/` (not mine — review before committing)
 
@@ -38,6 +38,5 @@ The user has not yet decided whether to commit these on their own branch.
 
 ## Next steps
 
-1. Confirm the first `verify-database-schema` CI run passed.
-2. Decide what to do with the uncommitted client work.
-3. Run the trip location backfill in production once, then verify a sample of old trips.
+1. Decide what to do with the uncommitted client work.
+2. Run the trip location backfill in production once, then verify a sample of old trips.
