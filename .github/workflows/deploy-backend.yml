@@ -63,9 +63,94 @@ jobs:
             echo "${repository} is current at ${pinned_revision}."
           done
 
+  verify-database-schema:
+    name: Verify migrations and entity mappings on PostgreSQL
+    needs: verify-backend-revisions
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    # Production runs Flyway and then Hibernate ddl-auto=validate on startup, so a
+    # mapping mismatch crash-loops a service after every image is already built.
+    # Each service's PostgresSchemaTests reproduces that startup against a real
+    # PostGIS database. See docs/agents/database-changes.md.
+    services:
+      postgres:
+        image: postgis/postgis:16-3.5-alpine
+        env:
+          POSTGRES_DB: tripplanner
+          POSTGRES_USER: tripplanner
+          POSTGRES_PASSWORD: tripplanner
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U tripplanner -d tripplanner"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+
+    env:
+      NAVIO_TEST_DB_URL: jdbc:postgresql://localhost:5432/tripplanner
+      NAVIO_TEST_DB_USERNAME: tripplanner
+      NAVIO_TEST_DB_PASSWORD: tripplanner
+
+    steps:
+      - name: Check out deployment repository
+        uses: actions/checkout@v7
+
+      - name: Check out submodules
+        shell: bash
+        run: |
+          git submodule sync -- server
+          git submodule update --init --depth 1 server
+          git -C server submodule sync --recursive
+          git -C server submodule update --init --recursive --depth 1
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+          cache-dependency-path: server/**/pom.xml
+
+      # trip-planning-service and user-management-service import the
+      # configuration server at startup, even in a JPA slice.
+      - name: Start configuration server
+        shell: bash
+        run: |
+          cd server/configuration-server
+          chmod +x mvnw
+          nohup ./mvnw -B -ntp spring-boot:run > "${RUNNER_TEMP}/configuration-server.log" 2>&1 &
+          for attempt in $(seq 1 90); do
+            if curl -fs http://localhost:8888/trip-planning-service/default > /dev/null; then
+              echo "Configuration server is up."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Configuration server did not start." >&2
+          tail -n 100 "${RUNNER_TEMP}/configuration-server.log" >&2
+          exit 1
+
+      - name: Run PostgreSQL schema tests
+        shell: bash
+        run: |
+          for service in user-management-service trip-planning-service mobility-and-ev-service community-service; do
+            echo "::group::${service}"
+            (cd "server/${service}" && chmod +x mvnw && ./mvnw -B -ntp test -Dtest=PostgresSchemaTests)
+            echo "::endgroup::"
+          done
+
+      - name: Show configuration server log
+        if: failure()
+        shell: bash
+        run: tail -n 200 "${RUNNER_TEMP}/configuration-server.log" || true
+
   build:
     name: Build ${{ matrix.image }}
-    needs: verify-backend-revisions
+    needs:
+      - verify-backend-revisions
+      - verify-database-schema
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
