@@ -24,5 +24,6 @@ logs/
 Thumbs.db
 
 ### AI ###
-AGENTS.md
+# AGENTS.md is shared agent context and is committed. CLAUDE.md stays local and
+# contains only "@AGENTS.md" so Claude loads the same file.
 CLAUDE.md
