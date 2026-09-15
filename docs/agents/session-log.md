@@ -17,6 +17,18 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 ---
 
+## 2026-09-15 — Claude — Commit and release accumulated client and trip title work
+
+**Goal:** `/commit` everything uncommitted, split by type, merged through `dev` to `main` (user chose all three options explicitly, including production release and the undocumented title change).
+**Done:**
+- client (`dev` and `main` = `4622b54`, stacked branches): `44386d8` chore(deps) on `chore/client-deps-agents`; `279dfac` docs(design) on `docs/client-design-md`; `406468c` style(planner) on `style/brand-theme-redesign`; `4622b54` feat(dashboard) on `feat/dashboard-trip-management`. Client `CLAUDE.md` left untracked.
+- trip-planning-service (`dev` and `main` = `fde94e0`, `fix/trip-title-country-first`): title falls back name -> country -> city; test updated.
+- server: pin bump on `chore/bump-trip-planning-title`, merged to `dev` and `main`.
+- root: these notes on a `docs/` branch and the `client`/`server` pins on a `chore/` branch, merged to `dev` and `main` (deploys).
+**Verified:** client full `tsc --noEmit` exit 0 and `eslint .` (0 errors, 2 warnings) on the full tree, which equals the committed tree. trip-planning-service `./mvnw -o test` with a local config server: 46 run, 44 pass, 1 skipped, 2 errors in `TripPlanningServiceApplicationTests`/`VerificationTests` because Postgres on 5432 was not running (Docker Desktop off); not a code failure, but the local real-Postgres check was not run. No browser check of any client work.
+**Not done / left uncommitted:** client `CLAUDE.md` (must never be committed).
+**Follow-ups:** watch the deploy run; browser-check the released UI; intermediate client commits were split by file and not type-checked individually.
+
 ## 2026-09-15 - Codex - Blur garage photo background
 
 **Goal:** match community post image backgrounds in the garage.
@@ -43,6 +55,70 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 **Not done / left uncommitted:** client routes/route-segment-info.tsx and routes/charge-segment-info.tsx under app/feature/planner/planId/_components; no deployment.
 **Follow-ups:** none for alignment. Other sessions' unfinished changes preserved.
 
+
+## 2026-09-15 - Codex - Redesign daily route estimate
+
+**Goal:** redesign the pictured route estimate using DESIGN.md and the anti-ai-ui-review skill.
+**Done:**
+- New shared client `garage/route-estimate.tsx`, consumed by planner `day-route-overview.tsx` and Explore `plan-view.tsx` on `feat/structured-trip-location` (uncommitted).
+- Battery-led header, existing battery colors and 12% reserve marker, mono labeled metrics, compatibility footer, responsive two/four-column layout, semantic meter, and visible low/reserve labels. Removed repeated icons, blue action-like charging text, uppercase heading and shadow. Preserved calculations and existing Explore edits.
+**Verified:** full `tsc --noEmit`; targeted ESLint; changed-file `git diff --check` (repository-wide check finds pre-existing dashboard whitespace); isolated Chrome checks with actual component/CSS at 360/768/1024/1440px in light/dark and battery/warning variants (no overflow, meter correct). Inspected light desktop/dark mobile screenshots. Isolated preview uses fallback fonts; full application integration not browser-tested.
+**Not done / left uncommitted:** three client files above plus these notes; both agent documents already contain other sessions' uncommitted edits, so no combined docs commit was made without authorization to include them.
+**Follow-ups:** review within the live planner with loaded fonts; commit with the existing client work when its owner approves.
+
+## 2026-09-15 — Claude — Rework charging stop card and route leg rows
+
+**Goal:** redesign the planner charging-stop card and the drive/battery leg rows with the anti-ai-ui-review skill.
+**Done (client, uncommitted):**
+- `block/items/trip-place-card.tsx` (charger branch): removed the icon-plus-pill-plus-title repetition and the blue tinted card; header is block-color marker, title, and a meta line (Charging stop · operator · kept when optimizing). Duplicate `ChargeSegmentInfo` hidden when the charging control is shown. Earlier token swaps by another session kept.
+- `charger/station-specifications.tsx`: ruled spec grid (Max power, Ports, Plugs) via new `charger/spec-cell.tsx`; per-row blue icons removed. `station-opening-hours.tsx` icon muted.
+- `charger/station-charging-control.tsx`: large mono target, segmented 60/80/100 picker, custom track (arrival dimmed, added charge lit in battery ramp colors) over a transparent native range input, and Arrive at / Adds / Takes cells; incompatible plugs shown as a warning.
+- `routes/charge-segment-info.tsx`: new `ChargeBar`; `ChargeSegmentInfo` (explore) and `DischargeSegmentInfo` restyled without boxes; discharge shows a mini battery bar, from → to, usage, and a Low label.
+- `routes/route-segment-info.tsx`: boxless row (route-colored car icon, mono time and distance); clearer loading and no-route text.
+- Leg wrappers in `block/sortable-block-items.tsx`, `itinerary/anchor-stop-card.tsx`, and explore `plan-view.tsx` now lay the drive and battery rows on one wrapping line.
+**Verified:** full `tsc --noEmit` and ESLint on the changed planner files pass. Not browser-checked (slider thumb alignment with the native input, dark mode, narrow widths, drag handles).
+**Not done / left uncommitted:** all files above.
+**Follow-ups:** browser check; confirm the transparent range input still works with the card's drag-and-drop (`data-no-drag` kept).
+**Revision (same session):** user reported the drive and battery rows were vertically misaligned. Both `RouteSegmentInfo` and `DischargeSegmentInfo` rows now use a fixed `h-6` flex row with `leading-none`, so they share one center line (fallback row uses `min-h-6` since it may wrap). A suspected IBM Plex Mono fallback was ruled out: the built CSS registers the face under its real name, so a temporary `layout.tsx`/`globals.css` font change was reverted.
+**Revision 2 (same session):** user asked for colored percentages. Added `--battery-{high,mid,low,critical}-text` tokens (light: deepened shades; dark: the fill colors) and `.battery-text-*` utilities in `globals.css`; `BATTERY_TONES[tone].valueText` and `BATTERY_CHANGE_TEXT` in `garage-formatters.ts`. `DischargeSegmentInfo` colors from/to by level and the usage (−N%) red; `ChargeSegmentInfo` colors from/to and adds a green +N%. Computed contrast: light ≥5.88:1, dark ≥5.44:1. `DESIGN.md` battery section updated. tsc and ESLint pass; not browser-checked. Rows were meanwhile changed from `<p>` to `<div>` on disk (accordion prose margins); kept.
+**Revision 3 (same session):** user asked for the charge-to thumb to match the garage starting battery slider ("only the circle"). `station-charging-control.tsx` keeps the arrival/added `ChargeBar` track but its thumb is now the slider's 20px level-colored circle (`getBatteryColor`) with a 7px light center dot; track inset widened to `inset-x-2.5`. A brief swap to the full `BatterySlider` was reverted, leaving `battery-slider.tsx` with only the earlier tone-color change. tsc and ESLint pass; not browser-checked.
+**Revision 4 (same session, reverted):** added meaning-based color to the charging card (plugs that fit the EV in `text-charging` with a text note, muted spec grid surface, green 24-hour hours, battery-colored quick target and Arrive at, green +kWh, 5% `bg-charging` tint on the charge section). The user asked to revert; all of it was undone, returning `spec-cell.tsx`, `station-specifications.tsx`, `station-opening-hours.tsx`, `station-charging-control.tsx` and the `trip-place-card.tsx` wrapper to their Revision 3 state (`opening-hours.ts` has no diff). tsc and ESLint pass.
+
+## 2026-09-15 — Claude — Rework garage vehicle card and trip energy panel
+
+**Goal:** make the garage vehicle card and usage overview look less AI-generated, using `client/DESIGN.md` and the anti-ai-ui-review skill.
+**Done (client, uncommitted, garage folder):**
+- `vehicle-card.tsx`: spec sheet layout: title + one meta line (Catalogue pill removed), 4-cell spec grid in mono numbers, connectors as one "Plugs" line (no pills), source sentence with external-link cue. The duplicate battery bar is gone (the slider below owns it). Active card shows a check + "Used for this trip's battery estimates" instead of a disabled button; inactive shows "Use for this trip".
+- `vehicle-usage-overview.tsx`: renamed "Trip energy"; removed the repeated photo and name header (also redundant in explore `plan-view.tsx`), the fake 8-segment battery and all icon-circle tiles. Now: battery at trip end + range left, a start/end track with a 12% reserve marker, a 4-cell stat grid (Distance, Energy used, Driving, Charging; "Mileage" and the duplicated Connector tile removed), and a per-day bar chart with value labels, reserve line, screen-reader text, and a real empty state.
+- `garage-formatters.ts`: shared `getBatteryTone` (critical < 12% planner reserve, low <= 25%) used by card, chart and `battery-slider.tsx`; previously three different thresholds turned 45% amber/brown. Added connector, date and distance formatters.
+- `garage-section.tsx`: removed the uppercase "USAGE OVERVIEW" divider, non-pill Add button, neutral empty state (primary text failed contrast), outer route warning hidden when the overview shows its own empty state.
+- `vehicle-media.tsx`: `mix-blend-multiply` in light mode so studio photo backdrops blend into the frame.
+**Verified:** `tsc --noEmit` and ESLint on the six files pass. Not checked in a browser (light/dark, narrow two-column cards, many-day chart scroll).
+**Not done / left uncommitted:** the six garage files above.
+**Follow-ups:** browser check.
+**Revision (same session):** user asked for colorful battery fills. Added `--battery-high|mid|low|critical` tokens (light and `.dark`) and `.battery-fill` / `.battery-fill-up` / `.battery-<level>` utilities in `globals.css` (same-hue gradient, top highlight, glow). Bands: green >=50%, yellow 26-49%, orange 12-25% ("Low"), red <12% ("Below reserve"). Used by the trip-end track, daily bars, and the starting-battery slider. `DESIGN.md` gained the tokens and a Battery level section. tsc, ESLint and DESIGN.md lint (0 errors, same 3 warnings) pass; not browser-checked.
+
+## 2026-09-15 — Claude — Add client DESIGN.md
+
+**Goal:** describe Navio's visual identity in the DESIGN.md format (Google `@google/design.md`, alpha) for coding agents.
+**Done:** new `client/DESIGN.md`: YAML tokens (brand pair, light and `-dark` colors, feature tints, media/map colors, 10 type styles, radii, spacing, 40 component entries) taken from `app/globals.css`, `app/layout.tsx` fonts, and the shadcn `button`/`card`/`input`/`badge` primitives, plus prose in the spec's section order.
+**Verified:** `npx -p @google/design.md designmd lint DESIGN.md` (CLI 0.4.0): 0 errors, 3 contrast warnings that reflect real tokens: light primary with Paper text 3.27:1, and dark `destructive` with white text 3.76:1. Heading sizes above `text-lg` are a proposed scale, not measured from pages.
+**Not done / left uncommitted:** `client/DESIGN.md` (client tree holds other sessions' uncommitted work on `feat/structured-trip-location`).
+**Follow-ups:** decide whether to darken light `--primary` or accept 3.3:1 for short labels; set dark `--destructive-foreground` to navy if solid red fills are used; keep DESIGN.md in sync when `globals.css` changes (the user plans to convert hardcoded colors to tokens).
+
+## 2026-09-15 — Claude — Rebase light/dark theme on brand Paper and Pine
+
+**Goal:** base light and dark mode on the two brand colors `#FAFBFE` (Paper) and `#06211A` (Pine).
+**Done (client, uncommitted, `app/globals.css` only):**
+- Added `--brand-paper` `oklch(0.988 0.004 271)` and `--brand-pine` `oklch(0.2245 0.036 173)`.
+- Light: page = Paper, text and default primary = Pine; cards white; muted/border/input/sidebar/secondary are low-chroma Pine-hue (173) steps.
+- Dark: page = Pine, text = Paper; card/popover/muted/border step lighter in hue 173, sidebar darker; default primary is a light Pine mint `oklch(0.86 0.075 173)` with Pine text. Dark status foregrounds and red/neutral color-theme dark overrides use Pine/Paper.
+**Verified:** WCAG contrast computed for key pairs: fg/bg 16.3:1 both modes, muted text ≥6.2:1, primary text ≥11.4:1, light input border raised to ≥3:1. Not checked in a browser.
+**Not done / left uncommitted:** `client/app/globals.css` (already held other uncommitted work).
+**Follow-ups:** browser check of both modes; hardcoded non-token colors (scrim, map pins, planner block palette) were left unchanged.
+**Revision (same session):** user changed `--brand-pine` to a dark navy `oklch(0.157 0.049 271)` and asked for blue-gray, not green, neutrals. Dark mode now uses blue-gray (hue 265, chroma ≤0.022): background 0.19, card 0.235, popover 0.265, sidebar 0.165; primary is light brand blue `oklch(0.84 0.06 271)`. Light-mode neutrals moved to hue 265 too. Recomputed contrast: text ≥17.8:1, muted text ≥6:1, primary ≥10:1, input borders ≥3:1. The token name `--brand-pine` is kept though it now holds navy.
+**Revision 2 (same session):** user chose a single neutral color theme for now. Removed `--theme-*` tokens and all `[data-color-theme]` blocks from `globals.css`; primary is `--brand-pine` (navy) in light and `--brand-paper` in dark. Unwired the picker from `sidebar-account-actions.tsx` and the init script from `app/layout.tsx`; `components/theme/*` kept (unused) for later. Full `tsc --noEmit` and ESLint on both files pass. Next: user will add hardcoded colors and ask for them to be converted to tokens.
+**Revision 3 (same session):** sidebar active state moved off `bg-secondary` to its own `--sidebar-accent` tokens (`sidebar.item.tsx`, `sidebar.dropdown.tsx`, `sidebar.tsx` block list); `--sidebar-accent` is now neutral gray `oklch(0.9 0.004 265)` light / `oklch(0.32 0.006 265)` dark. Label contrast 14.5:1 light, 12.3:1 dark; ESLint passes. Active icon still `text-primary`: the user-set bright blue primary is 2.5:1 on the light gray (below 3:1, label text carries the meaning).
 
 ## 2026-09-15 — Codex — Repair trip country data and refresh sidebar after creation
 
