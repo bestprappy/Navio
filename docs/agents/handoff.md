@@ -4,6 +4,10 @@ Current state for the next agent. Overwrite sections as they change; keep it sho
 
 **Last updated:** 2026-09-15 by Codex
 
+## Latest fix: route and battery row alignment
+
+Client route status rows now use layout divs instead of paragraphs so AccordionContent's `[&_p:not(:last-child)]:mb-4` rule cannot shift the first row upward. Applies to normal/loading/fallback drive rows and discharge details. Browser verified equal row positions and zero margins, plus clean wrapping at 390px. TypeScript and targeted ESLint pass. Both route component files remain uncommitted alongside prior work; no deployment.
+
 ## In progress: delete trip (client, uncommitted)
 
 "⋯" trip options menu with Delete trip + confirmation dialog on dashboard cards (`trip-summary-card.tsx`) and in the planner beside the trip name (`trip-info-card.tsx`, redirects to `/dashboard`). New files: `client/app/feature/planner/_components/trip-actions-menu.tsx`, `use-delete-trip.ts`; `deleteTrip` added to `planner-api.ts`. Type-check and lint pass; not browser-tested. Do not make the delete hook refetch `["planner", tripId]`: a 404 there makes `PlannerPersistence` create the trip again.

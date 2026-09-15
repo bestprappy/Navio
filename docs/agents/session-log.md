@@ -17,6 +17,15 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 ---
 
+## 2026-09-15 � Codex � Fix route and battery row alignment
+
+**Goal:** align the drive time/distance and battery details shown in the screenshot.
+**Done:** changed RouteSegmentInfo (normal, loading, fallback) and DischargeSegmentInfo outer elements from paragraphs to layout divs. The accordion's descendant paragraph rule added a bottom margin only to the first row, causing an 8.625px vertical offset. Existing client changes preserved; application edits remain uncommitted.
+**Verified:** Chrome guest planner with mocked directions: both rows now have identical y coordinates and zero margins; 390px layout wraps without overlap. Full TypeScript check and targeted ESLint passed.
+**Not done / left uncommitted:** client routes/route-segment-info.tsx and routes/charge-segment-info.tsx under app/feature/planner/planId/_components; no deployment.
+**Follow-ups:** none for alignment. Other sessions' unfinished changes preserved.
+
+
 ## 2026-09-15 — Codex — Repair trip country data and refresh sidebar after creation
 
 **Goal:** fix sidebar pins, including the user's report of a new trip without country information.
