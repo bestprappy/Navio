@@ -17,6 +17,14 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 ---
 
+## 2026-09-15 — Codex — Repair trip country data and refresh sidebar after creation
+
+**Goal:** fix sidebar pins, including the user's report of a new trip without country information.
+**Done:** backed up production `trip.trip` to VM `/home/adminnav/navio-maintenance/flags-2026-09-15/trip-before-backfill.sql`; ran existing deployed backfill once in an isolated 700 MB container with discovery and Flyway disabled (6 of 9 unresolved trips repaired). Removed temporary container. Resolved legacy IDs 101/102/105 to matching Google destinations through mobility, checked matching names/countries and coordinate proximity, and repaired three trips through the trip service PUT endpoint. Local creation paths now invalidate trip-list queries.
+**Verified:** final live API check: all 6 currently remaining trips have valid TH/IN codes; SQL: zero null codes; service healthy. Count changed during concurrent activity. Client full type-check and targeted ESLint passed. Browser not verified.
+**Not done / left uncommitted:** client `planner-setup.tsx` and `planId/_components/overview/planner-persistence.tsx`; unrelated concurrent client/backend work untouched. No code deployment.
+**Follow-ups:** user was asked for the new trip destination and environment; inspect that specific case if browser refresh still shows a pin.
+
 ## 2026-09-15 — Claude — Delete trip from dashboard and planner
 
 **Goal:** add a delete trip action to the dashboard trip cards and the planner.

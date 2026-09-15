@@ -2,7 +2,7 @@
 
 Current state for the next agent. Overwrite sections as they change; keep it short. History belongs in [session-log.md](session-log.md).
 
-**Last updated:** 2026-09-15 by Claude
+**Last updated:** 2026-09-15 by Codex
 
 ## In progress: delete trip (client, uncommitted)
 
@@ -10,7 +10,9 @@ Current state for the next agent. Overwrite sections as they change; keep it sho
 
 ## Latest investigation
 
-Sidebar pins: local `SidebarTrips` already passes `destinationCountryCode` to `CountryFlag`, which falls back to a pin for missing/invalid codes. The existing opt-in location backfill likely explains older trips displaying pins. No live responses were inspected and no application code or production data changed. Existing client work remains untouched.
+Sidebar flags repaired in production data: initially 9/10 trips lacked country codes. Ran the deployed opt-in backfill in a temporary container (6 repaired), then resolved three legacy numeric destination IDs through mobility and updated them through the trip service (Phuket, Chiang Mai, Chiang Rai). Backup: VM `/home/adminnav/navio-maintenance/flags-2026-09-15/trip-before-backfill.sql`. Temporary container removed; service stayed healthy. Concurrent user activity reduced the trip count; final live API check verified all 6 remaining trips have codes, and SQL found zero null codes.
+
+Local client fix, uncommitted: `planner-setup.tsx` and `planner-persistence.tsx` invalidate trip-list queries after creation so the sidebar refreshes. Full type-check and targeted lint pass. User also reported a new trip without a country; requested destination and whether localhost/deployed, awaiting clarification. Browser rendering not verified. Other agents' client/backend edits preserved.
 
 ## Live in production
 
@@ -38,7 +40,7 @@ The user has not yet decided whether to commit these on their own branch.
 
 ## Known gaps
 
-- Existing trips created before 2026-09-14 have null city/region/country code until the backfill runs. It is off by default: `navio.trip-location-backfill.enabled=true` (rate limited, retries failed places on the next run).
+- Trip country backfill completed on 2026-09-15; zero remaining null country codes at verification. The runner remains disabled by default.
 - Premade-plan copy resolves the destination by name; not tested in a browser yet.
 - `docs/api/Navio Open API.yaml` trip schemas describe a planned design and do not match the current trip DTOs.
 - trip-planning-service `@SpringBootTest` and `@WebMvcTest` tests need the configuration server on port 8888 (no test `application.yml`).
@@ -47,4 +49,4 @@ The user has not yet decided whether to commit these on their own branch.
 ## Next steps
 
 1. Decide what to do with the uncommitted client work.
-2. Run the trip location backfill in production once, then verify a sample of old trips.
+2. Confirm the sidebar after browser refresh; investigate the reported new trip if the flag is still missing (need destination/environment).
