@@ -4,6 +4,10 @@ Current state for the next agent. Overwrite sections as they change; keep it sho
 
 **Last updated:** 2026-09-15 by Codex
 
+## Latest fix: garage photo background
+
+VehicleMedia now matches community post media: a scaled, blurred, darkened cover image fills the frame behind the sharp contained vehicle photo. Decorative image is hidden from accessibility; previous multiply blending removed. TypeScript and targeted ESLint passed, isolated Chrome rendering with real component/CSS/local vehicle asset verified and screenshot inspected. Client file remains uncommitted alongside earlier changes.
+
 ## Latest fix: block accent colors
 
 TripBlock.Root in client block/trip-block.tsx now scopes --primary, --primary-foreground and --ring to its selected palette entry. This makes primary icons, links, borders and focus states follow each block color. Chrome verified Rose-to-Teal updates across six primary elements, with global theme unchanged; TypeScript and ESLint pass. Application edit remains uncommitted alongside prior work.

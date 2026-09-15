@@ -17,6 +17,15 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 ---
 
+## 2026-09-15 - Codex - Blur garage photo background
+
+**Goal:** match community post image backgrounds in the garage.
+**Done:** VehicleMedia now layers a decorative object-cover copy with scale-110, blur-2xl and brightness-75 behind the sharp object-contain vehicle image. Removed foreground multiply blending. Reuses the same image URL and sizes; missing-image fallback retained.
+**Verified:** full TypeScript check and targeted client ESLint pass. Isolated Chrome render of the actual component with application CSS and BYD Atto 3 asset: background blur/brightness and foreground contain/no filter confirmed; dark screenshot inspected.
+**Not done / left uncommitted:** client garage/vehicle-media.tsx under app/feature/planner/planId/_components, alongside prior work. No deployment.
+**Follow-ups:** none.
+
+
 ## 2026-09-15 - Codex - Match block accents to selected color
 
 **Goal:** replace blue primary accents inside each trip block with that block's selected color.
