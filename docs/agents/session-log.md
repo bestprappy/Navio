@@ -17,6 +17,15 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 ---
 
+## 2026-09-15 - Codex - Match block accents to selected color
+
+**Goal:** replace blue primary accents inside each trip block with that block's selected color.
+**Done:** TripBlock.Root scopes primary, primary foreground, and focus-ring CSS variables to the selected block palette entry. Descendant actions, icons, borders and focus states update together when the block color changes.
+**Verified:** full TypeScript check and targeted ESLint pass; Chrome guest planner verified six primary elements change together from Rose to Teal, matching focus-ring color, with global primary unchanged. Inspected Rose screenshot.
+**Not done / left uncommitted:** client app/feature/planner/planId/_components/block/trip-block.tsx on feat/structured-trip-location; prior edits preserved; no deployment.
+**Follow-ups:** none.
+
+
 ## 2026-09-15 � Codex � Fix route and battery row alignment
 
 **Goal:** align the drive time/distance and battery details shown in the screenshot.

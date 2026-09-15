@@ -4,6 +4,10 @@ Current state for the next agent. Overwrite sections as they change; keep it sho
 
 **Last updated:** 2026-09-15 by Codex
 
+## Latest fix: block accent colors
+
+TripBlock.Root in client block/trip-block.tsx now scopes --primary, --primary-foreground and --ring to its selected palette entry. This makes primary icons, links, borders and focus states follow each block color. Chrome verified Rose-to-Teal updates across six primary elements, with global theme unchanged; TypeScript and ESLint pass. Application edit remains uncommitted alongside prior work.
+
 ## Latest fix: route and battery row alignment
 
 Client route status rows now use layout divs instead of paragraphs so AccordionContent's `[&_p:not(:last-child)]:mb-4` rule cannot shift the first row upward. Applies to normal/loading/fallback drive rows and discharge details. Browser verified equal row positions and zero margins, plus clean wrapping at 390px. TypeScript and targeted ESLint pass. Both route component files remain uncommitted alongside prior work; no deployment.
