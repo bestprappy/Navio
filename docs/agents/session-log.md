@@ -17,6 +17,14 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 ---
 
+## 2026-09-15 — Codex — Explain sidebar pin fallback
+
+**Goal:** explain why saved trips still show pins after the flag work.
+**Done:** inspected sidebar rendering and the country flag component; flags already use `destinationCountryCode`, with a pin for missing/invalid codes. Confirmed the backend backfill runner is opt-in.
+**Verified:** source inspection and repository status; no live trip responses inspected, so missing country codes for the pictured trips remain an inference supported by the prior handoff.
+**Not done / left uncommitted:** existing client changes preserved; no application changes or production operations.
+**Follow-ups:** inspect affected trip responses and run the existing location backfill if their country codes are null.
+
 ## 2026-09-14 — Claude — Finish structured trip location, fix failed release, add agent context
 
 **Goal:** continue Codex's structured trip location work, commit, and deploy.

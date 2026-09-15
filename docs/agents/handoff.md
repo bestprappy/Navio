@@ -2,7 +2,11 @@
 
 Current state for the next agent. Overwrite sections as they change; keep it short. History belongs in [session-log.md](session-log.md).
 
-**Last updated:** 2026-09-14 by Claude
+**Last updated:** 2026-09-15 by Codex
+
+## Latest investigation
+
+Sidebar pins: local `SidebarTrips` already passes `destinationCountryCode` to `CountryFlag`, which falls back to a pin for missing/invalid codes. The existing opt-in location backfill likely explains older trips displaying pins. No live responses were inspected and no application code or production data changed. Existing client work remains untouched.
 
 ## Live in production
 
