@@ -2,7 +2,11 @@
 
 Current state for the next agent. Overwrite sections as they change; keep it short. History belongs in [session-log.md](session-log.md).
 
-**Last updated:** 2026-09-15 by Codex
+**Last updated:** 2026-09-15 by Claude
+
+## In progress: delete trip (client, uncommitted)
+
+"⋯" trip options menu with Delete trip + confirmation dialog on dashboard cards (`trip-summary-card.tsx`) and in the planner beside the trip name (`trip-info-card.tsx`, redirects to `/dashboard`). New files: `client/app/feature/planner/_components/trip-actions-menu.tsx`, `use-delete-trip.ts`; `deleteTrip` added to `planner-api.ts`. Type-check and lint pass; not browser-tested. Do not make the delete hook refetch `["planner", tripId]`: a 404 there makes `PlannerPersistence` create the trip again.
 
 ## Latest investigation
 

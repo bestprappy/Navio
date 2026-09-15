@@ -17,6 +17,19 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 ---
 
+## 2026-09-15 — Claude — Delete trip from dashboard and planner
+
+**Goal:** add a delete trip action to the dashboard trip cards and the planner.
+**Done (client, uncommitted, on `feat/structured-trip-location` alongside the earlier Codex work):**
+- `planner-api.ts`: `deleteTrip(tripId)` -> `DELETE /api/trips/{id}` (proxy already forwards DELETE to `/v1/trips/{id}`).
+- New `use-delete-trip.ts`: mutation in the `planner-autosave-<id>` scope (waits for an in-flight save); treats 404 as success; clears the local draft and the recent-plan sidebar atom, drops the trip from every `["planner","trips"]` page and invalidates it; removes only *inactive* metadata/stats/snapshot queries, because refetching an open planner's snapshot would 404 and `PlannerPersistence` would recreate the trip.
+- New `trip-actions-menu.tsx`: "⋯" dropdown with "Delete trip" and a confirmation dialog (Cancel focused first, pending/error states, optional `redirectTo`).
+- `trip-summary-card.tsx`: menu replaces the decorative top-right arrow.
+- `trip-info-card.tsx`: now a client component; menu beside the trip name for signed-in users with a persisted trip; redirects to `/dashboard`.
+**Verified:** full client `tsc --noEmit` and ESLint on the five files pass. Not run in a browser; delete not exercised against the backend.
+**Not done / left uncommitted:** all five client files above (not committed because the client tree holds ~57 unreviewed files from another session on the same branch).
+**Follow-ups:** browser check (menu keyboard nav, dialog focus, redirect, sidebar refresh); decide how to commit the client tree. `TripHeroCard` has no menu because the dashboard does not render it.
+
 ## 2026-09-15 — Codex — Explain sidebar pin fallback
 
 **Goal:** explain why saved trips still show pins after the flag work.
