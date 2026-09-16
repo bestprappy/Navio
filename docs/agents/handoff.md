@@ -1,4 +1,4 @@
-﻿## 2026-09-16 - Codex - Pull latest integrated release
+## 2026-09-16 - Codex - Pull latest integrated release
 
 **Goal:** Pull all latest Git changes and resolve conflicts while preserving local work.
 **Done:** Fast-forwarded root to 3ee0228, client to 4622b54, server to 8eb47de; synchronized all four service gitlinks. Root/client/server on dev. Prior guest/drawer commits are ancestors of the incoming release. Backed up the local AGENTS files before accepting shared versions; no code conflicts. Installed incoming frontend dependencies and retained the upstream lockfile.
@@ -54,4 +54,3 @@ Root `0a4acc4` (deploy run 34829001804, success).
 1. Confirm the deploy run for the root release succeeded and production is healthy.
 2. Browser-check the released client work (see Known gaps).
 3. The user plans to add hardcoded colors and have an agent convert them into theme tokens; decide whether to darken light `--primary` for contrast.
-
