@@ -1,3 +1,11 @@
+## 2026-09-19 - Codex - Vehicle energy provenance Phase 1
+
+**Goal:** Implement only the additive vehicle-consumption provenance contract; Phase 2 requires separate approval.
+**Done:** User service exposes typed version-1 energyProfile metadata, stores explicit user-observed provenance in existing JSONB, and returns legacy/unknown profiles without read-time writes. Catalogue range standard/source remain separate from absent consumption evidence and unknown usable capacity. Frontend schemas/mappers carry profiles; explicit average-entry paths send USER_OBSERVED with UNKNOWN basis, including guest vehicles. Unrelated settings edits omit consumption so provenance is preserved. Existing scalar values, factors, battery calculations, optimizer multiplier and charger behaviour are unchanged.
+**Verified:** 32 focused backend tests pass; 2 conditional PostgreSQL tests skipped (Docker unavailable/no disposable DB configured). 17 frontend garage/provenance/guest tests pass with Node 22.22; installed Node 22.14 lacks the test suite's registerHooks API. TypeScript and targeted ESLint pass; diffs have no whitespace errors. Root fast-forward-only pull reports already up to date.
+**Uncommitted implementation:** client vehicle.types.ts; garage vehicle-api.ts, vehicle-mappers.ts, guest-vehicles.ts, add-vehicle-dialog.tsx, custom-vehicle-form.tsx, vehicle-settings-form.tsx; tests/garage/energy-profile.test.mjs. User service: new VehicleEnergyProfile.java; VehicleCatalogResponse, VehicleResponse, VehicleRequests, UserMapper, UserVehicleService; VehicleGarageTests, UserVehicleControllerTests, PostgresSchemaTests. Pre-existing client tsconfig flag/CLAUDE.md and service logs preserved. No push/deployment.
+**Next:** Review Phase 1, run the PostgreSQL JSONB persistence test when a disposable database is available, and deploy backend support before the client sends new provenance fields. Do not start fallback selection, uncertainty/reserve changes, model eligibility, or Phase 2 without user approval. Required session/API/database documentation is recorded in the root docs branch and merged locally to dev.
+
 ## 2026-09-16 - Codex - Pull latest integrated release
 
 **Goal:** Pull all latest Git changes and resolve conflicts while preserving local work.

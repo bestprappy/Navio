@@ -17,6 +17,14 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 ---
 
+## 2026-09-19 - Codex - Vehicle consumption provenance Phase 1
+
+**Goal:** Add the minimum backward-compatible provenance contract, with separate range/consumption standards and field-specific evidence; implement no later phases.
+**Done:** Added typed energyProfile responses/JSONB metadata, restricted observed-provenance requests, legacy unknown fallback without numeric changes, catalogue defaults with no fabricated consumption/usable capacity, frontend profile transport and minimal explicit-average submission wiring. Guest updates follow the same provenance semantics. API/database docs updated. Reporting is committed on a docs branch and merged locally to dev only; implementation remains uncommitted in client and user-management-service.
+**Verified:** 32 backend tests passed, 2 PostgreSQL tests skipped (Docker unavailable/no test DB). 17 frontend garage/provenance/guest tests passed using Node 22.22; TypeScript, targeted lint, and diff whitespace checks passed. Root pre-commit fast-forward pull was already up to date. No source research, migration, battery/charger/optimizer changes, or deployment.
+**Not done / left uncommitted:** Phase 1 implementation and tests in client/user service; pre-existing local files preserved. Actual PostgreSQL persistence and browser/backend integration were not run. Installed Node 22.14 cannot run the existing registerHooks-based tests; Node 22.22 was used without changing dependencies.
+**Follow-ups:** Run real PostgreSQL persistence check when available. Backend-first deployment for new request fields. Await explicit approval before Phase 2; no new selection/gating policy is active.
+
 ## 2026-09-16 - Codex - Pull latest integrated release
 
 **Goal:** Pull all latest Git changes and resolve conflicts while preserving local work.

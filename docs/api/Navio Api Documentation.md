@@ -8,6 +8,26 @@
 
 ## Global API Rules
 
+### Vehicle energy provenance (Phase 1, 2026-09-19)
+
+Garage responses from `/v1/users/me/vehicles` and its catalogue endpoints add an `energyProfile` object. Existing scalar specifications and calculation behaviour are unchanged. Old payloads remain accepted; older responses without this object remain supported by the client.
+
+The version-1 profile contains `modelKind` (`CONSUMPTION`, `RATED_RANGE`, `UNAVAILABLE`), `selectionMode` (`CATALOG_DEFAULT`, `USER_OVERRIDE`, `LEGACY_UNCONFIRMED`), nullable `consumptionKwhPer100km`, `consumptionSource` (`USER_OBSERVED`, `MANUFACTURER_REPORTED`, `REGULATORY_REPORTED`, `UNKNOWN`), `consumptionMeasurementBasis` (`BATTERY_SIDE`, `WALL_SIDE`, `TRIP_COMPUTER`, `UNKNOWN`), `consumptionStandard`, nullable consumption-evidence `sourceUrl`, nullable `usableBatteryCapacityKwh`, `capacityBasis` (`USABLE`, `GROSS`, `MANUFACTURER_DECLARED_UNSPECIFIED`, `UNKNOWN`), `ratedRangeKm`, and `ratedRangeStandard`. Standards are `NEDC`, `WLTP`, `EPA`, `CLTC`, `OTHER`, or `NONE`.
+
+Range standard and consumption standard are independent. Current catalogue entries have NEDC range, no direct consumption specification, no confirmed usable capacity, and no consumption source URL. Their existing top-level specification URL and manufacturer-declared capacity remain intact.
+
+Create, catalogue-add and update requests may include `consumptionProvenance` alongside a numeric consumption value:
+
+```json
+{"consumptionKwhPer100km":18.125,"consumptionProvenance":{"consumptionSource":"USER_OBSERVED","consumptionMeasurementBasis":"UNKNOWN"}}
+```
+
+Only `USER_OBSERVED` is writable by users. Basis may be `UNKNOWN`, `TRIP_COMPUTER`, or `BATTERY_SIDE`; omitted basis means `UNKNOWN`. Authoritative source claims are rejected with 400. Provenance without a consumption value is rejected with 422. Existing owner-scoped authorization is unchanged.
+
+Absent provenance is represented as legacy/unknown without recalculating consumption or writing a read-time migration. Numeric writes without provenance invalidate stale source claims; unrelated settings updates preserve them. Vehicle specification edits invalidate the old catalogue/profile claim. Phase 1 does not enforce future model eligibility, change standard factors, change the optimizer multiplier, or alter charger planning. Deploy backend contract support before the client that sends provenance.
+
+### Common conventions
+
 - All public APIs use `/v1`.
 - Default response format is JSON.
 - Default authentication is `Authorization: Bearer <access_token>`.
