@@ -17,6 +17,14 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 ---
 
+## 2026-09-21 - Codex - Record deferred Phase 5 Trip Energy consolidation
+
+**Goal:** Preserve the approved Usage Overview/Trip Energy consolidation as a Phase 5 requirement and proceed only within the approved Phase 2 plan.
+**Done:** Recorded design foundation, useful retained information, canonical model dependency, honest missing-value/provenance presentation, shared guest/account behavior and eventual validation criteria in the existing handoff. Recorded Phase 2 authorization. No UI/calculation changes.
+**Verified:** Inspected root/client/server and changed service Git state, current handoff/history, vehicle mapping and available plan references. Local search and GitHub code search did not locate the full approved PLAN 2; the original planning request is available but is not the approved plan. Documentation diff checked; application tests are not applicable to this documentation-only change.
+**Not done / left uncommitted:** Existing Phase 1/1.1 application changes, local tsconfig flag, CLAUDE.md and service logs preserved. Phase 2 implementation awaits the approved Phase 2 section requested from the user. No UI consolidation, push or deployment.
+**Follow-ups:** Use the supplied approved Phase 2 text as the implementation boundary; do not reconstruct it from phase summaries. Implement deferred UI consolidation only in Phase 5 after Phases 2-4 outputs stabilize. Phase 1 PostgreSQL and Phase 1.1 live browser/backend verification remain pending.
+
 ## 2026-09-21 - Codex - Phase 1.1 guest catalogue UX correction
 
 **Goal:** Restore catalogue-first selection for guests and signed-in users, with narrowly scoped public reads; do not begin Phase 2.
