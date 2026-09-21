@@ -1,3 +1,10 @@
+## 2026-09-21 - Codex - Phase 1.1 guest catalogue correction
+
+**Done:** Both vehicle-add flows default to Catalogue with Custom EV available. Guest catalogue selections copy validated catalogue specifications/identity/profile into temporary guest state; no account writes. Signed-in saving remains unchanged. Exact GET /v1/users/me/vehicles/catalog is public in the Next proxy, gateway and user service; controller no longer resolves/provisions a current user for this read. All private garage/account operations stay authenticated. Phase 1 provenance preserved; no Phase 2 or energy/charger/optimizer changes.
+**Verified:** 22 frontend tests (garage API, actual component render/callback harness, picker filtering, exact proxy rules, guest selection and Phase 1 regression); 33 user-service garage/security tests; 9 gateway security/identity tests passed. TypeScript and targeted lint passed. Existing guest browser script updated for catalogue selection plus Custom EV, but full browser/live-backend integration not run. Phase 1 real PostgreSQL persistence check remains pending; no schema change in Phase 1.1.
+**Working tree:** Phase 1 and 1.1 application changes remain uncommitted in client, server/api-gateway and user-management-service. Preserve pre-existing tsconfig flag, CLAUDE.md and logs. Additional 1.1 files: vehicle proxy route; add-vehicle-dialog, guest-vehicles, vehicle-api; garage API/energy-profile/catalogue-flow tests and guest/browser-check; GatewaySecurityConfig/GroupPublicRoutesTest; user SecurityConfig/UserVehicleController/UserVehicleControllerTests. Required documentation committed separately on a docs branch and merged locally to dev. No push/deployment.
+**Next:** Deploy gateway/user-service changes before relying on public catalogue in the client. Browser-check guest and signed-in flows together. Stop here; Phase 2 still requires approval.
+
 ## 2026-09-19 - Codex - Vehicle energy provenance Phase 1
 
 **Goal:** Implement only the additive vehicle-consumption provenance contract; Phase 2 requires separate approval.

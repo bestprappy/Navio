@@ -26,6 +26,12 @@ Only `USER_OBSERVED` is writable by users. Basis may be `UNKNOWN`, `TRIP_COMPUTE
 
 Absent provenance is represented as legacy/unknown without recalculating consumption or writing a read-time migration. Numeric writes without provenance invalidate stale source claims; unrelated settings updates preserve them. Vehicle specification edits invalidate the old catalogue/profile claim. Phase 1 does not enforce future model eligibility, change standard factors, change the optimizer multiplier, or alter charger planning. Deploy backend contract support before the client that sends provenance.
 
+### Public vehicle catalogue (Phase 1.1, 2026-09-21)
+
+Only `GET /v1/users/me/vehicles/catalog` is anonymously readable, through both gateway and user-service security. The matching Next.js proxy allows anonymous access only to this exact GET operation. It returns the curated catalogue, never personal garage records, and does not provision a user. All saved-vehicle reads/writes and other private user endpoints remain authenticated. Deploy the gateway and user service before enabling guest catalogue reads on the client.
+
+Both guest and signed-in Add Vehicle dialogs default to Catalogue and offer Custom EV. Guest catalogue selections copy validated specifications, catalogue identity and the catalogue energy profile into in-memory trip state only; their active consumption provenance remains unknown for the existing estimate, or USER_OBSERVED for an explicit average. Signed-in commands continue posting only catalogue ID and existing consumption/settings/provenance inputs; the browser catalogue snapshot is never posted as trusted server specifications. Phase 1 calculations and Phase 2 policy remain unchanged.
+
 ### Common conventions
 
 - All public APIs use `/v1`.

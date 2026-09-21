@@ -17,6 +17,14 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 ---
 
+## 2026-09-21 - Codex - Phase 1.1 guest catalogue UX correction
+
+**Goal:** Restore catalogue-first selection for guests and signed-in users, with narrowly scoped public reads; do not begin Phase 2.
+**Done:** Shared Catalogue/Custom EV choices; temporary guest catalogue snapshots and unchanged authenticated saves; exact catalogue GET exception across frontend proxy, gateway and user security; public controller returns only curated specifications without user resolution. Added component-callback, guest-provenance and security coverage; updated existing browser scenario and API docs. Reporting committed on docs branch then merged locally to dev only.
+**Verified:** 22 frontend tests, 33 user-service tests, 9 gateway tests passed; TypeScript and targeted ESLint passed; diff whitespace checks clean. Root fast-forward-only pre-commit pull already up to date. No calculation, standard-factor, optimizer multiplier, reachability or Phase 2 policy changes.
+**Not done / left uncommitted:** Phase 1 and 1.1 source/tests remain in client, server/api-gateway and user service; unrelated prior files preserved. Full browser/live-backend scenario not executed. Phase 1 PostgreSQL persistence verification remains pending. No push/deployment.
+**Follow-ups:** Backend/gateway first deployment; browser integration check; await Phase 2 approval.
+
 ## 2026-09-19 - Codex - Vehicle consumption provenance Phase 1
 
 **Goal:** Add the minimum backward-compatible provenance contract, with separate range/consumption standards and field-specific evidence; implement no later phases.
