@@ -4,6 +4,8 @@
 
 Phase 1 stores optional version-1 `energyProfile` provenance in the existing `iam.user_vehicles.metadata_jsonb` object. No column, entity mapping, or Flyway migration changes are required. Existing consumption remains in `consumption_kwh_per_100km`; JSONB carries its provenance without replacing that calculation input. Other metadata keys are preserved. Missing profiles are exposed as legacy/unknown at response time without backfilling or changing the numeric value. See the vehicle provenance contract in `docs/api/Navio Api Documentation.md` for fields and update semantics.
 
+Phase 2 adds explicit energy selection commands using that same JSONB profile. A requested range default/reset stores `RATED_RANGE` and null `consumption_kwh_per_100km`; the existing nullable column already supports this. Legacy confirmation stores a separate `legacyConsumptionConfirmed` boolean in JSONB without changing the numeric value or its provenance. Later consumption/specification changes invalidate confirmation. No automatic backfill, new table, entity mapping or migration is introduced. PostgreSQL verification now covers resetting an observed profile to a null-consumption range profile as well as preserving unrelated JSONB keys.
+
 **Project:** Navio
 **Database:** PostgreSQL 16+ with PostGIS, `pg_trgm`, and JSONB
 **Deployment:** Single PostgreSQL instance on the application VM; AI Planning may connect from the private ML VM

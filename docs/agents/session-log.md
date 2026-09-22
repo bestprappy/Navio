@@ -17,6 +17,14 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 ---
 
+## 2026-09-22 - Codex - Phase 2 direct selection, range fallback and overrides
+
+**Goal:** Implement only the supplied Phase 2 section of the full redesign; retain Phase 1/1.1 and defer Phases 3-5.
+**Done:** Added explicit energy-selection commands and backend-resolved defaults; suitable direct consumption precedes rated-range fallback, user average overrides, and reset clears the override. Removed frontend standard-factor default derivation. Range fallback stores null consumption, legacy values remain unchanged/unknown and confirmation is separate. Updated guest/account forms, active selection vs calculation readiness, client automatic-application guards and null-profile persistence mapping. Existing JSONB only; no migration. Updated existing API/database/handoff documentation. Source/tests remain uncommitted alongside prior work; docs committed separately and merged locally to dev only.
+**Verified:** 32 frontend garage/guest/filter tests; 39 backend garage/controller/service tests; TypeScript; targeted lint; whitespace checks passed. Two conditional PostgreSQL tests skipped without a disposable test database; extended test covers observed-to-range reset. Actual Chrome guest scenario with public API mocks passed catalogue/default/override/reset/custom flows and guest isolation, with no browser errors/account requests. Existing positive-consumption calculator and backend 1.12 unchanged. Initial obsolete consumption-required test was revised to require a value OR explicit default; test harness resolver/VM-object assertions corrected.
+**Not done / left uncommitted:** All Phase 1/1.1/2 implementation files remain uncommitted in client, gateway and user service; unrelated files preserved. No push/deployment. No live authenticated browser/backend integration or real PostgreSQL check. Rated-range numerical predictions are deferred to Phase 3, not recreated in the selection layer.
+**Follow-ups:** Backend-first rollout, real PostgreSQL and authenticated integration checks; await Phase 3 approval. Existing declared capacity/reference-range requirements remain; usable capacity is not inferred. Phase 4 must integrate server optimizer eligibility/model contracts; Phase 5 UI consolidation stays deferred in handoff.
+
 ## 2026-09-21 - Codex - Record deferred Phase 5 Trip Energy consolidation
 
 **Goal:** Preserve the approved Usage Overview/Trip Energy consolidation as a Phase 5 requirement and proceed only within the approved Phase 2 plan.

@@ -32,6 +32,20 @@ Only `GET /v1/users/me/vehicles/catalog` is anonymously readable, through both g
 
 Both guest and signed-in Add Vehicle dialogs default to Catalogue and offer Custom EV. Guest catalogue selections copy validated specifications, catalogue identity and the catalogue energy profile into in-memory trip state only; their active consumption provenance remains unknown for the existing estimate, or USER_OBSERVED for an explicit average. Signed-in commands continue posting only catalogue ID and existing consumption/settings/provenance inputs; the browser catalogue snapshot is never posted as trusted server specifications. Phase 1 calculations and Phase 2 policy remain unchanged.
 
+### Vehicle energy selection (Phase 2, 2026-09-22)
+
+Create, catalogue-add and update requests accept optional `energySelection`:
+
+- `USE_DEFAULT` / `RESET_DEFAULT`: omit numeric consumption and provenance. The service resolves the current catalogue entry by ID (never browser specifications), selects independently evidenced manufacturer/regulatory battery-side consumption if suitable, otherwise explicit `RATED_RANGE`, or `UNAVAILABLE` without range. Custom defaults use their reference range. Default selection stores null consumption for range fallback; no standard-factor or capacity/range derivation is performed.
+- `USER_OVERRIDE`: supply positive `consumptionKwhPer100km`; provenance becomes `USER_OBSERVED`. Basis remains `UNKNOWN` unless explicitly supplied in the existing restricted provenance object. The override takes precedence; reset discards it only on the user's explicit command.
+- `CONFIRM_LEGACY`: update an existing legacy vehicle without supplying consumption/provenance or changing specifications. Preserves the exact scalar and unknown provenance; stores a separate `legacyConsumptionConfirmed` boolean. Response includes that boolean. Consumption/specification edits and explicit default/override selection invalidate confirmation. No automatic migration or provenance reclassification occurs.
+
+Omitting the command preserves old-client Phase 1 write semantics. An empty catalogue-add body is still invalid: a numeric legacy value or explicit default command is required. Invalid enum/field values return 400; contradictory command combinations and invalid legacy confirmation return 422. Unrelated metadata/settings survive updates. Null-consumption profiles survive JSONB and API mapping. No schema migration is added.
+
+Both account modes remain catalogue-first and offer Custom EV. Custom consumption is optional. Guests resolve defaults from the fetched catalogue snapshot into temporary state only; authenticated defaults resolve on the server. The UI supports retaining current settings, using the vehicle default, entering an observed average and confirming a legacy estimate.
+
+Phase boundary: range-only vehicles remain active for identity and connector filtering, but are withheld from the existing consumption-only calculator/optimizer until the Phase 3 model is available. The UI reports estimates unavailable instead of inventing consumption. Legacy positive-value estimates remain available; automatic application requires confirmation. Client Auto Add and optimizer Apply handlers enforce selection eligibility, including the local insertion atom. This is a client selection policy, not a redesign of the raw backend optimizer contract or its reachability validation (Phase 4). Existing calculation arithmetic and backend 1.12 multiplier remain unchanged. Deploy user-service command support before this client; real PostgreSQL/live authenticated integration still require verification.
+
 ### Common conventions
 
 - All public APIs use `/v1`.
