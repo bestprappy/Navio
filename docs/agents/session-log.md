@@ -17,6 +17,15 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 ---
 
+## 2026-09-22 — Claude — LLM council: EV calibration and adoption
+
+**Goal:** the professor asked how battery differences are calibrated (the user answered "we use consumption rate"); the user asked what to improve in the EV feature, whether NEDC/WLTP etc. matter, and how to make real EV drivers want it.
+**Done:** advice only, via a 5-advisor council with peer review. No code changes.
+**Verdict:** the consumption answer is half right. Consumption covers energy, but the number comes from unsourced factors (NEDC/CLTC 0.7, WLTP 0.85, EPA 0.9, plus the 1.12 margin, 12% reserve and 0.9 charge efficiency), and one charge curve for every car ignores LFP vs NMC. Next: (1) run the flow in the browser with live routes; (2) a small evaluation: fixed Thai routes × cars against published real-world figures, pass/fail thresholds set before measuring, plus a ±15% consumption sensitivity rerun that checks whether the charging stops change; (3) sourced real-world consumption and usable kWh per catalog car, with test-cycle factors only as a cited fallback; (4) HVAC as a per-hour load (route duration × kW); (5) LFP/NMC charge-curve profiles. Position Navio as a trip planner with charging built into the itinerary, not as a physics rival to ABRP.
+**Verified:** n/a (no code).
+**Not done / left uncommitted:** this entry and the handoff note. `handoff.md` already had uncommitted edits at session start, so nothing was committed.
+**Follow-ups:** the user to choose which steps to implement. A change to the catalog schema needs a new migration (see `database-changes.md`) and regression tests on the optimizer before recalibrating.
+
 ## 2026-09-22 — Claude — Advise on EV simulation panel and planner UX
 
 **Goal:** the user asked for an opinion on Codex's EV simulation work, the "EV Trip Planner Research" UX critique, and whether the Energy simulation panel is too complex for users.
@@ -29,7 +38,9 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 **Then (arrival reserve):** client `4d6a90e` on `dev` (via `feat/arrival-reserve`) adds the "Arrive with at least" 10/12/15/20% setting and routes it to the optimizer, reserve lines and battery colours. `tsc` 0; planner ESLint 0 errors.
 **Then (battery chart):** client `9bd8ccb` on `dev` (via `feat/battery-route-chart`) adds `BatteryRouteChart` and `DayEvProjection.profile`. Rendered with headless Chrome against the running dev server using sample data, in light and dark mode with focus tooltips; moved the tooltip beside the crosshair after it covered the charger marker. `tsc` 0; planner ESLint 0 errors.
 **Then (panel):** at the user's request, removed `EnergySimulationPanel` (client `7dee312` on `dev`); the physics model stays. `tsc` 0; planner ESLint 0 errors.
-**Not done:** release; check in the real planner with live routes (reserve hydration, radio keyboard use, chart); evaluation harness.
+**Then (release, user asked to deploy):** fast-forwarded `main` to `dev` in mobility (`eb72b37`), server (`cdcd736`), client (`7dee312`) and root (`28b6d7e`, deploys). All pins matched `origin/main` before the root push. Deploy run 35700267438 succeeded; after the deploy `/health` 200, `/v1/trips` 401, `/` 200. Also explained the formula changes, the reserve and "Plan charging stops" controls, and the status of the physics model to the user.
+**Then (production bug):** the user reported "temporarily unavailable", then "could not be optimized". The VM logs showed no mobility error. Cause of the 422: trip-planning ignored day start/end anchors. Fixed on `dev` (trip-planning `c6d5b8c`, server `1657da2`, client `a4ab4b1`); see the handoff. Not deployed yet.
+**Not done:** deploy the fix; check in the real planner with live routes; decision on removing the "Charge each stop to" slider; evaluation harness (the user may want Thai cars and routes; ask).
 **Follow-ups:** user to decide where the panel goes and whether to restore the range factor. An LLM council on the plan agreed on: one energy model shared by planner and chart (backend as the source of truth), the arrival buffer passed through to the optimizer, the panel moved to a reachable `/research/energy` route, the driving-conditions preset dropped, and a real evaluation (public reference data, elevation, error measured by charging decisions). Nothing implemented.
 
 ## 2026-09-22 — Claude — Revert depth rework, keep EV simulation
