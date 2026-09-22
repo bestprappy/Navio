@@ -28,7 +28,8 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 **Verified:** `tsc --noEmit` 0; ESLint on `app/feature/planner` 0 errors (only the 2 known warnings). Not browser-checked, and the guest flow (sign-in prompt) is untested.
 **Then (arrival reserve):** client `4d6a90e` on `dev` (via `feat/arrival-reserve`) adds the "Arrive with at least" 10/12/15/20% setting and routes it to the optimizer, reserve lines and battery colours. `tsc` 0; planner ESLint 0 errors.
 **Then (battery chart):** client `9bd8ccb` on `dev` (via `feat/battery-route-chart`) adds `BatteryRouteChart` and `DayEvProjection.profile`. Rendered with headless Chrome against the running dev server using sample data, in light and dark mode with focus tooltips; moved the tooltip beside the crosshair after it covered the charger marker. `tsc` 0; planner ESLint 0 errors.
-**Not done:** release; check in the real planner with live routes (reserve hydration, radio keyboard use, chart); `/research/energy`; evaluation.
+**Then (panel):** at the user's request, removed `EnergySimulationPanel` (client `7dee312` on `dev`); the physics model stays. `tsc` 0; planner ESLint 0 errors.
+**Not done:** release; check in the real planner with live routes (reserve hydration, radio keyboard use, chart); evaluation harness.
 **Follow-ups:** user to decide where the panel goes and whether to restore the range factor. An LLM council on the plan agreed on: one energy model shared by planner and chart (backend as the source of truth), the arrival buffer passed through to the optimizer, the panel moved to a reachable `/research/energy` route, the driving-conditions preset dropped, and a real evaluation (public reference data, elevation, error measured by charging decisions). Nothing implemented.
 
 ## 2026-09-22 — Claude — Revert depth rework, keep EV simulation
