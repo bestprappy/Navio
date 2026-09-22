@@ -17,6 +17,14 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 ---
 
+## 2026-09-22 - Codex - Record approved Phase 3 trip battery state
+
+**Goal:** Preserve approved persisted trip-start SoC and optional stop observations in Phase 3 planning.
+**Done:** Updated existing handoff with canonical semantics, persistence/API work explicitly included in Phase 3, guest/account boundaries, compatibility, chronological integration and acceptance checks. No new report system or application changes.
+**Verified:** Reviewed current handoff, newest session entries and repository state; documentation diff checked. Application tests not rerun for documentation-only changes.
+**Not done / left uncommitted:** Existing client/server implementation work preserved. No Phase 3 implementation, schema changes, deployment or automatic calibration.
+**Follow-ups:** Resolve exact trip/stop storage fields and checkpoint/charging ordering in the Phase 3 plan; retain distinct predicted and observed SoC. Existing root Git divergence is not merged by this task.
+
 ## 2026-09-22 - Codex - Complete pre-Phase-3 vehicle settings cleanup
 
 **Goal:** Finish clarified consumption selector and immediate trip-only starting battery; preserve checkpoint requirement for Phase 3.
