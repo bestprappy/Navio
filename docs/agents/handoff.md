@@ -1,3 +1,11 @@
+## 2026-09-22 - Codex - Vehicle settings refinement in progress
+
+**Request:** Before Phase 3, label Nickname (Optional), remove the separate legacy confirm button, apply the starting battery immediately, separate the slider from inputs, replace Energy source choices with Vehicle Default / Custom / NAVIO Estimates, show consumption in kWh/100 km, disable Vehicle Default without suitable direct data, and provide an accessible NAVIO Estimates information tooltip. Save settings should be the only action applying nickname/consumption inputs. Phase 3 remains unapproved.
+
+**Done so far:** Optional label/divider; removed separate confirm button; added per-vehicle live starting-battery overlays consumed by active vehicle/trip state and cleared on garage/session cleanup. Slider no longer depends on Save settings or marks those form inputs dirty. Existing saved settings are not overwritten by this local overlay. Changes remain uncommitted with earlier work. Fourteen focused tests pass; TypeScript/targeted lint passed. The required fast-forward Git check found local dev and origin/dev diverged; no remote merge or source replacement was performed.
+
+**Pending clarification:** Asked whether NAVIO Estimates should mean the approved rated-range fallback (recommended, no invented kWh/100 km and numerical model deferred to Phase 3), or a new derived consumption formula requiring agreement; and whether live battery changes should also autosave to the garage or remain trip-only. Neither answer received yet. Current consumption selector is not finalized; do not claim this UI task complete. Preserve current provenance/legacy data and do not restore standard factors by assumption. Continue shared guest/account UI and tests once clarified; provide the requested copyable summary for the user's other GPT session.
+
 ## 2026-09-22 - Codex - Phase 2 energy selection implementation
 
 **Approved boundary:** User supplied the exact full-plan Phase 2 section: direct selection, range fallback and override UI; backend explicit default/override/reset with server-resolved defaults; Phase 1 profiles; preserve legacy values and require confirmation before automatic application. PLAN 2.md was Phase 1-only, not the full redesign. Do not start Phases 3-5.

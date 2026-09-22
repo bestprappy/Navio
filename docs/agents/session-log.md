@@ -17,6 +17,14 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 ---
 
+## 2026-09-22 - Codex - Start requested vehicle settings refinement
+
+**Goal:** Refine vehicle settings before Phase 3 and clarify the newly requested NAVIO Estimates mode.
+**Done:** Optional nickname label, divider, removed standalone confirmation button, immediate trip-battery overlay without requiring form save; session cleanup preserves guest isolation. Existing source work preserved. No new estimation formula, backend change or Phase 3 implementation.
+**Verified:** TypeScript and targeted lint passed for the live-state/label changes; 14 focused state/selection/settings tests passed. No browser check for this partial refinement yet. Required fast-forward pull was refused because local dev and origin/dev diverged; remote history was not merged.
+**Not done / left uncommitted:** Refinement remains in client alongside Phase 1/1.1/2 work. Awaiting definitions of NAVIO Estimates and battery autosave vs trip-only behavior; final selector/tooltip and related tests/documentation still pending. No push/deployment.
+**Follow-ups:** Resolve those two questions, finish the shared guest/account settings UX, rerun checks/browser validation and provide the requested copyable instruction/change summary. Do not proceed to Phase 3.
+
 ## 2026-09-22 - Codex - Phase 2 direct selection, range fallback and overrides
 
 **Goal:** Implement only the supplied Phase 2 section of the full redesign; retain Phase 1/1.1 and defer Phases 3-5.
