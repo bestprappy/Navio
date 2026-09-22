@@ -17,6 +17,14 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 ---
 
+## 2026-09-22 - Codex - Complete pre-Phase-3 vehicle settings cleanup
+
+**Goal:** Finish clarified consumption selector and immediate trip-only starting battery; preserve checkpoint requirement for Phase 3.
+**Done:** Three choices with suitable direct-data gate, explicit USE_RATED_RANGE guest/server command, honest range-basis display and accessible information, Custom observed average, optional nickname/divider, one Save settings action. Battery overlay updates immediately without garage mutation, scoped by trip provider. Recorded deferred stop SoC checkpoints; no Phase 3 calculations.
+**Verified:** 34 frontend tests, TypeScript, targeted lint, 39 backend tests pass; 2 conditional PostgreSQL tests skipped. Mocked-public-data Chrome guest scenario passes including live battery/no account requests; authenticated callbacks/API/service tested. Diff whitespace checks pass.
+**Not done / left uncommitted:** Application sources remain stacked with earlier Phase 1/1.1/2 work. No deployment, live authenticated browser or real PostgreSQL validation. Battery overlay is in-memory only, not persisted to saved trips. Existing remote divergence not merged.
+**Follow-ups:** Deploy new backend command before client; obtain Phase 3 approval and implement canonical projections/checkpoints there. Preserve Phase 5 UI consolidation requirement.
+
 ## 2026-09-22 - Codex - Start requested vehicle settings refinement
 
 **Goal:** Refine vehicle settings before Phase 3 and clarify the newly requested NAVIO Estimates mode.
