@@ -17,6 +17,14 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 ---
 
+## 2026-09-22 - Codex - Checkpoint implementation and plan canonical energy model
+
+**Goal:** Commit completed application work locally, then perform read-only Phase 3 planning.
+**Done:** Local commits user service 20a41c4, client c83dd28, server 8fff0bb, root 99cbdf8; docs history including cd9db54 preserved. Detailed plan supplied in conversation; only existing handoff/log updated for session reporting.
+**Verified:** Inspected real code/persistence/calculation paths, checked checkpoint diffs and residual workspace status. No application changes or new test execution during planning; previous reported tests remain the baseline.
+**Not done / left uncommitted:** No Phase 3 code/migrations, push, deployment or remote integration. Unrelated tsconfig flag/editor file/service logs preserved. No duplicate requirements or master-plan edits.
+**Follow-ups:** Await plan approval; future release must push child commits before parent pins and integrate diverged remote work separately.
+
 ## 2026-09-22 - Codex - Record approved Phase 3 trip battery state
 
 **Goal:** Preserve approved persisted trip-start SoC and optional stop observations in Phase 3 planning.
