@@ -17,6 +17,48 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 ---
 
+## 2026-09-22 — Claude — Advise on EV simulation panel and planner UX
+
+**Goal:** the user asked for an opinion on Codex's EV simulation work, the "EV Trip Planner Research" UX critique, and whether the Energy simulation panel is too complex for users.
+**Done:** read-only review. Recommended taking `EnergySimulationPanel` out of the user-facing garage (research/dev-only), keeping the engine; adding a user-set arrival buffer and one battery-along-route chart instead. Flagged that the `vehicle-mappers.ts` edit removed the real-world range factor, so catalogue consumption for NEDC/CLTC cars is now about 30% optimistic and only partly offset by the 12% margin.
+**Then (user approved step 1):** restored the real-world range factor in `client/.../garage/vehicle-mappers.ts`, updated the add-vehicle hint, and corrected a comment in `simulation-model.ts` that pointed to a parity script that doesn't exist. Committed Codex's work: client `feat/ev-simulation` `9ae6f5a`, mobility `feat/ev-simulation` `eb72b37`; both pushed.
+**Verified:** client `tsc --noEmit` exit 0; garage ESLint exit 0; mobility `./mvnw -o test` exit 0. Not browser-checked.
+**Then (user approved merging):** fast-forwarded client and mobility `dev` to the feature branches; server `dev` `cdcd736` and root `dev` bump the pins. Agent notes committed to root `dev`, including Codex's earlier notes and `ev-simulation-proposal-review.md`. Nothing is on `main`.
+**Not done:** release; browser check; the council's remaining steps (one shared energy source, arrival-buffer setting, battery chart, `/research/energy`).
+**Follow-ups:** user to decide where the panel goes and whether to restore the range factor. An LLM council on the plan agreed on: one energy model shared by planner and chart (backend as the source of truth), the arrival buffer passed through to the optimizer, the panel moved to a reachable `/research/energy` route, the driving-conditions preset dropped, and a real evaluation (public reference data, elevation, error measured by charging decisions). Nothing implemented.
+
+## 2026-09-22 — Claude — Revert depth rework, keep EV simulation
+
+**Goal:** return the UI to `main` with no 3D depth while keeping Codex's new EV work.
+**Done (client `main` working tree, uncommitted):** stashed the full tree as `backup: depth rework before revert 2026-09-22`; restored 26 depth-only files to `main` (sidebar, planner layout/blocks/itinerary/place/charger components, `globals.css`, `button.tsx`); deleted `app/depth.css`; removed depth classes from the two mixed files `route-estimate.tsx` and `vehicle-usage-overview.tsx`. EV files and edits left intact.
+**Verified:** `tsc --noEmit` exit 0; ESLint on `garage/` exit 0; no remaining references to depth utilities. Not browser-checked. `tests/simulation` is ignored by ESLint and was not run.
+**Not done / left uncommitted:** EV simulation work; root agent notes (they already held Codex's uncommitted edits).
+**Follow-ups:** commit the EV work on a `feat/` branch from `dev` when the user asks. The `EvStationDetailCard` kW unit fix went away with the depth revert (component is unused).
+
+## 2026-09-22 — Codex — Validate EV simulation proposal
+
+**Goal:** validate the supplied simulation-based EV planning proposal and recommend whether to implement it instead of the current approach.
+**Done:** compared current frontend energy/charging calculations, backend SOC-constrained optimizer, route adapter and vehicle provenance with the proposal; checked primary EPA, Google, FASTSim and UNECE references; wrote `docs/agents/ev-simulation-proposal-review.md`. Recommend incremental adoption, first resolving frontend/backend model differences and establishing independent evaluation. Corrected the worked trip's SOC arithmetic.
+**Verified:** read-only implementation review and source checks; no application tests, simulation experiments or empirical accuracy validation. UNECE search listing available but full page fetch failed.
+**Not done / left uncommitted:** review plus updated handoff/session log. Both agent documents already had another session's uncommitted changes; did not commit that work or switch branches. Existing client depth/UI work preserved. No application implementation or deployment.
+**Follow-ups:** if implementation is requested, use the review's staged scope and follow database-change instructions before model/schema edits.
+
+## 2026-09-15 — Claude — Depth rework for sidebar, planner and EV cards
+
+**Goal:** use `/ui-depth` to give the sidebar and whole planner clearly visible 3D depth, and rework the EV station cards. User then asked for no thick coloured side/bottom borders, only depth.
+**Done (client `feat/ui-reworked`, uncommitted):**
+- Found an unlogged earlier depth pass on this branch (`app/planner-depth.css` plus class hooks). Replaced it with `app/depth.css` (imported from `globals.css`): canvas/section/card/raised/well tokens and `--depth-shadow-sm|md|lg|inset`, light and dark. Utilities: `surface-section`, `surface-block`, `surface-card`, `surface-elevated`, `surface-floating`, `surface-panel`, `surface-interactive`, `surface-tile`, `surface-key`, `surface-well`, `surface-groove`, `divider-groove-t|b`, `surface-nav-item`, `sidebar-depth`, `planner-depth` (sections as slabs, inputs as wells, non-ghost buttons as keys with lift and press).
+- `Button` now emits `data-variant` so planner CSS can skip ghost/link buttons.
+- Sidebar: raised panel with cast shadow, raised active nav items (`aria-current`/`data-active`), recessed trip list, engraved dividers, New Trip key.
+- Planner: day/list blocks on the card layer (padding moved into `TripBlock.Root`), trip info card elevated, side panel and map preview panels floating, mobile tabs as well + raised thumb, engraved resize handles.
+- Day anchor rail: tried raised cards for the start/end rows; user did not like it, reverted to the flat rows. The "Private" badge is raised instead (`surface-tile` on the raised surface color).
+- Day action buttons (note, checklist, EV) use a 20% tint of `note`/`checklist`/`charging` with no border, including a `dark:` override because the outline variant's `dark:bg-input/30` otherwise wins; depth still comes from the planner key rule.
+- Add-place box: the whole field wrapper is the well; its inner input carries `data-depth="flat"`, which the planner input rules in `depth.css` now skip (use it for any icon + input composite field).
+- EV: charging stop card engraved dividers; station list cards raised and interactive with recessed photo; `EvStationDetailCard` rebuilt with raised stat tiles and a price well, and its power unit fixed from kWh to kW (component is currently not imported anywhere).
+**Verified:** `tsc --noEmit` exit 0; ESLint on changed files exit 0. Not checked in a browser (light/dark, narrow widths, drag-and-drop over lifted cards).
+**Not done / left uncommitted:** all of the above; client `CLAUDE.md`.
+**Follow-ups:** browser-check the look; `DESIGN.md` does not yet describe the depth tokens.
+
 ## 2026-09-15 — Claude — Commit and release accumulated client and trip title work
 
 **Goal:** `/commit` everything uncommitted, split by type, merged through `dev` to `main` (user chose all three options explicitly, including production release and the undocumented title change).

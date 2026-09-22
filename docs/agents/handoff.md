@@ -2,7 +2,11 @@
 
 Current state for the next agent. Overwrite sections as they change; keep it short. History belongs in [session-log.md](session-log.md).
 
-**Last updated:** 2026-09-15 by Claude
+**Last updated:** 2026-09-22 by Claude
+
+## Latest assessment: EV simulation proposal
+
+User requested validation and an adoption recommendation, not implementation. See [ev-simulation-proposal-review.md](ev-simulation-proposal-review.md). Recommendation: adopt the simulation research scope and extend existing planner; first align frontend/backend energy and charging calculations, then add a bounded route-aware model and independent evaluation. Review identifies capacity/consumption boundary issues, synthetic speed assumptions, circular validation, approximate detours, and incorrect section 24 SOC arithmetic. No application changes or experiments. Root is on `main`, client on `feat/ui-reworked`, server on `main`; existing UI changes remain. Both agent notes already contained uncommitted work at session start, so notes were updated but not committed without authorization to include that prior work.
 
 ## Latest release: dashboard, brand theme, planner redesigns, country-first titles
 
@@ -17,6 +21,18 @@ On 2026-09-15 all previously uncommitted client work and the trip-planning-servi
 - The split between style and feat commits is by file; some files carry both kinds of change, and intermediate commits were not type-checked on their own (only the final tree).
 
 Do not make the delete hook refetch `["planner", tripId]`: a 404 there makes `PlannerPersistence` create the trip again.
+
+## Reverted: depth rework (2026-09-22)
+
+The user asked to return the UI to `main` with no 3D depth. All depth work was removed from the client working tree (`app/depth.css` deleted, 26 files restored to `main`, `surface-*` classes removed from `route-estimate.tsx` and `vehicle-usage-overview.tsx`). A backup is in client `git stash` as `backup: depth rework before revert 2026-09-22`. Do not reapply it unless asked.
+
+## In progress: EV energy simulation (committed on `feat/ev-simulation`, not merged)
+
+- **client** `feat/ev-simulation` = `9ae6f5a` (pushed; cut from `main` = `dev` = `4622b54`). Codex's simulation model, panel and shared constants, plus the real-world range factor restored in `vehicle-mappers.ts` (NEDC/CLTC 0.7, WLTP 0.85, EPA 0.9) as a documented calibration assumption.
+- **mobility-and-ev-service** `feat/ev-simulation` = `eb72b37` (pushed). Codex's backend part, previously unlogged: `simulation/model-v1.json` (same constants as the client JSON; no automated parity check), `EvSimulationModel`, `OptimizedRouteVerifier`, optimizer changes. `./mvnw -o test` passed.
+- Merged (fast-forward) to `dev` in client and mobility. Server `dev` = `cdcd736` pins mobility `eb72b37`; root `dev` pins client `9ae6f5a` and server `cdcd736`. **Not on any `main`, not deployed.** Releasing requires the `release.md` flow (child `main`s first, then root `main`).
+- Agreed next steps (LLM council, 2026-09-22): the chart and itinerary share one energy source, with the backend as the source of truth; an "Arrive with at least __%" setting passed to the optimizer; a battery-along-route chart; move `EnergySimulationPanel` out of the garage to a reachable `/research/energy` route; no driving-conditions preset; an evaluation against public reference data with elevation, with error measured by charging decisions.
+- Not browser-checked.
 
 ## Live in production (before this release)
 
