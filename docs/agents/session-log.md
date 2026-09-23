@@ -17,6 +17,98 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 ---
 
+## 2026-09-23 — Claude — Browser-verify and commit the garage and EV charger redesign
+
+**Goal:** verify the uncommitted garage/EV-charger redesign in a real browser, then commit it.
+**Done:**
+- Browser-verified the redesign with Playwright against `next dev`, using live Google Places/Maps and a real Bangkok trip: planner, garage (light, dark, 390px), EV charger panel (list cards, power tiles, connector chips, opening-hours track), block action button dark tints.
+- client `feat/garage-ev-redesign`, merged `--no-ff` to `dev` = `ffd252a` and pushed: `ac46d10` real-world range and `range-efficiency-field.tsx`; `8c7a457` featured vehicle card, `battery-gauge.tsx`, `vehicle-switcher.tsx`, `vehicle-name-editor.tsx`, `spec-tile.tsx`; `ddf900e` station cards, specifications, opening hours, `connector-chips.tsx`, `spec-cell.tsx` deleted; `8bf23ba` connector/battery tokens and removal of the trip member controls. 30 files, +1328/-538.
+- root `chore/bump-client-garage-ev-redesign` `ed02ac2`, merged to `dev` = `bda8c20` and pushed. Neither repo's `main` was touched.
+
+**Verified:** `tsc --noEmit` clean and ESLint clean (0 errors) on the committed tree, including the six new files, which an earlier lint over `git diff --name-only` had missed because they were untracked. Zero console errors and zero uncaught exceptions across the browser run. The charger preview panel's dark mode was confirmed by computed style (`bg lab(11.1%)`, `fg lab(98.6%)`); an earlier white-panel screenshot was a repaint artifact from toggling emulated `prefers-color-scheme` after paint, not a bug. **Not verified:** authenticated flows (catalog picker, save-to-garage), the battery route chart with real leg distances, drag interaction on the battery gauge, keyboard-only dialog traversal, and anything against the deployed backend.
+
+**Not done / left uncommitted:** deliberately left alone as earlier Codex sessions' work (AGENTS.md §1.3) — `docs/agents/admin-dashboard-plan.md`, `docs/agents/plan-link-sharing-plan.md`, `docs/research/` (including the `ev-range-test-standards.md` that the garage work cites), `.deploy/compose.production.yml`, `.deploy/nginx/navio.conf`, `.deploy/observability/*`, `grafana/dashboards/navio-overview.json`, and a dirty `server` submodule working tree. Committing this log necessarily includes those sessions' six uncommitted log entries and their handoff edits, since they share these two files.
+
+**Follow-ups:** the untracked root docs need an owner to commit them. `client/CLAUDE.md` is not gitignored and must be excluded by hand every session. The "Charge each stop to" slider question from 2026-09-22 is still unanswered. Release requires the `release.md` flow (child `main`s first, then root `main`).
+
+## 2026-09-23 ? Codex ? Investigate Grafana no-data screenshot
+
+**Goal:** diagnose warning icons and empty production dashboard panels.
+**Done:** verified dashboard/provisioning datasource UID consistency; identified NGINX location-level proxy headers suppressing parent Host/forwarded headers as a likely origin-check issue. Asked for exact panel error before confirming live root cause.
+**Verified:** repository configuration inspection and official troubleshooting documentation; no authenticated production query available.
+**Not done / left uncommitted:** no application edits; agent notes remain uncommitted alongside existing unfinished changes.
+**Follow-ups:** obtain warning/Query Inspector error; if origin rejection, restore explicit Host/forwarded headers in Grafana location and validate/reload via release flow.
+
+## 2026-09-23 ? Codex ? Production Grafana and Zipkin guidance
+
+**Goal:** explain how to make Grafana and Zipkin work in production.
+**Done:** inspected production Compose, provisioning, NGINX, scrape config, deployment paths, tracing dependencies/settings and official Spring/Grafana/Zipkin docs. Identified existing Grafana stack and explicitly disabled/missing Zipkin; supplied configuration and verification guidance. No application/deployment changes.
+**Verified:** root/client/server/changed trip service state; public Grafana health HTTP 200 and database ok, version 12.3.2 with diagnostic TLS bypass. Normal TLS verification fails with untrusted root on this machine. No authenticated metrics or trace check.
+**Not done / left uncommitted:** both agent notes already contained prior unfinished work, so updates remain uncommitted; unrelated changes preserved.
+**Follow-ups:** verify Grafana data in Explore; implement internal Zipkin, storage/retention, export endpoint and sampling, datasource, then verify full request traces if requested. Investigate TLS chain/client trust.
+
+## 2026-09-23 — Codex — Council on Community next milestone
+
+**Goal:** inspect Navio Community and use the requested llm-council skill to recommend the next step.
+**Done:** inspected community client/service source and sharing proposal; ran five independent advisor passes in capacity-limited batches, followed by five anonymous peer reviews of faithfully condensed responses and chairman synthesis. Recommended real saved-trip publication/read integration with Community, explicit audience/ownership/revocation contract, and later optional copying. No application code changed.
+**Verified:** all 20 client community API/posts/upload-proxy tests passed. Confirmed fixture-backed trip selector/resolver, unchecked publication reference persistence, identical best/top sort, and no consumers for mock copied-trip panel. Browser check source uses stubbed APIs; no live browser/backend or database verification performed. Checked root/client/server/community/trip-planning status and branches.
+**Not done / left uncommitted:** these agent notes; both already contained prior unfinished edits and were not committed without authorization to include that work. Preserved unrelated client changes and untracked trip publication DTO work.
+**Follow-ups:** first define two-account publish/attach/read/revoke acceptance and audience contract against the existing sharing proposal; coordinate publication work before implementation. Correct misleading feed/fixture affordances as part of the milestone. Copying and notifications remain later scope decisions.
+
+## 2026-09-23 — Codex — Rehearse sharing plan with relevant skills
+
+**Goal:** revise the link-sharing plan so implementation reads and applies relevant skills, including frontend-design for UI.
+**Done:** found repository-local skills under `.claude/skills`; read frontend-design and applied its planning/self-critique guidance to a Navio-specific UI rehearsal. Added skill-to-phase mapping, supporting rule/document requirements, dialog wireframe, full interaction states and staged security/visual reviews to `docs/agents/plan-link-sharing-plan.md`. Updated handoff. No application code changed.
+**Verified:** skill discovery, current root/client/server status and branches, and documentation whitespace check. No browser or application tests; implementation has not started.
+**Not done / left uncommitted:** proposal and agent notes remain uncommitted; both agent notes already contained other unfinished work, which was preserved.
+**Follow-ups:** when implementation is requested, read/apply each phase's relevant skills and record actual verification; preserve existing Navio tokens and the user's removal of depth styling.
+
+## 2026-09-23 — Codex — Plan admin dashboard and shared vehicle catalog
+
+**Goal:** plan an Admin sidebar/dashboard, user counts and bans, and centrally managed vehicles; assign relevant skills including frontend-design.
+**Done:** wrote `docs/agents/admin-dashboard-plan.md` after inspecting sidebar/auth, existing admin endpoints, moderation, catalog and garage snapshots. Included UI contract, capability matrix, proposed APIs/migration, six delivery phases and acceptance tests. Read local frontend-design guidance and assigned it to UI planning/building; identified local security/UI review skills and optional GSD stages. Updated handoff.
+**Verified:** repository state and code inspection; documentation whitespace check. No application code, migrations or runtime tests executed.
+**Not done / left uncommitted:** plan and both agent notes; notes already had prior unfinished edits, so did not commit those edits or switch branches. Existing client work preserved.
+**Follow-ups:** implementation only when requested; verify existing-token ban enforcement across services, last-admin protection and database startup before release.
+
+## 2026-09-23 — Codex — Plan link publishing and permissions
+
+**Goal:** review the current implementation and plan seamless sharing from the three-dot menu with clear permissions.
+**Done:** wrote `docs/agents/plan-link-sharing-plan.md`: evidence from menu, Explore sharing/viewer, ownership services, proxy/gateway and persistence; proposed unlisted read-only snapshots, explicit updates, owner-managed links, privacy options and independent copying; API/data design and staged acceptance tests. Updated handoff.
+**Verified:** source inspection and repo status/branches (root/client/server/trip-planning on `dev`); documentation whitespace check. No application changes or runtime tests.
+**Not done / left uncommitted:** proposal and both agent notes. Notes already contained prior uncommitted work, so did not commit them or disturb existing UI edits.
+**Follow-ups:** implement only when requested, using the proposal's permission/sanitizer contract and database/release instructions.
+## 2026-09-23 — Codex — Remove trip member controls
+
+**Goal:** remove the avatar and add-member button shown in the screenshot.
+**Done:** removed the members UI, placeholder image, member prop/type and mock member passed by `planner-detail.tsx`; client `dev`, uncommitted.
+**Verified:** targeted ESLint, `tsc --noEmit`, and `git diff --check` passed. Not browser-checked.
+**Not done / left uncommitted:** two client files and updated agent notes. Both notes already contained uncommitted edits at session start; preserved them without committing prior work. Existing unrelated client changes preserved.
+**Follow-ups:** none for this removal.
+
+## 2026-09-22 — Claude — Cite range-standard factors and show real-world range
+
+**Goal:** the user asked what NEDC is and why one consumption rate misestimates distance, then for research backing the NEDC/CLTC/WLTP/EPA factors, a doc in `docs/`, and a UI showing the official and adjusted range.
+**Done (uncommitted):** new `docs/research/ev-range-test-standards.md` (factors table, EPA 40 CFR 0.7 rule as the anchor, Liu 2022 CLTC≈NEDC, 120 km/h study, Weiss 2020 counter-evidence of ~10% gap, verification status). Client `dev`: `vehicle-mappers.ts` exports `REAL_WORLD_RANGE_FACTOR` and `estimateRealWorldRange` (rounded to 10 km, null for custom/unknown standard); `SpecTile` gained an optional `detail` line; `vehicle-card.tsx` shows "About N km real-world" under the range and a note with the factor; the add-vehicle dialog states the estimate.
+**Verified:** client `tsc --noEmit` 0; ESLint on the four changed files 0. Not browser-checked. Only the EPA source was read in full; the paper figures came from abstracts (publishers blocked fetches).
+**Not done / left uncommitted:** all of the above, on top of the earlier uncommitted client work.
+**Follow-ups:** the user should confirm the paper figures before citing them in the report.
+**Then (plan with real-world range, own range option):** new `garage/range-efficiency-field.tsx`: one input the driver fills as "Range on a full charge" (km) or kWh/100 km, a ruler of planning range against the official tick, and "Use estimate". Used in `vehicle-settings-form.tsx` and in the add-vehicle dialog, which now pre-fills the estimate instead of the old "I know my consumption" checkbox. The vehicle card leads with "Real range" (battery ÷ consumption) and shows the official figure beneath. New `consumptionForRange` / `rangeForConsumption` in `vehicle-mappers.ts`; estimates are now saved to 0.001 instead of 0.1. Battery capacity deliberately stays declared, because the factor already sits in consumption. No API or schema change. `tsc` 0; garage ESLint 0; field rendered in headless Chrome at 320px light and dark (temporary preview page, deleted). The real settings form and dialog were not rendered.
+
+## 2026-09-22 — Claude — Redesign opening hours on place/charger cards
+
+**Goal:** the user asked to redesign the opening-hours block on the EV station card, which showed the raw "Monday: Open 24 hours | Tuesday: …" string.
+**Done (client `dev`, uncommitted):** added `getOpeningHoursSchedule` / `parseOpenSegments` to `charger/opening-hours.ts` (handles 24h, closed, split and overnight ranges; unparseable text falls back to plain text) and removed the now-unused `formatOpeningHours`. Rebuilt `StationOpeningHours` as grouped day rows with a 24-hour track and today highlighted (`aria-current="date"`), and used it in `charger-preview-panel.tsx` and `place-preview-panel.tsx`.
+**Verified:** client `tsc --noEmit` exit 0; ESLint on planner `_components` 0 errors (1 existing warning); parser checked with tsx against sample strings. Not browser-checked.
+**Then (station list card):** redesigned `charger/ev-station-list-card.tsx`: the stock Unsplash thumbnail (random, often failed to load) became a max-kW power tile shaded by speed tier, plus connector chips, distance ("300 m from stop"), port count and a one-line address. Removed the `visual` prop and `getEvStationVisual` / `EvStationVisual` from `ev-station-panel.data.ts`. `tsc` 0; charger ESLint 0. Follow-up: each connector family has its own colour via new `--connector-*` tokens in `globals.css` (light and dark; hues kept away from brand blue; CCS1/CCS2 share one), with a DC/AC title and screen-reader text. The distance icon is `primary` and the port icon `rating` yellow.
+**Then (block action buttons):** "Add a note / Add checklist / Add EV station" showed grey in dark mode because the Button `outline` variant's `dark:border-input dark:bg-input/30` beat their tints; added matching `dark:` tint overrides in `block/trip-block.tsx` and `charger/add-ev-station-button.tsx`. ESLint 0.
+**Then (route estimate card):** redesigned `garage/route-estimate.tsx`: start → end battery header (level-coloured, gradient connector), a sentence when the battery dips below reserve mid-route, non-monospace stats ("Energy needed", stop count under charging time), method note collapsed into "How this is estimated". `garage/battery-route-chart.tsx`: Chart/Table segmented toggle replaces the "Show as table" disclosure, the reserve label sits on the dashed line, chargers show "+N%". Same props, so `plan-view.tsx` (explore) picks it up too. Rendered with headless Chrome via a temporary `app/zz-preview` page (deleted) at about 480px and 220px; the table view was not screenshotted (no click automation available). `tsc` 0; garage ESLint 0.
+**Then (garage redesign):** `garage-section.tsx` now shows one featured `VehicleCard` for the trip vehicle (photo, 2×2 colour-coded spec tiles, plugs, trip settings inside) plus a `VehicleSwitcher` chip strip (new file) instead of a grid of full cards. New `battery-gauge.tsx` (`BatteryGauge`, `BatteryInput`): a 10-cell battery with nub and dashed reserve mark; the starting-battery slider in `vehicle-settings-form.tsx` is now the draggable battery (native range input overlay) with a range readout. `vehicle-usage-overview.tsx` uses the gauge (faded start, solid end), the per-day bars are upright batteries with a per-battery reserve tick, and the monospace numbers are gone. Nickname field removed from the settings form: new `vehicle-name-editor.tsx` renames the title in place (Enter/Escape; clearing or retyping the car name clears the nickname), and a nickname shows the real car name as a tag. `BatterySlider` still exists for the EV side panel. Rendered with a temporary preview page (deleted); the real settings form was not rendered (needs the garage provider). `tsc` 0; garage ESLint 0.
+**Then (charging stop card):** `station-charging-control.tsx` now uses `BatteryGauge` (new `chargeTo` striped segment via `.charge-stripes` in `globals.css`, and a `markerPct` knob) with the native range input overlaid, "Arrive with / Leave with" labels, and an Adds/Takes row with icons; monospace removed. `station-specifications.tsx`: Max power (blue) and Ports (yellow) tiles from new shared `garage/spec-tile.tsx`, coloured plug chips from new shared `charger/connector-chips.tsx` (also used by the station list card and the garage vehicle card), and price/hours rows. `trip-place-card.tsx` header lost its middle dots; the locked state is a badge. Deleted the now-unused `charger/spec-cell.tsx`. Preview-rendered (deleted); the live control with a real car and route was not rendered. `tsc` 0; ESLint 0.
+**Then (light-mode colour fix):** light-mode tints were muddy (dark, low-chroma tokens). In `globals.css` light theme only: raised chroma of `--warning`, `--note`, `--checklist`, `--charging`, `--premade`, `--tag`; battery text tokens now `high 0.48 0.16 148`, `mid 0.56 0.15 70` (amber-gold, ~3.9:1, was olive), `low 0.52 0.19 42`, `critical 0.5 0.21 27`. `.charge-stripes` now use `--battery-high`. `SpecTile` uses a paler wash in light mode (`/10`, ring `/30`) and a warning-coloured icon for the rating tone; the battery's faded "used" part is `/10` in light mode. Dark theme unchanged. Verified with headless Chrome using `--blink-settings=preferredColorScheme=1` (the app follows the system theme). Note: `--warning` and the others are app-wide, so other warning/feature UI shifts slightly in light mode.
+**Not done / left uncommitted:** all of the above plus these notes.
+**Follow-ups:** the user to check it visually and ask for a commit.
+
 ## 2026-09-22 — Claude — LLM council: EV calibration and adoption
 
 **Goal:** the professor asked how battery differences are calibrated (the user answered "we use consumption rate"); the user asked what to improve in the EV feature, whether NEDC/WLTP etc. matter, and how to make real EV drivers want it.

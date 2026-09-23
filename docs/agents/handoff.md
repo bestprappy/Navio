@@ -2,7 +2,41 @@
 
 Current state for the next agent. Overwrite sections as they change; keep it short. History belongs in [session-log.md](session-log.md).
 
-**Last updated:** 2026-09-22 by Claude
+**Last updated:** 2026-09-23 by Claude
+
+## Latest assessment: production observability (2026-09-23)
+
+Follow-up screenshot shows warning icons and no data in all visible metric panels. Dashboard datasource UID matches provisioning. Found likely proxy issue: Grafana location declares Upgrade/Connection headers, suppressing inheritance of server-level proxy headers including Host; this can cause Grafana origin checks to reject POST queries. Await exact panel error before attributing live failure; no proxy edit made.
+
+User asked how Grafana and Zipkin work in production; guidance only, no deployment/application changes. Grafana public `/grafana/api/health` returns HTTP 200, database ok, version 12.3.2 when certificate verification is bypassed for diagnosis; normal Windows curl rejects the certificate chain (untrusted root). Metrics ingestion/dashboards were not authenticated or verified. Production Compose already deploys Grafana/Prometheus/Loki/Alloy and provisions dashboards. Zipkin intentionally absent; common Java env sets sampling 0.0 and export false. To enable: add internal Zipkin with bounded/persistent storage, enable export and positive sampling, set MANAGEMENT_TRACING_EXPORT_ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans (covers hardcoded localhost configs), provision Grafana Zipkin source, redeploy and verify cross-service traces. Both agent notes already dirty; preserved prior work and left notes uncommitted. Other active edits include gateway/config and trip publication implementation; do not include them in observability changes.
+
+## Latest assessment: Community next step (2026-09-23)
+
+User invoked `llm-council` for advice, not implementation. Five independent advisor passes and five anonymous peer reviews recommend a narrow milestone: publish a sanitized real saved itinerary, attach its authorized publication reference to a community post, and let a second user read it; revocation shows an unavailable attachment without breaking discussion. First define the two-account acceptance scenario and attachment/audience contract using `plan-link-sharing-plan.md`, then implement publication before community integration. Community posting broadens discovery beyond an unlisted link and needs explicit owner consent. Defer persistent copying to a follow-up; notifications follow when discussion activity warrants them. No usage or deadline evidence was supplied.
+
+Source findings: composer selects `explorePlanSharedTrips`; feed/detail attachments call local `getTripById`; `PostService` stores `sharedTripId` without publication validation. Groups/posts/comments/votes/moderation already have API implementations. The mock copied-trip panel has no consumers found, so do not describe it as live UI. `best` and `top` share score ordering despite the "For you" label. All 20 client community API/posts/upload-proxy tests passed; no live browser/backend or Postgres checks in this assessment. Existing browser script stubs API responses. Root/client/server are `dev`, community is clean on `main`; trip-planning is `dev` with pre-existing untracked `dto/publication/` work. Coordinate before overlapping implementation. Existing dirty agent notes and unrelated application edits were preserved; notes remain uncommitted.
+
+## Latest proposal: admin dashboard and shared vehicles (2026-09-23)
+
+User requested a plan, not implementation. See [admin-dashboard-plan.md](admin-dashboard-plan.md): role-aware Admin sidebar (Dashboard, Users, Vehicle catalog, Activity log), reuse existing user search/suspend/reactivate APIs, verify cross-service bans, move bundled vehicle catalog into IAM persistence, preserve garage/trip snapshots, and enable published catalog selection for guests and accounts. Six delivery phases, API/data contracts and acceptance tests included. Explicit skill assignments include repository-local `.claude/skills/frontend-design/SKILL.md`, security/UI reviews and optional GSD workflows. Root/client/server remain `dev`; user-management was inspected clean on `main`. Application code unchanged. Plan and notes remain uncommitted because both agent notes already contained prior unfinished changes that cannot be committed without authorization.
+
+## Latest proposal: publish plan as a link (2026-09-23)
+
+User subsequently required relevant skills to be read and applied during implementation. The proposal now maps each phase to repository-local `frontend-design`, `security-review`, `anti-ai-ui-review`, and conditionally `optimization-review`, plus database/client/server/release rules. `frontend-design` was found at `.claude/skills/frontend-design/SKILL.md` and applied to a UI rehearsal covering tokens, dialog wireframe, owner/recipient tasks and interaction states. Discover skills again when executing; do not merely cite their names or restore the removed depth design. This remains planning only.
+
+User requested an implementation review and feature plan, not implementation. See [plan-link-sharing-plan.md](plan-link-sharing-plan.md) for the current-code evidence, owner/guest/viewer permission matrix, exact dialog flow, snapshot/privacy contract, API proposal and phased verification. Recommendation: unlisted read-only published snapshot, explicit updates, owner-only link management, optional independent copying off by default, no editor invites or Explore listing in v1. Must strip saved-place anchors and their derived routes; flush pending autosave/metadata before version-bound preview/publication. Root/client/server/trip-planning are on `dev`. Application code unchanged. Both notes already had uncommitted edits; this plan and note updates remain uncommitted to avoid committing prior work without authorization.
+## Committed 2026-09-23: garage and EV charger redesign (client `dev` `ffd252a`, root `dev` `bda8c20`)
+
+Four `feat` commits on `feat/garage-ev-redesign`, merged `--no-ff` to client `dev` and pushed; root `dev` pins it through `chore(submodule)` `ed02ac2` (merge `bda8c20`). **Not on any `main`, not deployed.** 30 files, +1328/-538.
+
+- `ac46d10` real-world range: the card leads with "Real range" (battery ÷ consumption) above the official figure, and `garage/range-efficiency-field.tsx` lets the driver enter their own full-charge range or kWh/100 km (settings form and add dialog), starting from the estimate (`estimateRealWorldRange`, `consumptionForRange` in `garage/vehicle-mappers.ts`). Battery capacity stays declared so the loss is not counted twice. Factors and sources: [docs/research/ev-range-test-standards.md](../research/ev-range-test-standards.md) — **still untracked in the root repo, see Known gaps.**
+- `8c7a457` garage: featured vehicle card plus a switcher strip (`vehicle-switcher.tsx`), a draggable battery (`battery-gauge.tsx`) and in-place renaming (`vehicle-name-editor.tsx`); the Nickname field is gone. Route estimate and battery chart redesigned (Chart/Table toggle). New shared `garage/spec-tile.tsx`.
+- `ddf900e` charger: one shared `StationOpeningHours` widget renders hours in the EV charger preview, station specifications and place preview — grouped day rows, each with a 24-hour track showing the open span, today highlighted. Parser is `getOpeningHoursSchedule` in `opening-hours.ts` (old `formatOpeningHours` removed). `ev-station-list-card.tsx` is rebuilt around a max-kW power tile and no longer uses stock photos. New `connector-chips.tsx`; `spec-cell.tsx` deleted in favour of `SpecTile`.
+- `8bf23ba` tokens and cleanup: `--connector-*` / battery / charging-state tokens with dark equivalents in `globals.css`, dark-mode tint overrides on the block action buttons, trip member controls removed from `trip-info-card.tsx` and `planner-detail.tsx` (they were never wired to a real membership flow).
+
+**Browser-verified this session** (Playwright against `next dev` on 3000, live Google Places/Maps, real Bangkok trip): planner renders; garage redesign correct in light, dark and at 390px; EV charger panel list cards, power tiles, connector chips and the opening-hours track all render correctly; block action button tints correct in dark. Zero console errors and zero uncaught exceptions across the whole run. The charger preview panel's dark tokens were confirmed by computed style (`bg lab(11.1%)` / `fg lab(98.6%)`) — an earlier white-panel screenshot was a repaint artifact from toggling emulated `prefers-color-scheme` after paint, not a bug. `tsc --noEmit` and ESLint both clean on the committed tree, including the six new files.
+
+Still unverified in a browser: authenticated flows (catalog picker, save-to-garage), the battery route chart with real leg distances, drag interaction on the battery gauge, and keyboard-only dialog traversal.
 
 ## Latest assessment: EV simulation proposal
 
@@ -62,6 +96,8 @@ Root `0a4acc4` (deploy run 34829001804, success).
 
 ## Known gaps
 
+- **Left uncommitted in the root repo on purpose (2026-09-23):** `docs/agents/admin-dashboard-plan.md`, `docs/agents/plan-link-sharing-plan.md`, `docs/research/` (including `ev-range-test-standards.md`, which the garage work cites), `.deploy/compose.production.yml`, `.deploy/nginx/navio.conf`, `.deploy/observability/*`, `grafana/dashboards/navio-overview.json`, and a dirty `server` submodule working tree. These belong to earlier Codex sessions; per AGENTS.md §1.3 they were not committed or discarded. Whoever owns them should commit them.
+- `client/CLAUDE.md` is **not** in `client/.gitignore`, so it shows as untracked on every client session and must be excluded by hand. Adding it to `.gitignore` would remove the footgun.
 - None of the released client UI work was checked end to end in a real browser session with the backend: theme in both modes, dashboard, delete trip, sidebar recent plan, charging slider thumb alignment and drag-and-drop, narrow widths.
 - `components/theme/*` is committed but unused (color theme picker unwired).
 - `components/profile/settings-sidebar.tsx` has `href="/dashboard"className=` with no space (compiles, cosmetic).
