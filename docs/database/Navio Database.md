@@ -1,5 +1,9 @@
 # Navio Database Design
 
+## Phase 3.1 trip garage membership (2026-09-24, local)
+
+Additive trip migration `V12__trip_garage_membership.sql` adds nullable `trip.trip.garage_vehicle_ids jsonb`, mapped as a list of vehicle UUID strings. NULL represents historical/unspecified membership; an empty array represents an explicitly empty trip garage. There is no backfill or cross-service foreign key. Account vehicle records remain intact and reusable. API validation bounds membership to 25 unique UUIDs; trip ownership and version checks are unchanged. The column and V11 energy state passed Flyway, Hibernate validation and save/reload/clear checks on disposable PostgreSQL. V12 was checked against fetched trip-service origin/main/dev and local migration history; it is not deployed yet.
+
 ## Applied Phase 3 trip energy state (2026-09-24)
 
 Trip service migration `V11__trip_energy_state.sql` adds nullable `trip.trip.initial_soc_pct numeric(5,2)`, `trip.trip.energy_vehicle_snapshot jsonb`, and `trip.block_item.observed_soc_pct numeric(5,2)`. Both SoC columns have inclusive 0-100 checks. Migration numbering was checked against the local checkpoint and known migration history before creation. No existing migration was edited and no data was backfilled. There are no new cross-service foreign keys or account vehicle changes.

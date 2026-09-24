@@ -18,6 +18,14 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 ---
 
 
+## 2026-09-24 - Codex - Phase 3.1 trip-specific garage correction
+
+**Goal:** Make each trip's garage independent, retain custom vehicles in a reusable personal list, rename/category the picker; preserve other UI and deploy only when safe.
+**Done:** Client `ddeff88`, trip service `73668d3` on local `fix/trip-specific-garage` branches. Trip membership JSONB V12/capability, explicit add/select/remove, no automatic account list/default import, reusable custom list categories/search, catalogue record reuse, membership-preserving battery edits and late-response guard. Updated existing API/database docs and handoff.
+**Verified:** 70 frontend tests; TypeScript/targeted lint; 54/54 trip tests including real PostgreSQL migration/Hibernate/reload/clear. Mocked Chrome new-trip/custom-reuse/reload/remove/other-trip preservation plus battery/checkpoint scenario passes, with no account writes for reuse/removal. No live account writes or deployed-service claims.
+**Not done / left uncommitted:** No push/deployment/remote merge. Conditional release approval held because fetched remote client has a conflicting garage redesign and alternate range-factor/simulation model. Parent pins left uncommitted pending child publishing; unrelated tsconfig/editor/log files preserved.
+**Follow-ups:** Resolve overlapping remote UI/model work explicitly before releasing; existing VM still lacks required energy/garage commands. Keep the trip-specific garage rule and no-unapproved-UI-change rule. No Phase 4/5 work.
+
 ## 2026-09-24 - Codex - Phase 3.1 garage compatibility troubleshooting
 
 **Goal:** Diagnose and fix failed Save/catalogue adds while preserving all existing UI; log Phase 3.1.
