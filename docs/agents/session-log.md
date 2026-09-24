@@ -17,6 +17,15 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 ---
 
+
+## 2026-09-24 - Codex - Complete Phase 3 canonical trip energy
+
+**Goal:** Continue the approved Phase 3 implementation from the existing checkpoint, preserving prior work; no Phase 4/5, push or deployment.
+**Done:** Local feature commits trip `1068215`, mobility `61294ab`, client `13fc1c8`, server pins `c380949`, root `b4d30bc`, merged to local dev. Canonical TS/Java energy/SoC, trip snapshot/initial state, observed checkpoints, additive V11/API, shared Planner/Explore projection and bounded continuous optimizer. Fixed first-edit autosave skip and unknown-duration DTO/energy transport integration. Updated existing API/database documentation and handoff, preserving history.
+**Verified:** 65 frontend tests, 53 trip tests, 25 mobility tests including separately enabled real-Postgres test; 18 identical single-case goldens + 3 chronological fixtures (1e-9 tolerance); dense-search/1,000-segment regression; TypeScript/targeted lint; planner model script; guest and synthetic authenticated Chrome scenarios. Disposable PostgreSQL 16.15 Flyway/Hibernate and saved/reloaded/cleared initial/observed state passed. Initial full-trip context DB-port error resolved by pointing all contexts to the disposable DB. No live-account/deployed-service validation claimed.
+**Not done / left uncommitted:** No Phase 4/5 or remote integration. Preserve client tsconfig flag, CLAUDE.md and service logs. Legacy integer applied-charge-minute storage remains for Phase 4; canonical calculations/preview are continuous. Application commits are local-only and remote branches diverge.
+**Follow-ups:** Await Phase 4 approval; exact deferred items and release constraints in handoff. Reconcile remote changes and recheck migration allocation before any authorized release; push children before parent pins. No production main changes.
+
 ## 2026-09-22 - Codex - Checkpoint implementation and plan canonical energy model
 
 **Goal:** Commit completed application work locally, then perform read-only Phase 3 planning.

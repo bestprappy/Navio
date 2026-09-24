@@ -1,5 +1,14 @@
 # Navio Database Design
 
+## Applied Phase 3 trip energy state (2026-09-24)
+
+Trip service migration `V11__trip_energy_state.sql` adds nullable `trip.trip.initial_soc_pct numeric(5,2)`, `trip.trip.energy_vehicle_snapshot jsonb`, and `trip.block_item.observed_soc_pct numeric(5,2)`. Both SoC columns have inclusive 0-100 checks. Migration numbering was checked against the local checkpoint and known migration history before creation. No existing migration was edited and no data was backfilled. There are no new cross-service foreign keys or account vehicle changes.
+
+Entity mappings use BigDecimal and JSONB. Saved user observations are distinct from calculated continuous SoC, which is not rounded or persisted as an observation. Omitted API properties preserve stored values; explicit null clears. The snapshot carries only calculation identity/profile/capabilities, rejects unrelated account fields, and remains independent of later garage edits.
+
+Verified with disposable PostgreSQL 16.15/PostGIS: all trip Flyway migrations and Hibernate validation pass, including initial 72.25%, JSONB snapshot and observed 0% save/reload/clear. Mobility's existing migration/Hibernate check also passes against the disposable database. This is local validation, not a deployment. Recheck remote migration allocation before release because remote histories were deliberately not integrated into the approved local checkpoint.
+
+
 ## Implemented vehicle provenance metadata (2026-09-19)
 
 Phase 1 stores optional version-1 `energyProfile` provenance in the existing `iam.user_vehicles.metadata_jsonb` object. No column, entity mapping, or Flyway migration changes are required. Existing consumption remains in `consumption_kwh_per_100km`; JSONB carries its provenance without replacing that calculation input. Other metadata keys are preserved. Missing profiles are exposed as legacy/unknown at response time without backfilling or changing the numeric value. See the vehicle provenance contract in `docs/api/Navio Api Documentation.md` for fields and update semantics.
