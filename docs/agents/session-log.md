@@ -18,6 +18,15 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 ---
 
 
+## 2026-09-24 - Codex - Phase 3.1 garage compatibility troubleshooting
+
+**Goal:** Diagnose and fix failed Save/catalogue adds while preserving all existing UI; log Phase 3.1.
+**Done:** Client `d15dd47` verifies energy-command acknowledgements and identifies old-backend catalogue validation, with regression tests. Existing backend support is already implemented in local user-service `20a41c4`. VM/frontend mismatch explains failed catalogue adds and ignored model changes; repeated cars are account garage entries. Corrected prior missed-save diagnosis. No UI/layout or account data changes.
+**Verified:** 68 frontend tests; 39 user-service garage/API/security tests; TypeScript, targeted lint and diff checks pass. Public catalogue through localhost returned 401; local configuration targets VM. Private account requests not replayed.
+**Not done / left uncommitted:** VM functionality remains pending deployment approval, not falsely marked fixed. No pushes/deployment, new schema or Phase 4 work. Unrelated files preserved.
+**Follow-ups:** User was asked to approve lifting prior deployment restriction for safe remote reconciliation and tested backend release. Standing no-UI-change requirement recorded in handoff.
+
+
 ## 2026-09-24 - Codex - Battery unavailable screenshot diagnosis
 
 **Request:** Check why battery predictions appear unavailable after Phase 3; investigation only, no application changes or deployment.
