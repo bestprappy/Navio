@@ -1,3 +1,13 @@
+## 2026-09-25 - Codex - Publish Phase 3.1 checkpoint; await next prompt
+
+**User request:** Check completed work and commit/push, then stop before further phases. Published separate feature/fix/checkpoint branches without merging conflicting origin/dev histories or deploying production. Standing UI and canonical energy requirements remain in force.
+
+**Published children:** User service `20a41c4` on `feat/vehicle-energy-selection`; trip service `73668d3` and client `ddeff88` on their respective `fix/trip-specific-garage`; mobility `61294ab` on `feat/canonical-trip-energy`. Server `c85586a` on `chore/phase31-checkpoint` pins the published children. Root checkpoint branch is `chore/phase31-checkpoint`, containing the client/server pins and this handoff. All parent pins are published child-first. Local dev retains the completed checkpoints; remote dev/main remain unchanged.
+
+**Checks:** Fetched all seven repository origins, reviewed working trees/diffs/pins and preserved unrelated files. Re-ran all 70 frontend focused tests and TypeScript successfully; no application edits this session. Previous unchanged-code verification remains 54/54 trip tests including real PostgreSQL, targeted lint and mocked Chrome trip-isolation/energy scenario. No claim of new production or live-account validation.
+
+**Still pending:** Remote client garage redesign and alternate factor/simulation work conflict with approved local UI/model. Release remains on hold; VM still needs compatible backend deployment after deliberate reconciliation. Do not start another phase until instructed. Preserve client tsconfig flag/untracked CLAUDE.md and service logs; not committed. Earlier entries saying changes are local-only are historical and superseded by this publication entry.
+
 ## 2026-09-24 - Codex - Phase 3.1 trip-specific garage correction
 
 **Approved product rule:** My Garage is individual to each trip, never an automatic projection of the account list. Custom EV specifications are reusable in the signed-in user's private vehicle list. Adding/selecting/removing trip vehicles must not change another trip's membership or account default, and removing from a trip must not delete the reusable custom EV. Guest vehicles retain the existing temporary lifecycle. UI permission was limited to renaming Thailand catalogue to EV Vehicle List and adding NAVIO catalogue / My custom EVs categories; preserve all other existing UI.

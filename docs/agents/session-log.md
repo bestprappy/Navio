@@ -18,6 +18,14 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 ---
 
 
+## 2026-09-25 - Codex - Publish tested Phase 3.1 checkpoint
+
+**Goal:** Check, commit and push completed work; await next prompt before further phases.
+**Done:** Published user `20a41c4`, trip `73668d3`, mobility `61294ab`, client `ddeff88` on separate feature/fix branches. Server checkpoint `c85586a` publishes trip pin; root `chore/phase31-checkpoint` contains updated pins/reporting. Child-first order; no remote dev/main merge or production deployment.
+**Verified:** All origins fetched, working trees/pins/diffs reviewed; 70 frontend tests and TypeScript pass again. Prior unchanged-code backend 54/54 real-Postgres tests, lint and browser checks remain valid.
+**Not done / left uncommitted:** Unrelated tsconfig flag, CLAUDE.md and service logs preserved. Conflicting remote UI/model histories not merged; release hold remains.
+**Follow-ups:** Wait for next user prompt. No further phases implemented.
+
 ## 2026-09-24 - Codex - Phase 3.1 trip-specific garage correction
 
 **Goal:** Make each trip's garage independent, retain custom vehicles in a reusable personal list, rename/category the picker; preserve other UI and deploy only when safe.
