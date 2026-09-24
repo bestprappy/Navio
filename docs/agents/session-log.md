@@ -18,6 +18,14 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 ---
 
 
+## 2026-09-24 - Codex - Battery unavailable screenshot diagnosis
+
+**Request:** Check why battery predictions appear unavailable after Phase 3; investigation only, no application changes or deployment.
+**Findings:** Screenshots show an unsaved NAVIO Estimate selection (Save settings enabled and explicit save-to-apply text), while Trip Energy still reports legacy 18.1 kWh/100 km. Current settings form applies model changes only on save, as requested. Legacy/unknown usable capacity allows nominal driving kWh but leaves SoC null; catalogue 82.56 kWh is declared capacity and cannot be silently promoted. Saving a successful RATED_RANGE selection enables range-based SoC without usable capacity, subject to route completeness. The old-server local-only toast proves some required snapshot capabilities are missing, but exact live capabilities/garage command support were not inspected; no claim of live backend verification. Driving total becomes unavailable if any route duration is missing. UI shortcomings: unexplained question marks, clipped Unavailable text, and local-only toast naming only older fields. These need a focused follow-up, not changed arithmetic or automatic legacy conversion.
+**Verified:** Existing energy suites 31/31 passed, including unknown-capacity, rated range, propagation and capability downgrade. Inspected current branch/status, settings submit, canonical arithmetic and summary conditions. No private account values changed. Unrelated tsconfig flag, CLAUDE.md and service logs preserved.
+
+
+
 ## 2026-09-24 - Codex - Complete Phase 3 canonical trip energy
 
 **Goal:** Continue the approved Phase 3 implementation from the existing checkpoint, preserving prior work; no Phase 4/5, push or deployment.
