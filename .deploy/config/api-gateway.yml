@@ -31,10 +31,14 @@ spring:
               uri: http://trip-planning-service:8082
               predicates:
                 - Path=/v1/trips/**,/v1/public-trips/**,/v1/share/**
+            - id: shared-plans
+              uri: http://trip-planning-service:8082
+              predicates:
+                - Path=/v1/shared-plans,/v1/shared-plans/{token}
             - id: user-management-service
               uri: http://user-management-service:8081
               predicates:
-                - Path=/v1/users/**,/v1/admin/users/**
+                - Path=/v1/users/**,/v1/admin/users,/v1/admin/users/**,/v1/admin/vehicle-models,/v1/admin/vehicle-models/**,/v1/admin/audit-events,/v1/vehicle-models,/v1/vehicle-models/**
             - id: mobility-and-ev-service
               uri: http://mobility-and-ev-service:8083
               predicates:
