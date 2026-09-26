@@ -2,7 +2,20 @@
 
 Current state for the next agent. Overwrite sections as they change; keep it short. History belongs in [session-log.md](session-log.md).
 
-**Last updated:** 2026-09-23 by Claude
+**Last updated:** 2026-09-26 by Codex
+
+## Current: admin dashboard and shared-plan title release
+
+The account dashboard, admin-managed global vehicle catalog, global activity feed, public catalog picker for members and guests, and custom shared-plan title are committed and merged through each child repository's `dev` to `main`. Root `main` is `eb00cff` (Actions run `36241742100`); its pins are client `465720e` and server `de5bd91`, with IAM `8056fb6` and trip-planning `a79a085`.
+
+The first release (`78ea743`, run `36241081199`) passed but live public shared-plan and vehicle-model routes still returned the gateway's 404. Production config-server mounts `.deploy/config/api-gateway.yml` from the root repo, which lacked routes added to the server image's bundled development YAML. Root fix `2051204` adds those routes to the mounted file and adds deployment smoke checks for both public endpoints and the protected activity endpoint. Follow-up run `36241742100` completed successfully.
+
+Verification: IAM 138 tests plus real PostgreSQL schema/catalog tests; trip-planning 150 tests with PostgreSQL; gateway 11 and configuration-server 1; isolated client typecheck, scoped lint, 12 admin API tests and fixture-backed Chrome workflows for account moderation, catalog draft creation, and activity. Live `/v1/shared-plans` returns 200 with a listed plan, `/explore` renders its card, and that plan's API, Explore detail, and share-link pages all return 200. Public `/v1/vehicle-models` returns three published cars; anonymous admin activity returns 401; `/health` returns 200. Invalid share tokens now return the trip service's expected 404. No live Keycloak/two-account acceptance yet.
+
+The original `client/` worktree remains on old dirty `feat/admin-console` with concurrent Explore/planner edits. The release client was assembled from `origin/dev` in a separate clean worktree at `%TEMP%/navio-client-admin-release-20260926`, committed and merged; do not reset the original dirty worktree. Root deployment/observability edits, `docs/agents/plan-link-sharing-plan.md`, and `docs/research/` remain unstaged and were not part of this release. Agent notes were already dirty from prior sessions; this session's entry is at the top of `session-log.md`.
+
+The sections below predate this release and are retained as historical notes. Use the current section above for deployed state.
+
 
 ## Latest assessment: production observability (2026-09-23)
 
