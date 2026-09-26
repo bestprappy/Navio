@@ -441,8 +441,10 @@ if [[ "${USER_ROUTE_STATUS}" != "401" ]]; then
   exit 1
 fi
 
-# Verify the group migration and public/protected routing through the production edge.
-verify_group_route() {
+# Verify public and protected routes through the production edge. These
+# routes come from the mounted .deploy/config/api-gateway.yml, not the
+# configuration-server image's bundled development config.
+verify_api_route() {
   local method="$1"
   local path="$2"
   local expected_status="$3"
@@ -457,10 +459,13 @@ verify_group_route() {
     exit 1
   fi
 }
-verify_group_route GET '/v1/groups?size=1' 200
-verify_group_route GET '/v1/groups/search?q=ev&size=1' 200
-verify_group_route GET '/v1/groups/mine' 401
-verify_group_route POST '/v1/groups' 401
+verify_api_route GET '/v1/groups?size=1' 200
+verify_api_route GET '/v1/groups/search?q=ev&size=1' 200
+verify_api_route GET '/v1/groups/mine' 401
+verify_api_route POST '/v1/groups' 401
+verify_api_route GET '/v1/shared-plans?page=0&size=1' 200
+verify_api_route GET '/v1/vehicle-models?page=0&size=1' 200
+verify_api_route GET '/v1/admin/audit-events' 401
 
 for auth_path in sign-in sign-up; do
   auth_page_html="$(curl --fail --silent --show-error \
