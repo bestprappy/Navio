@@ -165,7 +165,9 @@ configure_keycloak_authentication() {
         | grep -qx "${role_name}"; then
         role_id="$("${kcadm}" get "roles/${role_name}" -r "${KEYCLOAK_REALM}" \
           --fields id --format csv --noquotes)"
-        printf '[{"id":"%s","name":"%s"}]' "${role_id}" "${role_name}" \
+        # Double quotes only: a single quote here would close the bash -euc
+        # string and strip the JSON quotes, so kcadm rejects the payload.
+        printf "[{\"id\":\"%s\",\"name\":\"%s\"}]" "${role_id}" "${role_name}" \
           > /tmp/navio-scope-mapping.json
         "${kcadm}" create "clients/${client_id}/scope-mappings/realm" \
           -r "${KEYCLOAK_REALM}" -f /tmp/navio-scope-mapping.json
