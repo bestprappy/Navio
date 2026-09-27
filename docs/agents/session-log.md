@@ -17,6 +17,17 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 ---
 
+## 2026-09-26 — Codex — Release admin dashboard, vehicle catalog, and shared-plan titles
+
+**Goal:** finish the admin dashboard and global vehicle catalog, let a shared plan have a public name, fix the live Explore/shared-link 404, then commit and deploy to root `main`.
+**Done:** IAM admin account, catalog, and activity backend (`dfb14c0`, main `8056fb6`); client admin UI, catalog picker, activity, and share-name dialog (`2ec2c33`, `c3faf9a`, main `465720e`); trip publication custom title (`9b63ff3`, main `a79a085`); dedicated shared-plan gateway route, catalog routes, and gateway tests (server `8ef99e5`, main `de5bd91`); root pins (`525c4da`, main `78ea743`). The first deployment succeeded but the live public routes still 404ed because the root's mounted production gateway YAML was stale. Fixed that file and added public-route deployment checks (`2051204`, root main `eb00cff`); follow-up Actions run `36241742100` succeeded.
+**Verified:** IAM 138 tests passed, plus 4 real-PostgreSQL catalog/schema tests; trip 150 tests passed with PostgreSQL and standalone service config; gateway 11 tests and configuration-server 1 test passed. Isolated client `tsc`, scoped ESLint, 12 admin transport tests, prior admin Chrome workflow, and new Chrome catalog draft/activity workflow passed. Live shared-plan feed and vehicle catalog returned 200; a listed plan opened in both reading pages and appeared in Explore HTML; invalid token returned the trip service's 404; anonymous activity returned 401; health returned 200. The browser checks used fixtures, not live Keycloak.
+**Not done / left uncommitted:** root deployment/observability edits, old dirty client `feat/admin-console` worktree and concurrent Explore/planner edits, `docs/agents/plan-link-sharing-plan.md`, and `docs/research/` were preserved. The release client was assembled in a clean worktree from `origin/dev`; its main commit is deployed by the root pin. Live two-account Keycloak acceptance is outstanding.
+**Follow-ups:** live authenticated admin and two-account share acceptance remains; no test credentials were available. The production shared-plan 404 was reproduced and fixed by updating the mounted gateway config.
+
+
+---
+
 ## 2026-09-23 — Claude — Browser-verify and commit the garage and EV charger redesign
 
 **Goal:** verify the uncommitted garage/EV-charger redesign in a real browser, then commit it.

@@ -26,6 +26,15 @@ scrape_configs:
           environment: 'production'
           service: 'loki'
 
+  - job_name: 'zipkin'
+    metrics_path: '/prometheus'
+    static_configs:
+      - targets: ['zipkin:9411']
+        labels:
+          cluster: 'navio'
+          environment: 'production'
+          service: 'zipkin'
+
   - job_name: 'alloy'
     static_configs:
       - targets: ['alloy:12345']
