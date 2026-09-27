@@ -25,28 +25,7 @@
   "description": "Production operations dashboard for Navio services. RED, SLO, JVM, database, Kafka, and correlated Loki log signals.",
   "editable": true,
   "graphTooltip": 1,
-  "links": [
-    {
-      "icon": "external link",
-      "includeVars": false,
-      "keepTime": true,
-      "tags": [],
-      "targetBlank": true,
-      "title": "Prometheus targets",
-      "type": "link",
-      "url": "http://localhost:9090/targets"
-    },
-    {
-      "icon": "external link",
-      "includeVars": false,
-      "keepTime": true,
-      "tags": [],
-      "targetBlank": true,
-      "title": "Zipkin traces",
-      "type": "link",
-      "url": "http://localhost:9411/zipkin/"
-    }
-  ],
+  "links": [],
   "panels": [
     {
       "datasource": { "type": "prometheus", "uid": "prometheus" },
