@@ -1511,7 +1511,7 @@ paths:
       tags:
       - User Management Service
       summary: Search users for administration
-      description: Requires MODERATOR or ADMIN.
+      description: Requires MODERATOR, ADMIN, or OWNER.
       operationId: searchAdminUsers
       parameters:
       - name: query
@@ -1536,7 +1536,7 @@ paths:
       tags:
       - User Management Service
       summary: Grant global role
-      description: Grants the role through the Keycloak Admin API and records a Navio audit entry. Requires ADMIN.
+      description: Grants the role through the Keycloak Admin API and records a Navio audit entry. ADMIN may grant USER or MODERATOR; only OWNER may grant ADMIN. OWNER itself is assigned by a trusted Keycloak operator only.
       operationId: grantGlobalUserRole
       parameters:
       - name: userId
@@ -1552,11 +1552,11 @@ paths:
               $ref: '#/components/schemas/RoleChangeRequest'
       responses:
         '200':
-          description: Updated profile/role snapshot
+          description: Updated role snapshot
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserProfile'
+                $ref: '#/components/schemas/RoleAssignmentResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1566,7 +1566,7 @@ paths:
       tags:
       - User Management Service
       summary: Revoke global role
-      description: Revokes the role through the Keycloak Admin API and records a Navio audit entry. Requires ADMIN.
+      description: Revokes the role through the Keycloak Admin API and records a Navio audit entry. ADMIN may revoke USER or MODERATOR; only OWNER may revoke ADMIN. OWNER itself is managed by a trusted Keycloak operator only.
       operationId: revokeGlobalUserRole
       parameters:
       - name: userId
@@ -1579,9 +1579,18 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/GlobalRole'
+      - name: reason
+        in: query
+        schema:
+          type: string
+          maxLength: 2000
       responses:
-        '204':
-          description: Role revoked
+        '200':
+          description: Updated role snapshot
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleAssignmentResponse'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -5896,6 +5905,7 @@ components:
       - USER
       - MODERATOR
       - ADMIN
+      - OWNER
     RoleChangeRequest:
       type: object
       required:
@@ -5906,8 +5916,25 @@ components:
           $ref: '#/components/schemas/GlobalRole'
         reason:
           type: string
-          minLength: 1
-          maxLength: 500
+          minLength: 3
+          maxLength: 2000
+    RoleAssignmentResponse:
+      type: object
+      required:
+      - userId
+      - roles
+      - updatedAt
+      properties:
+        userId:
+          type: string
+          format: uuid
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/GlobalRole'
+        updatedAt:
+          type: string
+          format: date-time
     UserVehiclePatch:
       type: object
       description: All fields are optional on PATCH. Null leaves the existing value unchanged. Editing official specifications converts the vehicle to a custom entry.
