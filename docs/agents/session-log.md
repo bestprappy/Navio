@@ -1,5 +1,20 @@
 # Session Log
 
+## 2026-09-27 — Claude — Admin route fix, OWNER provisioning, Explore seeded
+
+**Goal:** `/admin/users` reload showed Keycloak's "internal server error"; production had no OWNER role; run the Explore seed as "Navio Team".
+**Done:** nginx routed every `/admin/` path to Keycloak; now only `/admin/realms/`, `/admin/serverinfo` and `/admin/<realm>/console/` go there (Keycloak console is `/admin/master/console/`). deploy.sh creates the OWNER realm role if missing and adds it to the `navio-web` scope; a smoke check asserts anonymous `/admin/users` redirects to `/sign-in`. First release (`ac8ed60`, run `36332867659`) failed and rolled back: the pre-existing scope-mapping `printf '...'` inside `bash -euc '...'` broke the quoting (never ran before because all roles were already mapped). Fixed in `b853d1a`; OWNER scope mapping was also added manually. Root `main` `6915bca`, run `36333726651` succeeded. Created Keycloak user `navio-team@example.com` (Navio Team, id `0ae736e4-a315-456e-bb2e-7257d419b2d9`, no password, no IAM profile yet). Ran the seed on the VM from `~/navio-maintenance/seed-explore` (log `run-2026-09-27.log`): 30 published, 0 failed.
+**Verified:** `/admin/users` -> 307 sign-in; `/admin/master/console/` 200; OWNER role exists and is in the `navio-web` scope; replayed smoke checks pass; feed lists 30 plans with `authorName` "Navio Team"; a seeded `/explore/shared/<token>` returns 200.
+**Not verified:** no one holds OWNER yet (manual steps 3-5 in owner-role.md); seeded plans were not browser-checked.
+
+## 2026-09-27 — Claude — Explore seed script (30 real plans)
+
+**Goal:** fill Explore with many real plans: 5 Thailand, 5 Japan, 20 elsewhere.
+**Done (uncommitted, root `dev`):** `.deploy/scripts/seed-explore/` with `seed.mjs`, `plans.mjs` (30 itineraries) and `README.md`. The script uses the real API only: `POST /v1/trips` (destination = Google place id from `/v1/geo/places/search`), `PUT .../planner` with stops resolved to real Google places (photo, rating, coordinates) and real chargers from `/v1/ev/chargers/near` for the two Thai EV trips, then `PUT .../publication` with `listInExplore`, `includeNotes`, byline "Navio Team". It calls trip-planning and mobility directly with `X-User-Id`, because Keycloak has direct-access grants off. It is idempotent by trip title and has `DRY_RUN`/`ONLY`.
+**Verified:** `node --check`; plan counts and time order; full run against a contract stub (`scratchpad/stub.mjs`): 30 published, 4 charger stops, the re-run skipped 30, and a missing user id was refused.
+**Not verified:** not run against a real backend or Google (nothing was running locally, and production needs a seed account id).
+**Follow-ups:** create the seed account, run with `DRY_RUN=1` on the VM (`docker run --network navio-backend ...`, see README), check the resolved places, then run for real.
+
 ## 2026-09-27 — Claude — Commit and release Owner role, Explore sharing and observability
 
 **Goal:** `/commit` everything dirty across all repos and release it through `main` (user chose "Everything" and "Through main (deploys)").
