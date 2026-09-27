@@ -2,9 +2,30 @@
 
 Current state for the next agent. Overwrite sections as they change; keep it short. History belongs in [session-log.md](session-log.md).
 
+**Last updated:** 2026-09-27 by Claude
+
+## Current: Owner role, Explore sharing and observability released
+
+Everything that was dirty on 2026-09-27 is committed and merged `dev` -> `main` in every repo. Root `main` is `881ea96` (Actions run `36327266654`, succeeded; smoke checks: /health 200, /v1/shared-plans and trending 200, anonymous copies/trips/admin 401, /grafana/api/health 200). Pins: client `f790652`, server `4395d86`, IAM `9351eb8`, trip-planning `f0549d4`. Details are in the top session-log entry.
+
+- **Owner role:** `OWNER` is in the realm import, gateway, IAM (V6 constraint) and client gates. Admins grant or remove Moderator; Owners grant or remove Administrator, with a required reason. Only a Keycloak operator assigns OWNER. **The existing production realm needs the manual setup in [owner-role.md](owner-role.md)** before anyone can hold it.
+- **Admin user search:** four null-free queries replace the nullable `search`, which is the likely cause of the 500 on `GET /api/admin/users`. Confirm on production.
+- **Explore:** real listed plans, view-count trending (V13), and `/explore/shared/[token]` rendering the real planner components read-only through `plannerReadOnlyAtom`. When adding an editing control to a planner component, gate it on that atom. Published place/charger stops carry coordinates; day anchors stay private. Plans published before this release show no pins until the owner presses Update.
+- **Copies:** `POST /v1/shared-plans/{token}/copies` (authenticated) is routed in both gateway configs. Before this release, neither routed it.
+- **Observability:** nginx forwards Host/X-Forwarded-* in `/grafana/` and `/`; in-memory Zipkin (320m limit, healthcheck disabled) with 0.1 sampling; Grafana Zipkin/Loki trace links.
+
+**Not verified:** live Keycloak/two-account acceptance of role grants and plan copies, Grafana panels and traces on the VM, and VM memory headroom (declared limits ~8.3 GB).
+
+**Worktrees:** `main` is checked out in `%TEMP%/navio-client-admin-release-20260926` and `%TEMP%/navio-root-admin-release-20260926`, so merge to `main` there. The main client worktree is detached at `f790652`. Its old `feat/admin-console` branch points at temp snapshot commit `0b54f2c` (never pushed) and can be deleted. `client/.next-explore-check/` is ignored build output.
+
+**Trap:** Raum-1's unmerged trip-planning `fix/trip-specific-garage` adds `V11__trip_energy_state` and `V12`. Main already applied `V11__trip_publication` and now `V13`, so that branch must renumber to V14+ before merging.
+
+---
+
+
 **Last updated:** 2026-09-26 by Codex
 
-## Current: admin dashboard and shared-plan title release
+## Previous release: admin dashboard and shared-plan title (2026-09-26)
 
 The account dashboard, admin-managed global vehicle catalog, global activity feed, public catalog picker for members and guests, and custom shared-plan title are committed and merged through each child repository's `dev` to `main`. Root `main` is `eb00cff` (Actions run `36241742100`); its pins are client `465720e` and server `de5bd91`, with IAM `8056fb6` and trip-planning `a79a085`.
 
@@ -17,17 +38,89 @@ The original `client/` worktree remains on old dirty `feat/admin-console` with c
 The sections below predate this release and are retained as historical notes. Use the current section above for deployed state.
 
 
-## Latest assessment: production observability (2026-09-23)
+## Done on branches: Raum-1's Phase 3.1 reconciled (not pushed, not on dev)
 
-Follow-up screenshot shows warning icons and no data in all visible metric panels. Dashboard datasource UID matches provisioning. Found likely proxy issue: Grafana location declares Upgrade/Connection headers, suppressing inheritance of server-level proxy headers including Host; this can cause Grafana origin checks to reject POST queries. Await exact panel error before attributing live failure; no proxy edit made.
+Superseded by the hybrid merge on `feat/hybrid-energy-model` in all six repos (root `bb775f0`, client `a17a747`, server `2a11ad1`, mobility `c8bfa8c`, trip-planning `bab8f61`, user-management `a60ece6`). That branch's committed `docs/agents/handoff.md` has the current state, verification and release order; the note below is kept only until these docs are reconciled with it.
 
-User asked how Grafana and Zipkin work in production; guidance only, no deployment/application changes. Grafana public `/grafana/api/health` returns HTTP 200, database ok, version 12.3.2 when certificate verification is bypassed for diagnosis; normal Windows curl rejects the certificate chain (untrusted root). Metrics ingestion/dashboards were not authenticated or verified. Production Compose already deploys Grafana/Prometheus/Loki/Alloy and provisions dashboards. Zipkin intentionally absent; common Java env sets sampling 0.0 and export false. To enable: add internal Zipkin with bounded/persistent storage, enable export and positive sampling, set MANAGEMENT_TRACING_EXPORT_ZIPKIN_ENDPOINT=http://zipkin:9411/api/v2/spans (covers hardcoded localhost configs), provision Grafana Zipkin source, redeploy and verify cross-service traces. Both agent notes already dirty; preserved prior work and left notes uncommitted. Other active edits include gateway/config and trip publication implementation; do not include them in observability changes.
+### Earlier note (2026-09-26, before the merge)
+
+Raum-1 pushed feature branches only (see the 2026-09-26 session-log entry for the full list). They conflict with `dev` because they carry a second energy model (`CanonicalEnergy`, continuous SoC) that competes with the `EvSimulationModel` already on `main`. **Do not merge any of them until both devs agree a written energy contract.** Trip-planning and user-management look clean as text but depend on the friend's mobility contract (optional battery/consumption, `RATED_RANGE`, `observedSocPct`). Migration numbers: the friend keeps trip-planning V11/V12, and local plan sharing is now V13. All three must ship to `main` in one release. When resolving the client, the `dev` redesign markup wins and the friend's trip-isolation logic and tests are ported onto it.
+
+## Historical: plan link sharing and Explore listing
+
+The notes below predate the earlier sharing release and this admin release; the current code is on `main`.
+
+The feature in [plan-link-sharing-plan.md](plan-link-sharing-plan.md) is implemented end to end in code. It **has never run against a real backend with real accounts**. Nothing is committed.
+
+**2026-09-26 (Claude): published plans can now be listed on Explore.** See the plan's "Addendum 2026-09-26" for the contract. Summary: V13 gained `listed_in_explore` and `listed_at`, plus a CHECK constraint (V13 was edited in place because it has never been merged); publish carries `listInExplore`; a new owner `PATCH .../publication` lists or unlists immediately; stop sharing also unlists. The anonymous `GET /v1/shared-plans` feed is built by `ExplorePlanSummarizer` from frozen snapshots, and the gateway permits exactly that route plus `/{token}`. On the client: `app/feature/explore/_components/shared-plans/*` (API/zod, server fetch, infinite-query hook, `RouteStrip`, `SharedPlanCard`, `SharedPlansSection`), `app/api/shared-plans/route.ts` (GET-only feed proxy), `app/explore/shared/[token]/*` (listed-only reading page), and a shared `SharedPlanHeader`. `shared-plan-request.ts` moved from `app/share/plans/[token]/` into `feature/planner/_components/share/`. `/explore` is now `force-dynamic` and server-fetches the first feed page. The client branch is now `feat/admin-console` (another session's work is also uncommitted there). The untracked share files moved with the working tree.
+- **Author byline (later the same day):** published plans now show "Shared by *name*". `author_display_name` (in V13) is frozen from the owner's profile name at publish or list time, sanitized server-side, and shown with an initials avatar. No account id or photo reaches the public routes. The dialog shows "Shown as *name*" with a "Change your name" link. Details are in the plan addendum. Verified: 149 trip-planning tests (only the 2 known Postgres full-context errors), `PostgresSchemaTests` on disposable Postgres, client `tsc`/ESLint/`next build`, and Chromium against the stub (bylines, the no-name fallback, author search, light/dark/390px).
+- **Stale build trap:** `trip-planning-service/target/classes` still held `V11__trip_publication.sql` from before the rename. Flyway ran it, V13's `CREATE TABLE IF NOT EXISTS` was then skipped silently, and the schema test failed. I deleted that one artifact. After any migration rename, clean `target/` (the offline `mvn clean` plugin is missing on this machine).
+- **Concurrent edit:** another session added `GET /v1/vehicle-models` to the same `GatewaySecurityConfig.java`. Both changes are in the file; split them when committing.
+- **Verified 2026-09-26:** trip-planning `./mvnw -o test`: 142 run, only the two known full-context tests error (Postgres on 5432). That includes 30 publication service tests, 5 summarizer tests, and 8 + 17 controller slices (these need the config server on 8888). `PostgresSchemaTests` passes on disposable Postgres (V1 to V13 plus `validate` plus the JPQL feed query). The listing CHECK constraint was exercised directly in psql. api-gateway: 10 tests, including a new shared-plans routing test. Client: `tsc`, scoped ESLint and `next build` are clean. Explore UI was checked in Chromium against a stub gateway in light, dark and 390px: search merge, keyboard open, no overflow, and unlisted/dead tokens refused on `/explore/shared`. **Not browser-checked:** the owner dialog's Explore toggle (needs auth and a backend).
+
+**Backend** (`server/trip-planning-service` `dev`, untracked): `V13__trip_publication.sql` (renumbered from V11 on 2026-09-26: Raum-1's pushed `fix/trip-specific-garage` holds V11 and V12) (one row per trip, token nullable and cleared on revoke, `sanitizer_version` so a redaction fix dead-links stale snapshots rather than serving them), `TripPublication`, `TripPublicationRepository`, `PlanPublicationSanitizer`, `ShareTokenGenerator`, `TripPublicationService`, `TripPublicationController` (owner-only `GET`/`POST preview`/`PUT`/`DELETE` under `/v1/trips/{tripId}/publication`), `SharedPlanController` (`GET /v1/shared-plans/{token}`, the service's one anonymous route), plus a modified `GlobalExceptionHandler`. `server/api-gateway` permits `GET /v1/shared-plans/{token}` only; `server/configuration-server` routes `/v1/shared-plans/**` to trip-planning.
+
+**Client** (`feat/garage-ev-redesign`, untracked except two modified files): `app/feature/planner/_components/share/*` (typed API, query hooks, `PublishPlanDialog`, `ShareOptionRow`, `SharedLinkField`, `SharedPlanContent`), `app/share/plans/[token]/*` (recipient page as a Server Component fetching the gateway directly), `planner-autosave-flush.ts`, and edits to `planner-persistence.tsx` (pending-save flush) and `trip-actions-menu.tsx` (entry point).
+
+The snapshot is **frozen at publish time**, not projected on read: the owner's later edits stay private until they press Update. `SharedPlanContent` renders both the owner's preview and the recipient page, so the preview cannot drift from what is served.
+
+Two things to know before touching it:
+
+- `usePublishPlan` must **not** take the `planner-autosave-<tripId>` mutation scope. It calls the autosave flush, which calls the autosave mutation; sharing that scope makes each wait for the other.
+- `expectedTripVersion` is `trip.version`, which the client already has as the planner snapshot's `version` (`PlannerService` returns `trip.getVersion()` there). `TripResponse` does not expose it.
+
+**Not built:** replace link / token rotation, the allow-copy option (no `allow_copy` column in V13), independent copying, guest "Sign in to publish", moderation/reporting of Explore listings, and server-side Explore search. `docs/api/Navio Open API.yaml` is not updated (it is also missing the feed and PATCH routes).
+
+**Next:** browser-verify against a running backend, with owner account A, unrelated account B and a signed-out browser. Include publish-with-listing, unlist, and stop-sharing, and confirm each one disappears from the Explore feed. The plan's must-pass list is still unexercised end to end. Then split the commits: the client tree also holds the admin-console work, and the gateway file holds the vehicle-models permit.
+
+## Observability fix + tracing details (written 2026-09-23, released 2026-09-27)
+
+Edits are in the working tree on root `dev`, **uncommitted and not deployed**. Root-repo files only — no submodule changes. They only take effect on the VM after a root `main` push runs the deploy workflow.
+
+**Files:** `.deploy/nginx/navio.conf`, `.deploy/compose.production.yml`, `.deploy/.env.example`, `.deploy/observability/prometheus.yml`, `.deploy/observability/grafana/datasources.yml`, `grafana/provisioning/datasources/datasources.yml`, `grafana/dashboards/navio-overview.json`.
+
+### 1. Grafana dashboard showed no data — root cause
+
+`proxy_set_header` does not merge across nginx configuration levels: declaring *any* `proxy_set_header` inside a `location` discards every server-level one. The `/grafana/` location declared only `Upgrade` and `Connection`, so it silently dropped `Host` and all `X-Forwarded-*` and sent `Host: navio_grafana` upstream. Grafana's CSRF middleware compares the browser `Origin` against that `Host` and answers 403 to every non-GET request; panels query over `POST /api/ds/query`, so every panel failed while the GET-based template variables still resolved. Fix repeats all six inherited headers in the location.
+
+`location /` (navio-web) had the identical defect and is fixed the same way. It was not visibly broken because Auth.js is configured with an explicit `AUTH_URL`, but Next.js also compares `Origin` against `Host` to guard Server Actions.
+
+`GF_SERVER_ROOT_URL`'s compose *default* was `http://`, inconsistent with `GF_SECURITY_COOKIE_SECURE=true`; changed to `https://`. The VM's `.env` already sets the value, so this only affects the fallback.
+
+### 2. Tracing turned on in production
+
+`MANAGEMENT_TRACING_EXPORT_ZIPKIN_ENABLED` binds to **no Spring property** and was always a no-op — the real switch is `management.tracing.export.enabled`. What actually kept tracing off was `MANAGEMENT_TRACING_SAMPLING_PROBABILITY=0.0`.
+
+Now: a `zipkin` service (`openzipkin/zipkin:3.5.1`, matching the dev stack), `STORAGE_TYPE: mem` with `MEM_MAX_SPANS=50000`, `mem_limit: 320m`, backend network only. Sampling is `${NAVIO_TRACING_SAMPLING_PROBABILITY:-0.1}` and `MANAGEMENT_TRACING_EXPORT_ZIPKIN_ENDPOINT` is set on the shared Java env anchor — verified to reach all seven Java services.
+
+- **Traces are in-memory and lost on restart.** Persisting them needs Elasticsearch or Cassandra, which this VM has no memory budget for.
+- **Zipkin is not proxied by NGINX.** Its UI has no authentication. Traces are read through Grafana Explore, which is behind a login.
+- Zipkin has `healthcheck: disable: true` on purpose: `deploy.sh` runs `compose up --wait` over the whole stack and **rolls the release back** if any container is unhealthy. A trace backend must never fail an application release.
+- Grafana gets a Zipkin datasource (trace→logs/metrics, copied from the dev stack's working config) and a Loki `derivedFields` entry that turns the trace id in Spring Boot's `[app,traceId,spanId]` log prefix into a link into Zipkin. Both stacks' datasource files now match.
+
+**Memory:** declared `mem_limit` across the stack is now ~8.3 GB. These are limits, not reservations, but check `free -h` on the VM before releasing.
+
+### 3. Dashboard links removed
+
+`grafana/dashboards/navio-overview.json` had two `http://localhost:` links (Prometheus targets, Zipkin UI) that only ever worked on a machine running the stack locally; neither port is exposed in production. Removed rather than replaced: the file is installed into **both** dev and production by `deploy.sh`, Grafana serves it at the root in dev but under `/grafana` in production, and dashboard link URLs are not sub-path aware, so no single hardcoded URL is correct in both. Traces are reached via Grafana's Explore nav, or by clicking the TraceID field on a log line.
+
+### Not verified / left for the next agent
+
+- Nothing was deployed or exercised against the live VM. YAML/JSON syntax validated locally only.
+- The Zipkin `metrics_path: /prometheus` scrape job mirrors the dev stack's; the target was not confirmed UP against a running container.
+- Latent trap, **not** fixed because it needs a `server` submodule change: the config server serves `management.tracing.sampling.probability: 1.0` hardcoded for api-gateway, discovery-server and trip-planning-service, and `${TRACING_SAMPLING_PROBABILITY:1.0}` — a *different* env name — for community and mobility. This is harmless today only because services use `spring.config.import: configserver:` (config-data mode), where config-server values rank **below** `systemEnvironment`, so the compose env var wins. Switching to legacy bootstrap mode would flip that and start sampling 100% of requests.
+
+Unrelated dirty work was present at session start and was preserved untouched: `client` and `server` submodules (link-sharing / gateway edits), and the untracked `docs/agents/*-plan.md` and `docs/research/`. Do not fold those into an observability commit.
 
 ## Latest assessment: Community next step (2026-09-23)
 
 User invoked `llm-council` for advice, not implementation. Five independent advisor passes and five anonymous peer reviews recommend a narrow milestone: publish a sanitized real saved itinerary, attach its authorized publication reference to a community post, and let a second user read it; revocation shows an unavailable attachment without breaking discussion. First define the two-account acceptance scenario and attachment/audience contract using `plan-link-sharing-plan.md`, then implement publication before community integration. Community posting broadens discovery beyond an unlisted link and needs explicit owner consent. Defer persistent copying to a follow-up; notifications follow when discussion activity warrants them. No usage or deadline evidence was supplied.
 
 Source findings: composer selects `explorePlanSharedTrips`; feed/detail attachments call local `getTripById`; `PostService` stores `sharedTripId` without publication validation. Groups/posts/comments/votes/moderation already have API implementations. The mock copied-trip panel has no consumers found, so do not describe it as live UI. `best` and `top` share score ordering despite the "For you" label. All 20 client community API/posts/upload-proxy tests passed; no live browser/backend or Postgres checks in this assessment. Existing browser script stubs API responses. Root/client/server are `dev`, community is clean on `main`; trip-planning is `dev` with pre-existing untracked `dto/publication/` work. Coordinate before overlapping implementation. Existing dirty agent notes and unrelated application edits were preserved; notes remain uncommitted.
+
+## Council verdict: implementing the admin plan (2026-09-23)
+
+Nothing implemented yet. The council says to build in slices. **Slice 1**, which needs no migration or gateway edits: the `/admin` shell, a Users table and ban/unban on the existing `AdminUserController`, a statistics endpoint under `/v1/admin/users/statistics` (the existing gateway route already covers it), last-admin protection, and role-matrix tests. **Slice 2:** an additive catalog migration (check the next free version, keep the JSON IDs, confirm the previous image still starts), admin CRUD, and a `status` column plus `@Version`. **Deferred:** gateway ban enforcement (tokens already expire in 300 s), the public `/v1/vehicle-models` route, guest selection and the activity log UI. All of those need the dirty gateway files. Waiting on the user to approve slice 1 and decide what happens to the gateway work.
 
 ## Latest proposal: admin dashboard and shared vehicles (2026-09-23)
 

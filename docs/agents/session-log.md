@@ -1,5 +1,38 @@
 # Session Log
 
+## 2026-09-27 — Claude — Commit and release Owner role, Explore sharing and observability
+
+**Goal:** `/commit` everything dirty across all repos and release it through `main` (user chose "Everything" and "Through main (deploys)").
+**Done:**
+- client: the dirty `feat/admin-console` tree was 5 commits behind `origin/dev`, whose released admin files were untracked here. Snapshotted it as temp commit `0b54f2c` (the old branch still points at it), cherry-picked onto `feat/explore-read-only-planner` from `origin/dev`, and resolved all 22 add/add conflicts to the snapshot after confirming every dev-only line was superseded; the final tree equals the snapshot. Commits `c072bce` feat(admin) Owner role, `1296322` feat(explore) read-only planner. `main` = `f790652` (merged in the `%TEMP%/navio-client-admin-release-20260926` worktree, which holds `main`). The main client worktree is left detached at `f790652`.
+- IAM (was dirty on `main`): `e9dac80` fix(admin) null-free user search on `fix/admin-user-search`, `27295c9` feat(admin) Owner role + V6 on `feat/owner-role`; `main` = `9351eb8`.
+- trip-planning (was dirty on `main`): `8e4ff37` feat(sharing) trending/V13, located stops, copies; `main` = `f0549d4`.
+- server: `feat/gateway-owner-role` (OWNER authority), pins `f5f1cb9`, and **new** `fix/shared-plan-copy-route`: neither gateway config routed `POST /v1/shared-plans/{token}/copies` (would 404). `main` = `4395d86`.
+- root: `fix/shared-plan-copy-route` (same route in `.deploy/config/api-gateway.yml`), `feat/owner-realm-role`, `fix/grafana-proxy-headers`, `feat/production-tracing` (Zipkin), `docs/owner-explore-release`, pins. `main` = `881ea96` (merged in `%TEMP%/navio-root-admin-release-20260926`), Actions run `36327266654` succeeded (pins, Postgres schema, 9 builds, deploy). Live smoke: `/health` 200, feed and trending 200, anonymous copies/trips/admin 401, Grafana health 200.
+**Verified:** IAM full suite 148 (2 skipped by design) incl. `PostgresSchemaTests`, admin repository and catalog Postgres tests on disposable PostGIS 16; trip-planning full suite 157 incl. V13 on Postgres; gateway 12 (1 skipped); client `tsc` clean, ESLint 0 errors on changed files, 13 admin tests (`node --experimental-transform-types --test`). Production compose validated with `docker compose config`. First IAM run had 8 errors only because the config server was still starting (connection refused on 8888); rerun passed.
+**Not verified:** live Keycloak/two-account acceptance, copy end to end, nginx `-t`, VM memory headroom for Zipkin.
+**Follow-ups:** Raum-1's `fix/trip-specific-garage` still carries trip-planning `V11`/`V12`; renumber above V13 before merging. Existing production realm needs the manual OWNER setup in `owner-role.md`.
+
+## 2026-09-27 — Claude — Explore shared plan rendered by the planner itself
+
+**Goal:** make an Explore plan page 1:1 with the planner (map on the right), fed by the real published plan, copyable, and automatically updated whenever planner cards change.
+**Done (all uncommitted):**
+- User decision: published itinerary stops (places and chargers) may expose coordinates; day anchors stay private.
+- trip-planning `main`: `PlanPublicationSanitizer.sanitizePlace` now publishes `placeId`/`address`/`lat`/`lng` only for valid coordinates; `SANITIZER_VERSION` deliberately unchanged (adding fields must not dead-link live plans; old snapshots just lack pins). Copy no longer requires an address. Tests updated and added.
+- client `feat/admin-console`: new `plannerReadOnlyAtom`; read-only branches in `ItinerarySection` (+ `renderDayAnchors` slot), `SortableBlockItems`, `TripPlaceCard`, `TripNoteItem`, `TripChecklistItem`, `BudgetSection`/`ExpenseCard`, and both planner maps (no POI add). New `share/shared-plan-blocks.ts` (snapshot → `TripBlockData`/budget) and `share/shared-day-anchors.tsx`; `SharedPlannerView` rewritten to hydrate a scoped Jotai `Provider` and render the real planner components + `PlannerMap`; `/explore/shared/[token]` uses the planner's sidebar layout. Deleted the unused custom `shared-planner-map.tsx`.
+**Verified:** `PlanPublicationSanitizerTests` 33/33, `TripPublicationServiceTests` 39/39; client `tsc` clean, scoped ESLint clean (one pre-existing warning). Headless Chrome against a stub gateway at 1440px: planner layout, real cards, numbered/charger pins, budget. Phone width not truly verifiable (headless min width). Not verified: live routes, real accounts, copy end to end, full trip-planning suite, Postgres.
+**Follow-ups:** `/share/plans/[token]` and the publish-dialog preview still use `SharedPlanContent`; move them to `SharedPlannerView` if they should match too. Plans published before this change show stops as "(location not shared)" notes until the owner presses Update.
+
+## 2026-09-27 — Codex — Real Explore plans and planner-style shared view
+
+**Goal:** remove mocked Explore trips, show real recent and trending user publications, open a shared plan in the planner layout without editing, and let a user copy it.
+**Done:** Connected Explore, dashboard recommendations, and the planner Explore section to published plans; added view-based trending and a private-copy endpoint in trip-planning with V13 `view_count`; replaced the old mock detail route with a read-only planner workspace and shared card/day components. App changes remain uncommitted.
+**Verified:** client TypeScript, scoped ESLint, and production `next build`; targeted publication/controller/privacy tests; V1–V13 Flyway migration and JPA validation on disposable PostgreSQL 16. No real-account browser acceptance.
+**Not done / left uncommitted:** Client `feat/admin-console` and trip-planning `main` hold these changes alongside unrelated dirty work. The isolated frontend build left `client/.next-explore-check/`; automatic approval review blocked recursive removal. App changes were not staged, merged, or deployed.
+**Follow-ups:** The user was asked whether publicly shared itinerary stops may expose coordinates. Until answered, the sanitizer keeps locations private: the read-only map has no pins and copied stops without public coordinates become editable notes. Recheck the exact visual match and copy flow with two real accounts once that choice is settled. Agent notes already contained another session’s uncommitted changes, so this note was not committed separately.
+
+---
+
 One entry per agent session, **newest first**. Every session adds an entry before it ends, including unfinished or abandoned work. Keep entries factual and short; current state goes in [handoff.md](handoff.md).
 
 ## Template
@@ -17,6 +50,16 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 ---
 
+## 2026-09-27 — Codex — Repair admin users and add Owner role
+
+**Goal:** fix the admin users 500, present users in a role-badge table, and let an Owner grant administrator roles while admins manage lower roles.
+**Done:** changed IAM search to avoid nullable PostgreSQL query parameters; added `OWNER` through IAM, gateway, Keycloak import, client role gates, V6 migration, and docs; added audited role controls in the account drawer and colored badges in the users table; stopped logging handled admin HTTP failures to the Next development error overlay. No commits or deployment.
+**Verified:** client typecheck after `next typegen`, scoped ESLint, 13 admin transport tests; IAM 47 targeted controller/service tests plus 13 final role/guard tests; gateway suite and new Owner converter test; disposable PostgreSQL 16 migration/schema/search/Owner constraint tests (5 passed). No live authenticated Keycloak or browser check. The exact backend exception behind the reported 500 was unavailable, so the null-parameter query is a tested likely cause.
+**Not done / left uncommitted:** all changes are uncommitted. Root agent notes and deployment files, client Explore/planner work, and server submodule work were already dirty before this session and may belong to other sessions; they were not staged or discarded. `docs/agents/owner-role.md` records existing-realm setup, including the display snapshot row. The local Chrome extension timeout is unrelated to Navio.
+**Follow-ups:** the local client's API base URL points at production, so its reported 500 can persist until the IAM change is released. Complete live authenticated acceptance and release through the repository's submodule order. Keep the existing dirty work separate when committing.
+
+---
+
 ## 2026-09-26 — Codex — Release admin dashboard, vehicle catalog, and shared-plan titles
 
 **Goal:** finish the admin dashboard and global vehicle catalog, let a shared plan have a public name, fix the live Explore/shared-link 404, then commit and deploy to root `main`.
@@ -27,6 +70,106 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 
 ---
+
+## 2026-09-26 — Claude — Share published plans to Explore
+
+**Goal:** continue plan sharing so a published plan can be shared to the Explore page, keep Explore seamless, and use `/frontend-design` for the UI.
+**Done:** (all **uncommitted**; trip-planning `dev`, api-gateway in server `dev`, client `feat/admin-console`)
+- trip-planning: V13 (never merged, edited in place) gains `listed_in_explore`, `listed_at`, a listed-only-when-active CHECK and a partial feed index. `TripPublication.applyListing`, a repository `findListedInExplore` JPQL query, `ExplorePlanSummary`/`UpdateExploreListingRequest` DTOs, `listInExplore` on `PublishPlanRequest`, `listedInExplore` on `PublicationResponse` and `SharedPlanResponse`, `ExplorePlanSummarizer`, service `updateExploreListing`/`listExplorePlans` (revoke also unlists), `PATCH /v1/trips/{id}/publication` and anonymous `GET /v1/shared-plans` (size capped at 48, `no-store`).
+- api-gateway: permit `GET /v1/shared-plans` alongside `/{token}`; new routing test in `GroupPublicRoutesTest`.
+- client: "List on Explore" in `PublishPlanDialog` (a draft before publish, immediate PATCH after), plus an Explore access row and a "View on Explore" link. Explore "Shared by travelers" section with a server-fetched first page and infinite "Show more". Search/filters merge shared plans into results. `SharedPlanCard` with a `RouteStrip` (the design's one distinctive element: stops per day, chargers as bolts; with no photo the cover becomes the per-day itinerary). New `/explore/shared/[token]` reading page (listed plans only), shared `SharedPlanHeader`, and a GET-only `/api/shared-plans` proxy.
+**Verified:** trip-planning full suite, 142 run: only the two known full-context tests error (Postgres 5432); all publication, summarizer and controller-slice tests pass with the config server up. `PostgresSchemaTests` passes on disposable Postgres; the CHECK constraint was exercised in psql. api-gateway 10/10 (1 skipped as before). Client `tsc`, scoped ESLint and `next build` are clean. Chromium against a stub gateway: feed, search merge, keyboard navigation, light/dark/390px, and `/explore/shared` refusing unlisted/dead tokens. No new console errors (the existing `/help` 404 and `/community/create` sign-in prefetches are unrelated). **Not verified:** the owner dialog in a browser, and anything against a real backend or accounts.
+**Not done / left uncommitted:** everything above, alongside other sessions' uncommitted admin and observability work. OpenAPI not updated.
+**Follow-up request, same session: show the author's name.** Added `author_display_name` to V13 and the entity. `authorDisplayName` (max 120) on `PublishPlanRequest` and `UpdateExploreListingRequest`; `authorName` on `ExplorePlanSummary` and `SharedPlanResponse`; `authorDisplayName` on `PublicationResponse`. `PlanPublicationSanitizer.sanitizeAuthorName`. Client: the dialog reads the profile name (shared `currentUserProfileQueryKey` cache) and shows "Shown as …". New `PlanAuthor` widget on cards and in `SharedPlanHeader`; Explore search also matches author names. New tests: byline frozen and sanitized on publish, a PATCH without a name keeps the stored one, the feed and shared plan carry the name but no owner id, 121-character names rejected with 400, and sanitizer normalization. Verified as noted in the handoff. Still uncommitted.
+**Follow-ups:** unlisting does not revoke the link, and anyone who opened it from Explore keeps it (the UI says so). Decide whether listings need moderation/reporting before release. Clean `target/` after migration renames (a stale V11 artifact masked V13). Split the gateway file's vehicle-models change from this work when committing.
+
+---
+
+## 2026-09-26 — Codex — Continue admin dashboard with shadcn
+
+**Goal:** continue the admin dashboard; use frontend-design and shadcn for UI.
+**Done:**
+- Continued existing uncommitted client admin work on `feat/admin-console`: account search from the dashboard, refresh for all overview queries, accurate count-link semantics, shared shadcn Sheet, paginated moderation history, strict page URL parsing, and honest write-failure feedback.
+- Fixed a browser-observed race where refreshing the newly banned account changed its still-open confirmation into an unban dialog. Preserved the submitted action and reset sheet state per account.
+- Added the UI brief (`docs/agents/admin-dashboard-ui.md`) and repeatable fixture-backed browser coverage (`client/tests/admin/browser-check.mjs`). Applied frontend-design, security-review and anti-ai-ui-review to this slice.
+**Verified:** final TypeScript and scoped ESLint clean; 12 client admin tests; 37 IAM controller/service tests; 3 real PostgreSQL 16 Flyway/entity/aggregate/lock tests. Chrome checks passed for search, overview refresh, history paging/error recovery, ban failure/success, unban, keyboard focus return, page role gates, actual Next proxy guest/CSRF/route gates, and 390/768/1440px light/dark screens. No live Keycloak end-to-end test or production build/release. Full typecheck temporarily caught concurrent Explore/sharing edits; the final run passed.
+**Not done / left uncommitted:** application work and both agent notes remain uncommitted. Notes already included another session's unfinished changes, which were not authorized for inclusion in a commit. Pre-existing backend admin code was verified but not modified. Unrelated deployment, sharing and concurrent Explore work preserved.
+**Follow-ups:** live Keycloak/two-account acceptance; catalog persistence/publishing and global activity are still separate work. See handoff for repeatable Postgres setup. Isolated test server/container cleaned up; screenshots remain under ignored `client/.next/admin-screenshots/`.
+
+---
+
+## 2026-09-26 — Codex — Clarify global car and admin backend scope
+
+**Goal:** confirm the planned global-car feature and existing admin backend work.
+**Done:** checked the original admin plan, current IAM diff, catalog service, and migration files. Global catalog management remains in the original scope; the prior account-focused continuation did not complete the full plan. IAM admin statistics/details/history and safeguards already exist uncommitted. The vehicle catalog remains JSON-backed, with authenticated garage integration.
+**Verified:** source inspection only; no additional tests or application edits.
+**Not done / left uncommitted:** catalog persistence/admin publishing/guest integration still pending; updated notes remain uncommitted with pre-existing notes.
+**Follow-ups:** continue the global vehicle catalog portion of the original plan.
+
+---
+
+
+## 2026-09-26 — Claude — Review Raum-1's Phase 3.1 branches and council the reconciliation
+
+**Goal:** read the friend's (Raum-1) newly pushed work, find conflicts with `dev` and local work, and use `/llm-council` to decide what to take.
+**Done:**
+- Mapped Raum-1's branches (none on `dev`/`main`): root/server `chore/phase31-checkpoint`, client and trip-planning `fix/trip-specific-garage`, mobility `feat/canonical-trip-energy` (61294ab), user-management `feat/vehicle-energy-selection` (20a41c4). All branched before the garage/EV-charger redesign and the `EvSimulationModel`, which is already on `main`.
+- Dry-run merges (`git merge-tree`): client 11 conflicting files (garage/charger); mobility `SocConstrainedRouteOptimizer` (integer `EvSimulationModel` vs continuous `CanonicalEnergy`); root `session-log.md` and pins; trip-planning and user-management merge cleanly as text.
+- Council verdict: merge nothing to `dev` until both devs agree a written energy contract; production model wins a tie; keep the friend's commits (merge, not squash); owner's UI wins client markup conflicts.
+- Renamed the local, uncommitted `V11__trip_publication.sql` to `V13__trip_publication.sql` (the friend's pushed V11 `trip_energy_state` and V12 `trip_garage_membership` keep their numbers). Updated the reference in `TripPublication.java` and in handoff.md.
+**Verified facts:** the friend's trip-planning commit 1068215 changes the contract it sends to mobility: `batteryKwh`/`consumptionKwhPer100km` become optional, and it adds `energyModel` (`RATED_RANGE`) and per-stop `observedSocPct`. Production mobility still requires those fields, so trip-planning **cannot** merge without mobility. V12 is stacked on V11. The friend's migrations are nullable `ADD COLUMN` only. No test pins the migration number. Nothing was compiled or tested this session.
+**Not done / left uncommitted:** no merges performed. These docs edits and the rename are uncommitted, alongside the earlier uncommitted plan-sharing, admin-console and observability work.
+**Follow-ups:** a meeting between the two devs to decide the energy model (integer v1 vs continuous as `model-v2`) and the `energy_vehicle_snapshot` JSON shape. Tell Raum-1 about the V13 renumber. Add a routing test for `/v1/users/me/vehicles/catalog` vs `/{id}` when merging. V11–V13 must reach `main` in one release.
+
+---
+
+## 2026-09-23 — Claude — LLM council on implementing the admin dashboard plan
+
+**Goal:** user ran `/llm-council` with "read admin-dashboard-plan.md and implement it".
+**Done:** five advisors, five anonymous peer reviews, and a chairman verdict. No application code was changed. Verdict: build it in slices, not six phases. Slice 1 is the admin shell plus the Users page on the existing search/suspend/reactivate endpoints, and a statistics endpoint placed under `/v1/admin/users/...`. Slice 2 is the catalog table. Gateway ban enforcement and public catalog routes are deferred until the uncommitted link-sharing gateway work is resolved.
+**Verified facts:** `accessTokenLifespan` is 300 s (`.deploy/keycloak/navio-realm.json:15`), so a suspended user's token already expires within 5 minutes. No service outside user-management checks ban status. The gateway (`api-gateway.yml:49`) routes only `/v1/users/**` and `/v1/admin/users/**` to user-management, so any new `/v1/admin/*` or `/v1/vehicle-models` path needs a gateway config edit, and that file is dirty with link-sharing work.
+**Not done / left uncommitted:** this entry and the handoff note. Earlier uncommitted work in root/client/server was left untouched.
+**Follow-ups:** the user must approve the slice-1 scope and say how the dirty gateway files should be handled (commit link-sharing first, or wait) before gateway-dependent work can start.
+
+---
+
+## 2026-09-23 — Claude — Build the client half of plan link sharing
+
+**Goal:** finish "publish plan as a link", which a previous session had left as a complete backend and no client at all.
+
+**Done:** (client, branch `feat/garage-ev-redesign`, **uncommitted**)
+- `app/feature/planner/_components/share/publication-api.ts` — typed mirrors of the server DTOs (`PublicationOptions`, `Publication`, `PublicPlanSnapshot` and its nested day/item/anchor/charger/budget shapes), owner fetchers for get/preview/publish/revoke, and `sharedPlanPath`/`sharedPlanUrl`. Unreadable options parse to "nothing extra was shared", never the reverse.
+- `app/feature/planner/_components/share/use-publication.ts` — TanStack Query hooks. `staleTime: 0, gcTime: 0` on the link state so a revocation in another tab cannot be masked by cache.
+- `app/feature/planner/_components/planner-autosave-flush.ts` (new) and `planId/_components/overview/planner-persistence.tsx` — the save-flush barrier the plan required. `PlannerPersistence` now records its pending debounced save in `pendingSaveRef` and registers a flush handler keyed by trip id; `usePublishPlan` calls it, then publishes that exact version. Deliberately **not** in the `planner-autosave-<tripId>` mutation scope: the flush calls the autosave mutation, so taking the same scope would deadlock the two.
+- `app/feature/planner/_components/share/publish-plan-dialog.tsx` plus `share-option-row.tsx` and `shared-link-field.tsx` — the owner dialog: access summary, three opt-ins (all off by default), inline preview with Back, published state with selectable URL and copy, update-when-changed, and an inline stop-sharing confirmation. Clipboard failure leaves the URL selectable with `role="status"` feedback.
+- `app/feature/planner/_components/share/shared-plan-content.tsx` — one renderer for the projected snapshot, used by **both** the owner's preview and the recipient page, so the preview cannot drift from the real page. Takes only the sanitised snapshot.
+- `app/share/plans/[token]/page.tsx` and `shared-plan-request.ts` — the recipient page as a **Server Component** fetching the gateway directly, `force-dynamic`, `robots: noindex/nofollow/nocache`, generic metadata so unfurl services retain nothing. One "no longer available" page for every dead-link cause.
+- `app/feature/planner/_components/trip-actions-menu.tsx` — entry point above Delete, labelled "Publish plan as a link" / "Manage published link". The publication query is enabled only while the dropdown is open, so the dashboard does not fire one request per trip card.
+- Deleted the `app/api/shared-plans/[token]` proxy I had written first: with the page fetching server-side it had no consumer, and an unauthenticated route on our origin with no caller is surface for nothing.
+
+**Verified:** client `npx tsc --noEmit` clean; ESLint clean on all new and changed files; `npx next build` exit 0 with `/share/plans/[token]` registered as a dynamic server route. trip-planning-service `./mvnw -o test`: the 69 publication tests pass (`SharedPlanControllerTests` 5, `TripPublicationControllerTests` 12, `PlanPublicationSanitizerTests` 32, `TripPublicationServiceTests` 20); `TripPlanningServiceApplicationTests` and `VerificationTests` error for the pre-existing environmental reason (config server on 8888, Postgres on 5432).
+**Not verified — nothing here has been run:** no browser session, no request ever made against a running backend, so publish, preview, copy, revoke and the recipient page are all unexercised end to end. The two-account and signed-out journeys in the plan's must-pass list have not been run. The autosave flush has not been observed firing.
+
+**Not done / left uncommitted:** everything above, plus the backend work from the earlier session it builds on (`server/trip-planning-service` V11 migration, model, repository, sanitizer, service, both controllers, tests; `server/api-gateway` `GatewaySecurityConfig`; `server/configuration-server` `api-gateway.yml`). Not implemented from the plan and **not started**: replace link / token rotation (`POST .../publication/rotation`), the allow-copy option (`PATCH .../publication`, no `allow_copy` column in V11), and independent copying (`POST /v1/shared-plans/{token}/copies`) — the earlier session deferred copying and I did not add it. Guest "Sign in to publish" is not built: the menu is only rendered where a persisted trip exists. Preserved untouched: the garage/EV redesign edits on this branch, `.deploy/` changes, `docs/agents/admin-dashboard-plan.md`, `docs/research/`.
+
+**Follow-ups:** nothing was committed — the client working tree still holds another session's uncommitted EV work on `feat/garage-ev-redesign`, so a commit here would mix the two. The user needs to decide whether to split this onto its own `feat/` branch cut from `dev`. `docs/api/Navio Open API.yaml` has not been updated with the publication routes. Browser and two-account verification remain the real gate before this goes anywhere near `main`.
+
+## 2026-09-23 — Claude — Fix the Grafana proxy and turn on production tracing
+
+**Goal:** make Grafana work in production and get Zipkin tracing running there.
+**Done:** (all root-repo, branch `dev`, **uncommitted**)
+- `.deploy/nginx/navio.conf` — confirmed the previous session's hypothesis and fixed it: a `location`-level `proxy_set_header` discards every server-level one, so `/grafana/` was sending `Host: navio_grafana`, and Grafana's CSRF middleware answered 403 to every `POST /api/ds/query`. Re-declared all six inherited headers. Applied the same fix to `location /` (navio-web), which had the identical defect and guards Server Actions the same way.
+- `.deploy/compose.production.yml` — added an internal `zipkin` service (`openzipkin/zipkin:3.5.1`, `STORAGE_TYPE: mem`, `MEM_MAX_SPANS=50000`, `mem_limit: 320m`, `healthcheck: disable: true` so it can never fail `compose up --wait` and trigger a rollback); replaced the no-op `MANAGEMENT_TRACING_EXPORT_ZIPKIN_ENABLED` with `MANAGEMENT_TRACING_EXPORT_ENABLED` plus `MANAGEMENT_TRACING_EXPORT_ZIPKIN_ENDPOINT`; sampling is now `${NAVIO_TRACING_SAMPLING_PROBABILITY:-0.1}`; `GF_SERVER_ROOT_URL` default corrected to `https://`.
+- `.deploy/observability/prometheus.yml` — `zipkin` scrape job mirroring the dev stack's.
+- `.deploy/observability/grafana/datasources.yml` and `grafana/provisioning/datasources/datasources.yml` — production gains the Zipkin datasource (trace→logs/metrics, copied from the dev stack's working config); both gain a Loki `derivedFields` entry linking the trace id in Spring Boot's `[app,traceId,spanId]` log prefix into Zipkin.
+- `.deploy/.env.example` — documented `NAVIO_TRACING_SAMPLING_PROBABILITY`.
+- `grafana/dashboards/navio-overview.json` — removed two `http://localhost:` dashboard links that could never work in production.
+
+**Verified:** YAML and JSON parse; the shared Java env anchor was confirmed by parsing the compose file to reach all seven Java services; the dev and production Zipkin scrape jobs differ only in the `environment` label. **Not verified:** nothing was deployed or exercised against the live VM — the 403 root cause, the Zipkin target coming up, the derived-field regex against real log lines, and the trace→logs links are all unconfirmed in a running stack.
+
+**Not done / left uncommitted:** everything above. Untouched and preserved as other sessions' work: the `client` and `server` submodule working trees, `docs/agents/admin-dashboard-plan.md`, `docs/agents/plan-link-sharing-plan.md`, `docs/research/`.
+
+**Follow-ups:** declared `mem_limit` across the stack is now ~8.3 GB — check `free -h` on the VM before releasing. Not fixed because it needs a `server` submodule change: the config server hardcodes `management.tracing.sampling.probability: 1.0` for three services and uses a different env name (`TRACING_SAMPLING_PROBABILITY`) for two others; harmless only while `spring.config.import` config-data mode keeps `systemEnvironment` above config-server values.
 
 ## 2026-09-23 — Claude — Browser-verify and commit the garage and EV charger redesign
 
