@@ -14,6 +14,10 @@ Everything that was dirty on 2026-09-27 is committed and merged `dev` -> `main` 
 - **Copies:** `POST /v1/shared-plans/{token}/copies` (authenticated) is routed in both gateway configs. Before this release, neither routed it.
 - **Observability:** nginx forwards Host/X-Forwarded-* in `/grafana/` and `/`; in-memory Zipkin (320m limit, healthcheck disabled) with 0.1 sampling; Grafana Zipkin/Loki trace links.
 
+**Follow-up release (root `main` `6915bca`, run `36333726651`):** nginx now routes only Keycloak's own admin paths to Keycloak, so Navio's `/admin/*` pages load on reload; the Keycloak console is at `/admin/master/console/`. deploy.sh provisions the OWNER role and its `navio-web` scope mapping. **Still manual:** assign OWNER to a person and insert the `iam.user_roles` row (steps 3-5 in [owner-role.md](owner-role.md)).
+
+**Explore seed: done.** 30 plans published as Keycloak user `navio-team@example.com` ("Navio Team", `0ae736e4-a315-456e-bb2e-7257d419b2d9`, no password set). Script is committed in `.deploy/scripts/seed-explore/`; the VM copy and run log are in `~/navio-maintenance/seed-explore/`. Re-running skips existing titles.
+
 **Not verified:** live Keycloak/two-account acceptance of role grants and plan copies, Grafana panels and traces on the VM, and VM memory headroom (declared limits ~8.3 GB).
 
 **Worktrees:** `main` is checked out in `%TEMP%/navio-client-admin-release-20260926` and `%TEMP%/navio-root-admin-release-20260926`, so merge to `main` there. The main client worktree is detached at `f790652`. Its old `feat/admin-console` branch points at temp snapshot commit `0b54f2c` (never pushed) and can be deleted. `client/.next-explore-check/` is ignored build output.
