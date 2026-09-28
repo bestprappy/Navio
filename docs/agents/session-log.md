@@ -18,6 +18,22 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 ---
 
 
+## 2026-09-28 - Codex - Phase 3.1 deployed garage contract correction
+
+**Scope:** Diagnose catalogue add / Save Settings failures; no UI changes and no Phase 4/5 work. User's prior conditional deployment approval applies after checks pass.
+
+**Cause:** Local Phase 3.1 client targets the university VM, but published IAM still required numeric consumption for catalogue POST and ignored energySelection on PATCH. The two console messages report one failed mutation. The client acknowledgement guard is correct; do not remove it or invent consumption to bypass the old server.
+
+**Correction:** Ported the approved energy contract onto current IAM origin/dev in isolated worktree `%TEMP%/navio-garage-api-fix-20260928`, branch `fix/garage-energy-api-compatibility`, commit `fd109bc`. Preserved the friend's database-backed catalogue, version, admin/owner security, deduplication and old payload compatibility. Catalogue response derives truthful capacity basis (usable only when explicitly USABLE), keeps range standard separate, and does not invent consumption/evidence. Explicit default/range/custom/reset commands persist energyProfile in existing JSONB and allow null consumption for an explicit fallback. Legacy values remain unchanged absent an explicit command. Service-level anonymous catalogue GET remains narrowly public; other account operations remain authenticated. No gateway, migration, entity, frontend or calculation edits.
+
+**Tests:** Full IAM suite 163 tests: 161 passed, 2 pre-existing disabled, 0 failures/errors. Includes real PostgreSQL Flyway/Hibernate validation, provenance/null-consumption reload, unrelated metadata preservation, anonymous/ownership security and existing admin/catalogue tests. Frontend garage suite 33/33 passed using Node 22.22 with --experimental-transform-types. Initial failures were test setup/fixture integration: response-only energyProfile in entity fixture conversion, nested Mockito stubbing, BigDecimal scale-only equality and missing configuration server; fixed the test adapters/comparisons and ran the real configuration server on 18888. Default Node 22.14 cannot run these tests; compatible runtime used without dependency edits. No live authenticated user write replayed.
+
+**Release:** IAM main `5293c22`, server main `416644c`, root main `16fffce`; root dev release `49bfa50`. Child-first dev/main publication; all six pins checked against live origin/main. Client remains published `f790652`, trip `f0549d4`, mobility `eb72b37`, community `5f0cf41`. Release workflow https://github.com/bestprappy/Navio/actions/runs/36452979632 completed successfully, including all schema checks, nine image builds and VM deployment. Live public catalogue now returns all three RATED_RANGE/CATALOG_DEFAULT profiles with null consumption and NEDC range basis; health 200; anonymous private garage and trips 401. The legacy catalogue URL /v1/users/me/vehicles/catalog still returns 401 at the current gateway, while /v1/vehicle-models is public; guest legacy-route reconciliation remains separate. Authenticated end-to-end adds were covered by controller/service tests, not replayed against a real user account.
+
+**Boundary / follow-up:** This is a narrow garage compatibility release, not complete Phase 3.1 reconciliation. Original local Phase 3.1 worktrees and UI are preserved; remote UI/energy-model differences and trip migration collisions remain for the separate reconciliation gate. Production trip service still lacks the local canonical trip energy/membership persistence contract, so this release does not claim to fix its local-draft compatibility warning. Do not advance phases automatically. Preserve unrelated client tsconfig flag/CLAUDE.md and service logs. Temporary PostgreSQL container and configuration-server process stopped; existing dev server left running.
+
+
+
 ## 2026-09-28 - Codex - Pull published updates and revise remaining energy phases
 
 **Goal:** Review friend's Git updates, preserve completed Phase 3.1 and propose remaining plan; no new phase implementation.
