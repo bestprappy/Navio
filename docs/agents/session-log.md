@@ -18,6 +18,14 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 ---
 
 
+## 2026-09-28 - Codex - Pull published updates and revise remaining energy phases
+
+**Goal:** Review friend's Git updates, preserve completed Phase 3.1 and propose remaining plan; no new phase implementation.
+**Done:** Fetched/rechecked existing remotes and pulled root dev `24c7f1f` with recursive published pins into `%TEMP%/navio-plan-review-20260928`. Original working trees preserved. Reviewed global catalogue/admin, sharing/copies/read-only planner, alternate simulation, backend optimizer/road verifier and anchor integration. Documented revised reconciliation gate, Phase 4 correctness/preview/apply/validation and Phase 5 approval-gated consolidation in existing handoff.
+**Verified:** Six published mobility optimizer/simulation tests pass. Planner regression script fails at CommonJS JSON/TypeScript module-name resolution before assertions; not classified as runtime app failure. Clone reset recovered on Git retry. Checkpoint branches unchanged and not ancestors of main; handoff's hybrid branch absent from remote heads/history after second check.
+**Not done / left uncommitted:** No application edits, migration changes, destructive merge, push or deployment. No full integrated build/DB/live-account certification. Unrelated tsconfig flag/editor files/service logs remain untouched.
+**Follow-ups:** Approve reconciliation-first plan; resolve model/visual baseline explicitly, new catalogue provenance and sharing privacy, and deployed V11/V13 collision before merging Phase 3.1. Do not start Phase 4/5 automatically.
+
 ## 2026-09-25 - Codex - Publish tested Phase 3.1 checkpoint
 
 **Goal:** Check, commit and push completed work; await next prompt before further phases.
