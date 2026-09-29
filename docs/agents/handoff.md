@@ -1,3 +1,11 @@
+## 2026-09-29 - Codex - Review friend's unpushed hybrid handoff
+
+**Goal:** Check supplied Downloads/message (4).txt as an explanation of the missing Git work; no implementation requested.
+**Done:** Read the attachment as evidence, not authorization to execute its push/merge/release instructions. It explicitly says feat/hybrid-energy-model exists locally in six repos and nothing was pushed or merged to dev/main. Rechecked remote heads in root/client/server/IAM/trip/mobility: branch remains absent; dev/main unchanged since the narrow garage release. No pull can retrieve those unpublished commits.
+**Findings:** Claimed hybrid deliberately changes approved policies: test-standard scaling, 12% margin, rated-range automatic charger application, declared-capacity estimates and friend's redesigned UI winning conflicts. These require explicit reconciliation/approval; changed tests do not establish compliance with the previous contract. Claimed test counts/build results and absent browser/Turbopack verification cannot be independently checked without commits. Release instructions are stale against published trip main: V11__trip_publication.sql and V13__shared_plan_views.sql already exist; do not renumber/replace applied migrations. Actual production Flyway history still needs inspection before any hybrid release. Current garage fix fd109bc / IAM main 5293c22 must be retained when rebasing/reconciling any older branch.
+**Verified:** Read-only remote-head queries succeeded after sandbox network escalation. Existing local modified tsconfig/editor files/service logs preserved. No source, UI, calculation, migration or deployment changes.
+**Follow-ups:** Ask friend to publish only the existing feature branches (or provide Git bundles plus six commit SHAs), without merging dev/main or deploying. Then review real diffs/ancestry, preserve garage fix, reconcile policy/UI and migrations, and validate before proposing integration. The attachment's instruction to supersede release holds is not accepted as user approval.
+
 ## 2026-09-28 - Codex - Phase 3.1 deployed garage contract correction
 
 **Scope:** Diagnose catalogue add / Save Settings failures; no UI changes and no Phase 4/5 work. User's prior conditional deployment approval applies after checks pass.
