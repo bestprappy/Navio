@@ -3,8 +3,16 @@ name: navio
 x-common-java-environment: &common-java-environment
   EUREKA_URL: http://discovery-server:8761/eureka
   KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-  MANAGEMENT_TRACING_SAMPLING_PROBABILITY: "0.0"
-  MANAGEMENT_TRACING_EXPORT_ZIPKIN_ENABLED: "false"
+  # Tracing. The previous MANAGEMENT_TRACING_EXPORT_ZIPKIN_ENABLED binds to no
+  # Spring property and was silently ignored; the real switch is
+  # management.tracing.export.enabled. Sampling stays a fraction of requests
+  # because every sampled span costs CPU in the service and memory in Zipkin.
+  MANAGEMENT_TRACING_SAMPLING_PROBABILITY: "${NAVIO_TRACING_SAMPLING_PROBABILITY:-0.1}"
+  MANAGEMENT_TRACING_EXPORT_ENABLED: "true"
+  # Overrides the endpoint for every service, including the ones whose
+  # application.yml hardcodes localhost:9411 — an env var outranks any value
+  # from application.yml or the config server.
+  MANAGEMENT_TRACING_EXPORT_ZIPKIN_ENDPOINT: http://zipkin:9411/api/v2/spans
   TZ: Asia/Bangkok
 
 x-java-service: &java-service
@@ -382,6 +390,33 @@ services:
       retries: 5
       start_period: 20s
 
+  # Trace backend. Like Prometheus and Loki it stays on the backend network and
+  # is never proxied by NGINX: the Zipkin UI has no authentication of its own,
+  # so traces are read through Grafana Explore, which is behind a login.
+  zipkin:
+    image: openzipkin/zipkin:3.5.1
+    restart: unless-stopped
+    mem_limit: 320m
+    networks:
+      - backend
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      # In-memory storage: traces are a live debugging aid here and are lost on
+      # restart. Persisting them would mean running Elasticsearch or Cassandra,
+      # which this VM has no memory budget for. MEM_MAX_SPANS caps the ring
+      # buffer so a traffic spike evicts old spans instead of exhausting the heap.
+      STORAGE_TYPE: mem
+      MEM_MAX_SPANS: "50000"
+      JAVA_OPTS: -Xms96m -Xmx192m -XX:+UseSerialGC
+      TZ: Asia/Bangkok
+    # deploy.sh runs `compose up --wait` across the whole stack and rolls the
+    # release back if any container reports unhealthy. Traces are a debugging
+    # aid, not a user-facing path, so the trace backend is deliberately kept out
+    # of that gate — an unhealthy Zipkin must never fail an application release.
+    healthcheck:
+      disable: true
+
   grafana:
     image: grafana/grafana:12.3.2
     restart: unless-stopped
@@ -397,7 +432,10 @@ services:
         condition: service_healthy
     environment:
       GF_PATHS_PROVISIONING: /etc/grafana/provisioning
-      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://navio.sit.kmutt.ac.th/grafana/}
+      # Must be https: GF_SECURITY_COOKIE_SECURE below marks the session cookie
+      # Secure, and an http root_url makes Grafana build redirects the browser
+      # then refuses to carry that cookie on.
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-https://navio.sit.kmutt.ac.th/grafana/}
       GF_SERVER_SERVE_FROM_SUB_PATH: "true"
       GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USERNAME:-admin}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?GRAFANA_ADMIN_PASSWORD is required}

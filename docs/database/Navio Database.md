@@ -956,7 +956,7 @@ This is a read-only application snapshot synchronized after successful Keycloak 
 | Column               |          Type | Required | Description                  |
 | -------------------- | ------------: | -------: | ---------------------------- |
 | `user_id`            |        `UUID` |      Yes | FK to `iam.users`            |
-| `role`               | `VARCHAR(30)` |      Yes | `USER`, `MODERATOR`, `ADMIN` |
+| `role`               | `VARCHAR(30)` |      Yes | `USER`, `MODERATOR`, `ADMIN`, `OWNER` |
 | `granted_by_user_id` |        `UUID` |       No | Who granted the role         |
 | `granted_at`         | `TIMESTAMPTZ` |      Yes | Grant time                   |
 
@@ -2408,7 +2408,7 @@ CREATE INDEX IF NOT EXISTS idx_iam_users_status ON iam.users(status);
 
 CREATE TABLE IF NOT EXISTS iam.user_roles (
     user_id UUID NOT NULL REFERENCES iam.users(id) ON DELETE CASCADE,
-    role VARCHAR(30) NOT NULL CHECK (role IN ('USER', 'MODERATOR', 'ADMIN')),
+    role VARCHAR(30) NOT NULL CHECK (role IN ('USER', 'MODERATOR', 'ADMIN', 'OWNER')),
     granted_by_user_id UUID,
     granted_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     PRIMARY KEY (user_id, role)

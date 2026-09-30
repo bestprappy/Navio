@@ -145,17 +145,29 @@ configure_keycloak_authentication() {
     # only if it is in the client'"'"'s scope. With that list empty Keycloak omits
     # realm_access entirely and every token looks unprivileged: the gateway lets
     # plain authenticated calls through, so this surfaces only as empty roles and
-    # silently unreachable MODERATOR/ADMIN features. Grant exactly the three
+    # silently unreachable MODERATOR/ADMIN/OWNER features. Grant exactly the
     # Navio roles rather than turning full scope on.
+    #
+    # The realm import only applies to a brand-new realm, so a role added to
+    # navio-realm.json later (OWNER) must be created here for existing realms.
+    # This only defines the role; assigning OWNER to a person stays a manual
+    # operator step (docs/agents/owner-role.md).
+    if ! "${kcadm}" get roles/OWNER -r "${KEYCLOAK_REALM}" >/dev/null 2>&1; then
+      "${kcadm}" create roles -r "${KEYCLOAK_REALM}" \
+        -s name=OWNER \
+        -s "description=Navio owner: may grant and revoke ADMIN" >/dev/null
+    fi
     client_id="$("${kcadm}" get clients -r "${KEYCLOAK_REALM}" \
       -q clientId=navio-web --fields id --format csv --noquotes)"
-    for role_name in USER MODERATOR ADMIN; do
+    for role_name in USER MODERATOR ADMIN OWNER; do
       if ! "${kcadm}" get "clients/${client_id}/scope-mappings/realm" \
         -r "${KEYCLOAK_REALM}" --fields name --format csv --noquotes \
         | grep -qx "${role_name}"; then
         role_id="$("${kcadm}" get "roles/${role_name}" -r "${KEYCLOAK_REALM}" \
           --fields id --format csv --noquotes)"
-        printf '[{"id":"%s","name":"%s"}]' "${role_id}" "${role_name}" \
+        # Double quotes only: a single quote here would close the bash -euc
+        # string and strip the JSON quotes, so kcadm rejects the payload.
+        printf "[{\"id\":\"%s\",\"name\":\"%s\"}]" "${role_id}" "${role_name}" \
           > /tmp/navio-scope-mapping.json
         "${kcadm}" create "clients/${client_id}/scope-mappings/realm" \
           -r "${KEYCLOAK_REALM}" -f /tmp/navio-scope-mapping.json
@@ -441,8 +453,10 @@ if [[ "${USER_ROUTE_STATUS}" != "401" ]]; then
   exit 1
 fi
 
-# Verify the group migration and public/protected routing through the production edge.
-verify_group_route() {
+# Verify public and protected routes through the production edge. These
+# routes come from the mounted .deploy/config/api-gateway.yml, not the
+# configuration-server image's bundled development config.
+verify_api_route() {
   local method="$1"
   local path="$2"
   local expected_status="$3"
@@ -457,10 +471,26 @@ verify_group_route() {
     exit 1
   fi
 }
-verify_group_route GET '/v1/groups?size=1' 200
-verify_group_route GET '/v1/groups/search?q=ev&size=1' 200
-verify_group_route GET '/v1/groups/mine' 401
-verify_group_route POST '/v1/groups' 401
+verify_api_route GET '/v1/groups?size=1' 200
+verify_api_route GET '/v1/groups/search?q=ev&size=1' 200
+verify_api_route GET '/v1/groups/mine' 401
+verify_api_route POST '/v1/groups' 401
+verify_api_route GET '/v1/shared-plans?page=0&size=1' 200
+verify_api_route GET '/v1/vehicle-models?page=0&size=1' 200
+verify_api_route GET '/v1/admin/audit-events' 401
+
+# The Next.js admin pages share the /admin/ prefix with Keycloak's console.
+# An anonymous request must reach Next.js (proxy.ts redirects to sign-in),
+# never Keycloak.
+readonly ADMIN_PAGE_REDIRECT="$(curl --silent --show-error \
+  --output /dev/null --write-out '%{http_code} %{redirect_url}' \
+  --cacert "${TLS_CERT_FILE}" \
+  --resolve navio.sit.kmutt.ac.th:443:127.0.0.1 \
+  https://navio.sit.kmutt.ac.th/admin/users)"
+if [[ ! "${ADMIN_PAGE_REDIRECT}" =~ ^30[27]\ .*/sign-in ]]; then
+  echo "Expected anonymous /admin/users to redirect to Navio sign-in; got '${ADMIN_PAGE_REDIRECT}'." >&2
+  exit 1
+fi
 
 for auth_path in sign-in sign-up; do
   auth_page_html="$(curl --fail --silent --show-error \

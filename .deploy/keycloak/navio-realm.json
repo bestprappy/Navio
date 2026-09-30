@@ -43,7 +43,11 @@
       },
       {
         "name": "ADMIN",
-        "description": "May grant and revoke global roles, and moderate privileged accounts."
+        "description": "May manage moderators, catalog, activity, and privileged accounts."
+      },
+      {
+        "name": "OWNER",
+        "description": "May grant and revoke administrator roles. Assigned by a trusted Keycloak operator only."
       }
     ]
   },
@@ -53,7 +57,7 @@
   "scopeMappings": [
     {
       "client": "navio-web",
-      "roles": ["USER", "MODERATOR", "ADMIN"]
+      "roles": ["USER", "MODERATOR", "ADMIN", "OWNER"]
     }
   ],
   "clients": [

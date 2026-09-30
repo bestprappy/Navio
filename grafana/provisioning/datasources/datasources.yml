@@ -20,6 +20,17 @@ datasources:
     access: proxy
     url: http://loki:3100
     editable: false
+    jsonData:
+      # Spring Boot prefixes every log line with [<app>,<traceId>,<spanId>] once
+      # a tracer is on the classpath, so the trace id can be lifted straight out
+      # of the log text and turned into a link into Zipkin. The doubled $$ is
+      # Grafana provisioning escaping — a single $ would be read as an env var
+      # and interpolated away before Grafana ever sees the field.
+      derivedFields:
+        - name: TraceID
+          matcherRegex: '\[[^,\]]*,([0-9a-f]{32}),[0-9a-f]{16}\]'
+          url: '$${__value.raw}'
+          datasourceUid: zipkin
 
   - name: Zipkin
     uid: zipkin
