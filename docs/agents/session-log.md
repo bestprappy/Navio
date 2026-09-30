@@ -1,5 +1,13 @@
 # Session Log
 
+## 2026-09-30 - Codex - Verify and publish integrated dev
+
+**Goal:** Check and push the integrated project. No source or UI changes requested or made.
+**Verified:** Fresh fetch of all seven repositories found no unintegrated remote dev/main commits. No unmerged entries or whitespace errors. Re-ran all 113 frontend tests, planner model checks and TypeScript: passed. Reviewed unchanged backend Surefire reports: trip 166 passed; gateway 12 passed/1 skipped; mobility 26 passed/1 skipped, zero failures/errors. Previous production build passed on the same source. No additional browser or live production migration validation claimed.
+**Publication:** Pushed IAM 6183185, trip f724442, mobility 322b616, client d3d0563 and server e836f76 to origin/dev, in dependency order. Root dev publication includes this reporting entry and the integrated child pins. Community is already current. No force pushes, main updates or production deployment. Local logs/editor files and the pre-existing tsconfig status flag remain untouched (no textual tsconfig diff).
+**Remaining:** Production release still requires the merged browser walkthrough and actual deployment migration-history check documented below. Continue remaining energy phases only with user direction.
+
+
 ## 2026-09-30 - Codex - Integrate published main with Phase 3.1
 
 **Goal:** User requested current-workspace main integration, incoming UI preferred, preserving valid prior work. User asked how to reconcile competing energy approaches; retained approved canonical energy policy beneath incoming presentation. No further phase or production release authorized by this integration.
