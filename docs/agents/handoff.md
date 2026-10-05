@@ -1,3 +1,14 @@
+## 2026-10-06 - Codex - Review gate and Phase 4C apply validation
+
+**Authority/status:** User asked to check for issues and proceed if clear. Review found outstanding charging precision/target persistence and apply-validation defects. Began the narrow Phase 4C apply-safety prerequisite; Phase 4C is NOT complete. No UI, formula, schema, push or deployment changes.
+
+**Changes:** TripEvOptimizationApplier validates all operations before mutating managed entities or deleting items. Rejects infeasible/wrong-day responses, unsupported operations, missing/non-charger/duplicate targets, replacement/removal of locked/targeted/observed stops, station-changing updates, invalid numeric charging data and insertion references that are absent or removed by this plan. Existing transaction/version/ownership safeguards remain. Valid refresh preserves notes, lock, target and observed SoC.
+
+**Verification:** Full trip suite passed 184 tests with zero failures/errors/skips, including disposable PostgreSQL tests (target/phase4c-validation-tests.log). Then added two test-only cases and ran all 14 focused applier tests successfully (target/phase4c-focused-tests.log); 11 new validation cases total. Whitespace check passed. No live distributed acceptance or UI changes. Earlier Phase 4B 53-test and client 127-test results were not rerun because their source was unchanged.
+
+**Worktree:** Trip now fix/phase4c-apply-validation with one source edit and new TripEvOptimizationApplyValidationTests.java uncommitted. Client batching and mobility Phase 4B edits preserved. Root dev pulled fast-forward-only: no incoming changes. Reporting-only commit on docs branch merged locally to dev; no child pins changed.
+
+**Remaining before Phase 4C completion:** Applier still rounds estimated charging duration and does not persist optimizer-selected departure target. Need additive compatible precision/target representation through saved DTOs, frontend mappings, guest state, autosave and reopen; review schema requirements before implementation. Need whole-trip downstream validation, actual database transaction rollback/concurrency acceptance, and connected preview/apply/reopen parity. Review retained chargers whose saved charging is replayed differently from search, and position retention across spans. Do not claim existing validation tests prove distributed atomicity. Existing UI unchanged; Phase 5 remains deferred. User-reported Google billing resolution has not been independently verified.
 ## 2026-10-06 - Codex - Phase 4B completed locally
 
 **Authority/status:** User reported Google Maps billing resolved and approved proceeding. Implemented the next Phase 4B active-backend reachability/reserve checks. No Phase 4C persistence or Phase 5 UI work. No push/deployment. Client route-request batching fix and all unrelated local files remain preserved.

@@ -1,3 +1,10 @@
+## 2026-10-06 - Codex - Review optimization apply safety
+
+**Goal:** Check for issues before proceeding to the next phase.
+**Done:** Found charging duration/target persistence gap and unsafe handling of invalid apply operations. Added complete operation preflight, checkpoint protection, station identity and malformed-state guards. No UI/schema/energy-formula changes; Phase 4C remains incomplete.
+**Verified:** Full trip suite 184/184 passed with real PostgreSQL. Two later test-only additions also passed in 14/14 focused applier tests. Eleven new validation cases total; whitespace checks passed. No live deployment certification.
+**Git:** Trip fix/phase4c-apply-validation source/tests remain uncommitted. Previous client/mobility work preserved. Root dev pull found no incoming updates. Required reporting-only docs commit merged to local dev; nothing pushed.
+**Next:** Finish precise charging target/duration round-trip and whole-trip downstream consistency; test real transaction rollback/concurrency and connected preview/apply/reopen. No Phase 5.
 ## 2026-10-06 - Codex - Phase 4B routed feasibility checks
 
 **Goal:** Continue after user-reported billing resolution with Phase 4B; preserve existing UI and route-loading fix.
