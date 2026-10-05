@@ -1,4 +1,82 @@
+## 2026-10-05 - Codex - Publish verified Phase 4A to dev
+
+**Goal:** Push latest verified changes safely at the user's request.
+**Done:** Fetched all seven repositories, confirmed remote dev alignment and pulled dev before commits. Committed/pushed mobility b5a80eb, trip 957cfbf, client ba01a1b, then server f4a2813 and root pins e8b21b7 in dependency order. Published feature/chore branches and fast-forwarded dev. Updated existing API/handoff/session documentation on a docs branch for dev only.
+**Verified:** Staged paths and whitespace checks; no incoming changes or conflicts, no force pushes. Existing successful Phase 4A verification remains applicable; no code changes or new test runs this session.
+**Limits:** Main and production are untouched. Reports, logs, local editor/env files remain local. Google Maps billing diagnosis remains unresolved externally. Phase 4B/4C and connected release acceptance remain outstanding.
+**Next:** Pull root dev and its recursive submodule pins to obtain Phase 4A; continue the approved remaining phases separately.
+
+## 2026-10-03 - Codex - Complete Phase 4A after resumption
+
+**Goal:** Resume the saved Phase 4A checkpoint, preserve existing work/UI, and finish focused verification.
+**Done:** Finished saved canonical optimizer inputs and policy, earlier-day battery replay, endpoint protection, incomplete-charger rejection, version checks around preview, autosave flush/capability checks and stale-response preservation including budget edits. Restored only the previously approved normal-stop battery checkpoint control. Updated existing API documentation and handoff; no Phase 5 or schema changes.
+**Verified:** Trip 175/175 and mobility 39/39 tests pass, including disposable PostgreSQL checks. Frontend 119/119 unit tests, TypeScript, targeted lint and production build pass. Latest production-build guest and synthetic authenticated energy/garage browser walkthroughs pass without private account writes. Test-only configuration and mock-type failures were corrected before final passing runs; Windows build-log lock resolved by using TEMP.
+**Limits:** No full distributed/live-account optimization acceptance or production deployment. Browser Explore feed integration is not certified. Remaining Phase 4B/C feasibility/reserve and charging target/duration preview/apply/reload work is explicit in handoff. Some necessary stale-state safeguards were completed ahead of broader 4C.
+**Git:** All implementation remains local/uncommitted on feat/phase4-canonical-optimization in client/trip/mobility; root/server dev. Preserved previous dirty files. No commit/push under the existing restriction; reporting files remain local. Test server3113 stopped; user server3000 untouched.
+**Next:** Review Phase 4A, then proceed with explicitly scoped 4B/C; coordinate compatible service release and connected-system acceptance before claiming release readiness.
+
+## 2026-10-03 - Codex - PAUSED at user request: Phase 4A in progress
+
+**Authority/status:** User approved baseline verification and Phase 4A, then requested a safe pause because hourly usage was low. STOPPED without claiming Phase 4A complete. Resume from this entry, not from the older report or maintainer handoff. No commits, pushes, merges or deployment this session. User separately approved restoring the existing observed-SoC control on normal stops; otherwise existing UI must remain unchanged.
+
+**Git baseline:** Fresh fetch of all seven origins found no HEAD..origin/dev or HEAD..origin/main commits. Root dev 0421513, client d3d0563, server e836f76; preserved all pre-existing documentation/report/editor/log files. Created local feat/phase4-canonical-optimization branches in client, trip-planning-service and mobility-and-ev-service. All new implementation remains UNCOMMITTED on these branches. Root/server remain dev. Do not discard or automatically commit pre-existing files (client tsconfig flag/CLAUDE.md, service logs, report output and earlier documentation changes).
+
+**Completed narrow regression fix:** trip-place-card.tsx had ObservedSocControl inside the EV-only branch, so normal stops never displayed it. Moved the unchanged control to the regular-place branch, still hidden read-only. Updated energy browser test for current custom-list buttons and mocked profile response. Synthetic signed-in browser test PASSED: initial SoC immediate save/reload, checkpoint save/reload/clear, immutable trip vehicle snapshot after garage refresh, trip-only membership/removal, custom reuse, no garage writes, responsive themes. No real account mutated.
+
+**Phase 4A implementation so far (needs finishing/review):**
+- TripOptimizationEnergy resolves vehicle profile, charging limits/connectors and initial SoC from owned saved trip; ignores request vehicle/SoC. Rejects insufficient usable capacity for consumption, missing snapshot or missing explicitly saved initial SoC. Rated range can preview but never apply. Applies only supported authoritative battery-side catalogue provenance, user-observed override or explicitly confirmed legacy; preserves legacy numbers/source.
+- TripEvOptimizationService now gathers chronologically preceding saved itinerary days/anchors/stops, observations and charge durations. Checks expectedVersion on preview as well as existing apply path. New additive precedingDays/estimatedChargeMinutes internal DTOs retain old constructors.
+- Mobility PrecedingTripEnergy replays earlier days through existing CanonicalEnergy and road routes, including observations/charging; refuses unknown/unreachable earlier legs and disconnected day boundaries. Earlier observations cannot erase prior infeasibility. Only selected day is optimized.
+- New internal /internal/v1/ev-route/optimize-canonical route (old /optimize retained) and trip client uses new route, so old mobility cannot silently ignore context. Planner capability canonical-optimization-v1 added.
+- Frontend optimization-state.ts flushes autosave, checks version/capability, and keys previews on blocks plus energy state plus request. Panel sends expectedVersion, checks stale apply. Existing autosave flush now waits through pending/in-flight mutation scope and refuses local-only/unsynced settings. No visual changes here.
+
+**Verification at pause:**
+- Frontend all 116 unit tests PASS, TypeScript PASS, targeted changed-file ESLint PASS, production Next build PASS (font downloads required approved network access).
+- Full mobility suite: 33 total, 32 PASS, 1 database test skipped, zero failures/errors. New prior-day tests cover propagation, checkpoint removal, unreachable prior leg despite observation, fallback route refusal, discontinuity and Day 1.
+- Latest full trip suite: 173 total, 171 PASS, 2 context setup errors, zero assertion failures. PostgreSQL schema/migration/upgrade tests passed in this latest run. ONLY TripPlanningServiceApplicationTests and VerificationTests fail: isolated target/phase4-test.yml omits required navio.currency-provider.base-url. Add the normal https://api.frankfurter.dev setting to this ignored test config and rerun. Earlier failed runs were configserver import setup failures, not passing tests; latest XML/log is authoritative.
+- Guest browser walkthrough remains INCOMPLETE due outdated selectors, not a demonstrated application failure at last step. Current failure tests/guest/browser-check.mjs line ~74 searches 'Search Thailand vehicles'; actual current aria-label is 'Search vehicle catalog'. Already updated old 'Thailand catalogue' button to 'EV Vehicle List', scoped stop search to Itinerary, and added mock public /api/vehicle-models page/detail responses. Continue updating selectors to current UI, NOT changing UI to satisfy tests. Earlier dev overlay came from mocked profile shape/external Google Maps failures; production localhost:3113 used to avoid dev overlay. No full live-account acceptance claimed.
+
+**Next exact steps:**
+1. Recheck working tree and review this session's edits. Finish guest browser walkthrough, add multiple checkpoint/readonly coverage and optimizer flush/stale integration coverage. Energy browser test uses synthetic APIs and must remain isolated from real account data.
+2. Fix ignored test configuration currency provider property and rerun full trip suite on disposable Postgres. New TripOptimizationEnergyTests passed in latest suite; cover policy matrix/unknown capacity/missing initial state. Add preceding-days charging and JSON round-trip tests as needed.
+3. Review edge cases before calling 4A complete: mapCharger still maps incomplete charger snapshots to ordinary waypoints (risk for earlier-day replay); selected day at a replaceable first charger; concurrent edits during apply response; version-consistent snapshot reads; unknown connector treatment. Do not silently weaken eligibility or fabricate capacity/consumption. Further optimizer/precision changes belong 4B/4C, document boundary clearly.
+4. Update existing API documentation for canonical capability/internal request contract; not done yet. No entity/migration edits introduced. Review diff, rerun affected checks, document exact remaining release gates. No Phase 5 UI consolidation.
+
+**Local tools/resources:** Bundled Node24 C:/Users/suriy/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe; normal PATH node22 cannot run registerHooks tests. Browser env NAVIO_PLAYWRIGHT_MODULE=file:///C:/Users/suriy/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright/index.mjs; NAVIO_TEST_ORIGIN=http://127.0.0.1:3113. Maven C:/Users/suriy/.m2/wrapper/dists/apache-maven-3.9.16/0daed3be3ebd1c706f0e69e8b07c6b73f5cc4ea3dfce72a8d0ec2e849ca2ddb0/bin/mvn.cmd -o test requires approved cache access. Test configuration: set SPRING_CONFIG_LOCATION=file:./target/phase4-test.yml and NAVIO_TEST_DB_URL=jdbc:postgresql://localhost:55434/navio_phase4. Logs: trip target/phase4-verification.log, Surefire XML; client .next/phase4-unit-tests.log.
+
+**Processes:** Disposable Docker navio-phase4-verify-pg (--rm) on localhost55434, DB navio_phase4, test username/password tripplanner; no live DB touched. Container retained for resumption. Existing user dev server PID32332/localhost3000 was not stopped. Session-created production test server on3113 is being stopped for pause; restart with bundled Node next start --hostname127.0.0.1 --port3113 (Next warns standalone build prefers standalone/server.js). No further tests/background work should continue after pause.
+
+**Usage:** Agent cannot observe hourly quota. User explicitly requested pause; wait for user to resume. Reporting files updated locally; prior documentation Git restriction remains respected.
+
+## 2026-10-03 - Codex - Pre-Phase-4 readiness recommendation
+
+**Goal:** User is considering resuming development and asks what should precede Phase 4.
+**Reviewed:** Current handoff, session history and local repository status. Local root/client/server remain on dev; existing report/documentation, editor and log changes preserved. No fresh remote fetch or claim that the friend has not pushed.
+**Recommendation:** First run integrated browser acceptance of garage, trip state, checkpoints, reload and sharing; verify connected backend capabilities and inspect migration history before release. Fix reproduced baseline regressions narrowly. Then implement Phase 4 server model-policy enforcement, canonical optimizer state, route/charger feasibility and preview/apply/reload consistency; finish with focused integration/security tests. Phase 5 visual consolidation remains deferred and existing UI must be preserved without approval.
+**Limits:** Planning review only; no code changes or fresh tests. No commit/push/deployment; local reporting updates retained under the existing documentation Git restriction.
+
+## 2026-10-01 - Codex - NAVIO report draft and visual verification
+
+**Goal:** Review supplied historical slides and Chapters 1-3 against current scope and implementation; revise chapters as needed and prepare Chapters 4-5 without changing application code.
+
+**Done:** Completed output/doc/NAVIO_Project_Report.docx (35 pages) and output/doc/NAVIO_Report_Revision_Notes.txt. Rewrote Chapters 1-3 and added Chapters 4-5, references, three diagrams and six tables. Preserved original documents. Planner, EV Integration, Explore and Community are treated as main features; moderation is excluded, AI and additional Explore recommendations conditional. Current code and historical test evidence are distinguished from planned acceptance and empirical evaluation.
+
+**Verified:** Exported final DOCX through Word and inspected every rendered page; checked pagination, tables, figures and text layout. Document structural checks completed. No application tests rerun for this report-only task.
+
+**Outstanding:** Confirm official cover/team spelling/course formatting and Community scope assumption. Linked DB diagrams and Gantt were not readable as source exports; request PDF/PNG/DBML exports before inserting detailed ERDs and actual dated schedule. Report is a review draft, not a claim of completed user or road testing.
+
+**Git:** Existing application and documentation changes preserved. No code changes, commit, push or deployment. Reporting updates remain local because earlier documentation Git actions were declined.
+
 # Session Log
+
+## 2026-09-30 - Codex - Revised remaining plan for maintainer handoff
+
+**Goal:** Pause coding and prepare a current, considerate plan for the user's friend to own.
+**Done:** Reviewed workspace states, latest handoff, selection/canonical calculations, optimizer preview/apply and chart integration. Added a superseding maintainer handoff at the top of handoff.md with completed baseline, concrete Phase 4 gaps, Phase 5 scope and release prerequisites. Explicitly transferred subsequent decisions to the friend; historical approval holds are not demands for this agent's approval.
+**Findings:** Server model-policy enforcement, pending-edit/preview integrity and charge-target precision need Phase 4 attention; guest optimization is currently authenticated-only; chart profiles suppress observed checkpoints; legacy-confirmation copy no longer matches the settings UI. These are planning findings, not application fixes.
+**Verified:** Read-only source/Git inspection; no tests rerun or source/UI changes. Prior tested/pushed baseline remains root 0421513. Existing unrelated files preserved. No main push/deployment.
+**Next:** Friend validates baseline and decides remaining work; user proceeds with proposal report. See newest handoff entry for full revised plan and evidence limits.
+
 
 ## 2026-09-30 - Codex - Verify and publish integrated dev
 
