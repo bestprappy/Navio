@@ -73,6 +73,16 @@ The additive internal request to `POST /internal/v1/ev-route/optimize-canonical`
 
 The old internal `/optimize` route remains available for existing callers. The new route prevents an old mobility deployment from silently ignoring chronological context; coordinated mobility, trip and frontend deployment is required. Anonymous/account permissions are unchanged. No database migration, new consumption formula, automatic calibration or UI consolidation is introduced. Complete charger feasibility/reserve policy and continuous preview/apply/reload precision remain Phase 4B/4C work; Phase 4A is not completion of all Phase 4 release gates.
 
+### Routed charging feasibility (Phase 4B, 2026-10-06)
+
+The existing canonical optimizer now excludes `OTHER` as evidence of connector compatibility and requires an active station and known compatible effective power for a required charge. Unknown/stale/busy availability is disclosed as a warning, not a guarantee of a free connector. The unused frontend `planAutoEvChargers` helper is not the active planning path and is not re-enabled.
+
+The selected itinerary is replayed on road routes, splitting expanded routes into at most 25 points per call with a shared boundary point. Missing, duplicate or fallback road legs cannot certify feasibility. For each replaceable/inserted charging stop, detour distance is the routed incoming plus outgoing distance minus the routed bypass between its neighbours, floored at zero. It must not exceed `maximumDetourKm`; retained mandatory stops are not treated as optional detours. Reported detour values use this measurement rather than corridor geometry.
+
+Starting battery is not an arrival: a compatible charger at the actual origin can charge from below reserve, including zero. The optimizer does not teleport to a nearby charger. Every driving arrival is checked before an observed checkpoint: physical depletion and reserve insufficiency return distinct failure reasons. Earlier-day reserve violations prevent later-day certification. Final observations below reserve also prevent a feasible result. Saved charging targets/durations are replayed at retained stops, including the final stop; no target/duration is not interpreted as confirmed zero charging. Targets below current SoC never discharge the vehicle. Unavailable prior charging state cannot be erased to certify an earlier leg.
+
+No energy formula, schema, UI or public request shape changes. Search remains bounded and corridor-based; road verification may reject its selected candidate without finding every alternative. Phase 4C still owns precise charging-operation persistence and connected preview/apply/reopen parity. Local service tests do not certify live charger availability or a deployed distributed release.
+
 ### Common conventions
 
 - All public APIs use `/v1`.

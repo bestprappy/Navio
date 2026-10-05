@@ -1,3 +1,11 @@
+## 2026-10-06 - Codex - Phase 4B routed feasibility checks
+
+**Goal:** Continue after user-reported billing resolution with Phase 4B; preserve existing UI and route-loading fix.
+**Done:** Strengthened actual-road detour/reserve/physical reachability checks, origin charging, final saved charging replay, connector/power eligibility, prior-day reserve enforcement and truthful availability diagnostics. Added road-request chunking for expanded optimizer routes. No canonical formulas, public DTOs, schema or UI components changed; unused frontend Auto Add helper remains unused.
+**Verified:** Full mobility suite 53/53 passed with real disposable PostgreSQL schema validation; 14 new adversarial tests. git diff --check passed. No live provider/connected-system acceptance claim. Updated existing API documentation and handoff.
+**Git:** Mobility fix/phase4b-route-feasibility source remains uncommitted; client fix/route-request-batching preserved. Documentation-only local docs commit merged to dev. No push/deployment and no parent-pin changes.
+**Next:** Phase 4C target/duration persistence precision, downstream whole-trip verification and preview/apply/reload parity. Additional route-call latency remains a connected release check; Phase 5 deferred.
+
 ## 2026-10-05 - Codex - Fix route request batching and diagnostics
 
 **Goal:** Resolve the reproduced route-loading request-limit mismatch without UI or energy changes.
