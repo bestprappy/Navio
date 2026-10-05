@@ -1,3 +1,15 @@
+## 2026-10-05 - Codex - Route-loading request-limit correction
+
+**Authority/scope:** User approved the focused route-loading fix after diagnosis, before Phase 4B. No UI, energy formula, backend, billing, optimizer or schema changes. No push/deployment requested for this correction.
+
+**Diagnosis evidence:** The connected localhost proxy returned HTTP 400 for a synthetic 11-group request: validationErrors.groups = size must be between 1 and 10. Mobility also limits each group to 25 points. The previous client sent all groups/points together. The original user's specific failed request was not captured, so this is a reproduced defect, not proof that every route failure has this cause. Old error parsing ignored message/validationErrors when error was null.
+
+**Implementation:** Client fix/route-request-batching adds trip-route-api.ts, imported/re-exported by trip-route-query.ts. Splits long days into <=25-point chunks with one shared endpoint, packs <=10 groups per request sequentially, and preserves block/point IDs, order, profile and fallback/null data. Only returns the complete combined response; failed, malformed or mismatched/incomplete batches reject instead of becoming partial route data. TanStack cancellation signal stops further batches when obsolete. HTTP status is logged in text; message/error/validationErrors are retained rather than hidden by the console overlay.
+
+**Verification:** 127 frontend tests passed including eight new route tests (25 days, 2/24/25/26/49/50/242 points, start/end anchors, later batch failure, proxy/non-JSON error, malformed/missing/mismatched legs, fallback null duration, cancellation/empty input). Initial TypeScript error in unknown-payload narrowing corrected; TypeScript, targeted ESLint and affected eight tests then passed. git diff --check passed. No new production build or live Google routing acceptance; no backend changes to retest. Original local tsconfig/CLAUDE/log/report files preserved.
+
+**Next:** Recheck the affected real trip in the local app. Further failures should expose the actual HTTP/backend reason. Google Maps billing remains a separate unresolved Cloud Console issue. Phase 4B/C remain outstanding. This correction is local; root submodule pins remain at the published Phase 4A baseline until an authorized publication.
+
 ## 2026-10-05 - Codex - Phase 4A Git publication
 
 **Authority:** User explicitly requested committing/pushing the latest changes. This supersedes the previous hold on publication for this work. Publish to dev only; production main remains unchanged.

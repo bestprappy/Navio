@@ -1,3 +1,11 @@
+## 2026-10-05 - Codex - Fix route request batching and diagnostics
+
+**Goal:** Resolve the reproduced route-loading request-limit mismatch without UI or energy changes.
+**Done:** Added client transport batching (10 groups/request, 25 points/group, shared chunk boundary), complete-response checks, cancellation forwarding and informative backend error extraction. Preserved route order/identity and fallback/unknown values. No backend, database, billing or visual changes.
+**Verified:** Connected proxy previously reproduced HTTP 400 for 11 groups. All 127 frontend unit tests passed; after a typing correction, TypeScript, targeted lint and eight affected routing tests passed. Whitespace check passed. No live user-trip payload capture or Google provider acceptance claimed.
+**Git:** Local fix/route-request-batching; unrelated files preserved. Session docs on a docs branch merged to root dev only. No push/deployment; published submodule pins unchanged.
+**Next:** User rechecks affected trip; diagnose any remaining response-specific failure. Continue Phase 4B separately.
+
 ## 2026-10-05 - Codex - Publish verified Phase 4A to dev
 
 **Goal:** Push latest verified changes safely at the user's request.
