@@ -1,3 +1,11 @@
+## 2026-10-07 - Codex - Final CSC499 report export
+
+**Goal:** Resume the final report, using the university manual and supplied source documents; project coding remains paused.
+**Done:** Completed Chapters 1-5 and front matter in documents/reports/NAVIO_CSC499_Report.docx, with legacy DOC and PDF copies. Final PDF is 39 pages. Preserved four original ER images; Figures 3.1 and 3.6 are captioned spaces for the user to insert architecture/data-flow diagrams. Testing is qualitative, reflecting the user report; advanced EV/Maps integration remains under refinement. Original source files copied into documents/references, not modified.
+**Verified:** Word refreshed contents/fields and exported both formats. Reviewed all PDF pages as rendered contact sheets and detailed affected layout; corrected theme-overridden heading fonts and an isolated paragraph page. All sections A4 with 30/40/20/20 mm top/left/bottom/right margins. No fabricated user-study metrics. No project source edits or code tests for this document-only task.
+**Git:** Existing client batching, mobility Phase 4B and trip Phase 4C edits preserved. Reports/references/working files remain local and untracked; commit only agent reporting files on a docs branch and merge to local dev. No push/deployment.
+**Next:** User reviews report and inserts the two missing diagrams. Use documents/working/report-blocks.json and build-report-fallback.py for revisions, then native Word render-report.ps1; prepare-content.py predates figure insertion and must not overwrite the final blocks. Engineering Phase 4C remains incomplete as recorded below.
+
 ## 2026-10-06 - Codex - Review gate and Phase 4C apply validation
 
 **Authority/status:** User asked to check for issues and proceed if clear. Review found outstanding charging precision/target persistence and apply-validation defects. Began the narrow Phase 4C apply-safety prerequisite; Phase 4C is NOT complete. No UI, formula, schema, push or deployment changes.
