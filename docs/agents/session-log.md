@@ -1,3 +1,12 @@
+## 2026-10-07 - Codex - Create latest Navio Chapters 1-5 report from supplied templates
+
+**Goal:** Produce a new complete Word report through Chapter 5, using the supplied templates and Chapter 3 as the prior version, with project context, references and reusable figures.
+**Done:** Created docs/report/Navio_Report_Chapters_1-5_Latest_2026-10-07.docx and matching PDF through native Microsoft Word COM. Preserved the template-derived cover/approval pages, used supplied native DOTX front matter and the official chapter outline/manual, revised Chapters 1-3 and completed Chapters 4-5, 16 references and an evidence appendix. Reused six original ER diagrams and added three current architecture/navigation/data-flow figures. Used the exact three author names and IDs confirmed by the user. Originals remain unchanged.
+**Verified:** Inspected latest root dev 9fb2619 and its child pins via Git objects/temporary exports without changing child worktrees. Fresh frontend run: 119 passes, zero failures/skips, against client ba01a1b with unchanged assertions. Backend evidence is explicitly dated and distinguished from the newer recorded Phase 4A verification; no backend rerun or live acceptance claimed. Reviewed rendered pages, cover spacing, abstract alignment, headings, references, tables, figures, generated lists and Roman/Arabic pagination. Source hashes and all six reused ERD image hashes match the originals.
+**Limits:** Physical EV accuracy, connected two-account acceptance, user evaluation and capacity remain unmeasured. Planned features and Phase 4B/4C are not described as completed. No application changes, main push or deployment.
+**Git:** Mandatory notes are committed as docs(agents): log session 2026-10-07 on docs/report-session-2026-10-07 from dev and merged to dev only. Pre-existing docs/report files and the new deliverables remain untracked/local. Existing client CLAUDE.md, mobility logs and older checked-out submodules are preserved.
+**Next:** Use the new template-based Word/PDF as the latest report; future edits should preserve its template and update fields. Follow the retained Phase 4A handoff for development work. Local reproduction scripts/evidence: %LOCALAPPDATA%/Temp/navio-report-20261007.
+
 ## 2026-10-05 - Codex - Publish verified Phase 4A to dev
 
 **Goal:** Push latest verified changes safely at the user's request.

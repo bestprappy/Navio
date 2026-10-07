@@ -1,3 +1,15 @@
+## 2026-10-07 - Codex - Template-based Chapters 1-5 report
+
+**Delivered:** New `docs/report/Navio_Report_Chapters_1-5_Latest_2026-10-07.docx` and matching PDF. Used native Microsoft Word COM, the original Chapter 3 document as the template-derived backbone, the supplied CSC498-CSC499 DOTX files/manual and capstone outline, and the senior example as a structural reference. Revised Chapters 1-3, completed Chapters 4-5, and included front matter, generated contents/figure/table lists, 16 references and a source/test appendix. Reused all six original Chapter 3 ER diagrams; label them as target designs rather than applied migration diagrams. Originals and templates were preserved.
+
+**Confirmed authors:** Suriya Upariphutthiphong (66130500858), Prapangkorn Thangsathityangkul (66130500848), Supakrit Duangsri (66130500856). Committee names were retained from Chapter 3. The report distinguishes implemented behaviour, historical artifacts, newer recorded Phase 4A verification and remaining acceptance work; it makes no physical EV accuracy or completed user-study claim.
+
+**Context and verification:** Root dev was fast-forwarded to 9fb2619. Inspected its latest child pins through Git objects and isolated temporary exports: client ba01a1b, server f4a2813, trip 957cfbf, mobility b5a80eb, IAM 6183185 and community 5f0cf41. All 119 frontend tests passed against that client snapshot, with unchanged assertions and a local JSON import hook on Node 25.8.1. Backend tests were not rerun: dated retained XML and the October 3 handoff's 175-trip/39-mobility results are separately identified. Word/PDF page review, numbering, fields, source hashes and preserved-image checks passed. Task scripts and detailed evidence are in `%LOCALAPPDATA%/Temp/navio-report-20261007`.
+
+**Git/workspace:** Only the mandatory agent notes are committed on docs/report-session-2026-10-07 and merged to dev. The entire pre-existing docs/report directory, including the new deliverables, remains local and untracked. Root `M client`/`M server` reflects newer root pins versus older checked-out child worktrees; no child switches or application changes were made. Existing client CLAUDE.md and mobility logs remain untouched. No main update, deployment or live account/database changes.
+
+**Next:** Use this report as the latest Chapters 1-5 version. Future revisions should update its existing Word document and fields while retaining the supplied template. Development Phase 4B/4C and connected-service acceptance remain outstanding; development Phase 5 is separate from report Chapter 5. The earlier Phase 4A handoff below remains the implementation reference.
+
 ## 2026-10-05 - Codex - Phase 4A Git publication
 
 **Authority:** User explicitly requested committing/pushing the latest changes. This supersedes the previous hold on publication for this work. Publish to dev only; production main remains unchanged.
