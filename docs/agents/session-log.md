@@ -1,3 +1,11 @@
+## 2026-10-08 - Codex - Scoped report feedback revision
+
+**Goal:** Revise only Implementation Plan 2.6, architecture placement/explanation and compact ER explanations, preserving the user-reviewed report. User additionally approved correcting abstract metadata and adding a credit reminder.
+**Done:** Saved separate documents/reports/NAVIO_CSC499_Report_Revised.docx and PDF (41 pages), plus NAVIO_Compact_Gantt.png. Restored eight-phase implementation narrative from prior chapters with current scope. Gantt spans Dec 2025-Nov 2026: early periods are explicitly reconstructed estimates per user instruction; later periods consolidate recovered screenshots. Moved the supplied architecture image to Figure 4.1 with current-service explanation and a short note on its older design labels. Added four compact ER relationship explanations, retaining all image bytes. Updated affected numbering and generated lists. Corrected NAVIO abstract details and left (Reminder: confirm credits).
+**Verified:** Native Word edits/save/export; all final pages inspected as rendered sheets and detailed changed pages. 266 protected nonempty paragraphs retain text and paragraph formatting; existing styles.xml byte-identical; original images retained byte-for-byte; page geometry unchanged. Header/footer relationship IDs renumbered only due new chart. Download/project sources had identical body content/styles and are untouched. Read-only baseline export stalled; stopped only automation Word PID 24344, not the user's Word session. Subsequent Word edit/export succeeded.
+**Git:** No code/UI or source-report modifications. Existing client batching, mobility Phase 4B and trip Phase 4C work preserved. Only required agent docs committed locally via docs branch/dev; no push/deploy.
+**Next:** User reviews separate revised report. Credit total remains unconfirmed; data-flow figure remains a captioned space; architecture still contains historical labels, explained rather than redrawn. Do not regenerate from old report builder: source-of-truth is the user-reviewed copy and scoped revision in documents/working/revision1. Further unrelated text/style edits require user approval. Coding remains paused.
+
 ## 2026-10-07 - Codex - Final CSC499 report export
 
 **Goal:** Resume the final report, using the university manual and supplied source documents; project coding remains paused.
