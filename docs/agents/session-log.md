@@ -1,3 +1,11 @@
+## 2026-10-08 - Codex - Phase durations and system data-flow figure
+
+**Goal:** Use the latest reviewed Downloads/NAVIO_CSC499_Report_Revised.docx; edit only approximate phase durations and missing system data-flow diagram, preserving user styling.
+**Done:** Separate documents/reports/NAVIO_CSC499_Report_Updated.docx and PDF (51 pages), plus NAVIO_System_Data_Flow.png. Added approximate overlapping phase durations 17/22/4/13/9/6/4/8 weeks and a short qualification. Filled Figure 3.5 with a context-level DFD grounded in local client/auth.ts, shared-plan/trip optimization controllers/services and Google Places/Routes adapters. Context boundary includes client and backend; external actors are travellers, Keycloak and Google Maps Platform. Added a compact explanatory paragraph. Original reviewed copy and earlier deliverables untouched.
+**Verified:** Native Word COM save/PDF export. Reviewed all pages as sheets and changed pages at full size. 237 protected body paragraphs retain text and paragraph properties; styles.xml identical; original media preserved by content hashes despite Word filename renumbering. Figure/contents lists refreshed by page numbers only, preserving existing entries. Source uses user-updated 1.5 spacing; no global style changes. Scripts and source backup in documents/working/revision2. No code tests needed or code/UI edits.
+**Git:** Required dev pull attempted; origin/dev advanced to eb5bbb0, but fast-forward refused because local dev diverges. No remote merge/rebase/push or submodule changes. Record this session with a local docs branch merged only to local dev. All pre-existing dirty work preserved.
+**Next:** User reviews Updated report; do not replace with earlier builder output. Future coding must reconcile diverged dev deliberately. Engineering phases remain paused/incomplete as below. Context-level figure intentionally abstracts internal databases/services; ER diagrams and architecture retain that detail.
+
 ## 2026-10-08 - Codex - Scoped report feedback revision
 
 **Goal:** Revise only Implementation Plan 2.6, architecture placement/explanation and compact ER explanations, preserving the user-reviewed report. User additionally approved correcting abstract metadata and adding a credit reminder.
