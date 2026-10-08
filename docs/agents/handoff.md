@@ -1,3 +1,10 @@
+## 2026-10-08 - Codex - Proposal equipment and references
+
+**Goal:** Complete only equipment/software costs and references in the user's CS-project-proposal-template (2).docx, using friend's research proposal as a structural example.
+**Done:** documents/reports/NAVIO_Project_Proposal_Equipment.docx (4 pages). Hardware/software/external-services subsections adapted to NAVIO; no GPU/LLM research costs copied. Existing equipment/software incremental cost zero under stated assumptions; Google Maps budget remains unconfirmed. Five verified official documentation references added. Original Downloads document untouched.
+**Verified:** Native Word save and PDF layout review, original section text retained. Existing paragraph layout retained; Word normalized one font hint and style-gallery visibility only, without changing font/spacing definitions. New text matches Times New Roman and 1.5 spacing. Preview/scripts in documents/working/proposal-equipment. No code changes or tests.
+**Git/next:** Local docs-only log commit; no push or remote integration. Known diverged dev from earlier fetch remains unresolved. User reviews proposal; external API budget requires actual billing/budget confirmation.
+
 ## 2026-10-08 - Codex - Phase durations and system data-flow figure
 
 **Goal:** Use the latest reviewed Downloads/NAVIO_CSC499_Report_Revised.docx; edit only approximate phase durations and missing system data-flow diagram, preserving user styling.
