@@ -16,7 +16,7 @@ Snapshots advertise `precise-charging-v1`. The client requires this capability f
 
 Trip service calls private mobility `POST /internal/v1/ev-route/optimize-canonical-v2`, carrying `precedingDays`, selected-day `stops`, and `followingDays` in chronological order. Each stop may include both new fields. The older private routes remain supported, but the new client does not fall back to them. A successful selected-day result is replayed through the unchanged later itinerary; unavailable, disconnected, unreachable or below-reserve state prevents application. Response `finalSocPct` and driving/charging totals still describe the selected day, not the whole trip. Rated-range models remain preview-only for automatic application.
 
-Apply revalidates ownership and trip version and writes atomically. Retained movable chargers are positioned according to the verified route without losing their identity/notes; protected stops remain in place. Shared-plan publication excludes private charging duration/targets. Deploy compatible mobility, trip (including V16), and client versions together; older mobility fails closed on the new route. Local verification is not certification of live Google routing or deployment.
+Apply revalidates ownership and trip version and writes atomically. Retained movable chargers are positioned according to the verified route without losing their identity/notes; protected stops remain in place. Shared-plan publication excludes private charging duration/targets. Deploy compatible mobility, trip (including V17), and client versions together; older mobility fails closed on the new route. Local verification is not certification of live Google routing or deployment.
 
 ### Vehicle energy provenance (Phase 1, 2026-09-19)
 

@@ -2,7 +2,7 @@
 
 ## Phase 4C precise charging state (2026-10-11, local; not deployed)
 
-Trip migration `V16__precise_charging_plan.sql` adds nullable `trip.block_item.charging_duration_minutes double precision` (0–2147483647) and `planned_departure_soc_pct double precision` (0–100). Both map to Java `Double`. Existing integer `estimated_charge_minutes` and user constraint `target_battery_pct` remain unchanged. There is no backfill or inference about old rows. Optimizer application writes precise minutes plus the rounded legacy integer and its separate departure target, without creating a user lock.
+Trip migration `V17__precise_charging_plan.sql` adds nullable `trip.block_item.charging_duration_minutes double precision` (0–2147483647) and `planned_departure_soc_pct double precision` (0–100). Both map to Java `Double`. Existing integer `estimated_charge_minutes` and user constraint `target_battery_pct` remain unchanged. There is no backfill or inference about old rows. Optimizer application writes precise minutes plus the rounded legacy integer and its separate departure target, without creating a user lock.
 
 Verified on disposable PostgreSQL 16.15/PostGIS: Flyway upgrade, Hibernate validation, apply/save/reopen, rollback after flushed writes, and competing same-version applications (only one commits). The unmodified pre-change trip source also passes its three Postgres schema tests against the upgraded database, verifying schema rollback compatibility. Recheck migration allocation and child repository pins before release. These fields remain trip/stop state and are excluded from shared-plan publication.
 
