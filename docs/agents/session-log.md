@@ -1,3 +1,11 @@
+## 2026-10-11 - Codex - Recommend repeat visits and shared map pins
+
+**Goal:** Advise how one day can include hotel check-in and an evening return, with clear map badges and already-added place actions; apply frontend-design where useful.
+**Done:** Inspected planner add/search state, both map consumers, day anchors, existing anchor pin grouping and planner persistence. Recommended keeping Start/End for day boundaries and allowing separate visits for intermediate returns. For the arrival day: Start airport -> hotel check-in -> sightseeing -> End hotel. Unify map location grouping across regular visits and anchors, show a stop number plus +N additional visits, and list/select each occurrence in a popover. Show existing day usage alongside an enabled Add another visit action; retain normal Add to trip for unused places.
+**Verified:** Source review confirms selectedSearchPlaceIsAddedAtom and addSelectedPlaceToTripAtom reject repeated placeId values inside the selected block, while persistence syncs by item clientId and the applied schema's item uniqueness is on (block_id, client_id). Existing grouped anchor pins do not include regular stops. No tests/browser checks run: this was design advice, with no application changes.
+**Not done / left uncommitted:** Implementation is proposed, not delivered. Preserved all existing client map/category/details changes, client CLAUDE.md, mobility logs and untracked docs/report. Required notes alone committed on docs/repeat-visits-design-2026-10-11 from synced root dev and merged locally to dev only; no push, pins, main changes or deployment.
+**Follow-ups:** When implementing, cover visit-specific notes/time/cost/status and deletion, grouping across stops/anchors and both map providers, saved-state reload and ordered routing/export. Do not deduplicate non-consecutive return visits or clone previous visit costs/progress. Existing local features and earlier live acceptance checks remain open.
+
 ## 2026-10-11 - Claude - Markdown-lite planner notes
 
 **Goal:** User chose markdown-lite notes (toolbar, Edit/Preview, react-markdown without raw HTML, safe links) as the next planner feature.
