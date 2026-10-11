@@ -23,7 +23,9 @@ services:
       retries: 20
 
   community-storage-init:
-    image: quay.io/minio/mc:RELEASE.2025-04-16T18-13-26Z
+    # Use the client built into our release image, avoiding an upstream registry
+    # dependency during deployment. The server version and data volume stay the same.
+    image: ghcr.io/bestprappy/navio-community-storage:${NAVIO_IMAGE_TAG:?Set the release image tag}
     mem_limit: 128m
     networks:
       - backend
@@ -56,8 +58,7 @@ services:
         trap 'mc rm "$$probe" >/dev/null' EXIT
         printf '%s' 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=' | base64 -d > /tmp/picture.png
         mc cp /tmp/picture.png "$$probe" >/dev/null
-        # The mc image carries no diffutils, so cmp(1) is unavailable. Compare
-        # through base64 instead: both sides run the same encoder, so any line
+        # Compare through base64: both sides run the same encoder, so any line
         # wrapping is identical and this stays a byte-for-byte check.
         if [ "$$(mc cat "$$probe" | base64)" != "$$(base64 < /tmp/picture.png)" ]; then
           echo 'Stored picture did not read back byte-for-byte.' >&2
