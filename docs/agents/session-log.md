@@ -1,3 +1,11 @@
+## 2026-10-11 - Codex - Redeploy verified storage fix through main
+
+**Goal:** Redeploy to main at the user's explicit request.
+**Done:** Checked all six pinned repositories against fresh remote main refs and local HEADs; published fix/storage-init-image and earlier documentation branches, pushed dev, then fast-forwarded dev into main and pushed root release 279a4e8. The release carries the existing planner JSON/TWD hotfix and the tested mc packaging repair. No additional source, pin or database changes.
+**Verified:** Actions run 38127347516 succeeded in revision/schema checks, all nine builds and VM deploy. Fresh live homepage/health return 200, anonymous trips 401; THB/TWD changed from pre-rollout 400 to post-rollout 200, and reverse TWD/THB also returns 200 with positive dated Frankfurter rates. Used curl -k for local certificate-trust limitations; no TLS-trust or authenticated browser acceptance claim. No real account/trip mutated. Earlier local packaging smoke checks remain applicable; no unrelated suites repeated.
+**Git:** Release 279a4e8 published to root main/dev through the required dev-to-main flow; feature and earlier notes branches published. Current mandatory notes committed as docs(agents): log session 2026-10-11 on docs/redeploy-storage-2026-10-11 from dev, merged and pushed to dev only to avoid another production build. Root ends dev, child worktrees main. Pre-existing report/editor/log files untouched.
+**Next:** User verifies signed-in planner load/save and TWD UI switching. Phase 4A connected optimize/apply/reopen acceptance remains outstanding. Run: https://github.com/bestprappy/Navio/actions/runs/38127347516.
+
 ## 2026-10-11 - Codex - Fix failed MinIO client pull during deployment
 
 **Goal:** Investigate and repair the deployment failure in the pasted release log.
