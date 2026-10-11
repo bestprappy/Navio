@@ -1,3 +1,11 @@
+## 2026-10-11 - Claude - Publish client features to dev
+
+**Goal:** Commit the block editor and Codex's uncommitted client work to dev and leave the client on dev.
+**Done:** Client: `feat/planner-maps-and-places` (5b1a4c3 map appearance, 489525d places/tags/details/repeat visits; mixed files prevented a finer split) and `feat/markdown-notes` (f8846a4) merged into dev 6adb00a and pushed with both branches. Root `chore/bump-client-notes-maps-places` 9515766 pins it; root dev pushed (also published earlier local docs commits). Main client checkout now on dev, npm install run.
+**Verified:** Merged dev: tsc clean, 167/167 client tests, ESLint no errors (one existing unused-variable warning). No build or live checks.
+**Not done / left uncommitted:** Nothing to main. Client CLAUDE.md, root docs/report and server state untouched.
+**Follow-ups:** Release checks before main; remove the markdown-notes worktree.
+
 ## 2026-10-11 - Claude - Notion-style block editor for planner notes
 
 **Goal:** User asked to rework the markdown notes editor into a full Notion-style editor (slash/+ block menu, movable blocks, selection toolbar, ⋯ block actions menu), using frontend-design.
