@@ -1,3 +1,11 @@
+## 2026-10-11 - Codex - Explain missing route on visible Taoyuan Airport MRT
+
+**Goal:** Diagnose the user's dashed station leg despite the visible purple Taoyuan Airport MRT and confirm the line identity.
+**Done:** Confirmed operator's A13 Airport Terminal 2 -> A1 Taipei Main Station route. Probed the running anonymous localhost directions proxy with transit/railOnly=true; actual upstream response is still a ROUTED BUS with 4310 moving seconds. Explained that the local client correctly discards that bus, while the strict rail-selecting backend remains unrun/undeployed, producing the dashed fallback. Checked omitted departureTime and overnight local time against official operator/Google docs; schedule timing is an additional plausible factor, not a proven provider-ranking cause.
+**Verified:** One read-only directions POST through the running application; no account/trip mutations and no direct fresh Google-response claim. Official A13 guide shows express last 22:55 and commuter last 23:35 toward A1; probe was about 00:30 Taipei. Google Routes defaults missing departureTime to now. No source changes or tests repeated; prior implementation checks remain valid.
+**Not done / left uncommitted:** Prior client and mobility rail fixes plus all concurrent features/logs/reports preserved. No backend restart, scheduling implementation, push, pin, main update or deployment. Required notes committed as docs(agents): log session 2026-10-11 on docs/mrt-route-diagnosis-2026-10-11 from synced dev and merged locally to dev only.
+**Follow-ups:** Run/deploy updated rail backend with client; then verify live MRT selection. Add destination-aware planned departure time/cache keys for timetable accuracy when authorized as continued routing work; do not fabricate geometry from the background line.
+
 ## 2026-10-11 - Codex - Require rail between subway stations
 
 **Goal:** Explain why Airport Terminal 2 -> Taipei Main Station chose 1819 instead of the purple MRT, then implement the user's rule that subway -> subway must never choose a bus.
