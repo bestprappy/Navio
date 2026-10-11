@@ -1,3 +1,11 @@
+## 2026-10-11 - Claude - Markdown-lite planner notes
+
+**Goal:** User chose markdown-lite notes (toolbar, Edit/Preview, react-markdown without raw HTML, safe links) as the next planner feature.
+**Done:** Reusable `client/components/markdown/` (pure commands, compound editor, safe renderer + CSS module); `trip-note-item.tsx` rendered/edit modes with clickable task boxes; shared plan notes rendered. remark-breaks added after screenshots showed plain notes losing line breaks; table cells keep whole words and scroll; ending a list leaves a blank line so following text is not absorbed. Client-only, no API/DB change.
+**Verified:** 27 unit tests pass; client suite 159/160 (golden-fixture test needs sibling server dir absent in worktree); TypeScript + changed-file ESLint clean; 27/27 Chrome checks on a temporary route (removed), light/dark/360px screenshots inspected. No signed-in real-API save or production build.
+**Not done / left uncommitted:** All source in worktree `Navio-worktrees/markdown-notes/client` on `feat/markdown-notes` (from 306ee3e), uncommitted. Notes committed on root docs/markdown-notes-session-2026-10-11, merged locally to dev only; no push, pins, main or deploy. Main client checkout and other sessions' work untouched.
+**Follow-ups:** Commit/publish on request. Consider stripping `[x]` from published notes in PlanPublicationSanitizer to match checklist privacy.
+
 ## 2026-10-11 - Codex - Remove 3D and restore Google's original Light map
 
 **Goal:** Resolve the user's vector fallback error, remove 3D, and restore the original Light colors after the new preset made roads yellow.
