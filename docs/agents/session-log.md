@@ -1,3 +1,7 @@
+## 2026-10-12 - Codex - VS Code browser access restored
+
+**Authorization/result:** User approved browser control and NAVIO sign-in. Computer Use now accesses the local VS Code integrated browser. Opened localhost:3000, followed NAVIO's normal Keycloak login and confirmed the authenticated saved-trip dashboard renders. Credentials were used only in the sign-in form, not written to files. Earlier ClientFetchError overlay did not prevent subsequent successful authentication.
+**Next:** Browser unavailable is no longer the Phase 5 verification blocker. Continue Trip Energy visual/mobile/theme/keyboard and account-flow checks; sign-in alone is not acceptance of those flows. No source changes, tests, deployment or remote integration this session. Phase 4C.1 remains ON HOLD.
 ## 2026-10-11 - Codex - Phase 5 Explore/display parity continuation
 
 **Boundary:** User explicitly authorized remaining Phase 5 work while halting 4C.1. No remote integration, migration/backend changes or deployment.
