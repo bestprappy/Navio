@@ -1,3 +1,11 @@
+## 2026-10-11 - Claude - Export itinerary as a table (CSV and Excel)
+
+**Goal:** New "Export table" button on the itinerary: choose days (all or any mix), preview the itinerary as a shadcn table with each day's color, download it. User decisions: columns Day / Time / Place / Notes / Expenses; no "Getting there" column; CSV and Excel; include day Start/End rows; shared/read-only viewers can export too; leave note and checklist items out; keep EV stations. Used frontend-design within the existing Navio tokens.
+**Done:** New itinerary/export/ (pure table builder, sheet model, CSV writer with formula-injection guard, dependency-free .xlsx writer, day picker, preview, dialog), lib/zip.ts, lib/download-file.ts, components/ui/table.tsx (shadcn CLI; fixed its broken `cn` import). Button in itinerary-section.tsx; shared-planner-view.tsx passes published day anchors. Shared Checkbox now draws a dash for the indeterminate state (no other user of that state). Details in handoff.md.
+**Verified:** 12 new unit tests; full client suite 218/218 (--experimental-transform-types); tsc clean; changed-file ESLint clean. Real Excel (COM) opened a generated file: values, teal day fill with white text, numeric cost 1,120.50, frozen header, auto row heights. Real Chrome on guest template plan 200 (dev server 3000, routes mocked empty): 12/12 checks (preview, day selection/mixed state, empty guidance, CSV and Excel downloads, Escape returns focus, light/dark 1440, dark 390 without page overflow, no page errors); screenshots inspected. Script: Claude scratchpad export-table-browser.mjs.
+**Not done / left uncommitted:** All client source/tests uncommitted on client feat/route-focus-by-place (6adb00a) alongside other sessions' work; itinerary-section.tsx and shared-planner-view.tsx are mixed files. Notes committed on root docs/itinerary-table-export-2026-10-11, merged locally to dev only. No push, pin, main change or deployment.
+**Follow-ups:** Signed-in plan with linked expenses and owner Start/End anchors not exercised in the browser (unit-tested only). Commit by feature when asked.
+
 ## 2026-10-11 - Codex - Explain missing route on visible Taoyuan Airport MRT
 
 **Goal:** Diagnose the user's dashed station leg despite the visible purple Taoyuan Airport MRT and confirm the line identity.
