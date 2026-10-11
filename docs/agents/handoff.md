@@ -1,3 +1,6 @@
+## 2026-10-11 - Codex - EV station search fix reverted at user request
+
+**Status:** User reported the last change broke the planner and requested reversal. Restored add-ev-station-button.tsx and ev-station-api.ts exactly to their pre-fix Git content after confirming their diffs contained only this session's edits. Removed only the newly created ev-station-search.ts and ev-station-search.test.mjs. Prior Phase 4C/batching work remains untouched. TypeScript noEmit passed; both restored files have no Git diff. Earlier station-search fix entry is historical and no longer describes current code. No further diagnosis, push or deployment.
 ## 2026-10-11 - Codex - Manual EV station search resilience
 
 **Request:** Fix Add EV station search failure without changing existing UI or unrelated Phase 4C work.
