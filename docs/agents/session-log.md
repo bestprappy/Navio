@@ -1,3 +1,11 @@
+## 2026-10-11 - Codex - Add New Taiwan Dollar expense currency and conversion
+
+**Goal:** Add TWD currency and conversion to the expense flow.
+**Done:** Added TWD/NT$ to currency options/types, backend CurrencyCode, planner API currency validation and shared-plan mapping. Preserved the existing conversion of budget, expenses and planned place costs; explicit NT$ formatting avoids an ambiguous dollar symbol. Updated the budgeting API documentation. No provider configuration, entities or migrations changed.
+**Verified:** Three frontend conversion/persistence tests, TypeScript and targeted ESLint pass. Trip service 25 focused tests pass, including eight TWD controller cases, existing currency service/controller tests and planner service tests. Read-only live provider checks succeeded for all eight TWD/existing-currency directions. Initial backend run encountered a config-server import setup error; isolated ignored target/twd-test.yml resolved it, and the final run passed. No browser, production build, real PostgreSQL or live account acceptance claimed.
+**Git:** Client/trip stale local dev refs fast-forwarded to published ba01a1b/957cfbf before creating feat/twd-expense-currency branches; feature source/tests remain uncommitted. Required session notes and API documentation are committed locally as docs(agents): log session 2026-10-11 on docs/twd-currency-session-2026-10-11 from dev and merged to dev only. No push, main update, deployment or submodule-pin commit. Pre-existing report files, client CLAUDE.md, mobility logs and other child checkouts preserved.
+**Next:** Review and publish TWD child changes when requested; publish compatible client/trip changes before hosted acceptance. Existing Phase 4B/4C remain outside this task. Local backend evidence: target/twd-verification.log.
+
 ## 2026-10-07 - Codex - Create latest Navio Chapters 1-5 report from supplied templates
 
 **Goal:** Produce a new complete Word report through Chapter 5, using the supplied templates and Chapter 3 as the prior version, with project context, references and reusable figures.

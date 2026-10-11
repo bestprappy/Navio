@@ -1063,6 +1063,8 @@ Attach uploaded media:
 
 #### Budgeting
 
+The current planner supports `THB`, `USD`, `EUR`, `JPY`, and `TWD` (New Taiwan Dollar, displayed as `NT$`). Changing the default currency converts the budget, expenses, and planned place costs using the latest available rate from `GET /v1/trips/currencies/rate?base=THB&quote=TWD`. The response contains `base`, `quote`, `rate`, `asOf`, and `source`; rates come from Frankfurter v2. Conversion works in both directions. If rate retrieval fails, the currency and amounts remain unchanged. Saved and shared planner budgets retain `TWD`.
+
 | Method  | Endpoint                             | Purpose                                     |
 | ------- | ------------------------------------ | ------------------------------------------- |
 | `GET`   | `/v1/trips/{tripId}/budget`          | Get budget amount/currency.                 |
