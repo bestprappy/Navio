@@ -1,3 +1,11 @@
+## 2026-10-11 - Codex - Allow exact typed planner times
+
+**Goal:** Let users enter their own stop times, such as 9:11 AM, instead of only selecting half-hour slots.
+**Done:** Updated client `place-time-popover.tsx` with independent start/end text drafts and validated 12/24-hour parsing to the existing HH:mm storage format. Save and Enter accept exact minutes; lowercase AM/PM and surrounding spaces work. Custom times appear as selectable suggestions, existing half-hour options remain, and selecting a start suggestion focuses the end input. Invalid nonempty fields block saving and expose accessible validation; the end remains optional. Switching fields no longer loses typed input. Clear and cancellation retain their existing behavior. No API, database or shared style changes.
+**Verified:** TypeScript, changed-file ESLint and whitespace checks pass. Chrome checks on the actual popover and real Jotai update atom pass six grouped scenarios: exact start/end state save and reopen, switching drafts, custom suggestions/focus/Enter, invalid input and optional end, midnight/noon/24-hour input, cancellation/dropdown/Clear, and desktop/390px dark layout with no page errors or overflow. Light/dark screenshots inspected. Temporary fixture route removed; script/results/screenshots: `C:/Users/User/.codex/tmp/navio-time-input-20261011/`. No live API save/reload or production build claimed.
+**Not done / left uncommitted:** The single client source change remains uncommitted on dev, based on 6adb00a. Previous notes/maps/places/repeat visits are already published by Claude; their older uncommitted handoff descriptions are superseded. Required root notes alone committed as `docs(agents): log session 2026-10-11` on docs/custom-time-session-2026-10-11 from freshly pulled dev and merged locally to dev only. No push, source commit, submodule pin, main change or deployment. Existing client CLAUDE.md, mobility logs and untracked docs/report preserved; user server3000 left running.
+**Follow-ups:** Review the local time-input change and commit/publish when requested. Existing release acceptance for signed-in notes/maps/places/repeated visits and Phase 4A remains outstanding.
+
 ## 2026-10-11 - Claude - Publish client features to dev
 
 **Goal:** Commit the block editor and Codex's uncommitted client work to dev and leave the client on dev.
