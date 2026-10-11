@@ -8,6 +8,16 @@
 
 ## Global API Rules
 
+### Phase 4C implemented charging contract (2026-10-11, local)
+
+The current planner snapshot API adds nullable `evCharger.chargingDurationMinutes` (continuous minutes, 0–2147483647) and `evCharger.plannedDepartureSocPct` (0–100). `estimatedChargeMinutes` remains the rounded legacy integer. The optimizer's target is separate from the user's `targetBatteryPct`: a manual target takes precedence and locks the stop; an optimizer target does not create a user lock. Replay uses the precise duration before the legacy integer. An unchanged legacy snapshot preserves existing precise fields; changing its legacy duration or manual target replaces that charging instruction. Removing the charger clears its charging state.
+
+Snapshots advertise `precise-charging-v1`. The client requires this capability for precise charging saves and, together with `canonical-optimization-v1`, before optimization. Unsupported saves are rejected without reporting a successful synchronization. Existing guest state remains temporary; no account vehicle changes are made.
+
+Trip service calls private mobility `POST /internal/v1/ev-route/optimize-canonical-v2`, carrying `precedingDays`, selected-day `stops`, and `followingDays` in chronological order. Each stop may include both new fields. The older private routes remain supported, but the new client does not fall back to them. A successful selected-day result is replayed through the unchanged later itinerary; unavailable, disconnected, unreachable or below-reserve state prevents application. Response `finalSocPct` and driving/charging totals still describe the selected day, not the whole trip. Rated-range models remain preview-only for automatic application.
+
+Apply revalidates ownership and trip version and writes atomically. Retained movable chargers are positioned according to the verified route without losing their identity/notes; protected stops remain in place. Shared-plan publication excludes private charging duration/targets. Deploy compatible mobility, trip (including V16), and client versions together; older mobility fails closed on the new route. Local verification is not certification of live Google routing or deployment.
+
 ### Vehicle energy provenance (Phase 1, 2026-09-19)
 
 Garage responses from `/v1/users/me/vehicles` and its catalogue endpoints add an `energyProfile` object. Existing scalar specifications and calculation behaviour are unchanged. Old payloads remain accepted; older responses without this object remain supported by the client.
