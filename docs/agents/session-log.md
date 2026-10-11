@@ -1,3 +1,11 @@
+## 2026-10-11 - Claude - Route focus by place
+
+**Goal:** User found overlapping back-and-forth routes confusing and asked for a "Show route by place" filter that shows only the A -> B leg while scrolling; approved fading the rest (not hiding) and moving the map.
+**Done:** Added Place mode to a new All / Day / Place route switch: scroll-tracked focused leg at full strength, rest of the day faded, off-leg pins faded, settled camera fit when the leg is off screen or tiny, and a per-travel-row "show this leg" button. Google and Mapbox both wired through shared pure logic/hooks. Details and code map in handoff.md.
+**Verified:** 20 new unit tests; client suite 206/206 (needs --experimental-transform-types); changed-file ESLint clean; 21/21 real-Chrome checks against the real Google map with mocked routes; screenshots inspected. Mapbox not run live.
+**Not done / left uncommitted:** All client source/tests uncommitted on feat/route-focus-by-place (branch created this session from dev 6adb00a), alongside other sessions' concurrent work. Session notes committed on root docs/route-focus-session-2026-10-11 and merged locally to dev only. No push, pin, main change or deployment. Dev server 3000 untouched.
+**Follow-ups:** Commit by feature when asked; live Mapbox/real-route check before release.
+
 ## 2026-10-11 - Codex - Insert itinerary items from each card's bottom edge
 
 **Goal:** Insert items between existing stops in a long itinerary, with a menu for place, note, checklist and EV station. User refined the design to a plus revealed on the card's bottom edge, and explicitly restored route time/distance to left alignment.
