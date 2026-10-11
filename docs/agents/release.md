@@ -28,6 +28,7 @@ Before step 4:
 ## What deploy.sh does
 
 - Pulls images, ensures Postgres is healthy, runs community storage checks.
+- The community storage release image contains both the pinned MinIO server and `mc` client built from source. Storage setup uses that same GHCR image; it does not pull `quay.io/minio/mc` during deployment.
 - `docker compose up --wait` with a 420 s timeout. A container that exits or is unhealthy fails the deploy.
 - Configures Keycloak, reloads NGINX, and smoke-tests authentication, public and protected routes.
 - **On any failure it prints diagnostics and rolls back to the previous image tag.** Production keeps serving the old release, but migrations that already ran stay applied.
@@ -55,6 +56,7 @@ Step logs require a signed-in GitHub account. If the deploy job fails, ask the u
 | `container navio-<service>-1 is unhealthy` and `Restarting (1)` | Service crashes on startup | Reproduce locally: real Postgres + config server + `*ApplicationTests`. Schema validation and Flyway errors are the usual cause |
 | `Expected ... to return 401; got ...` | Gateway routing or security change | Check `api-gateway` routes and `IdentityPropagationFilter` |
 | Keycloak / Google OAuth smoke checks | Realm or theme config | Check `.deploy/keycloak` |
+| `quay.io/minio/mc` pull returns `401 UNAUTHORIZED` | Older storage setup still depends on the upstream client registry | Release the storage image containing the source-built `mc` client and the matching storage Compose configuration |
 
 Never re-run a failed deploy without identifying the cause. Confirm production is healthy after a rollback:
 
