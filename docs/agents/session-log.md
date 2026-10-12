@@ -1,3 +1,10 @@
+## 2026-10-12 - Codex - Publish clean planner Explore carousel branch
+
+**Request:** Push the latest work and merge/push to main only if stable.
+**Actions:** Pushed `feat/planner-explore-carousel` at `0bbba97`. Because that branch extends deferred Phase 4/5 checkpoints and is behind current remote dev, fetched current client dev/main and created `feat/planner-explore-carousel-dev` from `origin/dev`. Cherry-picked only the carousel commits without conflict and pushed the clean branch at `9fd12b2`. No force push, main merge, root pointer update or deployment.
+**Verification:** Clean branch passes 173/173 frontend tests, TypeScript noEmit, targeted ESLint, diff whitespace and Next 16.3.4 production build. An initial isolated run failed only because an older shared dependency tree lacked new dev packages and the temporary path lacked the sibling Java fixture; clean lockfile installation and correct fixture access produced the full pass.
+**Decision:** Main was not advanced. Required feature -> dev -> main flow would carry unrelated current dev features, while root main would trigger a coordinated backend deployment whose child-main pins/PostgreSQL/release checks were outside this UI change and remain incomplete. Use `feat/planner-explore-carousel-dev` for integration. Phase 4C.1 remains on hold.
+
 ## 2026-10-12 - Codex - Reposition planner Explore carousel controls
 
 **Request:** Move the carousel arrows to the plan card's top-right, make them approximately the destination-icon size, retain behavior and prevent overlap with destination text.

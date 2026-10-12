@@ -1,3 +1,10 @@
+## 2026-10-12 - Codex - Planner Explore carousel published on clean dev-based branch
+
+**Status:** Pushed the original checkpoint-based client branch `feat/planner-explore-carousel` (`0bbba97`) for backup, then created and pushed the release-review branch `feat/planner-explore-carousel-dev` (`9fd12b2`) from current `origin/dev`. Use the `-dev` branch for review/integration: it contains only the two carousel commits on top of current client dev and excludes the deferred local Phase 4/5 checkpoint commits. No force-push, client main merge, root change or deployment.
+**Verification:** On the clean dev-based branch, full frontend tests pass 173/173, TypeScript noEmit passes, targeted ESLint and whitespace checks pass, and the Next 16.3.4 production build passes. The initial temporary-worktree run had two environment-only failures because it reused older dependencies and lacked the sibling server fixture; a clean `npm ci` plus the expected fixture path resolved both, and the complete rerun passed.
+**Release decision:** Do not merge directly to `main`. NAVIO requires feature -> dev -> main, current client main is behind dev, and advancing dev to main would also release unrelated transit/map/place/markdown work. Root main additionally triggers the full backend deployment and requires all child pins on their own mains plus PostgreSQL/release checks. Those broader release gates were not completed here. Phase 4C.1 remains ON HOLD.
+**Next:** Review or merge `feat/planner-explore-carousel-dev` into client dev when desired. Coordinate the eventual client dev-to-main and root pin/deployment as a complete release, not as this UI-only push.
+
 ## 2026-10-12 - Codex - Planner Explore carousel controls repositioned
 
 **Status:** Follow-up adjustment committed locally in Navio-Client on `feat/planner-explore-carousel` at `0bbba97`; not merged, pushed or deployed. Phase 4C.1 remains ON HOLD.
