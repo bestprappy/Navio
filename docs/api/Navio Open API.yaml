@@ -1,4 +1,13 @@
 openapi: 3.1.0
+x-navio-implemented-travel-options:
+  status: Implemented locally; coordinated client, Trip Planning and Mobility deployment required.
+  plannerCapability: cycling-legs-v1
+  arrivalModes: [drive, transit, bike, walk]
+  cycling: Bike legs use the CYCLING provider profile and never consume the car battery.
+  railPreference: Automatic transit between two rail stations sends railOnly true; an explicit transit choice allows all public transit.
+  suggestions: The client compares individual legs on demand using POST /v1/routes/directions. Transit steps expose provider line names, boarding and arrival stops, stop counts and walking connections.
+  stationInsertion: Station names are resolved through place search; the traveller confirms a provider place before inserting it into the itinerary.
+  unavailable: Fallback geometry is an unverified direct connection; it must not be presented as navigation or given a travel-time estimate.
 x-navio-implemented-phase4c:
   status: Implemented in the coordinated 2026-10-13 release; remaining domain schemas below include target designs.
   plannerCapability: precise-charging-v1
