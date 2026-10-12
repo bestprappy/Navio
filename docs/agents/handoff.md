@@ -1,3 +1,10 @@
+## 2026-10-12 - Codex - Planner Explore carousel controls repositioned
+
+**Status:** Follow-up adjustment committed locally in Navio-Client on `feat/planner-explore-carousel` at `0bbba97`; not merged, pushed or deployed. Phase 4C.1 remains ON HOLD.
+**Changed:** Moved the existing previous/next controls from the card's middle edges to a compact pair over its upper-right cover area. Each circular target is 28 px with a 14 px arrow, matching the nearby destination icon scale while retaining a usable control surface. The controls remain above the stretched card link, preserve their hover/click/reduced-motion behavior, and do not overlap the plan title or destination text below the cover. No carousel data, selection, card content or unrelated UI changed.
+**Checks:** Focused carousel suite passes 6/6 with Node 24; TypeScript noEmit, targeted ESLint and diff whitespace checks pass. Existing charger/`tsconfig` status markers and `CLAUDE.md` remain excluded.
+**Next:** The feature branch remains ready for deliberate reconciliation and visual narrow/desktop review before release. No visible position indicator. Do not resume Phase 4C.1 without approval.
+
 ## 2026-10-12 - Codex - Planner Explore destination carousel implemented
 
 **Status:** Implemented and committed locally in Navio-Client on `feat/planner-explore-carousel` at `b7c3791`; not merged, pushed or deployed. The branch extends the preserved Phase 5 checkpoint and remains separate from newer published `dev` work. Phase 4C.1 remains ON HOLD.

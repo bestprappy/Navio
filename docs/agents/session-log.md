@@ -1,3 +1,9 @@
+## 2026-10-12 - Codex - Reposition planner Explore carousel controls
+
+**Request:** Move the carousel arrows to the plan card's top-right, make them approximately the destination-icon size, retain behavior and prevent overlap with destination text.
+**Result:** Updated only the existing carousel control classes and their render regression. Controls are now a compact upper-right overlay on the cover, with 28 px targets and 14 px icons; carousel interaction and motion are unchanged. The destination/title content area is unobstructed. No position indicator, API/data behavior, backend, database or unrelated UI change.
+**Verification/Git:** TDD assertion failed against the old middle-edge controls before the implementation and passed afterward. Focused tests 6/6, TypeScript noEmit, targeted ESLint and diff whitespace checks pass. Navio-Client commit `0bbba97` on `feat/planner-explore-carousel`; no push, merge or deployment. Preserved unrelated client status markers. Phase 4C.1 remains on hold.
+
 ## 2026-10-12 - Codex - Build destination-aware planner Explore carousel
 
 **Goal:** Replace the planner's per-destination Explore sections with one encouraging, responsive carousel of top viewed shared plans, limited to ten plans and the first ten trip destinations, without a visible position indicator.
