@@ -1,3 +1,8 @@
+﻿## 2026-10-13 - Codex - Prepare canonical energy release
+
+**Request:** Treat the plan as complete, leave Phase 4C.1 deferred unless its hydration issue returns, commit/push the completed work to main, then pull the latest repository state.
+**Integration:** Rebased the preserved checkpoint work by cherry-picking it onto the current published dev histories in isolated worktrees. Resolved only additive contract conflicts so travel-mode/transit work and the approved Explore/UI remain intact. Published Trip Planning 72f01f6 and Mobility/EV 533850b through release branches to dev/main, then Navio-Server 7630e41 with those exact pins. Published Navio-Client contract fix 05df617 and Phase 5 display 19a6e1e through release branches to dev/main.
+**Verification:** Client 190/190, TypeScript and targeted ESLint pass. Trip Planning 217/217 and Mobility/EV 82/82 pass with disposable real PostgreSQL; Flyway and Hibernate schema validation pass. Root release/deployment verification remains the next step. No academic documents, generated output, CLAUDE.md, IDE state or local service logs were swept into application commits.
 ## 2026-10-13 - Codex - Release planner Explore carousel to main
 
 **Request:** Merge main.
@@ -268,14 +273,14 @@
 **Remaining plan:** First browser-check merged guest/signed-in catalogue, custom reuse, trip separation, settings/checkpoints and shared read-only views; inspect actual deployment migration history before releasing. Then Phase 4 should integrate/evaluate charger optimization on canonical road-leg energy, distinguish feasibility from automatic-apply eligibility and test reserves/checkpoints/unknown data. Incoming simulation modules remain reference code, not approved runtime policy. Do not adopt standard factors/margins or rated-range automatic apply without explicit policy approval. Phase 5 retains incoming Trip Energy visual foundation, incorporates useful old overview detail from canonical results, and never presents unknown as confirmed zero. Friend's unpushed hybrid branch remains unavailable; no claim to have integrated unpublished commits.
 
 
-## 2026-09-27 — Claude — Admin route fix, OWNER provisioning, Explore seeded
+## 2026-09-27 â€” Claude â€” Admin route fix, OWNER provisioning, Explore seeded
 
 **Goal:** `/admin/users` reload showed Keycloak's "internal server error"; production had no OWNER role; run the Explore seed as "Navio Team".
 **Done:** nginx routed every `/admin/` path to Keycloak; now only `/admin/realms/`, `/admin/serverinfo` and `/admin/<realm>/console/` go there (Keycloak console is `/admin/master/console/`). deploy.sh creates the OWNER realm role if missing and adds it to the `navio-web` scope; a smoke check asserts anonymous `/admin/users` redirects to `/sign-in`. First release (`ac8ed60`, run `36332867659`) failed and rolled back: the pre-existing scope-mapping `printf '...'` inside `bash -euc '...'` broke the quoting (never ran before because all roles were already mapped). Fixed in `b853d1a`; OWNER scope mapping was also added manually. Root `main` `6915bca`, run `36333726651` succeeded. Created Keycloak user `navio-team@example.com` (Navio Team, id `0ae736e4-a315-456e-bb2e-7257d419b2d9`, no password, no IAM profile yet). Ran the seed on the VM from `~/navio-maintenance/seed-explore` (log `run-2026-09-27.log`): 30 published, 0 failed.
 **Verified:** `/admin/users` -> 307 sign-in; `/admin/master/console/` 200; OWNER role exists and is in the `navio-web` scope; replayed smoke checks pass; feed lists 30 plans with `authorName` "Navio Team"; a seeded `/explore/shared/<token>` returns 200.
 **Not verified:** no one holds OWNER yet (manual steps 3-5 in owner-role.md); seeded plans were not browser-checked.
 
-## 2026-09-27 — Claude — Explore seed script (30 real plans)
+## 2026-09-27 â€” Claude â€” Explore seed script (30 real plans)
 
 **Goal:** fill Explore with many real plans: 5 Thailand, 5 Japan, 20 elsewhere.
 **Done (uncommitted, root `dev`):** `.deploy/scripts/seed-explore/` with `seed.mjs`, `plans.mjs` (30 itineraries) and `README.md`. The script uses the real API only: `POST /v1/trips` (destination = Google place id from `/v1/geo/places/search`), `PUT .../planner` with stops resolved to real Google places (photo, rating, coordinates) and real chargers from `/v1/ev/chargers/near` for the two Thai EV trips, then `PUT .../publication` with `listInExplore`, `includeNotes`, byline "Navio Team". It calls trip-planning and mobility directly with `X-User-Id`, because Keycloak has direct-access grants off. It is idempotent by trip title and has `DRY_RUN`/`ONLY`.
@@ -283,7 +288,7 @@
 **Not verified:** not run against a real backend or Google (nothing was running locally, and production needs a seed account id).
 **Follow-ups:** create the seed account, run with `DRY_RUN=1` on the VM (`docker run --network navio-backend ...`, see README), check the resolved places, then run for real.
 
-## 2026-09-27 — Claude — Commit and release Owner role, Explore sharing and observability
+## 2026-09-27 â€” Claude â€” Commit and release Owner role, Explore sharing and observability
 
 **Goal:** `/commit` everything dirty across all repos and release it through `main` (user chose "Everything" and "Through main (deploys)").
 **Done:**
@@ -296,23 +301,23 @@
 **Not verified:** live Keycloak/two-account acceptance, copy end to end, nginx `-t`, VM memory headroom for Zipkin.
 **Follow-ups:** Raum-1's `fix/trip-specific-garage` still carries trip-planning `V11`/`V12`; renumber above V13 before merging. Existing production realm needs the manual OWNER setup in `owner-role.md`.
 
-## 2026-09-27 — Claude — Explore shared plan rendered by the planner itself
+## 2026-09-27 â€” Claude â€” Explore shared plan rendered by the planner itself
 
 **Goal:** make an Explore plan page 1:1 with the planner (map on the right), fed by the real published plan, copyable, and automatically updated whenever planner cards change.
 **Done (all uncommitted):**
 - User decision: published itinerary stops (places and chargers) may expose coordinates; day anchors stay private.
 - trip-planning `main`: `PlanPublicationSanitizer.sanitizePlace` now publishes `placeId`/`address`/`lat`/`lng` only for valid coordinates; `SANITIZER_VERSION` deliberately unchanged (adding fields must not dead-link live plans; old snapshots just lack pins). Copy no longer requires an address. Tests updated and added.
-- client `feat/admin-console`: new `plannerReadOnlyAtom`; read-only branches in `ItinerarySection` (+ `renderDayAnchors` slot), `SortableBlockItems`, `TripPlaceCard`, `TripNoteItem`, `TripChecklistItem`, `BudgetSection`/`ExpenseCard`, and both planner maps (no POI add). New `share/shared-plan-blocks.ts` (snapshot → `TripBlockData`/budget) and `share/shared-day-anchors.tsx`; `SharedPlannerView` rewritten to hydrate a scoped Jotai `Provider` and render the real planner components + `PlannerMap`; `/explore/shared/[token]` uses the planner's sidebar layout. Deleted the unused custom `shared-planner-map.tsx`.
+- client `feat/admin-console`: new `plannerReadOnlyAtom`; read-only branches in `ItinerarySection` (+ `renderDayAnchors` slot), `SortableBlockItems`, `TripPlaceCard`, `TripNoteItem`, `TripChecklistItem`, `BudgetSection`/`ExpenseCard`, and both planner maps (no POI add). New `share/shared-plan-blocks.ts` (snapshot â†’ `TripBlockData`/budget) and `share/shared-day-anchors.tsx`; `SharedPlannerView` rewritten to hydrate a scoped Jotai `Provider` and render the real planner components + `PlannerMap`; `/explore/shared/[token]` uses the planner's sidebar layout. Deleted the unused custom `shared-planner-map.tsx`.
 **Verified:** `PlanPublicationSanitizerTests` 33/33, `TripPublicationServiceTests` 39/39; client `tsc` clean, scoped ESLint clean (one pre-existing warning). Headless Chrome against a stub gateway at 1440px: planner layout, real cards, numbered/charger pins, budget. Phone width not truly verifiable (headless min width). Not verified: live routes, real accounts, copy end to end, full trip-planning suite, Postgres.
 **Follow-ups:** `/share/plans/[token]` and the publish-dialog preview still use `SharedPlanContent`; move them to `SharedPlannerView` if they should match too. Plans published before this change show stops as "(location not shared)" notes until the owner presses Update.
 
-## 2026-09-27 — Codex — Real Explore plans and planner-style shared view
+## 2026-09-27 â€” Codex â€” Real Explore plans and planner-style shared view
 
 **Goal:** remove mocked Explore trips, show real recent and trending user publications, open a shared plan in the planner layout without editing, and let a user copy it.
 **Done:** Connected Explore, dashboard recommendations, and the planner Explore section to published plans; added view-based trending and a private-copy endpoint in trip-planning with V13 `view_count`; replaced the old mock detail route with a read-only planner workspace and shared card/day components. App changes remain uncommitted.
-**Verified:** client TypeScript, scoped ESLint, and production `next build`; targeted publication/controller/privacy tests; V1–V13 Flyway migration and JPA validation on disposable PostgreSQL 16. No real-account browser acceptance.
+**Verified:** client TypeScript, scoped ESLint, and production `next build`; targeted publication/controller/privacy tests; V1â€“V13 Flyway migration and JPA validation on disposable PostgreSQL 16. No real-account browser acceptance.
 **Not done / left uncommitted:** Client `feat/admin-console` and trip-planning `main` hold these changes alongside unrelated dirty work. The isolated frontend build left `client/.next-explore-check/`; automatic approval review blocked recursive removal. App changes were not staged, merged, or deployed.
-**Follow-ups:** The user was asked whether publicly shared itinerary stops may expose coordinates. Until answered, the sanitizer keeps locations private: the read-only map has no pins and copied stops without public coordinates become editable notes. Recheck the exact visual match and copy flow with two real accounts once that choice is settled. Agent notes already contained another session’s uncommitted changes, so this note was not committed separately.
+**Follow-ups:** The user was asked whether publicly shared itinerary stops may expose coordinates. Until answered, the sanitizer keeps locations private: the read-only map has no pins and copied stops without public coordinates become editable notes. Recheck the exact visual match and copy flow with two real accounts once that choice is settled. Agent notes already contained another sessionâ€™s uncommitted changes, so this note was not committed separately.
 
 ---
 
@@ -321,7 +326,7 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 ## Template
 
 ```markdown
-## YYYY-MM-DD — <agent> — <short title>
+## YYYY-MM-DD â€” <agent> â€” <short title>
 
 **Goal:** what the user asked for.
 **Done:**
@@ -481,6 +486,684 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 **Not done / left uncommitted:** Existing local client tsconfig working-tree flag (no textual diff), CLAUDE.md and service logs preserved. No production build, browser run, backend/PostgreSQL tests or deployment in this pull-only session.
 **Follow-ups:** Runtime/production health and schema validation remain separate from Git synchronization. Session docs committed locally only per AGENTS.md; no push requested.
 
+## 2026-09-27 â€” Codex â€” Repair admin users and add Owner role
+
+**Goal:** fix the admin users 500, present users in a role-badge table, and let an Owner grant administrator roles while admins manage lower roles.
+**Done:** changed IAM search to avoid nullable PostgreSQL query parameters; added `OWNER` through IAM, gateway, Keycloak import, client role gates, V6 migration, and docs; added audited role controls in the account drawer and colored badges in the users table; stopped logging handled admin HTTP failures to the Next development error overlay. No commits or deployment.
+**Verified:** client typecheck after `next typegen`, scoped ESLint, 13 admin transport tests; IAM 47 targeted controller/service tests plus 13 final role/guard tests; gateway suite and new Owner converter test; disposable PostgreSQL 16 migration/schema/search/Owner constraint tests (5 passed). No live authenticated Keycloak or browser check. The exact backend exception behind the reported 500 was unavailable, so the null-parameter query is a tested likely cause.
+**Not done / left uncommitted:** all changes are uncommitted. Root agent notes and deployment files, client Explore/planner work, and server submodule work were already dirty before this session and may belong to other sessions; they were not staged or discarded. `docs/agents/owner-role.md` records existing-realm setup, including the display snapshot row. The local Chrome extension timeout is unrelated to Navio.
+**Follow-ups:** the local client's API base URL points at production, so its reported 500 can persist until the IAM change is released. Complete live authenticated acceptance and release through the repository's submodule order. Keep the existing dirty work separate when committing.
+
+---
+
+## 2026-09-26 â€” Codex â€” Release admin dashboard, vehicle catalog, and shared-plan titles
+
+**Goal:** finish the admin dashboard and global vehicle catalog, let a shared plan have a public name, fix the live Explore/shared-link 404, then commit and deploy to root `main`.
+**Done:** IAM admin account, catalog, and activity backend (`dfb14c0`, main `8056fb6`); client admin UI, catalog picker, activity, and share-name dialog (`2ec2c33`, `c3faf9a`, main `465720e`); trip publication custom title (`9b63ff3`, main `a79a085`); dedicated shared-plan gateway route, catalog routes, and gateway tests (server `8ef99e5`, main `de5bd91`); root pins (`525c4da`, main `78ea743`). The first deployment succeeded but the live public routes still 404ed because the root's mounted production gateway YAML was stale. Fixed that file and added public-route deployment checks (`2051204`, root main `eb00cff`); follow-up Actions run `36241742100` succeeded.
+**Verified:** IAM 138 tests passed, plus 4 real-PostgreSQL catalog/schema tests; trip 150 tests passed with PostgreSQL and standalone service config; gateway 11 tests and configuration-server 1 test passed. Isolated client `tsc`, scoped ESLint, 12 admin transport tests, prior admin Chrome workflow, and new Chrome catalog draft/activity workflow passed. Live shared-plan feed and vehicle catalog returned 200; a listed plan opened in both reading pages and appeared in Explore HTML; invalid token returned the trip service's 404; anonymous activity returned 401; health returned 200. The browser checks used fixtures, not live Keycloak.
+**Not done / left uncommitted:** root deployment/observability edits, old dirty client `feat/admin-console` worktree and concurrent Explore/planner edits, `docs/agents/plan-link-sharing-plan.md`, and `docs/research/` were preserved. The release client was assembled in a clean worktree from `origin/dev`; its main commit is deployed by the root pin. Live two-account Keycloak acceptance is outstanding.
+**Follow-ups:** live authenticated admin and two-account share acceptance remains; no test credentials were available. The production shared-plan 404 was reproduced and fixed by updating the mounted gateway config.
+
+
+---
+
+## 2026-09-26 â€” Claude â€” Share published plans to Explore
+
+**Goal:** continue plan sharing so a published plan can be shared to the Explore page, keep Explore seamless, and use `/frontend-design` for the UI.
+**Done:** (all **uncommitted**; trip-planning `dev`, api-gateway in server `dev`, client `feat/admin-console`)
+- trip-planning: V13 (never merged, edited in place) gains `listed_in_explore`, `listed_at`, a listed-only-when-active CHECK and a partial feed index. `TripPublication.applyListing`, a repository `findListedInExplore` JPQL query, `ExplorePlanSummary`/`UpdateExploreListingRequest` DTOs, `listInExplore` on `PublishPlanRequest`, `listedInExplore` on `PublicationResponse` and `SharedPlanResponse`, `ExplorePlanSummarizer`, service `updateExploreListing`/`listExplorePlans` (revoke also unlists), `PATCH /v1/trips/{id}/publication` and anonymous `GET /v1/shared-plans` (size capped at 48, `no-store`).
+- api-gateway: permit `GET /v1/shared-plans` alongside `/{token}`; new routing test in `GroupPublicRoutesTest`.
+- client: "List on Explore" in `PublishPlanDialog` (a draft before publish, immediate PATCH after), plus an Explore access row and a "View on Explore" link. Explore "Shared by travelers" section with a server-fetched first page and infinite "Show more". Search/filters merge shared plans into results. `SharedPlanCard` with a `RouteStrip` (the design's one distinctive element: stops per day, chargers as bolts; with no photo the cover becomes the per-day itinerary). New `/explore/shared/[token]` reading page (listed plans only), shared `SharedPlanHeader`, and a GET-only `/api/shared-plans` proxy.
+**Verified:** trip-planning full suite, 142 run: only the two known full-context tests error (Postgres 5432); all publication, summarizer and controller-slice tests pass with the config server up. `PostgresSchemaTests` passes on disposable Postgres; the CHECK constraint was exercised in psql. api-gateway 10/10 (1 skipped as before). Client `tsc`, scoped ESLint and `next build` are clean. Chromium against a stub gateway: feed, search merge, keyboard navigation, light/dark/390px, and `/explore/shared` refusing unlisted/dead tokens. No new console errors (the existing `/help` 404 and `/community/create` sign-in prefetches are unrelated). **Not verified:** the owner dialog in a browser, and anything against a real backend or accounts.
+**Not done / left uncommitted:** everything above, alongside other sessions' uncommitted admin and observability work. OpenAPI not updated.
+**Follow-up request, same session: show the author's name.** Added `author_display_name` to V13 and the entity. `authorDisplayName` (max 120) on `PublishPlanRequest` and `UpdateExploreListingRequest`; `authorName` on `ExplorePlanSummary` and `SharedPlanResponse`; `authorDisplayName` on `PublicationResponse`. `PlanPublicationSanitizer.sanitizeAuthorName`. Client: the dialog reads the profile name (shared `currentUserProfileQueryKey` cache) and shows "Shown as â€¦". New `PlanAuthor` widget on cards and in `SharedPlanHeader`; Explore search also matches author names. New tests: byline frozen and sanitized on publish, a PATCH without a name keeps the stored one, the feed and shared plan carry the name but no owner id, 121-character names rejected with 400, and sanitizer normalization. Verified as noted in the handoff. Still uncommitted.
+**Follow-ups:** unlisting does not revoke the link, and anyone who opened it from Explore keeps it (the UI says so). Decide whether listings need moderation/reporting before release. Clean `target/` after migration renames (a stale V11 artifact masked V13). Split the gateway file's vehicle-models change from this work when committing.
+
+---
+
+## 2026-09-26 â€” Codex â€” Continue admin dashboard with shadcn
+
+**Goal:** continue the admin dashboard; use frontend-design and shadcn for UI.
+**Done:**
+- Continued existing uncommitted client admin work on `feat/admin-console`: account search from the dashboard, refresh for all overview queries, accurate count-link semantics, shared shadcn Sheet, paginated moderation history, strict page URL parsing, and honest write-failure feedback.
+- Fixed a browser-observed race where refreshing the newly banned account changed its still-open confirmation into an unban dialog. Preserved the submitted action and reset sheet state per account.
+- Added the UI brief (`docs/agents/admin-dashboard-ui.md`) and repeatable fixture-backed browser coverage (`client/tests/admin/browser-check.mjs`). Applied frontend-design, security-review and anti-ai-ui-review to this slice.
+**Verified:** final TypeScript and scoped ESLint clean; 12 client admin tests; 37 IAM controller/service tests; 3 real PostgreSQL 16 Flyway/entity/aggregate/lock tests. Chrome checks passed for search, overview refresh, history paging/error recovery, ban failure/success, unban, keyboard focus return, page role gates, actual Next proxy guest/CSRF/route gates, and 390/768/1440px light/dark screens. No live Keycloak end-to-end test or production build/release. Full typecheck temporarily caught concurrent Explore/sharing edits; the final run passed.
+**Not done / left uncommitted:** application work and both agent notes remain uncommitted. Notes already included another session's unfinished changes, which were not authorized for inclusion in a commit. Pre-existing backend admin code was verified but not modified. Unrelated deployment, sharing and concurrent Explore work preserved.
+**Follow-ups:** live Keycloak/two-account acceptance; catalog persistence/publishing and global activity are still separate work. See handoff for repeatable Postgres setup. Isolated test server/container cleaned up; screenshots remain under ignored `client/.next/admin-screenshots/`.
+
+---
+
+## 2026-09-26 â€” Codex â€” Clarify global car and admin backend scope
+
+**Goal:** confirm the planned global-car feature and existing admin backend work.
+**Done:** checked the original admin plan, current IAM diff, catalog service, and migration files. Global catalog management remains in the original scope; the prior account-focused continuation did not complete the full plan. IAM admin statistics/details/history and safeguards already exist uncommitted. The vehicle catalog remains JSON-backed, with authenticated garage integration.
+**Verified:** source inspection only; no additional tests or application edits.
+**Not done / left uncommitted:** catalog persistence/admin publishing/guest integration still pending; updated notes remain uncommitted with pre-existing notes.
+**Follow-ups:** continue the global vehicle catalog portion of the original plan.
+
+---
+
+
+## 2026-09-26 â€” Claude â€” Review Raum-1's Phase 3.1 branches and council the reconciliation
+
+**Goal:** read the friend's (Raum-1) newly pushed work, find conflicts with `dev` and local work, and use `/llm-council` to decide what to take.
+**Done:**
+- Mapped Raum-1's branches (none on `dev`/`main`): root/server `chore/phase31-checkpoint`, client and trip-planning `fix/trip-specific-garage`, mobility `feat/canonical-trip-energy` (61294ab), user-management `feat/vehicle-energy-selection` (20a41c4). All branched before the garage/EV-charger redesign and the `EvSimulationModel`, which is already on `main`.
+- Dry-run merges (`git merge-tree`): client 11 conflicting files (garage/charger); mobility `SocConstrainedRouteOptimizer` (integer `EvSimulationModel` vs continuous `CanonicalEnergy`); root `session-log.md` and pins; trip-planning and user-management merge cleanly as text.
+- Council verdict: merge nothing to `dev` until both devs agree a written energy contract; production model wins a tie; keep the friend's commits (merge, not squash); owner's UI wins client markup conflicts.
+- Renamed the local, uncommitted `V11__trip_publication.sql` to `V13__trip_publication.sql` (the friend's pushed V11 `trip_energy_state` and V12 `trip_garage_membership` keep their numbers). Updated the reference in `TripPublication.java` and in handoff.md.
+**Verified facts:** the friend's trip-planning commit 1068215 changes the contract it sends to mobility: `batteryKwh`/`consumptionKwhPer100km` become optional, and it adds `energyModel` (`RATED_RANGE`) and per-stop `observedSocPct`. Production mobility still requires those fields, so trip-planning **cannot** merge without mobility. V12 is stacked on V11. The friend's migrations are nullable `ADD COLUMN` only. No test pins the migration number. Nothing was compiled or tested this session.
+**Not done / left uncommitted:** no merges performed. These docs edits and the rename are uncommitted, alongside the earlier uncommitted plan-sharing, admin-console and observability work.
+**Follow-ups:** a meeting between the two devs to decide the energy model (integer v1 vs continuous as `model-v2`) and the `energy_vehicle_snapshot` JSON shape. Tell Raum-1 about the V13 renumber. Add a routing test for `/v1/users/me/vehicles/catalog` vs `/{id}` when merging. V11â€“V13 must reach `main` in one release.
+
+---
+
+## 2026-09-23 â€” Claude â€” LLM council on implementing the admin dashboard plan
+
+**Goal:** user ran `/llm-council` with "read admin-dashboard-plan.md and implement it".
+**Done:** five advisors, five anonymous peer reviews, and a chairman verdict. No application code was changed. Verdict: build it in slices, not six phases. Slice 1 is the admin shell plus the Users page on the existing search/suspend/reactivate endpoints, and a statistics endpoint placed under `/v1/admin/users/...`. Slice 2 is the catalog table. Gateway ban enforcement and public catalog routes are deferred until the uncommitted link-sharing gateway work is resolved.
+**Verified facts:** `accessTokenLifespan` is 300 s (`.deploy/keycloak/navio-realm.json:15`), so a suspended user's token already expires within 5 minutes. No service outside user-management checks ban status. The gateway (`api-gateway.yml:49`) routes only `/v1/users/**` and `/v1/admin/users/**` to user-management, so any new `/v1/admin/*` or `/v1/vehicle-models` path needs a gateway config edit, and that file is dirty with link-sharing work.
+**Not done / left uncommitted:** this entry and the handoff note. Earlier uncommitted work in root/client/server was left untouched.
+**Follow-ups:** the user must approve the slice-1 scope and say how the dirty gateway files should be handled (commit link-sharing first, or wait) before gateway-dependent work can start.
+
+---
+
+## 2026-09-23 â€” Claude â€” Build the client half of plan link sharing
+
+**Goal:** finish "publish plan as a link", which a previous session had left as a complete backend and no client at all.
+
+**Done:** (client, branch `feat/garage-ev-redesign`, **uncommitted**)
+- `app/feature/planner/_components/share/publication-api.ts` â€” typed mirrors of the server DTOs (`PublicationOptions`, `Publication`, `PublicPlanSnapshot` and its nested day/item/anchor/charger/budget shapes), owner fetchers for get/preview/publish/revoke, and `sharedPlanPath`/`sharedPlanUrl`. Unreadable options parse to "nothing extra was shared", never the reverse.
+- `app/feature/planner/_components/share/use-publication.ts` â€” TanStack Query hooks. `staleTime: 0, gcTime: 0` on the link state so a revocation in another tab cannot be masked by cache.
+- `app/feature/planner/_components/planner-autosave-flush.ts` (new) and `planId/_components/overview/planner-persistence.tsx` â€” the save-flush barrier the plan required. `PlannerPersistence` now records its pending debounced save in `pendingSaveRef` and registers a flush handler keyed by trip id; `usePublishPlan` calls it, then publishes that exact version. Deliberately **not** in the `planner-autosave-<tripId>` mutation scope: the flush calls the autosave mutation, so taking the same scope would deadlock the two.
+- `app/feature/planner/_components/share/publish-plan-dialog.tsx` plus `share-option-row.tsx` and `shared-link-field.tsx` â€” the owner dialog: access summary, three opt-ins (all off by default), inline preview with Back, published state with selectable URL and copy, update-when-changed, and an inline stop-sharing confirmation. Clipboard failure leaves the URL selectable with `role="status"` feedback.
+- `app/feature/planner/_components/share/shared-plan-content.tsx` â€” one renderer for the projected snapshot, used by **both** the owner's preview and the recipient page, so the preview cannot drift from the real page. Takes only the sanitised snapshot.
+- `app/share/plans/[token]/page.tsx` and `shared-plan-request.ts` â€” the recipient page as a **Server Component** fetching the gateway directly, `force-dynamic`, `robots: noindex/nofollow/nocache`, generic metadata so unfurl services retain nothing. One "no longer available" page for every dead-link cause.
+- `app/feature/planner/_components/trip-actions-menu.tsx` â€” entry point above Delete, labelled "Publish plan as a link" / "Manage published link". The publication query is enabled only while the dropdown is open, so the dashboard does not fire one request per trip card.
+- Deleted the `app/api/shared-plans/[token]` proxy I had written first: with the page fetching server-side it had no consumer, and an unauthenticated route on our origin with no caller is surface for nothing.
+
+**Verified:** client `npx tsc --noEmit` clean; ESLint clean on all new and changed files; `npx next build` exit 0 with `/share/plans/[token]` registered as a dynamic server route. trip-planning-service `./mvnw -o test`: the 69 publication tests pass (`SharedPlanControllerTests` 5, `TripPublicationControllerTests` 12, `PlanPublicationSanitizerTests` 32, `TripPublicationServiceTests` 20); `TripPlanningServiceApplicationTests` and `VerificationTests` error for the pre-existing environmental reason (config server on 8888, Postgres on 5432).
+**Not verified â€” nothing here has been run:** no browser session, no request ever made against a running backend, so publish, preview, copy, revoke and the recipient page are all unexercised end to end. The two-account and signed-out journeys in the plan's must-pass list have not been run. The autosave flush has not been observed firing.
+
+**Not done / left uncommitted:** everything above, plus the backend work from the earlier session it builds on (`server/trip-planning-service` V11 migration, model, repository, sanitizer, service, both controllers, tests; `server/api-gateway` `GatewaySecurityConfig`; `server/configuration-server` `api-gateway.yml`). Not implemented from the plan and **not started**: replace link / token rotation (`POST .../publication/rotation`), the allow-copy option (`PATCH .../publication`, no `allow_copy` column in V11), and independent copying (`POST /v1/shared-plans/{token}/copies`) â€” the earlier session deferred copying and I did not add it. Guest "Sign in to publish" is not built: the menu is only rendered where a persisted trip exists. Preserved untouched: the garage/EV redesign edits on this branch, `.deploy/` changes, `docs/agents/admin-dashboard-plan.md`, `docs/research/`.
+
+**Follow-ups:** nothing was committed â€” the client working tree still holds another session's uncommitted EV work on `feat/garage-ev-redesign`, so a commit here would mix the two. The user needs to decide whether to split this onto its own `feat/` branch cut from `dev`. `docs/api/Navio Open API.yaml` has not been updated with the publication routes. Browser and two-account verification remain the real gate before this goes anywhere near `main`.
+
+## 2026-09-23 â€” Claude â€” Fix the Grafana proxy and turn on production tracing
+
+**Goal:** make Grafana work in production and get Zipkin tracing running there.
+**Done:** (all root-repo, branch `dev`, **uncommitted**)
+- `.deploy/nginx/navio.conf` â€” confirmed the previous session's hypothesis and fixed it: a `location`-level `proxy_set_header` discards every server-level one, so `/grafana/` was sending `Host: navio_grafana`, and Grafana's CSRF middleware answered 403 to every `POST /api/ds/query`. Re-declared all six inherited headers. Applied the same fix to `location /` (navio-web), which had the identical defect and guards Server Actions the same way.
+- `.deploy/compose.production.yml` â€” added an internal `zipkin` service (`openzipkin/zipkin:3.5.1`, `STORAGE_TYPE: mem`, `MEM_MAX_SPANS=50000`, `mem_limit: 320m`, `healthcheck: disable: true` so it can never fail `compose up --wait` and trigger a rollback); replaced the no-op `MANAGEMENT_TRACING_EXPORT_ZIPKIN_ENABLED` with `MANAGEMENT_TRACING_EXPORT_ENABLED` plus `MANAGEMENT_TRACING_EXPORT_ZIPKIN_ENDPOINT`; sampling is now `${NAVIO_TRACING_SAMPLING_PROBABILITY:-0.1}`; `GF_SERVER_ROOT_URL` default corrected to `https://`.
+- `.deploy/observability/prometheus.yml` â€” `zipkin` scrape job mirroring the dev stack's.
+- `.deploy/observability/grafana/datasources.yml` and `grafana/provisioning/datasources/datasources.yml` â€” production gains the Zipkin datasource (traceâ†’logs/metrics, copied from the dev stack's working config); both gain a Loki `derivedFields` entry linking the trace id in Spring Boot's `[app,traceId,spanId]` log prefix into Zipkin.
+- `.deploy/.env.example` â€” documented `NAVIO_TRACING_SAMPLING_PROBABILITY`.
+- `grafana/dashboards/navio-overview.json` â€” removed two `http://localhost:` dashboard links that could never work in production.
+
+**Verified:** YAML and JSON parse; the shared Java env anchor was confirmed by parsing the compose file to reach all seven Java services; the dev and production Zipkin scrape jobs differ only in the `environment` label. **Not verified:** nothing was deployed or exercised against the live VM â€” the 403 root cause, the Zipkin target coming up, the derived-field regex against real log lines, and the traceâ†’logs links are all unconfirmed in a running stack.
+
+**Not done / left uncommitted:** everything above. Untouched and preserved as other sessions' work: the `client` and `server` submodule working trees, `docs/agents/admin-dashboard-plan.md`, `docs/agents/plan-link-sharing-plan.md`, `docs/research/`.
+
+**Follow-ups:** declared `mem_limit` across the stack is now ~8.3 GB â€” check `free -h` on the VM before releasing. Not fixed because it needs a `server` submodule change: the config server hardcodes `management.tracing.sampling.probability: 1.0` for three services and uses a different env name (`TRACING_SAMPLING_PROBABILITY`) for two others; harmless only while `spring.config.import` config-data mode keeps `systemEnvironment` above config-server values.
+
+## 2026-09-23 â€” Claude â€” Browser-verify and commit the garage and EV charger redesign
+
+**Goal:** verify the uncommitted garage/EV-charger redesign in a real browser, then commit it.
+**Done:**
+- Browser-verified the redesign with Playwright against `next dev`, using live Google Places/Maps and a real Bangkok trip: planner, garage (light, dark, 390px), EV charger panel (list cards, power tiles, connector chips, opening-hours track), block action button dark tints.
+- client `feat/garage-ev-redesign`, merged `--no-ff` to `dev` = `ffd252a` and pushed: `ac46d10` real-world range and `range-efficiency-field.tsx`; `8c7a457` featured vehicle card, `battery-gauge.tsx`, `vehicle-switcher.tsx`, `vehicle-name-editor.tsx`, `spec-tile.tsx`; `ddf900e` station cards, specifications, opening hours, `connector-chips.tsx`, `spec-cell.tsx` deleted; `8bf23ba` connector/battery tokens and removal of the trip member controls. 30 files, +1328/-538.
+- root `chore/bump-client-garage-ev-redesign` `ed02ac2`, merged to `dev` = `bda8c20` and pushed. Neither repo's `main` was touched.
+
+**Verified:** `tsc --noEmit` clean and ESLint clean (0 errors) on the committed tree, including the six new files, which an earlier lint over `git diff --name-only` had missed because they were untracked. Zero console errors and zero uncaught exceptions across the browser run. The charger preview panel's dark mode was confirmed by computed style (`bg lab(11.1%)`, `fg lab(98.6%)`); an earlier white-panel screenshot was a repaint artifact from toggling emulated `prefers-color-scheme` after paint, not a bug. **Not verified:** authenticated flows (catalog picker, save-to-garage), the battery route chart with real leg distances, drag interaction on the battery gauge, keyboard-only dialog traversal, and anything against the deployed backend.
+
+**Not done / left uncommitted:** deliberately left alone as earlier Codex sessions' work (AGENTS.md Â§1.3) â€” `docs/agents/admin-dashboard-plan.md`, `docs/agents/plan-link-sharing-plan.md`, `docs/research/` (including the `ev-range-test-standards.md` that the garage work cites), `.deploy/compose.production.yml`, `.deploy/nginx/navio.conf`, `.deploy/observability/*`, `grafana/dashboards/navio-overview.json`, and a dirty `server` submodule working tree. Committing this log necessarily includes those sessions' six uncommitted log entries and their handoff edits, since they share these two files.
+
+**Follow-ups:** the untracked root docs need an owner to commit them. `client/CLAUDE.md` is not gitignored and must be excluded by hand every session. The "Charge each stop to" slider question from 2026-09-22 is still unanswered. Release requires the `release.md` flow (child `main`s first, then root `main`).
+
+## 2026-09-23 ? Codex ? Investigate Grafana no-data screenshot
+
+**Goal:** diagnose warning icons and empty production dashboard panels.
+**Done:** verified dashboard/provisioning datasource UID consistency; identified NGINX location-level proxy headers suppressing parent Host/forwarded headers as a likely origin-check issue. Asked for exact panel error before confirming live root cause.
+**Verified:** repository configuration inspection and official troubleshooting documentation; no authenticated production query available.
+**Not done / left uncommitted:** no application edits; agent notes remain uncommitted alongside existing unfinished changes.
+**Follow-ups:** obtain warning/Query Inspector error; if origin rejection, restore explicit Host/forwarded headers in Grafana location and validate/reload via release flow.
+
+## 2026-09-23 ? Codex ? Production Grafana and Zipkin guidance
+
+**Goal:** explain how to make Grafana and Zipkin work in production.
+**Done:** inspected production Compose, provisioning, NGINX, scrape config, deployment paths, tracing dependencies/settings and official Spring/Grafana/Zipkin docs. Identified existing Grafana stack and explicitly disabled/missing Zipkin; supplied configuration and verification guidance. No application/deployment changes.
+**Verified:** root/client/server/changed trip service state; public Grafana health HTTP 200 and database ok, version 12.3.2 with diagnostic TLS bypass. Normal TLS verification fails with untrusted root on this machine. No authenticated metrics or trace check.
+**Not done / left uncommitted:** both agent notes already contained prior unfinished work, so updates remain uncommitted; unrelated changes preserved.
+**Follow-ups:** verify Grafana data in Explore; implement internal Zipkin, storage/retention, export endpoint and sampling, datasource, then verify full request traces if requested. Investigate TLS chain/client trust.
+
+## 2026-09-23 â€” Codex â€” Council on Community next milestone
+
+**Goal:** inspect Navio Community and use the requested llm-council skill to recommend the next step.
+**Done:** inspected community client/service source and sharing proposal; ran five independent advisor passes in capacity-limited batches, followed by five anonymous peer reviews of faithfully condensed responses and chairman synthesis. Recommended real saved-trip publication/read integration with Community, explicit audience/ownership/revocation contract, and later optional copying. No application code changed.
+**Verified:** all 20 client community API/posts/upload-proxy tests passed. Confirmed fixture-backed trip selector/resolver, unchecked publication reference persistence, identical best/top sort, and no consumers for mock copied-trip panel. Browser check source uses stubbed APIs; no live browser/backend or database verification performed. Checked root/client/server/community/trip-planning status and branches.
+**Not done / left uncommitted:** these agent notes; both already contained prior unfinished edits and were not committed without authorization to include that work. Preserved unrelated client changes and untracked trip publication DTO work.
+**Follow-ups:** first define two-account publish/attach/read/revoke acceptance and audience contract against the existing sharing proposal; coordinate publication work before implementation. Correct misleading feed/fixture affordances as part of the milestone. Copying and notifications remain later scope decisions.
+
+## 2026-09-23 â€” Codex â€” Rehearse sharing plan with relevant skills
+
+**Goal:** revise the link-sharing plan so implementation reads and applies relevant skills, including frontend-design for UI.
+**Done:** found repository-local skills under `.claude/skills`; read frontend-design and applied its planning/self-critique guidance to a Navio-specific UI rehearsal. Added skill-to-phase mapping, supporting rule/document requirements, dialog wireframe, full interaction states and staged security/visual reviews to `docs/agents/plan-link-sharing-plan.md`. Updated handoff. No application code changed.
+**Verified:** skill discovery, current root/client/server status and branches, and documentation whitespace check. No browser or application tests; implementation has not started.
+**Not done / left uncommitted:** proposal and agent notes remain uncommitted; both agent notes already contained other unfinished work, which was preserved.
+**Follow-ups:** when implementation is requested, read/apply each phase's relevant skills and record actual verification; preserve existing Navio tokens and the user's removal of depth styling.
+
+## 2026-09-23 â€” Codex â€” Plan admin dashboard and shared vehicle catalog
+
+**Goal:** plan an Admin sidebar/dashboard, user counts and bans, and centrally managed vehicles; assign relevant skills including frontend-design.
+**Done:** wrote `docs/agents/admin-dashboard-plan.md` after inspecting sidebar/auth, existing admin endpoints, moderation, catalog and garage snapshots. Included UI contract, capability matrix, proposed APIs/migration, six delivery phases and acceptance tests. Read local frontend-design guidance and assigned it to UI planning/building; identified local security/UI review skills and optional GSD stages. Updated handoff.
+**Verified:** repository state and code inspection; documentation whitespace check. No application code, migrations or runtime tests executed.
+**Not done / left uncommitted:** plan and both agent notes; notes already had prior unfinished edits, so did not commit those edits or switch branches. Existing client work preserved.
+**Follow-ups:** implementation only when requested; verify existing-token ban enforcement across services, last-admin protection and database startup before release.
+
+## 2026-09-23 â€” Codex â€” Plan link publishing and permissions
+
+**Goal:** review the current implementation and plan seamless sharing from the three-dot menu with clear permissions.
+**Done:** wrote `docs/agents/plan-link-sharing-plan.md`: evidence from menu, Explore sharing/viewer, ownership services, proxy/gateway and persistence; proposed unlisted read-only snapshots, explicit updates, owner-managed links, privacy options and independent copying; API/data design and staged acceptance tests. Updated handoff.
+**Verified:** source inspection and repo status/branches (root/client/server/trip-planning on `dev`); documentation whitespace check. No application changes or runtime tests.
+**Not done / left uncommitted:** proposal and both agent notes. Notes already contained prior uncommitted work, so did not commit them or disturb existing UI edits.
+**Follow-ups:** implement only when requested, using the proposal's permission/sanitizer contract and database/release instructions.
+## 2026-09-23 â€” Codex â€” Remove trip member controls
+
+**Goal:** remove the avatar and add-member button shown in the screenshot.
+**Done:** removed the members UI, placeholder image, member prop/type and mock member passed by `planner-detail.tsx`; client `dev`, uncommitted.
+**Verified:** targeted ESLint, `tsc --noEmit`, and `git diff --check` passed. Not browser-checked.
+**Not done / left uncommitted:** two client files and updated agent notes. Both notes already contained uncommitted edits at session start; preserved them without committing prior work. Existing unrelated client changes preserved.
+**Follow-ups:** none for this removal.
+
+## 2026-09-22 â€” Claude â€” Cite range-standard factors and show real-world range
+
+**Goal:** the user asked what NEDC is and why one consumption rate misestimates distance, then for research backing the NEDC/CLTC/WLTP/EPA factors, a doc in `docs/`, and a UI showing the official and adjusted range.
+**Done (uncommitted):** new `docs/research/ev-range-test-standards.md` (factors table, EPA 40 CFR 0.7 rule as the anchor, Liu 2022 CLTCâ‰ˆNEDC, 120 km/h study, Weiss 2020 counter-evidence of ~10% gap, verification status). Client `dev`: `vehicle-mappers.ts` exports `REAL_WORLD_RANGE_FACTOR` and `estimateRealWorldRange` (rounded to 10 km, null for custom/unknown standard); `SpecTile` gained an optional `detail` line; `vehicle-card.tsx` shows "About N km real-world" under the range and a note with the factor; the add-vehicle dialog states the estimate.
+**Verified:** client `tsc --noEmit` 0; ESLint on the four changed files 0. Not browser-checked. Only the EPA source was read in full; the paper figures came from abstracts (publishers blocked fetches).
+**Not done / left uncommitted:** all of the above, on top of the earlier uncommitted client work.
+**Follow-ups:** the user should confirm the paper figures before citing them in the report.
+**Then (plan with real-world range, own range option):** new `garage/range-efficiency-field.tsx`: one input the driver fills as "Range on a full charge" (km) or kWh/100 km, a ruler of planning range against the official tick, and "Use estimate". Used in `vehicle-settings-form.tsx` and in the add-vehicle dialog, which now pre-fills the estimate instead of the old "I know my consumption" checkbox. The vehicle card leads with "Real range" (battery Ã· consumption) and shows the official figure beneath. New `consumptionForRange` / `rangeForConsumption` in `vehicle-mappers.ts`; estimates are now saved to 0.001 instead of 0.1. Battery capacity deliberately stays declared, because the factor already sits in consumption. No API or schema change. `tsc` 0; garage ESLint 0; field rendered in headless Chrome at 320px light and dark (temporary preview page, deleted). The real settings form and dialog were not rendered.
+
+## 2026-09-22 â€” Claude â€” Redesign opening hours on place/charger cards
+
+**Goal:** the user asked to redesign the opening-hours block on the EV station card, which showed the raw "Monday: Open 24 hours | Tuesday: â€¦" string.
+**Done (client `dev`, uncommitted):** added `getOpeningHoursSchedule` / `parseOpenSegments` to `charger/opening-hours.ts` (handles 24h, closed, split and overnight ranges; unparseable text falls back to plain text) and removed the now-unused `formatOpeningHours`. Rebuilt `StationOpeningHours` as grouped day rows with a 24-hour track and today highlighted (`aria-current="date"`), and used it in `charger-preview-panel.tsx` and `place-preview-panel.tsx`.
+**Verified:** client `tsc --noEmit` exit 0; ESLint on planner `_components` 0 errors (1 existing warning); parser checked with tsx against sample strings. Not browser-checked.
+**Then (station list card):** redesigned `charger/ev-station-list-card.tsx`: the stock Unsplash thumbnail (random, often failed to load) became a max-kW power tile shaded by speed tier, plus connector chips, distance ("300 m from stop"), port count and a one-line address. Removed the `visual` prop and `getEvStationVisual` / `EvStationVisual` from `ev-station-panel.data.ts`. `tsc` 0; charger ESLint 0. Follow-up: each connector family has its own colour via new `--connector-*` tokens in `globals.css` (light and dark; hues kept away from brand blue; CCS1/CCS2 share one), with a DC/AC title and screen-reader text. The distance icon is `primary` and the port icon `rating` yellow.
+**Then (block action buttons):** "Add a note / Add checklist / Add EV station" showed grey in dark mode because the Button `outline` variant's `dark:border-input dark:bg-input/30` beat their tints; added matching `dark:` tint overrides in `block/trip-block.tsx` and `charger/add-ev-station-button.tsx`. ESLint 0.
+**Then (route estimate card):** redesigned `garage/route-estimate.tsx`: start â†’ end battery header (level-coloured, gradient connector), a sentence when the battery dips below reserve mid-route, non-monospace stats ("Energy needed", stop count under charging time), method note collapsed into "How this is estimated". `garage/battery-route-chart.tsx`: Chart/Table segmented toggle replaces the "Show as table" disclosure, the reserve label sits on the dashed line, chargers show "+N%". Same props, so `plan-view.tsx` (explore) picks it up too. Rendered with headless Chrome via a temporary `app/zz-preview` page (deleted) at about 480px and 220px; the table view was not screenshotted (no click automation available). `tsc` 0; garage ESLint 0.
+**Then (garage redesign):** `garage-section.tsx` now shows one featured `VehicleCard` for the trip vehicle (photo, 2Ã—2 colour-coded spec tiles, plugs, trip settings inside) plus a `VehicleSwitcher` chip strip (new file) instead of a grid of full cards. New `battery-gauge.tsx` (`BatteryGauge`, `BatteryInput`): a 10-cell battery with nub and dashed reserve mark; the starting-battery slider in `vehicle-settings-form.tsx` is now the draggable battery (native range input overlay) with a range readout. `vehicle-usage-overview.tsx` uses the gauge (faded start, solid end), the per-day bars are upright batteries with a per-battery reserve tick, and the monospace numbers are gone. Nickname field removed from the settings form: new `vehicle-name-editor.tsx` renames the title in place (Enter/Escape; clearing or retyping the car name clears the nickname), and a nickname shows the real car name as a tag. `BatterySlider` still exists for the EV side panel. Rendered with a temporary preview page (deleted); the real settings form was not rendered (needs the garage provider). `tsc` 0; garage ESLint 0.
+**Then (charging stop card):** `station-charging-control.tsx` now uses `BatteryGauge` (new `chargeTo` striped segment via `.charge-stripes` in `globals.css`, and a `markerPct` knob) with the native range input overlaid, "Arrive with / Leave with" labels, and an Adds/Takes row with icons; monospace removed. `station-specifications.tsx`: Max power (blue) and Ports (yellow) tiles from new shared `garage/spec-tile.tsx`, coloured plug chips from new shared `charger/connector-chips.tsx` (also used by the station list card and the garage vehicle card), and price/hours rows. `trip-place-card.tsx` header lost its middle dots; the locked state is a badge. Deleted the now-unused `charger/spec-cell.tsx`. Preview-rendered (deleted); the live control with a real car and route was not rendered. `tsc` 0; ESLint 0.
+**Then (light-mode colour fix):** light-mode tints were muddy (dark, low-chroma tokens). In `globals.css` light theme only: raised chroma of `--warning`, `--note`, `--checklist`, `--charging`, `--premade`, `--tag`; battery text tokens now `high 0.48 0.16 148`, `mid 0.56 0.15 70` (amber-gold, ~3.9:1, was olive), `low 0.52 0.19 42`, `critical 0.5 0.21 27`. `.charge-stripes` now use `--battery-high`. `SpecTile` uses a paler wash in light mode (`/10`, ring `/30`) and a warning-coloured icon for the rating tone; the battery's faded "used" part is `/10` in light mode. Dark theme unchanged. Verified with headless Chrome using `--blink-settings=preferredColorScheme=1` (the app follows the system theme). Note: `--warning` and the others are app-wide, so other warning/feature UI shifts slightly in light mode.
+**Not done / left uncommitted:** all of the above plus these notes.
+**Follow-ups:** the user to check it visually and ask for a commit.
+
+## 2026-09-22 â€” Claude â€” LLM council: EV calibration and adoption
+
+**Goal:** the professor asked how battery differences are calibrated (the user answered "we use consumption rate"); the user asked what to improve in the EV feature, whether NEDC/WLTP etc. matter, and how to make real EV drivers want it.
+**Done:** advice only, via a 5-advisor council with peer review. No code changes.
+**Verdict:** the consumption answer is half right. Consumption covers energy, but the number comes from unsourced factors (NEDC/CLTC 0.7, WLTP 0.85, EPA 0.9, plus the 1.12 margin, 12% reserve and 0.9 charge efficiency), and one charge curve for every car ignores LFP vs NMC. Next: (1) run the flow in the browser with live routes; (2) a small evaluation: fixed Thai routes Ã— cars against published real-world figures, pass/fail thresholds set before measuring, plus a Â±15% consumption sensitivity rerun that checks whether the charging stops change; (3) sourced real-world consumption and usable kWh per catalog car, with test-cycle factors only as a cited fallback; (4) HVAC as a per-hour load (route duration Ã— kW); (5) LFP/NMC charge-curve profiles. Position Navio as a trip planner with charging built into the itinerary, not as a physics rival to ABRP.
+**Verified:** n/a (no code).
+**Not done / left uncommitted:** this entry and the handoff note. `handoff.md` already had uncommitted edits at session start, so nothing was committed.
+**Follow-ups:** the user to choose which steps to implement. A change to the catalog schema needs a new migration (see `database-changes.md`) and regression tests on the optimizer before recalibrating.
+
+## 2026-09-22 â€” Claude â€” Advise on EV simulation panel and planner UX
+
+**Goal:** the user asked for an opinion on Codex's EV simulation work, the "EV Trip Planner Research" UX critique, and whether the Energy simulation panel is too complex for users.
+**Done:** read-only review. Recommended taking `EnergySimulationPanel` out of the user-facing garage (research/dev-only), keeping the engine; adding a user-set arrival buffer and one battery-along-route chart instead. Flagged that the `vehicle-mappers.ts` edit removed the real-world range factor, so catalogue consumption for NEDC/CLTC cars is now about 30% optimistic and only partly offset by the 12% margin.
+**Then (user approved step 1):** restored the real-world range factor in `client/.../garage/vehicle-mappers.ts`, updated the add-vehicle hint, and corrected a comment in `simulation-model.ts` that pointed to a parity script that doesn't exist. Committed Codex's work: client `feat/ev-simulation` `9ae6f5a`, mobility `feat/ev-simulation` `eb72b37`; both pushed.
+**Verified:** client `tsc --noEmit` exit 0; garage ESLint exit 0; mobility `./mvnw -o test` exit 0. Not browser-checked.
+**Then (user approved merging):** fast-forwarded client and mobility `dev` to the feature branches; server `dev` `cdcd736` and root `dev` bump the pins. Agent notes committed to root `dev`, including Codex's earlier notes and `ev-simulation-proposal-review.md`. Nothing is on `main`.
+**Then (energy-path map, user chose backend-only stop planning):** found that displayed SOC (`projectTripCharging`) already does the same arithmetic as backend `OptimizedRouteVerifier`; the split was two stop planners. Removed the client planner (about 840 lines) in client `eb8c757` on `dev` (via `feat/backend-stop-planner`). Fixed the hard-coded 12% reserve and the day-start SOC sent to the optimizer. Root `dev` `257734d`.
+**Verified:** `tsc --noEmit` 0; ESLint on `app/feature/planner` 0 errors (only the 2 known warnings). Not browser-checked, and the guest flow (sign-in prompt) is untested.
+**Then (arrival reserve):** client `4d6a90e` on `dev` (via `feat/arrival-reserve`) adds the "Arrive with at least" 10/12/15/20% setting and routes it to the optimizer, reserve lines and battery colours. `tsc` 0; planner ESLint 0 errors.
+**Then (battery chart):** client `9bd8ccb` on `dev` (via `feat/battery-route-chart`) adds `BatteryRouteChart` and `DayEvProjection.profile`. Rendered with headless Chrome against the running dev server using sample data, in light and dark mode with focus tooltips; moved the tooltip beside the crosshair after it covered the charger marker. `tsc` 0; planner ESLint 0 errors.
+**Then (panel):** at the user's request, removed `EnergySimulationPanel` (client `7dee312` on `dev`); the physics model stays. `tsc` 0; planner ESLint 0 errors.
+**Then (release, user asked to deploy):** fast-forwarded `main` to `dev` in mobility (`eb72b37`), server (`cdcd736`), client (`7dee312`) and root (`28b6d7e`, deploys). All pins matched `origin/main` before the root push. Deploy run 35700267438 succeeded; after the deploy `/health` 200, `/v1/trips` 401, `/` 200. Also explained the formula changes, the reserve and "Plan charging stops" controls, and the status of the physics model to the user.
+**Then (production bug):** the user reported "temporarily unavailable", then "could not be optimized". The VM logs showed no mobility error. Cause of the 422: trip-planning ignored day start/end anchors. Fixed on `dev` (trip-planning `c6d5b8c`, server `1657da2`, client `a4ab4b1`); see the handoff. Not deployed yet.
+**Not done:** deploy the fix; check in the real planner with live routes; decision on removing the "Charge each stop to" slider; evaluation harness (the user may want Thai cars and routes; ask).
+**Follow-ups:** user to decide where the panel goes and whether to restore the range factor. An LLM council on the plan agreed on: one energy model shared by planner and chart (backend as the source of truth), the arrival buffer passed through to the optimizer, the panel moved to a reachable `/research/energy` route, the driving-conditions preset dropped, and a real evaluation (public reference data, elevation, error measured by charging decisions). Nothing implemented.
+
+## 2026-09-22 â€” Claude â€” Revert depth rework, keep EV simulation
+
+**Goal:** return the UI to `main` with no 3D depth while keeping Codex's new EV work.
+**Done (client `main` working tree, uncommitted):** stashed the full tree as `backup: depth rework before revert 2026-09-22`; restored 26 depth-only files to `main` (sidebar, planner layout/blocks/itinerary/place/charger components, `globals.css`, `button.tsx`); deleted `app/depth.css`; removed depth classes from the two mixed files `route-estimate.tsx` and `vehicle-usage-overview.tsx`. EV files and edits left intact.
+**Verified:** `tsc --noEmit` exit 0; ESLint on `garage/` exit 0; no remaining references to depth utilities. Not browser-checked. `tests/simulation` is ignored by ESLint and was not run.
+**Not done / left uncommitted:** EV simulation work; root agent notes (they already held Codex's uncommitted edits).
+**Follow-ups:** commit the EV work on a `feat/` branch from `dev` when the user asks. The `EvStationDetailCard` kW unit fix went away with the depth revert (component is unused).
+
+## 2026-09-22 â€” Codex â€” Validate EV simulation proposal
+
+**Goal:** validate the supplied simulation-based EV planning proposal and recommend whether to implement it instead of the current approach.
+**Done:** compared current frontend energy/charging calculations, backend SOC-constrained optimizer, route adapter and vehicle provenance with the proposal; checked primary EPA, Google, FASTSim and UNECE references; wrote `docs/agents/ev-simulation-proposal-review.md`. Recommend incremental adoption, first resolving frontend/backend model differences and establishing independent evaluation. Corrected the worked trip's SOC arithmetic.
+**Verified:** read-only implementation review and source checks; no application tests, simulation experiments or empirical accuracy validation. UNECE search listing available but full page fetch failed.
+**Not done / left uncommitted:** review plus updated handoff/session log. Both agent documents already had another session's uncommitted changes; did not commit that work or switch branches. Existing client depth/UI work preserved. No application implementation or deployment.
+**Follow-ups:** if implementation is requested, use the review's staged scope and follow database-change instructions before model/schema edits.
+
+## 2026-09-15 â€” Claude â€” Depth rework for sidebar, planner and EV cards
+
+**Goal:** use `/ui-depth` to give the sidebar and whole planner clearly visible 3D depth, and rework the EV station cards. User then asked for no thick coloured side/bottom borders, only depth.
+**Done (client `feat/ui-reworked`, uncommitted):**
+- Found an unlogged earlier depth pass on this branch (`app/planner-depth.css` plus class hooks). Replaced it with `app/depth.css` (imported from `globals.css`): canvas/section/card/raised/well tokens and `--depth-shadow-sm|md|lg|inset`, light and dark. Utilities: `surface-section`, `surface-block`, `surface-card`, `surface-elevated`, `surface-floating`, `surface-panel`, `surface-interactive`, `surface-tile`, `surface-key`, `surface-well`, `surface-groove`, `divider-groove-t|b`, `surface-nav-item`, `sidebar-depth`, `planner-depth` (sections as slabs, inputs as wells, non-ghost buttons as keys with lift and press).
+- `Button` now emits `data-variant` so planner CSS can skip ghost/link buttons.
+- Sidebar: raised panel with cast shadow, raised active nav items (`aria-current`/`data-active`), recessed trip list, engraved dividers, New Trip key.
+- Planner: day/list blocks on the card layer (padding moved into `TripBlock.Root`), trip info card elevated, side panel and map preview panels floating, mobile tabs as well + raised thumb, engraved resize handles.
+- Day anchor rail: tried raised cards for the start/end rows; user did not like it, reverted to the flat rows. The "Private" badge is raised instead (`surface-tile` on the raised surface color).
+- Day action buttons (note, checklist, EV) use a 20% tint of `note`/`checklist`/`charging` with no border, including a `dark:` override because the outline variant's `dark:bg-input/30` otherwise wins; depth still comes from the planner key rule.
+- Add-place box: the whole field wrapper is the well; its inner input carries `data-depth="flat"`, which the planner input rules in `depth.css` now skip (use it for any icon + input composite field).
+- EV: charging stop card engraved dividers; station list cards raised and interactive with recessed photo; `EvStationDetailCard` rebuilt with raised stat tiles and a price well, and its power unit fixed from kWh to kW (component is currently not imported anywhere).
+**Verified:** `tsc --noEmit` exit 0; ESLint on changed files exit 0. Not checked in a browser (light/dark, narrow widths, drag-and-drop over lifted cards).
+**Not done / left uncommitted:** all of the above; client `CLAUDE.md`.
+**Follow-ups:** browser-check the look; `DESIGN.md` does not yet describe the depth tokens.
+
+## 2026-09-15 â€” Claude â€” Commit and release accumulated client and trip title work
+
+**Goal:** `/commit` everything uncommitted, split by type, merged through `dev` to `main` (user chose all three options explicitly, including production release and the undocumented title change).
+**Done:**
+- client (`dev` and `main` = `4622b54`, stacked branches): `44386d8` chore(deps) on `chore/client-deps-agents`; `279dfac` docs(design) on `docs/client-design-md`; `406468c` style(planner) on `style/brand-theme-redesign`; `4622b54` feat(dashboard) on `feat/dashboard-trip-management`. Client `CLAUDE.md` left untracked.
+- trip-planning-service (`dev` and `main` = `fde94e0`, `fix/trip-title-country-first`): title falls back name -> country -> city; test updated.
+- server: pin bump on `chore/bump-trip-planning-title`, merged to `dev` and `main`.
+- root: these notes on a `docs/` branch and the `client`/`server` pins on a `chore/` branch, merged to `dev` and `main` (deploys).
+**Verified:** client full `tsc --noEmit` exit 0 and `eslint .` (0 errors, 2 warnings) on the full tree, which equals the committed tree. trip-planning-service `./mvnw -o test` with a local config server: 46 run, 44 pass, 1 skipped, 2 errors in `TripPlanningServiceApplicationTests`/`VerificationTests` because Postgres on 5432 was not running (Docker Desktop off); not a code failure, but the local real-Postgres check was not run. No browser check of any client work.
+**Not done / left uncommitted:** client `CLAUDE.md` (must never be committed).
+**Follow-ups:** watch the deploy run; browser-check the released UI; intermediate client commits were split by file and not type-checked individually.
+
+## 2026-09-15 - Codex - Blur garage photo background
+
+**Goal:** match community post image backgrounds in the garage.
+**Done:** VehicleMedia now layers a decorative object-cover copy with scale-110, blur-2xl and brightness-75 behind the sharp object-contain vehicle image. Removed foreground multiply blending. Reuses the same image URL and sizes; missing-image fallback retained.
+**Verified:** full TypeScript check and targeted client ESLint pass. Isolated Chrome render of the actual component with application CSS and BYD Atto 3 asset: background blur/brightness and foreground contain/no filter confirmed; dark screenshot inspected.
+**Not done / left uncommitted:** client garage/vehicle-media.tsx under app/feature/planner/planId/_components, alongside prior work. No deployment.
+**Follow-ups:** none.
+
+
+## 2026-09-15 - Codex - Match block accents to selected color
+
+**Goal:** replace blue primary accents inside each trip block with that block's selected color.
+**Done:** TripBlock.Root scopes primary, primary foreground, and focus-ring CSS variables to the selected block palette entry. Descendant actions, icons, borders and focus states update together when the block color changes.
+**Verified:** full TypeScript check and targeted ESLint pass; Chrome guest planner verified six primary elements change together from Rose to Teal, matching focus-ring color, with global primary unchanged. Inspected Rose screenshot.
+**Not done / left uncommitted:** client app/feature/planner/planId/_components/block/trip-block.tsx on feat/structured-trip-location; prior edits preserved; no deployment.
+**Follow-ups:** none.
+
+
+## 2026-09-15 ï¿½ Codex ï¿½ Fix route and battery row alignment
+
+**Goal:** align the drive time/distance and battery details shown in the screenshot.
+**Done:** changed RouteSegmentInfo (normal, loading, fallback) and DischargeSegmentInfo outer elements from paragraphs to layout divs. The accordion's descendant paragraph rule added a bottom margin only to the first row, causing an 8.625px vertical offset. Existing client changes preserved; application edits remain uncommitted.
+**Verified:** Chrome guest planner with mocked directions: both rows now have identical y coordinates and zero margins; 390px layout wraps without overlap. Full TypeScript check and targeted ESLint passed.
+**Not done / left uncommitted:** client routes/route-segment-info.tsx and routes/charge-segment-info.tsx under app/feature/planner/planId/_components; no deployment.
+**Follow-ups:** none for alignment. Other sessions' unfinished changes preserved.
+
+
+## 2026-09-15 - Codex - Redesign daily route estimate
+
+**Goal:** redesign the pictured route estimate using DESIGN.md and the anti-ai-ui-review skill.
+**Done:**
+- New shared client `garage/route-estimate.tsx`, consumed by planner `day-route-overview.tsx` and Explore `plan-view.tsx` on `feat/structured-trip-location` (uncommitted).
+- Battery-led header, existing battery colors and 12% reserve marker, mono labeled metrics, compatibility footer, responsive two/four-column layout, semantic meter, and visible low/reserve labels. Removed repeated icons, blue action-like charging text, uppercase heading and shadow. Preserved calculations and existing Explore edits.
+**Verified:** full `tsc --noEmit`; targeted ESLint; changed-file `git diff --check` (repository-wide check finds pre-existing dashboard whitespace); isolated Chrome checks with actual component/CSS at 360/768/1024/1440px in light/dark and battery/warning variants (no overflow, meter correct). Inspected light desktop/dark mobile screenshots. Isolated preview uses fallback fonts; full application integration not browser-tested.
+**Not done / left uncommitted:** three client files above plus these notes; both agent documents already contain other sessions' uncommitted edits, so no combined docs commit was made without authorization to include them.
+**Follow-ups:** review within the live planner with loaded fonts; commit with the existing client work when its owner approves.
+
+## 2026-09-15 â€” Claude â€” Rework charging stop card and route leg rows
+
+**Goal:** redesign the planner charging-stop card and the drive/battery leg rows with the anti-ai-ui-review skill.
+**Done (client, uncommitted):**
+- `block/items/trip-place-card.tsx` (charger branch): removed the icon-plus-pill-plus-title repetition and the blue tinted card; header is block-color marker, title, and a meta line (Charging stop Â· operator Â· kept when optimizing). Duplicate `ChargeSegmentInfo` hidden when the charging control is shown. Earlier token swaps by another session kept.
+- `charger/station-specifications.tsx`: ruled spec grid (Max power, Ports, Plugs) via new `charger/spec-cell.tsx`; per-row blue icons removed. `station-opening-hours.tsx` icon muted.
+- `charger/station-charging-control.tsx`: large mono target, segmented 60/80/100 picker, custom track (arrival dimmed, added charge lit in battery ramp colors) over a transparent native range input, and Arrive at / Adds / Takes cells; incompatible plugs shown as a warning.
+- `routes/charge-segment-info.tsx`: new `ChargeBar`; `ChargeSegmentInfo` (explore) and `DischargeSegmentInfo` restyled without boxes; discharge shows a mini battery bar, from â†’ to, usage, and a Low label.
+- `routes/route-segment-info.tsx`: boxless row (route-colored car icon, mono time and distance); clearer loading and no-route text.
+- Leg wrappers in `block/sortable-block-items.tsx`, `itinerary/anchor-stop-card.tsx`, and explore `plan-view.tsx` now lay the drive and battery rows on one wrapping line.
+**Verified:** full `tsc --noEmit` and ESLint on the changed planner files pass. Not browser-checked (slider thumb alignment with the native input, dark mode, narrow widths, drag handles).
+**Not done / left uncommitted:** all files above.
+**Follow-ups:** browser check; confirm the transparent range input still works with the card's drag-and-drop (`data-no-drag` kept).
+**Revision (same session):** user reported the drive and battery rows were vertically misaligned. Both `RouteSegmentInfo` and `DischargeSegmentInfo` rows now use a fixed `h-6` flex row with `leading-none`, so they share one center line (fallback row uses `min-h-6` since it may wrap). A suspected IBM Plex Mono fallback was ruled out: the built CSS registers the face under its real name, so a temporary `layout.tsx`/`globals.css` font change was reverted.
+**Revision 2 (same session):** user asked for colored percentages. Added `--battery-{high,mid,low,critical}-text` tokens (light: deepened shades; dark: the fill colors) and `.battery-text-*` utilities in `globals.css`; `BATTERY_TONES[tone].valueText` and `BATTERY_CHANGE_TEXT` in `garage-formatters.ts`. `DischargeSegmentInfo` colors from/to by level and the usage (âˆ’N%) red; `ChargeSegmentInfo` colors from/to and adds a green +N%. Computed contrast: light â‰¥5.88:1, dark â‰¥5.44:1. `DESIGN.md` battery section updated. tsc and ESLint pass; not browser-checked. Rows were meanwhile changed from `<p>` to `<div>` on disk (accordion prose margins); kept.
+**Revision 3 (same session):** user asked for the charge-to thumb to match the garage starting battery slider ("only the circle"). `station-charging-control.tsx` keeps the arrival/added `ChargeBar` track but its thumb is now the slider's 20px level-colored circle (`getBatteryColor`) with a 7px light center dot; track inset widened to `inset-x-2.5`. A brief swap to the full `BatterySlider` was reverted, leaving `battery-slider.tsx` with only the earlier tone-color change. tsc and ESLint pass; not browser-checked.
+**Revision 4 (same session, reverted):** added meaning-based color to the charging card (plugs that fit the EV in `text-charging` with a text note, muted spec grid surface, green 24-hour hours, battery-colored quick target and Arrive at, green +kWh, 5% `bg-charging` tint on the charge section). The user asked to revert; all of it was undone, returning `spec-cell.tsx`, `station-specifications.tsx`, `station-opening-hours.tsx`, `station-charging-control.tsx` and the `trip-place-card.tsx` wrapper to their Revision 3 state (`opening-hours.ts` has no diff). tsc and ESLint pass.
+
+## 2026-09-15 â€” Claude â€” Rework garage vehicle card and trip energy panel
+
+**Goal:** make the garage vehicle card and usage overview look less AI-generated, using `client/DESIGN.md` and the anti-ai-ui-review skill.
+**Done (client, uncommitted, garage folder):**
+- `vehicle-card.tsx`: spec sheet layout: title + one meta line (Catalogue pill removed), 4-cell spec grid in mono numbers, connectors as one "Plugs" line (no pills), source sentence with external-link cue. The duplicate battery bar is gone (the slider below owns it). Active card shows a check + "Used for this trip's battery estimates" instead of a disabled button; inactive shows "Use for this trip".
+- `vehicle-usage-overview.tsx`: renamed "Trip energy"; removed the repeated photo and name header (also redundant in explore `plan-view.tsx`), the fake 8-segment battery and all icon-circle tiles. Now: battery at trip end + range left, a start/end track with a 12% reserve marker, a 4-cell stat grid (Distance, Energy used, Driving, Charging; "Mileage" and the duplicated Connector tile removed), and a per-day bar chart with value labels, reserve line, screen-reader text, and a real empty state.
+- `garage-formatters.ts`: shared `getBatteryTone` (critical < 12% planner reserve, low <= 25%) used by card, chart and `battery-slider.tsx`; previously three different thresholds turned 45% amber/brown. Added connector, date and distance formatters.
+- `garage-section.tsx`: removed the uppercase "USAGE OVERVIEW" divider, non-pill Add button, neutral empty state (primary text failed contrast), outer route warning hidden when the overview shows its own empty state.
+- `vehicle-media.tsx`: `mix-blend-multiply` in light mode so studio photo backdrops blend into the frame.
+**Verified:** `tsc --noEmit` and ESLint on the six files pass. Not checked in a browser (light/dark, narrow two-column cards, many-day chart scroll).
+**Not done / left uncommitted:** the six garage files above.
+**Follow-ups:** browser check.
+**Revision (same session):** user asked for colorful battery fills. Added `--battery-high|mid|low|critical` tokens (light and `.dark`) and `.battery-fill` / `.battery-fill-up` / `.battery-<level>` utilities in `globals.css` (same-hue gradient, top highlight, glow). Bands: green >=50%, yellow 26-49%, orange 12-25% ("Low"), red <12% ("Below reserve"). Used by the trip-end track, daily bars, and the starting-battery slider. `DESIGN.md` gained the tokens and a Battery level section. tsc, ESLint and DESIGN.md lint (0 errors, same 3 warnings) pass; not browser-checked.
+
+## 2026-09-15 â€” Claude â€” Add client DESIGN.md
+
+**Goal:** describe Navio's visual identity in the DESIGN.md format (Google `@google/design.md`, alpha) for coding agents.
+**Done:** new `client/DESIGN.md`: YAML tokens (brand pair, light and `-dark` colors, feature tints, media/map colors, 10 type styles, radii, spacing, 40 component entries) taken from `app/globals.css`, `app/layout.tsx` fonts, and the shadcn `button`/`card`/`input`/`badge` primitives, plus prose in the spec's section order.
+**Verified:** `npx -p @google/design.md designmd lint DESIGN.md` (CLI 0.4.0): 0 errors, 3 contrast warnings that reflect real tokens: light primary with Paper text 3.27:1, and dark `destructive` with white text 3.76:1. Heading sizes above `text-lg` are a proposed scale, not measured from pages.
+**Not done / left uncommitted:** `client/DESIGN.md` (client tree holds other sessions' uncommitted work on `feat/structured-trip-location`).
+**Follow-ups:** decide whether to darken light `--primary` or accept 3.3:1 for short labels; set dark `--destructive-foreground` to navy if solid red fills are used; keep DESIGN.md in sync when `globals.css` changes (the user plans to convert hardcoded colors to tokens).
+
+## 2026-09-15 â€” Claude â€” Rebase light/dark theme on brand Paper and Pine
+
+**Goal:** base light and dark mode on the two brand colors `#FAFBFE` (Paper) and `#06211A` (Pine).
+**Done (client, uncommitted, `app/globals.css` only):**
+- Added `--brand-paper` `oklch(0.988 0.004 271)` and `--brand-pine` `oklch(0.2245 0.036 173)`.
+- Light: page = Paper, text and default primary = Pine; cards white; muted/border/input/sidebar/secondary are low-chroma Pine-hue (173) steps.
+- Dark: page = Pine, text = Paper; card/popover/muted/border step lighter in hue 173, sidebar darker; default primary is a light Pine mint `oklch(0.86 0.075 173)` with Pine text. Dark status foregrounds and red/neutral color-theme dark overrides use Pine/Paper.
+**Verified:** WCAG contrast computed for key pairs: fg/bg 16.3:1 both modes, muted text â‰¥6.2:1, primary text â‰¥11.4:1, light input border raised to â‰¥3:1. Not checked in a browser.
+**Not done / left uncommitted:** `client/app/globals.css` (already held other uncommitted work).
+**Follow-ups:** browser check of both modes; hardcoded non-token colors (scrim, map pins, planner block palette) were left unchanged.
+**Revision (same session):** user changed `--brand-pine` to a dark navy `oklch(0.157 0.049 271)` and asked for blue-gray, not green, neutrals. Dark mode now uses blue-gray (hue 265, chroma â‰¤0.022): background 0.19, card 0.235, popover 0.265, sidebar 0.165; primary is light brand blue `oklch(0.84 0.06 271)`. Light-mode neutrals moved to hue 265 too. Recomputed contrast: text â‰¥17.8:1, muted text â‰¥6:1, primary â‰¥10:1, input borders â‰¥3:1. The token name `--brand-pine` is kept though it now holds navy.
+**Revision 2 (same session):** user chose a single neutral color theme for now. Removed `--theme-*` tokens and all `[data-color-theme]` blocks from `globals.css`; primary is `--brand-pine` (navy) in light and `--brand-paper` in dark. Unwired the picker from `sidebar-account-actions.tsx` and the init script from `app/layout.tsx`; `components/theme/*` kept (unused) for later. Full `tsc --noEmit` and ESLint on both files pass. Next: user will add hardcoded colors and ask for them to be converted to tokens.
+**Revision 3 (same session):** sidebar active state moved off `bg-secondary` to its own `--sidebar-accent` tokens (`sidebar.item.tsx`, `sidebar.dropdown.tsx`, `sidebar.tsx` block list); `--sidebar-accent` is now neutral gray `oklch(0.9 0.004 265)` light / `oklch(0.32 0.006 265)` dark. Label contrast 14.5:1 light, 12.3:1 dark; ESLint passes. Active icon still `text-primary`: the user-set bright blue primary is 2.5:1 on the light gray (below 3:1, label text carries the meaning).
+
+## 2026-09-15 â€” Codex â€” Repair trip country data and refresh sidebar after creation
+
+**Goal:** fix sidebar pins, including the user's report of a new trip without country information.
+**Done:** backed up production `trip.trip` to VM `/home/adminnav/navio-maintenance/flags-2026-09-15/trip-before-backfill.sql`; ran existing deployed backfill once in an isolated 700 MB container with discovery and Flyway disabled (6 of 9 unresolved trips repaired). Removed temporary container. Resolved legacy IDs 101/102/105 to matching Google destinations through mobility, checked matching names/countries and coordinate proximity, and repaired three trips through the trip service PUT endpoint. Local creation paths now invalidate trip-list queries.
+**Verified:** final live API check: all 6 currently remaining trips have valid TH/IN codes; SQL: zero null codes; service healthy. Count changed during concurrent activity. Client full type-check and targeted ESLint passed. Browser not verified.
+**Not done / left uncommitted:** client `planner-setup.tsx` and `planId/_components/overview/planner-persistence.tsx`; unrelated concurrent client/backend work untouched. No code deployment.
+**Follow-ups:** user was asked for the new trip destination and environment; inspect that specific case if browser refresh still shows a pin.
+
+## 2026-09-15 â€” Claude â€” Delete trip from dashboard and planner
+
+**Goal:** add a delete trip action to the dashboard trip cards and the planner.
+**Done (client, uncommitted, on `feat/structured-trip-location` alongside the earlier Codex work):**
+- `planner-api.ts`: `deleteTrip(tripId)` -> `DELETE /api/trips/{id}` (proxy already forwards DELETE to `/v1/trips/{id}`).
+- New `use-delete-trip.ts`: mutation in the `planner-autosave-<id>` scope (waits for an in-flight save); treats 404 as success; clears the local draft and the recent-plan sidebar atom, drops the trip from every `["planner","trips"]` page and invalidates it; removes only *inactive* metadata/stats/snapshot queries, because refetching an open planner's snapshot would 404 and `PlannerPersistence` would recreate the trip.
+- New `trip-actions-menu.tsx`: "â‹¯" dropdown with "Delete trip" and a confirmation dialog (Cancel focused first, pending/error states, optional `redirectTo`).
+- `trip-summary-card.tsx`: menu replaces the decorative top-right arrow.
+- `trip-info-card.tsx`: now a client component; menu beside the trip name for signed-in users with a persisted trip; redirects to `/dashboard`.
+**Verified:** full client `tsc --noEmit` and ESLint on the five files pass. Not run in a browser; delete not exercised against the backend.
+**Not done / left uncommitted:** all five client files above (not committed because the client tree holds ~57 unreviewed files from another session on the same branch).
+**Follow-ups:** browser check (menu keyboard nav, dialog focus, redirect, sidebar refresh); decide how to commit the client tree. `TripHeroCard` has no menu because the dashboard does not render it.
+
+## 2026-09-15 â€” Codex â€” Explain sidebar pin fallback
+
+**Goal:** explain why saved trips still show pins after the flag work.
+**Done:** inspected sidebar rendering and the country flag component; flags already use `destinationCountryCode`, with a pin for missing/invalid codes. Confirmed the backend backfill runner is opt-in.
+**Verified:** source inspection and repository status; no live trip responses inspected, so missing country codes for the pictured trips remain an inference supported by the prior handoff.
+**Not done / left uncommitted:** existing client changes preserved; no application changes or production operations.
+**Follow-ups:** inspect affected trip responses and run the existing location backfill if their country codes are null.
+
+## 2026-09-14 â€” Claude â€” Finish structured trip location, fix failed release, add agent context
+
+**Goal:** continue Codex's structured trip location work, commit, and deploy.
+
+**Done:**
+
+- mobility-and-ev-service `f4e5493`: place details expose structured city/region/country (`GooglePlaceLocationMapper`).
+- trip-planning-service `0e11894`: trips resolve `destinationId` through mobility and store city/region/country code; optional display name with derived `title`; V10 migration; opt-in backfill runner.
+- client `19e7bf1`: server-resolved titles and locations; premade plan copy resolves a place id by name; only trip-location files committed (partial commit of `planner-detail.tsx`).
+- First release (root `363145a`) failed: trip-planning crash-looped on schema validation of the `char(2)` column; deploy rolled back. Fixed in trip-planning `cb3879c` (`@JdbcTypeCode(SqlTypes.CHAR)` + mapping test); released as root `3fb68c4`, deploy succeeded.
+- Added `AGENTS.md` (now committed), `docs/agents/database-changes.md`, `release.md`, `handoff.md`, this log.
+- Added `PostgresSchemaTests` to user-management, trip-planning, mobility, and community (skipped unless `NAVIO_TEST_DB_URL` is set) and a `verify-database-schema` job that gates image builds in `deploy-backend.yml`.
+
+**Verified:** mobility 19/19 tests; trip-planning 45/45 including full context against disposable Postgres 16 + PostGIS; reproduced the production failure without the fix. Client type-check and lint pass on the committed file set in isolation. All four `PostgresSchemaTests` pass on PostGIS 16; the trip-planning one fails when the `@JdbcTypeCode` fix is removed. Full suites still pass with the test skipped (user-management 95, trip-planning 46, mobility 20, community 74). The new `verify-database-schema` job passed its first GitHub run (deploy run 34829001804, root `0a4acc4`), and the deploy succeeded. Premade plan copy not tested in a browser.
+
+**Not done / left uncommitted:** ~57 client files from the Codex session (see handoff).
+
+**Follow-ups:** user decision on uncommitted client work; run the trip location backfill in production.
+
+## 2026-09-14 â€” Codex â€” Structured trip location (unfinished)
+
+**Goal:** store structured destination location for trips.
+
+**Done (uncommitted when the session ended):** backend changes in mobility-and-ev-service and trip-planning-service with tests; client migration to the new trip contract, plus unrelated dashboard, sidebar, and theme work in the same working tree.
+
+**Verified:** not recorded.
+
+**Not done / left uncommitted:** two client type errors (`itinerary-section.tsx`, `tests/planner/data.ts`); premade plan copy would have failed trip creation; nothing committed. Picked up by the Claude session above.
+
+## 2026-10-11 - Codex - Redeploy backend rail-routing fix
+
+**Goal:** Carry out the user's explicit request to redeploy the backend after the local subway-to-subway fix.
+**Done:** Committed only the six mobility rail source/test files as 9b25692 fix(routes): require rail-only station transit routes; pushed fix branch -> dev -> main. Server ccdd08a pins it; root 51d8e44 releases the backend through required chore -> dev -> main flows. Production client pin stayed 306ee3e, preserving every unrelated client feature. After triggering deployment, root dev-only 5f78f0f restored the prior client-dev pin 6adb00a. No new source, database, itinerary scheduling or client deployment changes.
+**Verified:** Prior full mobility tests remain 66 passed/one schema skip. Run 38156346487 succeeded: revision gate, real PostgreSQL schema checks across all services, nine image builds and VM deployment. Actual live request through localhost proxy with railOnly=true now returns purple #9932cc SUBWAY and 2816 moving seconds for Airport Terminal 2 -> Taipei Main Station; identical coordinates with general transit still return BUS/4310s. Health=200, anonymous trips=401; those checks used curl -k after local Schannel trust failed, so no TLS-chain validation claim. No account/trip mutation. Evidence: C:/Users/User/.codex/tmp/navio-station-rail-20261011/release-probe.json. User advised to refresh route-query cache.
+**Git:** Mobility main/dev 9b25692, server main/dev ccdd08a, root main 51d8e44 (deployed); release branches pushed. Root dev restored client pin with 5f78f0f, then required final notes committed as docs(agents): log session 2026-10-11 on docs/station-rail-release-2026-10-11 from synced dev and merged/pushed to dev only. Client feat/route-focus-by-place remains dirty at 6adb00a, including all own rail client files and other sessions' work; no client source committed. Existing logs/report/editor files and localhost3000 preserved.
+**Follow-ups:** Refresh local planner to fetch live MRT route. Publishing the client rail request/guard remains a separate client release; production client still does not send railOnly. Future root releases must align the restored client-dev pin with origin/main. Planned timetable departure accuracy and other pending signed-in acceptance remain outstanding.
+
+## 2026-10-11 - Claude - Export itinerary as a table (CSV and Excel)
+
+**Goal:** New "Export table" button on the itinerary: choose days (all or any mix), preview the itinerary as a shadcn table with each day's color, download it. User decisions: columns Day / Time / Place / Notes / Expenses; no "Getting there" column; CSV and Excel; include day Start/End rows; shared/read-only viewers can export too; leave note and checklist items out; keep EV stations. Used frontend-design within the existing Navio tokens.
+**Done:** New itinerary/export/ (pure table builder, sheet model, CSV writer with formula-injection guard, dependency-free .xlsx writer, day picker, preview, dialog), lib/zip.ts, lib/download-file.ts, components/ui/table.tsx (shadcn CLI; fixed its broken `cn` import). Button in itinerary-section.tsx; shared-planner-view.tsx passes published day anchors. Shared Checkbox now draws a dash for the indeterminate state (no other user of that state). Details in handoff.md.
+**Verified:** 12 new unit tests; full client suite 218/218 (--experimental-transform-types); tsc clean; changed-file ESLint clean. Real Excel (COM) opened a generated file: values, teal day fill with white text, numeric cost 1,120.50, frozen header, auto row heights. Real Chrome on guest template plan 200 (dev server 3000, routes mocked empty): 12/12 checks (preview, day selection/mixed state, empty guidance, CSV and Excel downloads, Escape returns focus, light/dark 1440, dark 390 without page overflow, no page errors); screenshots inspected. Script: Claude scratchpad export-table-browser.mjs.
+**Not done / left uncommitted:** All client source/tests uncommitted on client feat/route-focus-by-place (6adb00a) alongside other sessions' work; itinerary-section.tsx and shared-planner-view.tsx are mixed files. Notes committed on root docs/itinerary-table-export-2026-10-11, merged locally to dev only. No push, pin, main change or deployment.
+**Follow-ups:** Signed-in plan with linked expenses and owner Start/End anchors not exercised in the browser (unit-tested only). Commit by feature when asked.
+
+## 2026-10-11 - Codex - Explain missing route on visible Taoyuan Airport MRT
+
+**Goal:** Diagnose the user's dashed station leg despite the visible purple Taoyuan Airport MRT and confirm the line identity.
+**Done:** Confirmed operator's A13 Airport Terminal 2 -> A1 Taipei Main Station route. Probed the running anonymous localhost directions proxy with transit/railOnly=true; actual upstream response is still a ROUTED BUS with 4310 moving seconds. Explained that the local client correctly discards that bus, while the strict rail-selecting backend remains unrun/undeployed, producing the dashed fallback. Checked omitted departureTime and overnight local time against official operator/Google docs; schedule timing is an additional plausible factor, not a proven provider-ranking cause.
+**Verified:** One read-only directions POST through the running application; no account/trip mutations and no direct fresh Google-response claim. Official A13 guide shows express last 22:55 and commuter last 23:35 toward A1; probe was about 00:30 Taipei. Google Routes defaults missing departureTime to now. No source changes or tests repeated; prior implementation checks remain valid.
+**Not done / left uncommitted:** Prior client and mobility rail fixes plus all concurrent features/logs/reports preserved. No backend restart, scheduling implementation, push, pin, main update or deployment. First root pull failed with Cannot fast-forward to multiple branches; notes were inadvertently committed directly on dev as c5a43ed. After successful retry, both notes files were corrected and committed as docs(agents): log session 2026-10-11 on docs/mrt-route-diagnosis-2026-10-11 from synced dev and merged locally to dev only; no history rewritten.
+**Follow-ups:** Run/deploy updated rail backend with client; then verify live MRT selection. Add destination-aware planned departure time/cache keys for timetable accuracy when authorized as continued routing work; do not fabricate geometry from the background line.
+
+## 2026-10-11 - Codex - Require rail between subway stations
+
+**Goal:** Explain why Airport Terminal 2 -> Taipei Main Station chose 1819 instead of the purple MRT, then implement the user's rule that subway -> subway must never choose a bus.
+**Done:** Derived optional railOnly for directions legs between typed or legacy-labelled rail stations, including return visits; Drive/Walk overrides and general public transit retain their behavior. Google adapter requests RAIL and alternatives, filters actual vehicle types to reject bus transfers/unknown rides/walk-only results, and keeps valid provider colors/geometry. Rail/general cache entries differ. No eligible result reports No rail route. The client enforces the same restriction on replies from old backends and strips incorrect bus geometry/chips/time. Added backwards-compatible RoutePointRequest constructors, JSON/adapter/cache/frontend regressions and API contract documentation. No saved-trip/schema/migration/dependency changes.
+**Verified:** Full client suite 224/224 and final targeted transit suite 17/17 after one stricter response guard. Final TypeScript, changed-source ESLint and whitespace checks clean. Mobility full suite: 67 run, 66 passed, one DB-dependent schema check skipped. Browser: five grouped checks using actual directions fetch/serialization, route row and shared draw pieces with mocked API responses; purple MRT rendering, bus-only/mixed/missing rail rejection, general buses, explicit Drive and dark 390px without overflow/page errors. Screenshot inspected. Temporary verification route removed; evidence at C:/Users/User/.codex/tmp/navio-station-rail-20261011/ and mobility target/rail-route-verification.log. No live Google routing, real map or production acceptance claim.
+**Not done / left uncommitted:** Application fixes remain local: client feat/route-focus-by-place at 6adb00a and mobility fix/station-rail-routes from dev/main 58ecef4. All concurrent client features, mobility logs and root docs/report preserved. Required notes/API documentation committed as docs(agents): log session 2026-10-11 on docs/station-rail-session-2026-10-11 from synced root dev and merged locally to dev only. No application commit/push, pin, main update, deployment or server restart; localhost3000 left running.
+**Follow-ups:** Run/deploy updated mobility with the client for rail alternative selection; the client alone will reject old bus results with No rail route. Planned departure time is still omitted, so after-hours Google results can legitimately have no rail; date/time scheduling remains separate work. Coordinate dirty client features before any requested commit/release and perform live provider acceptance.
+
+## 2026-10-11 - Codex - Multiple categorized expenses and per-place totals
+
+**Goal:** Show named/category-icon expense rows and a total inside each place card, allow multiple expenses per visit, and show Add expense/X/edit controls only on the selected owner card; apply frontend-design.
+**Done:** Added block/items/place-expense-list.tsx and budget/place-expenses.ts. Refactored place-cost-popover.tsx to add independent entries and edit a specific expense; trip-place-card.tsx renders the compact footer instead of one cost chip. Existing expense IDs persist the visit association without an API/schema change; legacy place-cost IDs remain supported. Added synchronized save/remove/update atoms and connected use-budget.ts, so Budget and card edits/deletes update the same rows/aggregate item.cost. Per-visit/day deletion cleans up every linked entry; currency conversion totals rounded individual amounts. Legacy cost-only snapshots are preserved/materialized on an expense action. Unselected/read-only expense rows are static and keep their totals; selected owned cards reveal actions. No route-layout, backend, migration, dependency or global-style changes.
+**Verified:** Full client unit suite 206/206 with nine new expense regressions (multiple entries, Budget sync, legacy actual/cost-only data, separator/prefix identity, repeated visits, visit/day cleanup, read-only/stale/invalid writes, rounding, mocked persistence). Final TypeScript, targeted ESLint and whitespace checks pass. Seven grouped Chrome checks on actual TripPlaceCard and Budget UI plus real state/serializer cover selection visibility, independent entries/icons/names/amounts/totals, editing/cancellation, repeat visits, mocked save/reload, Budget edits/deletes, keyboard, light/dark desktop and 390px/360px layouts, and read-only display. No overflow/page errors; screenshots inspected. Fixed the fixture-only orange color typo to valid amber; previous route-focus handoff's TypeScript-error observation is now superseded. Temporary route removed; evidence/fixture/scripts/design note: C:/Users/User/.codex/tmp/navio-place-expenses-20261011/. No live authenticated API save/reload or production build certified. Public snapshot IDs are stripped, so published cards use their existing total-only fallback rather than linked owner detail.
+**Not done / left uncommitted:** All own client source/tests remain local on feat/route-focus-by-place at 6adb00a. Preserve concurrent insertion/route-focus hunks in trip-builder.atoms.ts and all other client changes; previous category/time features remain uncommitted too. Required notes alone committed as docs(agents): log session 2026-10-11 on docs/place-expenses-session-2026-10-11 from freshly synced root dev and merged locally to dev only. No push, application commit, submodule pin, main change or deployment. Existing client CLAUDE.md, mobility logs and docs/report preserved; localhost3000 left running.
+**Follow-ups:** Review multiple expenses locally. Coordinate the dirty client features before a requested commit/release. Real signed-in persistence, publication expense linkage and earlier release acceptance remain separate work.
+
+## 2026-10-11 - Claude - Route focus by place
+
+**Goal:** User found overlapping back-and-forth routes confusing and asked for a "Show route by place" filter that shows only the A -> B leg while scrolling; approved fading the rest (not hiding) and moving the map.
+**Done:** Added Place mode to a new All / Day / Place route switch: scroll-tracked focused leg at full strength, rest of the day faded, off-leg pins faded, settled camera fit when the leg is off screen or tiny, and a per-travel-row "show this leg" button. Google and Mapbox both wired through shared pure logic/hooks. Details and code map in handoff.md.
+**Verified:** 20 new unit tests; client suite 206/206 (needs --experimental-transform-types); changed-file ESLint clean; 21/21 real-Chrome checks against the real Google map with mocked routes; screenshots inspected. Mapbox not run live.
+**Not done / left uncommitted:** All client source/tests uncommitted on feat/route-focus-by-place (branch created this session from dev 6adb00a), alongside other sessions' concurrent work. Session notes committed on root docs/route-focus-session-2026-10-11 and merged locally to dev only. No push, pin, main change or deployment. Dev server 3000 untouched.
+**Follow-ups:** Commit by feature when asked; live Mapbox/real-route check before release.
+
+## 2026-10-11 - Codex - Insert itinerary items from each card's bottom edge
+
+**Goal:** Insert items between existing stops in a long itinerary, with a menu for place, note, checklist and EV station. User refined the design to a plus revealed on the card's bottom edge, and explicitly restored route time/distance to left alignment.
+**Done:** Added block/insert-item-row.tsx as a compact card-edge control: hidden on desktop until bottom-edge hover or keyboard focus, visible on touch screens with a 44px target, and retained while its menu/search is open. No extra divider row; route metrics keep their original left alignment. All four actions insert after that card; the first card also has a top-edge control and the last card supports append. Place autocomplete/map-result navigation and EV picker/preview carry a stable next-item ID through to addition. Preview placement labels, removed-position/day checks, read-only guards and canceled-request protection prevent stale additions. Notes/checklists reveal their inserted card; middle-gap EV searches use the adjacent places/leg instead of the whole day. Existing saved array order persists without backend/schema changes. New helpers/tests: block/item-insertion.ts, tests/planner/place-insertion.test.mjs and place-insertion/data.ts. Reused Navio tokens, typography and Base UI menu through frontend-design.
+**Verified:** Full client unit suite 197/197 (11 new insertion tests, including 50 stops, first/append, reorder/removal, mixed item numbering, repeat-visit independence, both EV add paths and read-only guards). Final TypeScript, targeted ESLint and whitespace checks pass. Synthetic Chrome on real TripBlock, Google planner and EV side panel with mocked SDK/APIs passes 12 grouped checks: card-edge position/hover/no divider height, all menu options, exact 20/21 search/preview insertion, mocked API save/reload and ordered route refresh, keyboard focus/cancel, stale detail cancellation, map navigation/first insertion, note/checklist/EV placement, final-card append, read-only, destination bias, desktop/390px dark and actual touch emulation. No browser errors or overflow; screenshots inspected after restoring left alignment. A test initially used the side panel's aria-label as its accessible name, although aria-labelledby takes precedence; corrected the locator. Temporary app/place-insertion-check-20261011 route removed; fixture/script/results/screenshots: C:/Users/User/.codex/tmp/navio-place-insertion-20261011/. No live authenticated API persistence, live Mapbox or production build claimed.
+**Not done / left uncommitted:** Feature source/tests remain uncommitted on client feat/route-focus-by-place at 6adb00a, alongside preserved concurrent route-focus and expense-type changes and the prior exact-time input. Own edits overlap sortable-block-items.tsx, itinerary-section.tsx, trip-builder.atoms.ts and both planner maps; preserve other sessions' hunks. Other own changes are TripBlock props, search/preview wiring and EV button/picker/preview/host modules. No source commit/push, submodule pin, main change or deployment. Mandatory root notes alone committed on docs/item-insertion-session-2026-10-11 from freshly synced dev and merged locally to dev only. Root reports, client CLAUDE.md and mobility logs preserved; localhost3000 left running.
+**Follow-ups:** Review the bottom-edge menu in the local planner. Coordinate all mixed client changes before any requested commit/release. Verify real authenticated save/reopen and live provider routes before release; earlier signed-in planner and Phase 4A acceptance remain outstanding.
+
+## 2026-10-11 - Codex - Choose expense types and icons on itinerary cards
+
+**Goal:** Let users change each place card's expense type, such as Food, with its matching icon; use the requested frontend-design skill.
+**Done:** Added reusable budget/expense-category-select.tsx using the existing Base UI Select and Navio tokens/typeface. The full-width category row opens a three-column grid of all 12 existing travel-expense categories and icons, with a blue border/tint/check for the current choice. PlaceCostPopover saves the selected categoryId instead of hardcoding Sightseeing, restores the saved category and custom name on reopening, and keeps changes as drafts until Save. Existing expense cards and breakdowns already use categoryId and therefore show the matching icon/category. The itinerary date and per-visit expense identity remain as before. No API, entity, migration, dependency or shared styling changes.
+**Verified:** Final client TypeScript, targeted ESLint and diff checks pass; existing budget-currency tests 3/3 pass. Chrome on the actual popover, ExpenseCard and real Jotai state passes six grouped checks: all 12 choices/icons, linked cost/name/type/date save, independent repeat visits, edit/reopen/cancel without duplicates, keyboard Enter/Home/arrows/Escape, actual planner API serialization with mocked save/reload, and light/390px/360px dark layout without overflow or page errors. Inspected desktop/mobile screenshots. Screenshot review caught selected-text contrast and Tailwind's data-selected=true shorthand conflicting with Base UI's empty attribute; fixed using explicit presence variants and added computed-color/border checks. Temporary fixture route removed; fixture/scripts/results/screenshots/design note retained at C:/Users/User/.codex/tmp/navio-expense-type-20261011/. No live authenticated save/reload or production build claimed.
+**Not done / left uncommitted:** Only the two own client source files above remain uncommitted on the existing feat/route-focus-by-place branch at 6adb00a. Preserve all pre-existing route-focus, place-insertion and exact-time edits, their tests/temporary fixture, client CLAUDE.md, mobility logs and untracked docs/report. Required notes alone committed as docs(agents): log session 2026-10-11 on docs/expense-type-session-2026-10-11 from freshly pulled root dev and merged locally to dev only. No push, application commit, submodule pin, main change or deployment; user server3000 left running.
+**Follow-ups:** Review the expense type/icon picker in the local planner. Coordinate other dirty client work before a requested commit/release. Real signed-in save/reopen and earlier release acceptance remain separate checks.
+
+## 2026-10-11 - Codex - Allow exact typed planner times
+
+**Goal:** Let users enter their own stop times, such as 9:11 AM, instead of only selecting half-hour slots.
+**Done:** Updated client `place-time-popover.tsx` with independent start/end text drafts and validated 12/24-hour parsing to the existing HH:mm storage format. Save and Enter accept exact minutes; lowercase AM/PM and surrounding spaces work. Custom times appear as selectable suggestions, existing half-hour options remain, and selecting a start suggestion focuses the end input. Invalid nonempty fields block saving and expose accessible validation; the end remains optional. Switching fields no longer loses typed input. Clear and cancellation retain their existing behavior. No API, database or shared style changes.
+**Verified:** TypeScript, changed-file ESLint and whitespace checks pass. Chrome checks on the actual popover and real Jotai update atom pass six grouped scenarios: exact start/end state save and reopen, switching drafts, custom suggestions/focus/Enter, invalid input and optional end, midnight/noon/24-hour input, cancellation/dropdown/Clear, and desktop/390px dark layout with no page errors or overflow. Light/dark screenshots inspected. Temporary fixture route removed; script/results/screenshots: `C:/Users/User/.codex/tmp/navio-time-input-20261011/`. No live API save/reload or production build claimed.
+**Not done / left uncommitted:** The single client source change remains uncommitted on dev, based on 6adb00a. Previous notes/maps/places/repeat visits are already published by Claude; their older uncommitted handoff descriptions are superseded. Required root notes alone committed as `docs(agents): log session 2026-10-11` on docs/custom-time-session-2026-10-11 from freshly pulled dev and merged locally to dev only. No push, source commit, submodule pin, main change or deployment. Existing client CLAUDE.md, mobility logs and untracked docs/report preserved; user server3000 left running.
+**Follow-ups:** Review the local time-input change and commit/publish when requested. Existing release acceptance for signed-in notes/maps/places/repeated visits and Phase 4A remains outstanding.
+
+## 2026-10-11 - Claude - Publish client features to dev
+
+**Goal:** Commit the block editor and Codex's uncommitted client work to dev and leave the client on dev.
+**Done:** Client: `feat/planner-maps-and-places` (5b1a4c3 map appearance, 489525d places/tags/details/repeat visits; mixed files prevented a finer split) and `feat/markdown-notes` (f8846a4) merged into dev 6adb00a and pushed with both branches. Root `chore/bump-client-notes-maps-places` 9515766 pins it; root dev pushed (also published earlier local docs commits). Main client checkout now on dev, npm install run.
+**Verified:** Merged dev: tsc clean, 167/167 client tests, ESLint no errors (one existing unused-variable warning). No build or live checks.
+**Not done / left uncommitted:** Nothing to main. Client CLAUDE.md, root docs/report and server state untouched.
+**Follow-ups:** Release checks before main; remove the markdown-notes worktree.
+
+## 2026-10-11 - Claude - Notion-style block editor for planner notes
+
+**Goal:** User asked to rework the markdown notes editor into a full Notion-style editor (slash/+ block menu, movable blocks, selection toolbar, ⋯ block actions menu), using frontend-design.
+**Done:** Replaced the textarea editor (components/markdown/, deleted along with its test) with `client/components/block-editor/` on TipTap 3.31.4 (ProseMirror). "/" or the gutter "+" opens a filtered block menu (text, H1-H4, bulleted/numbered/to-do/toggle lists, quote, callout, code, divider) with arrow keys/Enter/Esc; markdown shortcuts (#, -, 1., [], >, ```) also work. Hovering a block shows "+" and a grip: drag moves the block (drop line drawn as a route segment with a waypoint), click opens block actions (search, turn into, color text/background, duplicate, move up/down, delete). Selecting text shows a toolbar: turn into, B/I/U/S/code, link, color, ⋯ (same block menu). Keyboard: Ctrl+/ block menu, Ctrl+D duplicate, Ctrl+Shift+Up/Down move, Ctrl+K link, Alt+F10 toolbar, Ctrl+Enter tick to-do. Notes render statically (identical CSS) and swap to the lazily loaded editor on the first press/focus, replaying the press so the caret lands where clicked. Storage stays markdown in `block_item.notes` (GitHub conventions: `> [!TIP]` callouts, `<details>` toggles, `<u>`, `<span|mark data-color>`; any other HTML stays literal text; unsafe links dropped), so no server/DTO/migration change. Shared plan view uses the same static renderer. Removed react-markdown/remark-breaks; added @tiptap/* 3.31.4, @floating-ui/dom, unified, remark-parse, @types/mdast.
+**Verified:** 20 new converter unit tests (round trips, escaping, legacy plain-text line breaks, safety). Client suite 112/113 (only the known golden-fixture test needing a sibling server dir). TypeScript and changed-file ESLint clean. Chrome (playwright-core from an earlier session's scratchpad, temporary page since removed) 31/32 on the editor plus 4/4 inside the real guest planner (new note, slash blocks, to-do drag, planner card not dragged); the only failures were next-auth 500/backend 503 console errors from a worktree with no .env/backend. Light/dark/360px screenshots inspected. No signed-in save/reload against the real API, no production build.
+**Not done / left uncommitted:** All source in worktree `Navio-worktrees/markdown-notes/client` on `feat/markdown-notes` (from 306ee3e), uncommitted; worktree node_modules is its own directory. Mid-session, PowerShell 5.1 text replacement mangled UTF-8 characters and added BOMs; repaired with a reversible decode and verified (use Edit/Node for edits, not Get-Content/Set-Content). Notes committed on root docs/notion-notes-session-2026-10-11, merged locally to dev only.
+**Follow-ups:** Commit/publish on request. Run `next build --webpack` in the worktree before release. Consider normalising `[x]` in PlanPublicationSanitizer.sanitizeNote.
+
+## 2026-10-11 - Codex - Implement repeated places and station return visits
+
+**Goal:** Implement the approved repeat-visit design, including hotel check-in/return and public transport A -> B -> C -> B -> A; preserve independent travel modes.
+**Done:** Client feat/repeat-place-visits (from dev/HEAD 306ee3e): search and saved-place previews can Add another visit, with Already in Day N/count and the target day visible. Fresh visits keep place identity/provider type but reset notes, time, costs, observation, arrival-mode override and visited status. New trip-location-markers.ts groups regular stops, chargers and resolved Start/End roles by coordinates/provider identity for both planner map providers; TripLocationPin shows +N additional occurrences and an accessible chooser. Selecting a visit opens its day and scrolls to its own item/anchor card. Read-only plans keep navigation and hide additions. Existing itinerary order, transport-mode inference and persistence retain all occurrences. No API/schema/global-theme changes.
+**Verified:** Full client unit suite 147/147, including 10 new regressions for visit independence, removal/expenses, read-only guards, anchor grouping/carry-over, provider identity, station round-trip modes, routing/export order and mocked API round-trip. TypeScript, changed-file ESLint and whitespace checks pass. Synthetic Chrome with the actual Google planner map/OverlayView and mocked APIs passes 8 grouped walkthrough checks covering +1/+2, search/saved additions, per-visit selection, anchor scroll, collapsed overnight days, save/reload, read-only, station return route requests, keyboard and mobile/dark layout. Screenshots inspected. Initial test expectation wrongly ignored inherited hotel anchors and was corrected; concurrent browser/typechecking exhausted Windows memory, so final checks ran sequentially and passed. The first synthetic station click also exposed overlapping fixture pins, corrected by spacing the test projection. No live account/API save, real transit directions, live Mapbox or production build certified.
+**Not done / left uncommitted:** All feature source/tests remain local/uncommitted on client feat/repeat-place-visits, together with preserved earlier map appearance/category/details edits. New modules: itinerary/trip-location-markers.ts, trip-location-pin.tsx, use-trip-location-selection.ts; tests/planner/repeat-visits.test.mjs and repeat-visits/data.ts. Mixed edits: both planner maps, both place previews; other own edits: trip-builder.atoms.ts, anchor-stop-card.tsx, itinerary-section.tsx. Temporary app/repeat-visits-check-20261011 page removed. Evidence/reproduction fixture: C:/Users/User/.codex/tmp/navio-repeat-visits-20261011/. Restarted the local dev server on port 3000 after it disappeared during the user's interruption; left it running. Required notes alone committed on docs/repeat-visits-session-2026-10-11 from synced root dev, merged locally to dev only. No push, application commit, submodule pins, main change or deployment; existing editor/report/log files preserved.
+**Follow-ups:** User can review repeat visits locally. Coordinate existing mixed client changes before committing/releasing. Real authenticated save/reopen and live provider route acceptance remain separate checks. Existing charger-add restrictions and EV optimizer transit refusal are unchanged; this feature enables repeated regular places/stations.
+
+## 2026-10-11 - Codex - Recommend repeat visits and shared map pins
+
+**Goal:** Advise how one day can include hotel check-in and an evening return, with clear map badges and already-added place actions; apply frontend-design where useful.
+**Done:** Inspected planner add/search state, both map consumers, day anchors, existing anchor pin grouping and planner persistence. Recommended keeping Start/End for day boundaries and allowing separate visits for intermediate returns. For the arrival day: Start airport -> hotel check-in -> sightseeing -> End hotel. Unify map location grouping across regular visits and anchors, show a stop number plus +N additional visits, and list/select each occurrence in a popover. Show existing day usage alongside an enabled Add another visit action; retain normal Add to trip for unused places.
+**Verified:** Source review confirms selectedSearchPlaceIsAddedAtom and addSelectedPlaceToTripAtom reject repeated placeId values inside the selected block, while persistence syncs by item clientId and the applied schema's item uniqueness is on (block_id, client_id). Existing grouped anchor pins do not include regular stops. No tests/browser checks run: this was design advice, with no application changes.
+**Not done / left uncommitted:** Implementation is proposed, not delivered. Preserved all existing client map/category/details changes, client CLAUDE.md, mobility logs and untracked docs/report. Required notes alone committed on docs/repeat-visits-design-2026-10-11 from synced root dev and merged locally to dev only; no push, pins, main changes or deployment.
+**Follow-ups:** When implementing, cover visit-specific notes/time/cost/status and deletion, grouping across stops/anchors and both map providers, saved-state reload and ordered routing/export. Do not deduplicate non-consecutive return visits or clone previous visit costs/progress. Existing local features and earlier live acceptance checks remain open.
+
+## 2026-10-11 - Claude - Markdown-lite planner notes
+
+**Goal:** User chose markdown-lite notes (toolbar, Edit/Preview, react-markdown without raw HTML, safe links) as the next planner feature.
+**Done:** Reusable `client/components/markdown/` (pure commands, compound editor, safe renderer + CSS module); `trip-note-item.tsx` rendered/edit modes with clickable task boxes; shared plan notes rendered. remark-breaks added after screenshots showed plain notes losing line breaks; table cells keep whole words and scroll; ending a list leaves a blank line so following text is not absorbed. Client-only, no API/DB change.
+**Verified:** 27 unit tests pass; client suite 159/160 (golden-fixture test needs sibling server dir absent in worktree); TypeScript + changed-file ESLint clean; 27/27 Chrome checks on a temporary route (removed), light/dark/360px screenshots inspected. No signed-in real-API save or production build.
+**Not done / left uncommitted:** All source in worktree `Navio-worktrees/markdown-notes/client` on `feat/markdown-notes` (from 306ee3e), uncommitted. Notes committed on root docs/markdown-notes-session-2026-10-11, merged locally to dev only; no push, pins, main or deploy. Main client checkout and other sessions' work untouched.
+**Follow-ups:** Commit/publish on request. Consider stripping `[x]` from published notes in PlanPublicationSanitizer to match checklist privacy.
+
+## 2026-10-11 - Codex - Remove 3D and restore Google's original Light map
+
+**Goal:** Resolve the user's vector fallback error, remove 3D, and restore the original Light colors after the new preset made roads yellow.
+**Done:** Removed view controls/state, retaining eight map styles. Google now always uses flat raster tiles without a cloud map ID; original Light clears custom styling, while Dark/custom themes use inline raster palettes. Found that actual cloud map IDs reject the earlier local StyledMapType approach; previous DEMO_MAP_ID verification missed that provider constraint. Replaced AdvancedMarker consumers with shared OverlayView React DOM markers to preserve buttons and draggable/keyboard pin picking without map IDs. Theme changes retain the map/camera/zoom. Mapbox disables pitch/rotation and removes stale extruded buildings. Old view=3d is ignored and preferences persist style only on the next selection. No backend/schema/global CSS changes. The specific fallback is a WebGL/device/hardware-acceleration issue, not a higher billing tier (official support: https://developers.google.com/maps/documentation/javascript/webgl/support).
+**Verified:** Four focused unit tests, TypeScript, targeted ESLint and whitespace checks pass. Synthetic browser covers eight themes, Light reset, absent 3D controls, stale storage, camera/marker retention, no recreation/map ID conflict, click/Enter, pointer dragging/repeated arrow keys, reload, keyboard and 390px layout. Live Google with WebGL/GPU disabled renders Light/Dark/Retro as RASTER without vector fallback/map ID styling warnings; marker clicks and keyboard movement work. Guest planner sidebar has eight style radios and no page errors. Light/Dark screenshots inspected. Temporary route removed; scripts/results/screenshots: C:/Users/User/.codex/tmp/navio-map-appearance-20261011/. No full build, live Mapbox or signed-in trip mutation claimed.
+**Not done / left uncommitted:** Client feature/fix source remains local on fix/planner-place-details at 306ee3e, alongside preserved place-tag/detail edits. Root mandatory notes committed as docs(agents): log session 2026-10-11 on docs/map-2d-session-2026-10-11 (from freshly synced dev), merged locally to dev only. No push, main change, submodule pin or deployment. Existing report/editor files, mobility logs and user localhost3000 server preserved.
+**Follow-ups:** Review/commit/publish the compatible client changes when requested. This correction supersedes the earlier 3D/provider guidance below; original Google Light and all custom themes now remain 2D. Existing signed-in planner/TWD and Phase 4A acceptance stay open.
+
+## 2026-10-11 - Codex - Sidebar map appearance settings
+
+**Goal:** Add sidebar Appearance -> Map controls for the discussed styles and 2D/3D, using frontend-design.
+**Done:** Added a responsive appearance popover with native keyboard radio groups, eight map samples (Follow app, Light, Dark, Flat / minimal, Grayscale, Muted / pastel, Retro, Navio), and a view selector. Validated Jotai device storage shares preferences across planner, Explore and pin-picker maps. Google uses native Light/Dark vector maps with 45-degree tilt for 3D; custom presets use real StyledMapType raster tiles in 2D and clearly disable unsupported 3D. Mapbox applies the palettes and adds building extrusion/pitch in 3D, preserving route colors and planner POI hiding. Camera positions and existing marker children survive Google map recreation. No backend, schema, global CSS or prior place-card edits changed.
+**Verified:** Four focused tests, TypeScript, changed-file ESLint and whitespace checks pass. Synthetic Chrome checks cover every style, 2D/3D, markers/camera, reload, stale preferences, Follow app, keyboard arrows/Escape and 390px layout. Real guest sidebar check passes. Live Google browser checks render Retro/Navio custom tiles and native Dark/Light, retain the marker, and confirm VECTOR tilt 45/zoom 16 with no provider/page errors. Reviewed light/dark/mobile and live screenshots. Evidence/scripts: C:/Users/User/.codex/tmp/navio-map-appearance-20261011/. No production build, live Mapbox tiles or signed-in trip mutation tested.
+**Not done / left uncommitted:** Source/tests remain local in client on the existing fix/planner-place-details checkout, alongside preserved place-tag/detail changes. Own files: components/map/*, components/sidebar/sidebar-appearance.tsx, sidebar-account-actions.tsx, tests/map/appearance.test.mjs, planner-map-google.tsx, planner-map-mapbox.tsx, both pin-picker maps and Explore plan-map.tsx. Temporary verification page removed; user localhost3000 server left running. Required notes committed on root docs/map-appearance-session-2026-10-11 (from synced dev) and merged locally to dev only; no push, submodule pin, main merge or deployment.
+**Follow-ups:** Review/publish the client work with its existing changes when requested. Google custom themes intentionally stay 2D; cloud-styled vector map IDs would be needed for additional 3D theme combinations. Existing signed-in planner/TWD and Phase 4A acceptance remain outstanding.
+
+## 2026-10-11 - Codex - Configurable Google place category colors
+
+**Goal:** Give important Google place tags varied colors, editable centrally in globals.css.
+**Done:** Added 26 semantic tag families with light/dark OKLCH ink tokens and configurable background tint strength in client/app/globals.css. Reusable PlaceTypeTag matches provider primaryType / saved placeType first, then category labels for legacy/shared items; unknown types get a neutral tint. Wired shared PlaceCardVisual (planner, Explore and public plans), the older overview card and search preview. Documented tokens/examples in client/DESIGN.md. No API, entity, migration or provider changes.
+**Verified:** TypeScript, targeted ESLint and diff checks pass. A temporary standalone browser showcase rendered the actual PlaceTypeTag and PlaceCardVisual with compiled CSS in Chrome: all 26 families and provider/display-label precedence pass; light/dark desktop and 390px mobile render without overflow; minimum measured text contrast 5.05:1 light, 6.47:1 dark. Evidence: TEMP/navio-place-tag-20261011 (verify.cjs, results.json, compiled CSS, screenshots). No signed-in live planner walkthrough or full production build. Initial TypeScript check failed after concurrent preview type narrowing; adding primaryType fixed it and the rerun passed.
+**Git:** Client source is UNCOMMITTED. Started on style/place-category-tags from freshly synced dev (306ee3e); another session switched the shared checkout to fix/planner-place-details while editing opening hours/details. Preserved those edits and added primaryType to its shared preview type. Our complete files: globals.css, DESIGN.md, place-tag-category.ts, place-type-tag.tsx, PlaceCardVisual and the older overview card; our hunks in the active trip card only pass placeType, and preview hunks add the shared badge/import/primaryType. Other details/opening-hours files and temporary check route belong to that session. Required notes committed on docs/place-tags-session-2026-10-11 in an isolated root worktree, merged to dev only; no application commit, push, main update or deployment. Root pull reported multiple FETCH_HEAD branches; explicit fetch confirmed dev == origin/dev (422f4c1) before cutting notes branch. Existing report/editor/log files preserved.
+**Next:** Review and commit the tag feature when requested, preserving concurrent place-details edits; publish client before changing root pins. Edit --place-tag-* under :root/.dark and --place-tag-tint to tune colors/backgrounds. Production remains successful release 279a4e8; signed-in load/save, TWD UI and Phase 4A acceptance remain separate outstanding checks.
+
+## 2026-10-11 - Codex - Unify place details and show planner opening hours
+
+**Goal:** Use the full place card with opening hours when clicking saved stops, and display opening hours in the planner too.
+**Done:** Replaced the separate saved-stop layout with the existing PlacePreviewPanel, keeping saved status, notes and a disabled Added action. Added PlaceOpeningHours to regular planner cards and a shared TanStack Query detail hook for provider-prefixed Google/Mapbox IDs and legacy seeded ChI Google IDs. Opening hours, phone and website now load for existing saved stops without changing snapshot/database contracts. Preserved snapshot photo/description/rating when fresh details omit them. Missing hours use the existing Hours unavailable fallback; manual and EV IDs do not trigger place-detail requests. The full preview scrolls within the map area.
+**Verified:** Final TypeScript, changed-file ESLint and git diff --check pass. Chrome checks with synthetic data/mocked APIs pass for one shared preview, hours in planner/map, query deduplication, adding/selecting stops, Google legacy IDs, Mapbox, keyboard close, saved notes, provider failure fallback, manual/charger request avoidance, reload and mobile overflow. Desktop/light and mobile/dark screenshots inspected. No live Google/account or production acceptance claimed. Temporary fixture route removed; evidence/script retained at C:/Users/User/.codex/tmp/navio-place-details-20261011/.
+**Git:** Client fix/planner-place-details was cut from clean dev (306ee3e); source remains local/uncommitted. Concurrent place-tag work appeared during this session (DESIGN.md, globals.css, place-card-visual.tsx, overview/trip-place-card.tsx and new place tag modules, plus overlapping preview/card hunks); preserved and accommodated it. Client CLAUDE.md, mobility logs and untracked docs/report preserved. Required notes committed as docs(agents): log session 2026-10-11 on docs/planner-place-hours-session-2026-10-11 from freshly pulled root dev and merged locally to dev only. No push, main changes, deployment or submodule-pin staging. Existing user dev server on port 3000 remains running; isolated dev launch declined because Next locks the same directory, so synthetic checks used that server with API interception.
+**Next:** Coordinate the overlapping place-tag edits before committing the client branch; then publish compatible client changes through the normal release flow when requested. The successfully deployed release remains 279a4e8, and earlier signed-in planner/Phase 4A acceptance follow-ups remain outstanding.
+
+## 2026-10-11 - Codex - Redeploy verified storage fix through main
+
+**Goal:** Redeploy to main at the user's explicit request.
+**Done:** Checked all six pinned repositories against fresh remote main refs and local HEADs; published fix/storage-init-image and earlier documentation branches, pushed dev, then fast-forwarded dev into main and pushed root release 279a4e8. The release carries the existing planner JSON/TWD hotfix and the tested mc packaging repair. No additional source, pin or database changes.
+**Verified:** Actions run 38127347516 succeeded in revision/schema checks, all nine builds and VM deploy. Fresh live homepage/health return 200, anonymous trips 401; THB/TWD changed from pre-rollout 400 to post-rollout 200, and reverse TWD/THB also returns 200 with positive dated Frankfurter rates. Used curl -k for local certificate-trust limitations; no TLS-trust or authenticated browser acceptance claim. No real account/trip mutated. Earlier local packaging smoke checks remain applicable; no unrelated suites repeated.
+**Git:** Release 279a4e8 published to root main/dev through the required dev-to-main flow; feature and earlier notes branches published. Current mandatory notes committed as docs(agents): log session 2026-10-11 on docs/redeploy-storage-2026-10-11 from dev, merged and pushed to dev only to avoid another production build. Root ends dev, child worktrees main. Pre-existing report/editor/log files untouched.
+**Next:** User verifies signed-in planner load/save and TWD UI switching. Phase 4A connected optimize/apply/reopen acceptance remains outstanding. Run: https://github.com/bestprappy/Navio/actions/runs/38127347516.
+
+## 2026-10-11 - Codex - Fix failed MinIO client pull during deployment
+
+**Goal:** Investigate and repair the deployment failure in the pasted release log.
+**Done:** Identified HTTP 401 for the Quay MinIO client image during storage setup as the failure in root 328f5b5/run 38126179814; schema checks and image builds passed, application update did not run, rollback restored a9fc36f. Built the pinned mc source into Navio's existing community-storage image and switched the initializer to that same GHCR image. Updated release documentation. No application, submodule pin, database, bucket policy or production credential changes.
+**Verified:** Docker build passed; isolated local production storage initializer passed twice, including service write/read/delete and anonymous denial (403). Disposable test containers/network/volume removed. Final public health 200 and anonymous trips 401; certificate verification bypassed only for those read-only endpoint checks, so no TLS validation or signed-in acceptance claim. Initial temporary harness failed on Docker progress stderr under PowerShell Stop; corrected, final run passed. Evidence/scripts retained under TEMP/navio-storage-mc-20261011 and TEMP/navio-storage-mc-build-20261011.log.
+**Git:** Code committed on fix/storage-init-image from freshly pulled dev, merged locally to dev. Required notes/release docs committed as docs(agents): log session 2026-10-11 on docs/storage-init-session-2026-10-11 from dev and merged to dev only. No push, main update, retry, deploy or VM mutation. Existing report/editor/log files preserved; child worktrees remain main.
+**Next:** Publish the tested root packaging fix when authorized and run the new release; the failed JSON/TWD update is still awaiting successful deployment. Then verify signed-in planner load/save and conversion against connected services.
+
+## 2026-10-11 - Claude - Production incident: planner snapshots unreadable; hotfix + TWD release
+
+**Incident:** Release a9fc36f (first production release of Phase 4A + transit) broke every saved-trip load ("The saved trip could not be loaded. Please retry.", dashboard stats failing) and new trips got no days. Cause: trip-planning-service HTTP runs Jackson 3, but `energyState`, `observedSocCheckpoint` and `arrivalMode` are Jackson 2 `JsonNode`s, which Jackson 3 serialized as bean getters (`{"array":false,...,"nodeType":"NULL"}`); the client's schema rejected every snapshot. Introduced with Phase 4A energy fields, never previously released; earlier browser checks used mocked APIs, and slice tests never asserted these fields.
+**Fix:** trip ca2befc adds `config/LegacyJsonNodeModule` (Jackson 3 module: writes Jackson 2 nodes as raw JSON; explicit null -> NullNode, omitted -> null). `PlannerJsonContractTests` drives real HTTP both ways and fails 3/3 without the module. Reproduced and verified against the released service locally (real Postgres): empty trip energyState null, save/reload of energy state, observation, placeType and arrivalMode; the client's real `getPlannerSnapshot` accepts the fixed payload and rejects the broken one.
+**Also released at user request:** Codex's TWD currency (trip f777e73, client 306ee3e); budget_currency is varchar(3), no migration. Trip 199/199 on real Postgres, client 133/133 + TypeScript + lint.
+**Git:** trip main/dev 77d21f3, client main/dev 306ee3e, server main/dev 5956733, root pins pushed to dev and main (deploys). User's checkouts were switched to main earlier this session; two stale 2026-09-26 release worktrees in %TEMP% holding main (only deleted tracked files, no work) were removed.
+**Next:** After deploy, confirm a real signed-in trip loads and saves. Consider moving the trip DTOs to Jackson 3 types and removing the module. Phase 4A acceptance (optimize/apply/reopen) is still outstanding.
+
+## 2026-10-11 - Claude - Public transit legs (MRT/BTS) and transit-lines map layer
+
+**Goal:** User found station-to-station legs (e.g. Taoyuan Airport Terminal 2 to Taipei Main Station) drawn as car routes. Asked for MRT/BTS/rail legs drawn as transit in line colours, a per-leg mode choice, and a map toggle for transit lines. User chose: automatic transit between stations with a saved per-leg Drive/Transit/Walk override, plus a Google transit-layer toggle.
+**Done:** Mobility: `LegTravelMode`, `RouteProfile.TRANSIT`, per-point `arrivalMode` on directions, `RouteService` splits a day into same-mode runs (all-drive days unchanged: one call, same cache key), each transit leg routed alone (Google rejects transit waypoints), transit steps with line name/colour/vehicle/stops, merged walks, duration excludes initial wait, no-coverage returns an empty plan (not a breaker failure); place details expose `primaryType`. Trip: `V16__block_item_arrival_mode.sql` (nullable varchar(16)), entity/DTO `arrivalMode` (omitted preserves, null = automatic) and `placeType` into existing `place_type`, capability `leg-travel-mode-v1`, `LegTravelModes` rule mirrored in client `leg-travel-mode.ts`; EV optimization now returns 422 when the selected or an earlier day has a transit/walk leg (optimizer replays all legs as road). Client: leg mode menu on each itinerary leg, transit line chips, mode-aware missing-route text, battery drop hidden on car-less legs, energy projection counts transit/walk legs as zero car distance, shared Google route layer (planner + Explore) draws rides in line colour over white casing and walks dotted, Mapbox equivalent, "Transit lines" toggle (Google TransitLayer, Google provider only), capability gating in planner-api.
+**Verified:** Mobility 46 tests pass (+1 DB-skipped). Trip 188/188 pass against disposable PostGIS on 5432 with config server, including PostgresSchemaTests (V16 + round-trip) and both full-context tests. PostgresSchemaTests upgrade assertion deliberately changed from 2 to 3 migrations after V13 (V16 added). Client: TypeScript clean, ESLint clean on changed files, 129/130 unit tests with `--experimental-transform-types` (11 new); the one failure is the Java/TS fixture-parity test, which reads `../server/...` and cannot resolve from a worktree (ENOENT; fixtures untouched). `next build --webpack` passes; Turbopack refuses the worktree's linked node_modules. No live Google request, browser or account acceptance: a live check needs a server-side Google key and sends billed requests, and the earlier billing error is unresolved.
+**Git:** Codex was concurrently editing client/trip main checkouts (TWD currency, uncommitted). My early `git switch -c` moved those checkouts; I switched both back to `feat/twd-expense-currency` (same HEAD, edits intact) and mobility back to `dev`, so Codex's note that the switches were preserved is superseded. All feature work is UNCOMMITTED on `feat/transit-route-legs` in worktrees at `Capstone/Navio-worktrees/transit-route-legs/{client,trip-planning-service,mobility-and-ev-service}` (client node_modules is a junction to the main client). API/DB doc edits are uncommitted in root. Follow-up same day: user chose push-to-dev over a production release (release would ship all unreleased dev work incl. Phase 4A, V14-V16 and the web client). Committed and pushed feat/transit-route-legs to dev: mobility 58ecef4, trip 4fa2412, client 44f5106; server dev 79dff51 pins them; root dev pins client/server and carries the API/DB docs. Root push also published Codex's two local docs(agents) commits. No main push or deployment.
+**Next:** Release mobility + trip + client together (new contract, V16) only after the Phase 4A release gates. Optional live check with a Google key that has Routes API billing. Follow-ups: publish arrivalMode through `PublicItemDto` (shared plans currently auto-detect only), let preceding-day energy replay skip car-less legs instead of rejecting, transit departure time from the planned stop time.
+
+## 2026-10-11 - Codex - Add New Taiwan Dollar expense currency and conversion
+
+**Goal:** Add TWD currency and conversion to the expense flow.
+**Done:** Added TWD/NT$ to currency options/types, backend CurrencyCode, planner API currency validation and shared-plan mapping. Preserved the existing conversion of budget, expenses and planned place costs; explicit NT$ formatting avoids an ambiguous dollar symbol. Updated the budgeting API documentation. No provider configuration, entities or migrations changed.
+**Verified:** Three frontend conversion/persistence tests, TypeScript and targeted ESLint pass. Trip service 25 focused tests pass, including eight TWD controller cases, existing currency service/controller tests and planner service tests. Read-only live provider checks succeeded for all eight TWD/existing-currency directions. Initial backend run encountered a config-server import setup error; isolated ignored target/twd-test.yml resolved it, and the final run passed. No browser, production build, real PostgreSQL or live account acceptance claimed.
+**Git:** Client/trip stale local dev refs fast-forwarded to published ba01a1b/957cfbf before creating feat/twd-expense-currency branches; feature source/tests remain uncommitted. A concurrent session switched both worktrees to feat/transit-route-legs at the same tested HEADs before final verification; preserved those switches and recorded them in this follow-up documentation commit. Required session notes and API documentation are committed locally as docs(agents): log session 2026-10-11 on docs/twd-currency-session-2026-10-11 from dev and merged to dev only. No push, main update, deployment or submodule-pin commit. Pre-existing report files, client CLAUDE.md, mobility logs and other child checkouts preserved.
+**Next:** Review and publish TWD child changes when requested; publish compatible client/trip changes before hosted acceptance. Existing Phase 4B/4C remain outside this task. Local backend evidence: target/twd-verification.log.
+
+## 2026-09-27 — Claude — Admin route fix, OWNER provisioning, Explore seeded
+
+**Goal:** `/admin/users` reload showed Keycloak's "internal server error"; production had no OWNER role; run the Explore seed as "Navio Team".
+**Done:** nginx routed every `/admin/` path to Keycloak; now only `/admin/realms/`, `/admin/serverinfo` and `/admin/<realm>/console/` go there (Keycloak console is `/admin/master/console/`). deploy.sh creates the OWNER realm role if missing and adds it to the `navio-web` scope; a smoke check asserts anonymous `/admin/users` redirects to `/sign-in`. First release (`ac8ed60`, run `36332867659`) failed and rolled back: the pre-existing scope-mapping `printf '...'` inside `bash -euc '...'` broke the quoting (never ran before because all roles were already mapped). Fixed in `b853d1a`; OWNER scope mapping was also added manually. Root `main` `6915bca`, run `36333726651` succeeded. Created Keycloak user `navio-team@example.com` (Navio Team, id `0ae736e4-a315-456e-bb2e-7257d419b2d9`, no password, no IAM profile yet). Ran the seed on the VM from `~/navio-maintenance/seed-explore` (log `run-2026-09-27.log`): 30 published, 0 failed.
+**Verified:** `/admin/users` -> 307 sign-in; `/admin/master/console/` 200; OWNER role exists and is in the `navio-web` scope; replayed smoke checks pass; feed lists 30 plans with `authorName` "Navio Team"; a seeded `/explore/shared/<token>` returns 200.
+**Not verified:** no one holds OWNER yet (manual steps 3-5 in owner-role.md); seeded plans were not browser-checked.
+
+## 2026-09-27 — Claude — Explore seed script (30 real plans)
+
+**Goal:** fill Explore with many real plans: 5 Thailand, 5 Japan, 20 elsewhere.
+**Done (uncommitted, root `dev`):** `.deploy/scripts/seed-explore/` with `seed.mjs`, `plans.mjs` (30 itineraries) and `README.md`. The script uses the real API only: `POST /v1/trips` (destination = Google place id from `/v1/geo/places/search`), `PUT .../planner` with stops resolved to real Google places (photo, rating, coordinates) and real chargers from `/v1/ev/chargers/near` for the two Thai EV trips, then `PUT .../publication` with `listInExplore`, `includeNotes`, byline "Navio Team". It calls trip-planning and mobility directly with `X-User-Id`, because Keycloak has direct-access grants off. It is idempotent by trip title and has `DRY_RUN`/`ONLY`.
+**Verified:** `node --check`; plan counts and time order; full run against a contract stub (`scratchpad/stub.mjs`): 30 published, 4 charger stops, the re-run skipped 30, and a missing user id was refused.
+**Not verified:** not run against a real backend or Google (nothing was running locally, and production needs a seed account id).
+**Follow-ups:** create the seed account, run with `DRY_RUN=1` on the VM (`docker run --network navio-backend ...`, see README), check the resolved places, then run for real.
+
+## 2026-09-27 — Claude — Commit and release Owner role, Explore sharing and observability
+
+**Goal:** `/commit` everything dirty across all repos and release it through `main` (user chose "Everything" and "Through main (deploys)").
+**Done:**
+- client: the dirty `feat/admin-console` tree was 5 commits behind `origin/dev`, whose released admin files were untracked here. Snapshotted it as temp commit `0b54f2c` (the old branch still points at it), cherry-picked onto `feat/explore-read-only-planner` from `origin/dev`, and resolved all 22 add/add conflicts to the snapshot after confirming every dev-only line was superseded; the final tree equals the snapshot. Commits `c072bce` feat(admin) Owner role, `1296322` feat(explore) read-only planner. `main` = `f790652` (merged in the `%TEMP%/navio-client-admin-release-20260926` worktree, which holds `main`). The main client worktree is left detached at `f790652`.
+- IAM (was dirty on `main`): `e9dac80` fix(admin) null-free user search on `fix/admin-user-search`, `27295c9` feat(admin) Owner role + V6 on `feat/owner-role`; `main` = `9351eb8`.
+- trip-planning (was dirty on `main`): `8e4ff37` feat(sharing) trending/V13, located stops, copies; `main` = `f0549d4`.
+- server: `feat/gateway-owner-role` (OWNER authority), pins `f5f1cb9`, and **new** `fix/shared-plan-copy-route`: neither gateway config routed `POST /v1/shared-plans/{token}/copies` (would 404). `main` = `4395d86`.
+- root: `fix/shared-plan-copy-route` (same route in `.deploy/config/api-gateway.yml`), `feat/owner-realm-role`, `fix/grafana-proxy-headers`, `feat/production-tracing` (Zipkin), `docs/owner-explore-release`, pins. `main` = `881ea96` (merged in `%TEMP%/navio-root-admin-release-20260926`), Actions run `36327266654` succeeded (pins, Postgres schema, 9 builds, deploy). Live smoke: `/health` 200, feed and trending 200, anonymous copies/trips/admin 401, Grafana health 200.
+**Verified:** IAM full suite 148 (2 skipped by design) incl. `PostgresSchemaTests`, admin repository and catalog Postgres tests on disposable PostGIS 16; trip-planning full suite 157 incl. V13 on Postgres; gateway 12 (1 skipped); client `tsc` clean, ESLint 0 errors on changed files, 13 admin tests (`node --experimental-transform-types --test`). Production compose validated with `docker compose config`. First IAM run had 8 errors only because the config server was still starting (connection refused on 8888); rerun passed.
+**Not verified:** live Keycloak/two-account acceptance, copy end to end, nginx `-t`, VM memory headroom for Zipkin.
+**Follow-ups:** Raum-1's `fix/trip-specific-garage` still carries trip-planning `V11`/`V12`; renumber above V13 before merging. Existing production realm needs the manual OWNER setup in `owner-role.md`.
+
+## 2026-09-27 — Claude — Explore shared plan rendered by the planner itself
+
+**Goal:** make an Explore plan page 1:1 with the planner (map on the right), fed by the real published plan, copyable, and automatically updated whenever planner cards change.
+**Done (all uncommitted):**
+- User decision: published itinerary stops (places and chargers) may expose coordinates; day anchors stay private.
+- trip-planning `main`: `PlanPublicationSanitizer.sanitizePlace` now publishes `placeId`/`address`/`lat`/`lng` only for valid coordinates; `SANITIZER_VERSION` deliberately unchanged (adding fields must not dead-link live plans; old snapshots just lack pins). Copy no longer requires an address. Tests updated and added.
+- client `feat/admin-console`: new `plannerReadOnlyAtom`; read-only branches in `ItinerarySection` (+ `renderDayAnchors` slot), `SortableBlockItems`, `TripPlaceCard`, `TripNoteItem`, `TripChecklistItem`, `BudgetSection`/`ExpenseCard`, and both planner maps (no POI add). New `share/shared-plan-blocks.ts` (snapshot → `TripBlockData`/budget) and `share/shared-day-anchors.tsx`; `SharedPlannerView` rewritten to hydrate a scoped Jotai `Provider` and render the real planner components + `PlannerMap`; `/explore/shared/[token]` uses the planner's sidebar layout. Deleted the unused custom `shared-planner-map.tsx`.
+**Verified:** `PlanPublicationSanitizerTests` 33/33, `TripPublicationServiceTests` 39/39; client `tsc` clean, scoped ESLint clean (one pre-existing warning). Headless Chrome against a stub gateway at 1440px: planner layout, real cards, numbered/charger pins, budget. Phone width not truly verifiable (headless min width). Not verified: live routes, real accounts, copy end to end, full trip-planning suite, Postgres.
+**Follow-ups:** `/share/plans/[token]` and the publish-dialog preview still use `SharedPlanContent`; move them to `SharedPlannerView` if they should match too. Plans published before this change show stops as "(location not shared)" notes until the owner presses Update.
+
+## 2026-09-27 — Codex — Real Explore plans and planner-style shared view
+
+**Goal:** remove mocked Explore trips, show real recent and trending user publications, open a shared plan in the planner layout without editing, and let a user copy it.
+**Done:** Connected Explore, dashboard recommendations, and the planner Explore section to published plans; added view-based trending and a private-copy endpoint in trip-planning with V13 `view_count`; replaced the old mock detail route with a read-only planner workspace and shared card/day components. App changes remain uncommitted.
+**Verified:** client TypeScript, scoped ESLint, and production `next build`; targeted publication/controller/privacy tests; V1–V13 Flyway migration and JPA validation on disposable PostgreSQL 16. No real-account browser acceptance.
+**Not done / left uncommitted:** Client `feat/admin-console` and trip-planning `main` hold these changes alongside unrelated dirty work. The isolated frontend build left `client/.next-explore-check/`; automatic approval review blocked recursive removal. App changes were not staged, merged, or deployed.
+**Follow-ups:** The user was asked whether publicly shared itinerary stops may expose coordinates. Until answered, the sanitizer keeps locations private: the read-only map has no pins and copied stops without public coordinates become editable notes. Recheck the exact visual match and copy flow with two real accounts once that choice is settled. Agent notes already contained another session’s uncommitted changes, so this note was not committed separately.
+
+---
+
+One entry per agent session, **newest first**. Every session adds an entry before it ends, including unfinished or abandoned work. Keep entries factual and short; current state goes in [handoff.md](handoff.md).
+
+## YYYY-MM-DD — <agent> — <short title>
+
+**Goal:** what the user asked for.
+**Done:**
+- change (repo, branch, commit SHA)
+**Verified:** tests/checks run and their result; say what was not verified.
+**Not done / left uncommitted:** anything half-finished, with file paths.
+**Follow-ups:** decisions pending from the user, known risks.
+```
+
+---
+
 ## 2026-09-27 — Codex — Repair admin users and add Owner role
 
 **Goal:** fix the admin users 500, present users in a role-badge table, and let an Owner grant administrator roles while admins manage lower roles.
@@ -538,7 +1221,6 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 **Follow-ups:** continue the global vehicle catalog portion of the original plan.
 
 ---
-
 
 ## 2026-09-26 — Claude — Review Raum-1's Phase 3.1 branches and council the reconciliation
 
@@ -616,22 +1298,6 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 **Follow-ups:** the untracked root docs need an owner to commit them. `client/CLAUDE.md` is not gitignored and must be excluded by hand every session. The "Charge each stop to" slider question from 2026-09-22 is still unanswered. Release requires the `release.md` flow (child `main`s first, then root `main`).
 
-## 2026-09-23 ? Codex ? Investigate Grafana no-data screenshot
-
-**Goal:** diagnose warning icons and empty production dashboard panels.
-**Done:** verified dashboard/provisioning datasource UID consistency; identified NGINX location-level proxy headers suppressing parent Host/forwarded headers as a likely origin-check issue. Asked for exact panel error before confirming live root cause.
-**Verified:** repository configuration inspection and official troubleshooting documentation; no authenticated production query available.
-**Not done / left uncommitted:** no application edits; agent notes remain uncommitted alongside existing unfinished changes.
-**Follow-ups:** obtain warning/Query Inspector error; if origin rejection, restore explicit Host/forwarded headers in Grafana location and validate/reload via release flow.
-
-## 2026-09-23 ? Codex ? Production Grafana and Zipkin guidance
-
-**Goal:** explain how to make Grafana and Zipkin work in production.
-**Done:** inspected production Compose, provisioning, NGINX, scrape config, deployment paths, tracing dependencies/settings and official Spring/Grafana/Zipkin docs. Identified existing Grafana stack and explicitly disabled/missing Zipkin; supplied configuration and verification guidance. No application/deployment changes.
-**Verified:** root/client/server/changed trip service state; public Grafana health HTTP 200 and database ok, version 12.3.2 with diagnostic TLS bypass. Normal TLS verification fails with untrusted root on this machine. No authenticated metrics or trace check.
-**Not done / left uncommitted:** both agent notes already contained prior unfinished work, so updates remain uncommitted; unrelated changes preserved.
-**Follow-ups:** verify Grafana data in Explore; implement internal Zipkin, storage/retention, export endpoint and sampling, datasource, then verify full request traces if requested. Investigate TLS chain/client trust.
-
 ## 2026-09-23 — Codex — Council on Community next milestone
 
 **Goal:** inspect Navio Community and use the requested llm-council skill to recommend the next step.
@@ -663,6 +1329,7 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 **Verified:** source inspection and repo status/branches (root/client/server/trip-planning on `dev`); documentation whitespace check. No application changes or runtime tests.
 **Not done / left uncommitted:** proposal and both agent notes. Notes already contained prior uncommitted work, so did not commit them or disturb existing UI edits.
 **Follow-ups:** implement only when requested, using the proposal's permission/sanitizer contract and database/release instructions.
+
 ## 2026-09-23 — Codex — Remove trip member controls
 
 **Goal:** remove the avatar and add-member button shown in the screenshot.
@@ -764,24 +1431,6 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 **Not done / left uncommitted:** client `CLAUDE.md` (must never be committed).
 **Follow-ups:** watch the deploy run; browser-check the released UI; intermediate client commits were split by file and not type-checked individually.
 
-## 2026-09-15 - Codex - Blur garage photo background
-
-**Goal:** match community post image backgrounds in the garage.
-**Done:** VehicleMedia now layers a decorative object-cover copy with scale-110, blur-2xl and brightness-75 behind the sharp object-contain vehicle image. Removed foreground multiply blending. Reuses the same image URL and sizes; missing-image fallback retained.
-**Verified:** full TypeScript check and targeted client ESLint pass. Isolated Chrome render of the actual component with application CSS and BYD Atto 3 asset: background blur/brightness and foreground contain/no filter confirmed; dark screenshot inspected.
-**Not done / left uncommitted:** client garage/vehicle-media.tsx under app/feature/planner/planId/_components, alongside prior work. No deployment.
-**Follow-ups:** none.
-
-
-## 2026-09-15 - Codex - Match block accents to selected color
-
-**Goal:** replace blue primary accents inside each trip block with that block's selected color.
-**Done:** TripBlock.Root scopes primary, primary foreground, and focus-ring CSS variables to the selected block palette entry. Descendant actions, icons, borders and focus states update together when the block color changes.
-**Verified:** full TypeScript check and targeted ESLint pass; Chrome guest planner verified six primary elements change together from Rose to Teal, matching focus-ring color, with global primary unchanged. Inspected Rose screenshot.
-**Not done / left uncommitted:** client app/feature/planner/planId/_components/block/trip-block.tsx on feat/structured-trip-location; prior edits preserved; no deployment.
-**Follow-ups:** none.
-
-
 ## 2026-09-15 � Codex � Fix route and battery row alignment
 
 **Goal:** align the drive time/distance and battery details shown in the screenshot.
@@ -789,17 +1438,6 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 **Verified:** Chrome guest planner with mocked directions: both rows now have identical y coordinates and zero margins; 390px layout wraps without overlap. Full TypeScript check and targeted ESLint passed.
 **Not done / left uncommitted:** client routes/route-segment-info.tsx and routes/charge-segment-info.tsx under app/feature/planner/planId/_components; no deployment.
 **Follow-ups:** none for alignment. Other sessions' unfinished changes preserved.
-
-
-## 2026-09-15 - Codex - Redesign daily route estimate
-
-**Goal:** redesign the pictured route estimate using DESIGN.md and the anti-ai-ui-review skill.
-**Done:**
-- New shared client `garage/route-estimate.tsx`, consumed by planner `day-route-overview.tsx` and Explore `plan-view.tsx` on `feat/structured-trip-location` (uncommitted).
-- Battery-led header, existing battery colors and 12% reserve marker, mono labeled metrics, compatibility footer, responsive two/four-column layout, semantic meter, and visible low/reserve labels. Removed repeated icons, blue action-like charging text, uppercase heading and shadow. Preserved calculations and existing Explore edits.
-**Verified:** full `tsc --noEmit`; targeted ESLint; changed-file `git diff --check` (repository-wide check finds pre-existing dashboard whitespace); isolated Chrome checks with actual component/CSS at 360/768/1024/1440px in light/dark and battery/warning variants (no overflow, meter correct). Inspected light desktop/dark mobile screenshots. Isolated preview uses fallback fonts; full application integration not browser-tested.
-**Not done / left uncommitted:** three client files above plus these notes; both agent documents already contain other sessions' uncommitted edits, so no combined docs commit was made without authorization to include them.
-**Follow-ups:** review within the live planner with loaded fonts; commit with the existing client work when its owner approves.
 
 ## 2026-09-15 — Claude — Rework charging stop card and route leg rows
 

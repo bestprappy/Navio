@@ -1,6 +1,6 @@
 openapi: 3.1.0
 x-navio-implemented-phase4c:
-  status: Local implementation, not deployed; remaining domain schemas below include target designs.
+  status: Implemented in the coordinated 2026-10-13 release; remaining domain schemas below include target designs.
   plannerCapability: precise-charging-v1
   privateMobilityEndpoint: POST /internal/v1/ev-route/optimize-canonical-v2
   itineraryContext: [precedingDays, stops, followingDays]
@@ -15,7 +15,7 @@ x-navio-implemented-phase4c:
       minimum: 0
       maximum: 100
       description: Optimizer target, subordinate to manual targetBatteryPct; does not create a user lock.
-  compatibility: Existing fields and older private routes remain. New clients require the capability; new trip service does not fall back to older mobility routes. Shared plans exclude these fields.
+  compatibility: Existing fields and older private routes remain. Current clients require the capability; current Trip Planning does not fall back to older Mobility routes. Shared plans exclude these fields.
 info:
   title: Navio API
   version: 1.3.0

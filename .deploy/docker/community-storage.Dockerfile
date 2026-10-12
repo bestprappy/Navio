@@ -5,7 +5,8 @@
 FROM golang:1.25-bookworm AS build
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
-    CGO_ENABLED=0 go install github.com/minio/minio@RELEASE.2025-10-15T17-29-55Z
+    CGO_ENABLED=0 go install github.com/minio/minio@RELEASE.2025-10-15T17-29-55Z \
+    && CGO_ENABLED=0 go install github.com/minio/mc@RELEASE.2025-04-16T18-13-26Z
 
 FROM debian:bookworm-slim
 RUN apt-get update \
@@ -15,6 +16,7 @@ RUN apt-get update \
     && useradd --system --uid 10001 --gid navio --home-dir /data navio \
     && mkdir /data && chown navio:navio /data
 COPY --from=build /go/bin/minio /usr/local/bin/minio
+COPY --from=build /go/bin/mc /usr/local/bin/mc
 USER navio
 ENV GOMEMLIMIT=256MiB
 VOLUME /data

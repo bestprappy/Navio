@@ -1,10 +1,10 @@
 # Navio Database Design
 
-## Phase 4C precise charging state (2026-10-11, local; not deployed)
+## Phase 4C precise charging state (2026-10-13)
 
-Trip migration `V17__precise_charging_plan.sql` adds nullable `trip.block_item.charging_duration_minutes double precision` (0–2147483647) and `planned_departure_soc_pct double precision` (0–100). Both map to Java `Double`. Existing integer `estimated_charge_minutes` and user constraint `target_battery_pct` remain unchanged. There is no backfill or inference about old rows. Optimizer application writes precise minutes plus the rounded legacy integer and its separate departure target, without creating a user lock.
+Trip migration `V17__precise_charging_plan.sql` adds nullable `trip.block_item.charging_duration_minutes double precision` (0–2147483647) and `planned_departure_soc_pct double precision` (0–100). Both map to Java `Double`. Existing integer `estimated_charge_minutes` and user constraint `target_battery_pct` remain unchanged. There is no backfill or inference for old rows. Optimizer application writes precise minutes plus the rounded legacy integer and its separate departure target without creating a user lock.
 
-Verified on disposable PostgreSQL 16.15/PostGIS: Flyway upgrade, Hibernate validation, apply/save/reopen, rollback after flushed writes, and competing same-version applications (only one commits). The unmodified pre-change trip source also passes its three Postgres schema tests against the upgraded database, verifying schema rollback compatibility. Recheck migration allocation and child repository pins before release. These fields remain trip/stop state and are excluded from shared-plan publication.
+Verification on disposable PostgreSQL 16/PostGIS covered Flyway upgrade through V17, Hibernate validation, apply/save/reopen, rollback after flushed writes, and competing same-version applications where only one commits. The fields remain trip/stop state and are excluded from shared-plan publication.
 
 ## Phase 3.1 trip garage membership (2026-09-24, local)
 
@@ -13,6 +13,8 @@ Additive trip migration `V12__trip_garage_membership.sql` adds nullable `trip.tr
 ## Applied Phase 3 trip energy state (2026-09-24)
 
 Trip service migration `V11__trip_energy_state.sql` adds nullable `trip.trip.initial_soc_pct numeric(5,2)`, `trip.trip.energy_vehicle_snapshot jsonb`, and `trip.block_item.observed_soc_pct numeric(5,2)`. Both SoC columns have inclusive 0-100 checks. Migration numbering was checked against the local checkpoint and known migration history before creation. No existing migration was edited and no data was backfilled. There are no new cross-service foreign keys or account vehicle changes.
+
+Trip service migration `V16__block_item_arrival_mode.sql` adds nullable `trip.block_item.arrival_mode varchar(16)`: how a stop is reached from the previous one (`drive`, `transit`, `walk`), validated by the service. NULL means automatic, which is how every existing stop behaves, so there is no backfill and the previous release ignores the column. New stops also fill the existing `place_type varchar(100)` with the provider's machine type (for example `subway_station`).
 
 Entity mappings use BigDecimal and JSONB. Saved user observations are distinct from calculated continuous SoC, which is not rounded or persisted as an observation. Omitted API properties preserve stored values; explicit null clears. The snapshot carries only calculation identity/profile/capabilities, rejects unrelated account fields, and remains independent of later garage edits.
 
