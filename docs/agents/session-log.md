@@ -1,3 +1,9 @@
+## 2026-10-13 - Codex - Commit latest planner Explore repository pin
+
+**Request:** Commit all latest changes to Git.
+**Audit:** Confirmed Explore application work was already committed and pushed. Remaining dirty paths are explicitly preserved/excluded local state: line-ending-only client charger/`tsconfig` markers, `CLAUDE.md`, service logs, reports and generated output. No source change remained to commit in a child repository.
+**Done:** Fetched current root/client dev and main refs, verified `feat/planner-explore-carousel-dev` still descends from current client `origin/dev`, and created root `chore/planner-explore-carousel-pin` from root `origin/dev`. Committed only the client gitlink at `a0ca27e` and pushed the branch. No force-push, dev/main merge or deployment. Prior clean-client verification remains 173/173 tests plus TypeScript, lint, whitespace and production build; no code changed today.
+
 ## 2026-10-12 - Codex - Publish clean planner Explore carousel branch
 
 **Request:** Push the latest work and merge/push to main only if stable.

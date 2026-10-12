@@ -1,3 +1,9 @@
+## 2026-10-13 - Codex - Planner Explore root pin committed and published
+
+**Status:** The clean client implementation remains published as `feat/planner-explore-carousel-dev` at `9fd12b2` on top of current client `origin/dev`. Added the missing root repository pin on `chore/planner-explore-carousel-pin` at `a0ca27e` and pushed that branch. The root branch is based on current root `origin/dev` and changes only the `client` gitlink from `6adb00a` to `9fd12b2`. No force-push, dev/main merge or deployment.
+**Preserved/excluded:** Did not commit the older checkpoint checkout's line-ending-only charger/`tsconfig` markers, `CLAUDE.md`, service logs, academic documents, generated output or `NAVIO_Development_Handoff.txt`. Existing server/service branches and pins remain unchanged. The clean client branch's prior evidence remains 173/173 frontend tests, TypeScript noEmit, targeted ESLint, whitespace and production build passing; this Git-only session did not change or rerun application code.
+**Next:** Review the client branch and root pin PRs together. Main remains gated by the required client feature -> dev -> main sequence and coordinated root release checks. Phase 4C.1 remains ON HOLD.
+
 ## 2026-10-12 - Codex - Planner Explore carousel published on clean dev-based branch
 
 **Status:** Pushed the original checkpoint-based client branch `feat/planner-explore-carousel` (`0bbba97`) for backup, then created and pushed the release-review branch `feat/planner-explore-carousel-dev` (`9fd12b2`) from current `origin/dev`. Use the `-dev` branch for review/integration: it contains only the two carousel commits on top of current client dev and excludes the deferred local Phase 4/5 checkpoint commits. No force-push, client main merge, root change or deployment.
