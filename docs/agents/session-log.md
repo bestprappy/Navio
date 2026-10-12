@@ -1,3 +1,9 @@
+## 2026-10-13 - Codex - Release planner Explore carousel to main
+
+**Request:** Merge main.
+**Release process:** Refreshed root/client/server and all service refs; verified root/server service pins exactly matched every `origin/main`. Fast-forwarded client `dev` and `main` to `9fd12b2`, then root `dev` and `main` to `a0ca27e`. No conflict, force-push or unrelated local-file commit. Root main push triggered production deployment.
+**Result:** GitHub Actions run `38282571403` completed successfully. Backend revision verification, PostgreSQL migrations/entity mappings, all builds and VM deployment passed. Post-deploy checks returned health 200, protected unauthenticated trips 401 and web root 200. Exact client revision previously passed 173/173 tests, TypeScript, lint, whitespace and production build. Deferred Phase 4C.1 checkpoint work remains excluded and on hold.
+
 ## 2026-10-13 - Codex - Commit latest planner Explore repository pin
 
 **Request:** Commit all latest changes to Git.

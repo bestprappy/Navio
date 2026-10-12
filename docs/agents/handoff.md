@@ -1,3 +1,9 @@
+## 2026-10-13 - Codex - Planner Explore carousel released to main
+
+**Release:** User explicitly requested `main`. Fast-forwarded Navio-Client `dev` and `main` to `9fd12b2`, then root `dev` and `main` to `a0ca27e`. No force-push or conflict. Root main pins client `9fd12b2`, server `ccdd08a`; the server pins all four service `origin/main` revisions exactly.
+**Evidence:** Before release, confirmed every child/service main pin and root main/dev ancestry. The exact client revision had 173/173 frontend tests, TypeScript noEmit, targeted ESLint, whitespace and production build passing. GitHub Actions run `38282571403` completed successfully: revision check, real PostgreSQL migration/entity validation, all nine image builds, and VM deployment. Independent production checks after rollout: `/health` 200, unauthenticated `/v1/trips` 401, web root 200.
+**Preserved:** Older local Phase 4/5 checkpoint branches and line-ending/log/report/configuration working-tree items were not included. Phase 4C.1 remains ON HOLD; this release does not merge those deferred checkpoint branches.
+
 ## 2026-10-13 - Codex - Planner Explore root pin committed and published
 
 **Status:** The clean client implementation remains published as `feat/planner-explore-carousel-dev` at `9fd12b2` on top of current client `origin/dev`. Added the missing root repository pin on `chore/planner-explore-carousel-pin` at `a0ca27e` and pushed that branch. The root branch is based on current root `origin/dev` and changes only the `client` gitlink from `6adb00a` to `9fd12b2`. No force-push, dev/main merge or deployment.
