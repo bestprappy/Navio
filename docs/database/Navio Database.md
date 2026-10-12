@@ -1,5 +1,11 @@
 # Navio Database Design
 
+## Phase 4C precise charging state (2026-10-13)
+
+Trip migration `V17__precise_charging_plan.sql` adds nullable `trip.block_item.charging_duration_minutes double precision` (0–2147483647) and `planned_departure_soc_pct double precision` (0–100). Both map to Java `Double`. Existing integer `estimated_charge_minutes` and user constraint `target_battery_pct` remain unchanged. There is no backfill or inference for old rows. Optimizer application writes precise minutes plus the rounded legacy integer and its separate departure target without creating a user lock.
+
+Verification on disposable PostgreSQL 16/PostGIS covered Flyway upgrade through V17, Hibernate validation, apply/save/reopen, rollback after flushed writes, and competing same-version applications where only one commits. The fields remain trip/stop state and are excluded from shared-plan publication.
+
 ## Phase 3.1 trip garage membership (2026-09-24, local)
 
 Additive trip migration `V12__trip_garage_membership.sql` adds nullable `trip.trip.garage_vehicle_ids jsonb`, mapped as a list of vehicle UUID strings. NULL represents historical/unspecified membership; an empty array represents an explicitly empty trip garage. There is no backfill or cross-service foreign key. Account vehicle records remain intact and reusable. API validation bounds membership to 25 unique UUIDs; trip ownership and version checks are unchanged. The column and V11 energy state passed Flyway, Hibernate validation and save/reload/clear checks on disposable PostgreSQL. V12 was checked against fetched trip-service origin/main/dev and local migration history; it is not deployed yet.

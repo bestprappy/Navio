@@ -8,6 +8,16 @@
 
 ## Global API Rules
 
+### Precise charging contract (Phase 4C, 2026-10-13)
+
+Planner snapshots advertise `precise-charging-v1` and accept nullable `evCharger.chargingDurationMinutes` (continuous minutes, 0–2147483647) and `evCharger.plannedDepartureSocPct` (0–100). `estimatedChargeMinutes` remains the rounded legacy value. The optimizer target is separate from the user's `targetBatteryPct`: a manual target takes precedence and locks the stop, while an optimizer target does not create a user lock. Replay uses the precise duration before the legacy integer. An unchanged legacy snapshot preserves existing precise fields; changing its legacy duration or manual target replaces that charging instruction. Removing the charger clears its charging state.
+
+The client requires `precise-charging-v1` for precise saves and requires it together with `canonical-optimization-v1` before optimization. Unsupported saves are rejected without reporting a successful synchronization. Guest state remains temporary and does not change account vehicle data.
+
+Trip Planning calls private Mobility endpoint `POST /internal/v1/ev-route/optimize-canonical-v2`, carrying `precedingDays`, selected-day `stops`, and `followingDays` in chronological order. Stops may contain both precise fields. Older private routes remain available for old callers, but the current Trip Planning client does not fall back to them. A successful selected-day result is replayed through the unchanged later itinerary; unavailable, disconnected, unreachable, or below-reserve state prevents application. Response `finalSocPct` and driving/charging totals describe the selected day. Rated-range models remain preview-only for automatic application.
+
+Apply revalidates ownership and trip version and writes atomically. Retained movable chargers follow the verified route without losing identity or notes; protected stops remain in place. Shared-plan publication excludes private charging duration and target values. Mobility, Trip Planning (including V17), and the client must be deployed together; an older Mobility service fails closed on the new route.
+
 ### Vehicle energy provenance (Phase 1, 2026-09-19)
 
 Garage responses from `/v1/users/me/vehicles` and its catalogue endpoints add an `energyProfile` object. Existing scalar specifications and calculation behaviour are unchanged. Old payloads remain accepted; older responses without this object remain supported by the client.
@@ -76,6 +86,16 @@ The trip service enforces ownership and resolves the energy model, charging limi
 The additive internal request to `POST /internal/v1/ev-route/optimize-canonical` includes chronological `precedingDays: [{ blockId, stops }]`. Stop context carries `observedSocPct`, `targetBatteryPct` and nullable integer `estimatedChargeMinutes`. Earlier days are replayed unchanged through road routes and the existing canonical energy model; observations replace only forward state and charging follows observations. Unknown/unreachable earlier legs, disconnected day boundaries and incomplete charger specifications cannot certify a later-day optimization. First/last charger stops are protected as day boundaries within the request without changing saved lock settings. Only the selected day is optimized. Versions are checked around preview computation and by the transactional apply path.
 
 The old internal `/optimize` route remains available for existing callers. The new route prevents an old mobility deployment from silently ignoring chronological context; coordinated mobility, trip and frontend deployment is required. Anonymous/account permissions are unchanged. No database migration, new consumption formula, automatic calibration or UI consolidation is introduced. Complete charger feasibility/reserve policy and continuous preview/apply/reload precision remain Phase 4B/4C work; Phase 4A is not completion of all Phase 4 release gates.
+
+### Routed charging feasibility (Phase 4B, 2026-10-06)
+
+The canonical optimizer excludes `OTHER` as evidence of connector compatibility and requires an active station and known compatible effective power for a required charge. Unknown, stale, or busy availability is disclosed as a warning rather than a guarantee of a free connector. The unused frontend `planAutoEvChargers` helper is not the active planning path.
+
+The selected itinerary is replayed on road routes, splitting expanded routes into at most 25 points per call with a shared boundary point. Missing, duplicate, or fallback road legs cannot certify feasibility. For each replaceable or inserted charging stop, detour distance is routed incoming plus outgoing distance minus the routed bypass between its neighbours, floored at zero. It must not exceed `maximumDetourKm`; retained mandatory stops are not treated as optional detours.
+
+Starting battery is not an arrival: a compatible charger at the actual origin can charge from below reserve, including zero. The optimizer does not teleport to a nearby charger. Every driving arrival is checked before an observed checkpoint. Physical depletion and reserve insufficiency return distinct failure reasons. Earlier-day reserve violations prevent later-day certification. Final observations below reserve also prevent a feasible result. Saved charging targets and durations are replayed at retained stops, including the final stop. Targets below current SoC never discharge the vehicle, and unavailable prior charging state cannot be erased to certify an earlier leg.
+
+No energy formula or public request shape changed in Phase 4B. Search remains bounded and corridor based; road verification can reject its selected candidate without claiming every alternative was exhausted.
 
 ### Common conventions
 
