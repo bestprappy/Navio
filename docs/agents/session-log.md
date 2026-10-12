@@ -1,3 +1,11 @@
+## 2026-10-13 - Codex - Diagnose Google Maps versus Tokyo transit API
+
+**Goal:** Answer whether Navio can show Google Maps-style transit alternatives after the user supplied a Tokyo Tower to New National Theatre example that is available in Google Maps but unverified in Navio.
+**Done:** Read current provider/proxy code and verified official Google documentation. Public read-only routing requests through both localhost:3000/api/routes/directions and localhost:8080/v1/routes/directions returned transit fallback, reason No public transit route was found, 6012 m direct distance and no steps. Google Maps Platform FAQ explicitly states Routes API excludes Japanese transit partners (also IRCTC). Therefore the Tokyo example has a provider coverage limitation, not simply a missing UI. Google Routes can return up to three alternatives in addition to the main route, station and departure/arrival details, and fares where supplied, in supported regions. Current Navio keeps one provider route, requests alternatives only for rail-only searches, strips schedule metadata, and reports moving time rather than complete scheduled journey time. Google-style route rows need a richer provider/response contract. NAVITIME's official transit API is a viable Japan-capable integration option with separate access and relevant timetable/service options to check.
+**Sources:** https://developers.google.com/maps/faq#transit_directions_countries ; https://developers.google.com/maps/documentation/routes/transit-route ; https://api-sdk.navitime.co.jp/api/specs/api_guide/route_transit.html
+**Verified:** Current source inspection, official documentation and two live Navio public routing responses. No account/planner writes, new provider account/API key, application edits, restart, schema changes, push or deployment. Prior travel UI remains uncommitted on existing branches. Concurrent auth/guest-removal and development-runner changes were observed and preserved; prior frontend test counts are historical for their tested state.
+**Follow-ups:** Extend the common transit journey contract to include alternatives, schedule context, overall elapsed time, walking, lines/stops and nullable fares. Keep Google for covered regions and integrate a licensed Japan-capable transit source for Tokyo; changing the UI or departure time alone cannot overcome the documented Japan exclusion. No new branches, per the user's instruction. Session notes committed on the existing root docs branch and fast-forwarded locally into dev only.
+
 ## 2026-10-13 - Codex - Travel options and transit station UI
 
 **Goal:** Add travel-mode suggestions and visible public-transit station directions; explain straight-line fallbacks using a question-mark indicator. User requested the frontend-design skill and explicitly required current branches with no new branch.
@@ -6,7 +14,7 @@
 **Not done / left uncommitted:** All application changes remain uncommitted on client feat/route-focus-by-place and existing service fix/merge-friend-dev-20261013 branches, preserving the earlier mixed client work. No new branch, source commit, submodule pin, push, service restart or deployment. Only this session/API documentation is committed on the existing root docs/local-production-db-session-2026-10-13 branch and integrated locally into dev; root main is untouched. Concurrent root navio.cmd/scripts and additional client edits were observed and preserved.
 **Follow-ups:** Resolve the concurrent form type errors and rerun whole-workspace typecheck. Coordinated Trip Planning/Mobility updates are needed for live bike routing/saving. Provider coverage still determines whether actual rail/bus itineraries can be supplied; the panel never invents them. Planned departure times are still not sent to Google. Review/integrate the combined existing application work before any release; deferred Phase 4C.1 remains on hold.
 
-﻿## 2026-10-13 - Codex - Merge friend's latest dev/main changes locally
+## 2026-10-13 - Codex - Merge friend's latest dev/main changes locally
 
 **Goal:** Merge the friend's recent push and resolve conflicts while preserving unfinished local work.
 **Done:**
