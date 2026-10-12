@@ -1,3 +1,12 @@
+## 2026-10-13 - Claude - Transit stations clickable with Transit lines on
+
+**Goal:** User could not click a station on the Google planner map while the Transit lines toggle was on.
+**Cause (reproduced):** A headless probe against the real Maps JS API at Minami-asagaya returned station placeIds without TransitLayer and zero POI hits with it. Google's transit overlay redraws stations without click targets, so `handleMapPoiClick` never received a placeId.
+**Done:** New `routes/transit-station-click.ts` converts zoom into a ~40px search radius (null below zoom 14) and returns the nearest station from distance-ranked results. When transit lines are visible and a click has no placeId, `planner-map-google.tsx` calls the existing `/api/geo/places/nearby` and opens that station through `startPlaceSearch`. Normal POI clicks are unchanged. A failed lookup now logs `console.warn` instead of being swallowed silently.
+**Verified:** New `tests/planner/transit-station-click.test.mjs` passes, with transit-legs 23/23 combined. TypeScript noEmit and targeted ESLint are clean. The live local nearby endpoint at the measured station icon position returned the `subway_station` second, behind one shop, and the helper picks it. I did not click it in the actual planner UI.
+**Not done / left uncommitted:** Changes are uncommitted on client `feat/route-focus-by-place`, alongside the existing mixed work there. The Explore plan map (`plan-map.tsx`) has no POI click handler, so it is unchanged.
+**Follow-ups:** A click on the far end of a long station label (more than ~40px from the icon) still misses. Each empty-map click with transit lines on at zoom 14 or higher makes one nearby request.
+
 ## 2026-10-13 - Codex - Remove guest planning and refresh stale development route cache
 
 **Goal:** Completely remove guest sign-in/planning after a recurring missing page.tsx error. User explicitly required the current branches and no new branch, then asked to continue interrupted verification.

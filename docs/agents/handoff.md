@@ -1,3 +1,7 @@
+## 2026-10-13 - Claude - Transit stations clickable on the planner map with Transit lines on
+
+**Change (uncommitted, client `feat/route-focus-by-place`):** Google's TransitLayer removes station click targets. This was reproduced with the real Maps JS API: 0 POI hits with the layer, placeIds without it. While transit lines are visible, a click with no placeId now runs a nearby search over a ~40px radius at zoom 14 or higher. The nearest station from that search opens via `startPlaceSearch`. Files: `planner-map-google.tsx` and the new `routes/transit-station-click.ts` + `tests/planner/transit-station-click.test.mjs`. Tests, TypeScript and ESLint pass, and the live local nearby endpoint returns the station at the icon position. A manual click in the real planner UI is still pending. Commit these with the rest of the client work, not separately from a mixed stage.
+
 ## 2026-10-13 - Codex - Guest planning removed; missing test-route error verified resolved
 
 **Current behavior:** /planner and /dashboard require sign-in. Guest welcome/notices, temporary trip/metadata/garage state and guest-only tests are removed. New-trip and garage writes fail closed without a session. Old guest/non-persisted planner links open /planner/new after sign-in; public Explore/community browsing remains accessible. Current application work is local only on client feat/route-focus-by-place, preserving the existing multi-feature planner edits.
