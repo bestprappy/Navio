@@ -1,4 +1,17 @@
-﻿## 2026-10-13 - Codex - Prepare canonical energy release
+﻿## 2026-10-13 - Codex - Merge friend's latest dev/main changes locally
+
+**Goal:** Merge the friend's recent push and resolve conflicts while preserving unfinished local work.
+**Done:**
+
+- Fetched all seven repositories; remote dev/main agree. Fast-forwarded root dev to ab94c35, client dev and feat/route-focus-by-place to 19a6e1e, server dev to 7630e41, trip planning to 72f01f6 and mobility to 533850b. Changed services use fix/merge-friend-dev-20261013 branches because an existing worktree holds trip planning dev. Unchanged services remain on existing mains.
+- Backed up 63 dirty/untracked client files and saved tracked edits in a retained local stash. Resolved the single restored-work conflict by retaining incoming batched/cancelable fetching and moving the local rail-only response guard into trip-route-api.ts. Added a cross-batch rail regression; constants/types.ts combined both sides automatically.
+- Recorded required notes on docs/merge-friend-session-2026-10-13 from synced root dev, merged locally to dev only.
+
+**Verified:** Full client suite 248/248, TypeScript noEmit, targeted ESLint, whitespace and unresolved-conflict checks pass. New regression failed before the guard move and passed afterward. Verified all 61 unaffected original client files retain their contents. Evidence and recovery: C:/Users/User/.codex/tmp/navio-friend-merge-20261013-182410/. No fresh backend/PostgreSQL/browser/deployment checks.
+**Not done / left uncommitted:** Existing multi-feature client work plus trip-route-api.ts and tests/energy/route-batching.test.mjs remain unstaged/uncommitted on feat/route-focus-by-place. Concurrent scripts/dev-vm.mjs edits appeared after verification and were left untouched. CLAUDE.md, reports, service logs and other worktrees preserved. No source push, new pin or production operation; documentation merged locally only.
+**Follow-ups:** Review the combined planner and coordinate ownership before committing/publishing mixed client changes. Remote root main already matches release ab94c35; its deployment outcome was not inspected here. Phase 4C.1 remains deferred.
+
+## 2026-10-13 - Codex - Prepare canonical energy release
 
 **Request:** Treat the plan as complete, leave Phase 4C.1 deferred unless its hydration issue returns, commit/push the completed work to main, then pull the latest repository state.
 **Integration:** Rebased the preserved checkpoint work by cherry-picking it onto the current published dev histories in isolated worktrees. Resolved only additive contract conflicts so travel-mode/transit work and the approved Explore/UI remain intact. Published Trip Planning 72f01f6 and Mobility/EV 533850b through release branches to dev/main, then Navio-Server 7630e41 with those exact pins. Published Navio-Client contract fix 05df617 and Phase 5 display 19a6e1e through release branches to dev/main.
