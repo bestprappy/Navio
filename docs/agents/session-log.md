@@ -1,3 +1,11 @@
+## 2026-10-13 - Claude - Login left panel changed to abstract art
+
+**Goal:** After the split-screen login landed, the user asked for animated abstract art with no text on the left, the logo moved to the right, and a left side that contrasts with the form instead of blending into it.
+**Done:** In `.deploy/keycloak/themes/navio/login/template.ftl`, the route showcase is replaced by `.navio-art`: an inset, rounded, sticky panel. It holds three blurred glows (electric blue, cyan, battery green) over a deep indigo-to-blue gradient, plus an SVG ribbon of 30 generated flowing lines. Fifteen glowing pulses travel along the lines, and the ribbon drifts slowly. The panel is `aria-hidden`. The Navio logo and wordmark now sit above the form title (`.navio-brand`). Under reduced motion everything is still, and the pulses rest at spread-out points along the lines. On phones the art becomes a 9rem banner (6rem below 30rem). Removed the showcase copy from `messages_en.properties` and the old showcase/route CSS. The `deploy.sh` smoke check now looks for `navio-art`, and the README is updated.
+**Verified:** Headless Edge screenshots at 1844x903 dark, 1440x900 light, registration at 1280x800, and 390px dark, with both motion settings forced. No horizontal overflow. `bash -n deploy.sh` passes. No client code changed in this step.
+**Not done / left uncommitted:** Same as the previous entry: all theme, deploy and client work is uncommitted on the current branches. No push or deploy.
+**Follow-ups:** Watch for GPU cost from the animated blur glows on low-end laptops; if needed, drop the glow animation first.
+
 ## 2026-10-13 - Claude - Login UI rework: split-screen Keycloak theme, no interstitial
 
 **Goal:** Rework login to look like the user's split-screen reference: a brand showcase on the left and the sign-in form on the right. Remove the extra "Continue with email" step. User invoked /frontend-design.

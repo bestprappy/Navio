@@ -1,3 +1,7 @@
+## 2026-10-13 - Claude - Login left panel is now animated abstract art
+
+**Change (uncommitted):** The Keycloak `navio` theme's left panel is now decorative animated art (`.navio-art`) with no text: a vivid blue/teal inset panel with a silk ribbon of lines and glowing pulses. The logo moved to the right above "Welcome back". It stands out against both the light and dark form panels. Under reduced motion it is static. The deploy smoke check expects `navio-art`. Everything else in the entry below still applies.
+
 ## 2026-10-13 - Claude - Login is now the Keycloak `navio` theme, split-screen
 
 **Change (uncommitted):** `/sign-in` and `/sign-up` no longer show a Navio card with "Continue with email". They redirect straight to Keycloak, whose `navio` theme now has a split layout: a navy route and battery showcase on the left and the form on the right. Theme files are in `.deploy/keycloak/themes/navio/login/` (new `template.ftl` and `messages/messages_en.properties`, rewritten `resources/css/navio.css`), and `deploy.sh` installs and smoke-checks them. Client: new `app/feature/auth/auth-redirect.tsx` and `use-start-authentication.ts`; `auth-card.tsx` and `auth-submit-button.tsx` are deleted. A `?error=` from Auth.js shows a retry screen and never redirects again on its own. Passwords still never touch Navio; do not switch to Direct Access Grants.
