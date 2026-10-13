@@ -1066,3 +1066,11 @@ Root `0a4acc4` (deploy run 34829001804, success).
 **Verification and local state:** Before the energy release, client passed 190/190 tests plus TypeScript and targeted ESLint; Trip Planning passed 217/217 and Mobility/EV 82/82 against disposable PostgreSQL with Flyway/Hibernate validation. Temporary config-server and PostgreSQL verification resources were stopped. All active repositories are on `dev` and match the latest published child pins. Preserved local-only items remain uncommitted: root reports/generated output/handoff text, client `CLAUDE.md`, and service logs.
 
 **Next:** Continue from the pulled team release. Phase 4C.1 remains deferred unless the planner hydration problem returns; do not treat the historical one-off error as an active failure without reproduction.
+## 2026-10-13 - Codex - Main synchronization confirmed
+
+**Result:** Pulled `origin/main` with fast-forward-only safety in the client, all four services, Navio-Server, and root, in child-to-parent order. Every repository reported already up to date; no application file, submodule pin, migration, UI, or deployment changed. Active checkouts remain on `dev`, which already contains the published main revisions. Local-only reports, `CLAUDE.md`, and service logs remain preserved and uncommitted. Phase 4C.1 remains deferred.
+## 2026-10-13 - Codex - TipTap build failure diagnosed; no fix applied
+
+**Diagnosis:** The reported Turbopack `Can't resolve '@tiptap/core'` error is local dependency-install drift after the latest client pull. Current `package.json` and `package-lock.json` correctly declare and lock TipTap `3.31.4`, including `@tiptap/core` and `@tiptap/pm`. The local `node_modules` tree has no `@tiptap` directory, `npm ls` reports the packages absent, and direct Node resolution returns `MODULE_NOT_FOUND`. The installed-tree lock timestamp predates the pulled package files by roughly 17.5 hours, confirming dependencies were not synchronized after the pull.
+
+**Scope:** Diagnosis only at the user's explicit request. No package installation, source edit, lockfile edit, build retry, or application fix was performed. The source import and committed dependency metadata are internally consistent. When authorized, refresh the local install from the committed lockfile, restart the dev process, and verify module resolution/build.
