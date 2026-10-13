@@ -1,3 +1,11 @@
+## 2026-10-13 - Claude - Release traveler guides, community redesign and open-transit fallback
+
+**Goal:** User asked to commit all outstanding work and deploy to main.
+**Done:** Committed and merged feature -> dev -> main: community-service `47a0439` (V7 icons/comment reactions/joined feed), user-management-service `6138990` (V8 user guides, `/v1/users/me/guides`, `/v1/traveler-guides`), mobility-and-ev-service `010e4ef` (optional OTP transit fallback, disabled by default). Server `3d15386` (gateway routes/public reads, OTP config) and pins `bc0d0dd`. Client: community redesign, transit attribution/directions budget, dashboard scenery, traveler guides, README dependency note (main `3b16acd`). Root: transit overlay/data scripts and local runner hardening (chore), API/database/design/local-development docs, these notes, then client/server pins; pushing root main deploys.
+**Verified:** Full `./mvnw -o test` passes for api-gateway, community, user-management and mobility. Client `tsc --noEmit` against the committed tsconfig, ESLint on every changed file and 328/328 node tests (`node --experimental-transform-types --test`; plain `node --test` on Node 25 fails on an untouched `vehicle-api.ts` parameter property). Both migrations are additive and follow the versions on main; CI re-runs PostgresSchemaTests before building.
+**Not done / left uncommitted:** `docs/report/` (12 MB thesis docx/pdf, never tracked), client `tsconfig.json` (Next dev-server include paths only), local `CLAUDE.md`, service `logs/` and mobility JVM crash logs. Working copies of root agent docs were subsets of root dev and were replaced by dev's versions (backup in this session's scratchpad). OTP stays off in production; the transit overlay is not wired into deploy.
+**Follow-ups:** Confirm the deploy run for the root main SHA and the health/401 smoke checks in release.md. Enabling transit in production needs a built graph, the overlay and NAVIO_OTP_* settings.
+
 ## 2026-10-13 - Codex - Fix the shutdown race and activate local Japan transit
 
 **Goal:** Continue fixing Japan transit after the user's approved manual Mobility restart failed with "Mobility port changed owner during restart".
