@@ -53,6 +53,7 @@ install -d -m 0755 \
   "${DEPLOY_ROOT}/config" \
   "${DEPLOY_ROOT}/keycloak" \
   "${DEPLOY_ROOT}/keycloak/themes/navio/login/resources/css" \
+  "${DEPLOY_ROOT}/keycloak/themes/navio/login/messages" \
   "${DEPLOY_ROOT}/nginx" \
   "${DEPLOY_ROOT}/postgres" \
   "${DEPLOY_ROOT}/tls" \
@@ -74,10 +75,11 @@ install -m 0644 "${SOURCE_ROOT}/.deploy/compose.storage.yml" "${DEPLOY_ROOT}/com
 install -m 0644 "${SOURCE_ROOT}/.deploy/config/"*.yml "${DEPLOY_ROOT}/config/"
 install -m 0644 "${SOURCE_ROOT}/.deploy/keycloak/navio-realm.json" \
   "${DEPLOY_ROOT}/keycloak/navio-realm.json"
-install -m 0644 "${SOURCE_ROOT}/.deploy/keycloak/themes/navio/login/theme.properties" \
-  "${DEPLOY_ROOT}/keycloak/themes/navio/login/theme.properties"
-install -m 0644 "${SOURCE_ROOT}/.deploy/keycloak/themes/navio/login/resources/css/navio.css" \
-  "${DEPLOY_ROOT}/keycloak/themes/navio/login/resources/css/navio.css"
+KEYCLOAK_THEME_REVISION="$(bash \
+  "${SOURCE_ROOT}/.deploy/scripts/install-keycloak-theme.sh" \
+  "${SOURCE_ROOT}/.deploy/keycloak/themes/navio" \
+  "${DEPLOY_ROOT}/keycloak/themes/navio")"
+readonly KEYCLOAK_THEME_REVISION
 install -m 0644 "${SOURCE_ROOT}/.deploy/nginx/navio.conf" "${DEPLOY_ROOT}/nginx/navio.conf"
 install -m 0644 "${SOURCE_ROOT}/.deploy/postgres/init-keycloak.sql" "${DEPLOY_ROOT}/postgres/init-keycloak.sql"
 
@@ -100,6 +102,15 @@ if grep -q '^NAVIO_IMAGE_TAG=' "${ENV_FILE}"; then
   sed -i "s/^NAVIO_IMAGE_TAG=.*/NAVIO_IMAGE_TAG=${IMAGE_TAG}/" "${ENV_FILE}"
 else
   printf '\nNAVIO_IMAGE_TAG=%s\n' "${IMAGE_TAG}" >> "${ENV_FILE}"
+fi
+
+# A bind-mounted theme update does not invalidate Keycloak's theme, message or
+# gzip caches. Changing this Compose label recreates the container and its
+# writable cache directory while keeping the persistent realm/users in Postgres.
+if grep -q '^NAVIO_KEYCLOAK_THEME_REVISION=' "${ENV_FILE}"; then
+  sed -i "s/^NAVIO_KEYCLOAK_THEME_REVISION=.*/NAVIO_KEYCLOAK_THEME_REVISION=${KEYCLOAK_THEME_REVISION}/" "${ENV_FILE}"
+else
+  printf '\nNAVIO_KEYCLOAK_THEME_REVISION=%s\n' "${KEYCLOAK_THEME_REVISION}" >> "${ENV_FILE}"
 fi
 
 compose() {
@@ -409,8 +420,28 @@ readonly KEYCLOAK_LOGIN_HTML="$(curl --fail --silent --show-error \
   'https://navio.sit.kmutt.ac.th/realms/navio/protocol/openid-connect/auth')"
 if [[ "${KEYCLOAK_LOGIN_HTML}" != *'name="username"'* ]] \
   || [[ "${KEYCLOAK_LOGIN_HTML}" != *'name="password"'* ]] \
-  || [[ "${KEYCLOAK_LOGIN_HTML}" != *'navio.css'* ]]; then
+  || [[ "${KEYCLOAK_LOGIN_HTML}" != *"navio-${KEYCLOAK_THEME_REVISION}.css"* ]] \
+  || [[ "${KEYCLOAK_LOGIN_HTML}" != *'navio-art'* ]] \
+  || [[ "${KEYCLOAK_LOGIN_HTML}" != *'Welcome back'* ]]; then
   echo "Expected the themed Keycloak email/password login form." >&2
+  exit 1
+fi
+
+# HTML can use the new layout while the resource endpoint still serves old gzip
+# bytes. Verify the stylesheet the browser will request, including compression.
+KEYCLOAK_CSS_PATH="$(printf '%s' "${KEYCLOAK_LOGIN_HTML}" \
+  | grep -oE '/resources/[^" ]+/css/navio-[0-9a-f]{64}\.css' | head -n 1)"
+KEYCLOAK_CSS_HASH="$(curl --fail --silent --show-error --compressed \
+  --cacert "${TLS_CERT_FILE}" \
+  --resolve navio.sit.kmutt.ac.th:443:127.0.0.1 \
+  "https://navio.sit.kmutt.ac.th${KEYCLOAK_CSS_PATH}" \
+  | sha256sum | cut -d ' ' -f 1)"
+EXPECTED_KEYCLOAK_CSS_HASH="$(sha256sum \
+  "${SOURCE_ROOT}/.deploy/keycloak/themes/navio/login/resources/css/navio.css" \
+  | cut -d ' ' -f 1)"
+readonly KEYCLOAK_CSS_PATH KEYCLOAK_CSS_HASH EXPECTED_KEYCLOAK_CSS_HASH
+if [[ "${KEYCLOAK_CSS_HASH}" != "${EXPECTED_KEYCLOAK_CSS_HASH}" ]]; then
+  echo "Keycloak served a stale or incorrect Navio login stylesheet." >&2
   exit 1
 fi
 
@@ -430,7 +461,8 @@ readonly KEYCLOAK_REGISTRATION_HTML="$(curl --fail --silent --show-error \
   'https://navio.sit.kmutt.ac.th/realms/navio/protocol/openid-connect/auth')"
 if [[ "${KEYCLOAK_REGISTRATION_HTML}" != *'name="email"'* ]] \
   || [[ "${KEYCLOAK_REGISTRATION_HTML}" != *'kc-register-form'* ]] \
-  || [[ "${KEYCLOAK_REGISTRATION_HTML}" != *'navio.css'* ]]; then
+  || [[ "${KEYCLOAK_REGISTRATION_HTML}" != *"navio-${KEYCLOAK_THEME_REVISION}.css"* ]] \
+  || [[ "${KEYCLOAK_REGISTRATION_HTML}" != *'Create your Navio account'* ]]; then
   echo "Expected the themed Keycloak email registration form." >&2
   exit 1
 fi
@@ -478,6 +510,9 @@ verify_api_route POST '/v1/groups' 401
 verify_api_route GET '/v1/shared-plans?page=0&size=1' 200
 verify_api_route GET '/v1/vehicle-models?page=0&size=1' 200
 verify_api_route GET '/v1/admin/audit-events' 401
+verify_api_route GET '/v1/guides?page=0&size=1' 200
+verify_api_route GET '/v1/admin/guides' 401
+verify_api_route POST '/v1/admin/guides' 401
 
 # The Next.js admin pages share the /admin/ prefix with Keycloak's console.
 # An anonymous request must reach Next.js (proxy.ts redirects to sign-in),
@@ -497,13 +532,12 @@ for auth_path in sign-in sign-up; do
     --cacert "${TLS_CERT_FILE}" \
     --resolve navio.sit.kmutt.ac.th:443:127.0.0.1 \
     "https://navio.sit.kmutt.ac.th/${auth_path}")"
-  expected_email_action='Continue with email &amp; password'
+  expected_auth_status='Opening log in'
   if [[ "${auth_path}" == "sign-up" ]]; then
-    expected_email_action='Sign up with email'
+    expected_auth_status='Opening sign up'
   fi
-  if [[ "${auth_page_html}" != *'Continue with Google'* ]] \
-    || [[ "${auth_page_html}" != *"${expected_email_action}"* ]]; then
-    echo "Expected /${auth_path} to render email/password and Google authentication actions." >&2
+  if [[ "${auth_page_html}" != *"${expected_auth_status}"* ]]; then
+    echo "Expected /${auth_path} to render the Keycloak authentication handover." >&2
     exit 1
   fi
 done

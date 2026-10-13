@@ -97,6 +97,29 @@ replace this flow with Direct Access Grants: that would make the web app handle
 raw passwords and would bypass browser-flow capabilities such as required
 actions and identity brokering.
 
+`themes/navio/login/template.ftl` is a copy of the Keycloak 26.7.3 `keycloak.v2`
+layout with one change: the page body is a split layout, with decorative
+animated art on the left and the Navio logo plus Keycloak's unmodified form
+markup on the right. The art's ribbon paths are generated, not hand-drawn, so
+regenerate them rather than editing individual coordinates. When upgrading
+Keycloak, re-copy the new parent `template.ftl` and reapply only the block
+between `<body>` and `<main>`. Wording overrides live in
+`messages/messages_en.properties`. `deploy.sh` installs the theme through
+`scripts/install-keycloak-theme.sh`. The installer hashes all theme file names
+and contents, copies the stylesheet to `navio-<revision>.css`, and updates the
+installed `theme.properties` to use that URL. The same revision is a Compose
+label on Keycloak: a changed theme recreates the container, clearing its cached
+messages, templates and gzip resources while retaining realm/user data in
+Postgres. Unchanged themes keep the existing container and production caching.
+
+This matters even if the new HTML is visible: Keycloak can serve the previous
+compressed CSS from `data/tmp/kc-gzip-cache`, and resource responses allow
+browsers to cache the same URL for 30 days. The login smoke check therefore
+verifies both the wording and the SHA-256 of the compressed stylesheet response.
+
+The Next.js `/sign-in` and `/sign-up` pages send visitors straight to this
+theme, so it is the only login screen people see.
+
 ### Why `verifyEmail` is off
 
 `verifyEmail` is deliberately `false` and `deploy.sh` reasserts that on every

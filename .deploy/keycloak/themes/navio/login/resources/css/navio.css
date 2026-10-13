@@ -1,161 +1,552 @@
-:root {
-  --navio-bg: #101524;
-  --navio-card: #171c2b;
-  --navio-card-muted: #1d2335;
-  --navio-border: #30384f;
-  --navio-text: #f7f8fc;
-  --navio-muted: #aeb7d0;
-  --navio-primary: #45a9c6;
-  --navio-primary-hover: #58bad5;
-  --navio-danger: #ff5c68;
-  --keycloak-card-top-color: transparent;
-}
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
-html,
-body,
-.login-pf body,
-.pf-v5-c-login {
-  min-height: 100%;
-  background:
-    radial-gradient(circle at 15% 18%, rgb(69 169 198 / 12%), transparent 30rem),
-    radial-gradient(circle at 88% 82%, rgb(21 128 61 / 10%), transparent 28rem),
-    var(--navio-bg);
-  color: var(--navio-text);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+/*
+  Navio login theme. Values mirror client/app/globals.css (see client/DESIGN.md).
+  The art panel is a saturated brand-blue field in both themes so it always
+  stands apart from the form panel, which follows the visitor's light/dark
+  preference through Keycloak's .pf-v5-theme-dark class.
+*/
+:root {
+  --navio-art-top: oklch(0.42 0.22 262);
+  --navio-art-bottom: oklch(0.2 0.12 272);
+  --navio-art-glow-blue: oklch(0.62 0.24 258);
+  --navio-art-glow-cyan: oklch(0.82 0.15 215);
+  --navio-art-glow-green: oklch(0.82 0.22 150);
+  --navio-art-line-start: oklch(0.98 0.02 250);
+  --navio-art-line-mid: oklch(0.9 0.13 210);
+  --navio-art-line-end: oklch(0.9 0.2 150);
+
+  --navio-bg: oklch(0.988 0.004 271);
+  --navio-surface: oklch(1 0 0);
+  --navio-text: oklch(0.157 0.049 271);
+  --navio-muted: oklch(0.47 0.02 265);
+  --navio-border: oklch(0.87 0.01 265);
+  --navio-input-border: oklch(0.63 0.016 265);
+  --navio-primary: oklch(0.641 0.197 253);
+  --navio-primary-hover: oklch(0.58 0.19 255);
+  --navio-on-primary: oklch(0.988 0.004 271);
+  --navio-focus: oklch(0.641 0.197 253 / 35%);
+  --navio-danger: oklch(0.499 0.174 25.2);
+  --navio-danger-surface: oklch(0.499 0.174 25.2 / 8%);
+
+  --navio-radius-sm: 0.6rem;
+  --navio-radius-md: 0.8rem;
+  --navio-space-1: 0.5rem;
+  --navio-space-2: 1rem;
+  --navio-space-3: 1.5rem;
+  --navio-space-4: 2rem;
+  --navio-space-6: 3rem;
+
+  --navio-font: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", sans-serif;
 }
 
-.pf-v5-c-login__container {
-  grid-template-columns: minmax(0, 32rem);
-  padding: 1.5rem;
+.pf-v5-theme-dark {
+  --navio-bg: oklch(0.19 0.018 265);
+  --navio-surface: oklch(0.235 0.02 265);
+  --navio-text: oklch(0.988 0.004 271);
+  --navio-muted: oklch(0.76 0.015 265);
+  --navio-border: oklch(0.34 0.02 265);
+  --navio-input-border: oklch(0.5 0.02 265);
+  --navio-primary: oklch(0.737 0.158 235.9);
+  --navio-primary-hover: oklch(0.8 0.13 235);
+  --navio-on-primary: oklch(0.157 0.049 271);
+  --navio-focus: oklch(0.737 0.158 235.9 / 40%);
+  --navio-danger: oklch(0.638 0.208 25.1);
+  --navio-danger-surface: oklch(0.638 0.208 25.1 / 12%);
 }
 
-.pf-v5-c-login__main {
+/* ---------- Page frame ---------------------------------------------------- */
+
+html,
+body,
+.login-pf body {
+  min-height: 100%;
+  background: var(--navio-bg);
+  color: var(--navio-text);
+  font-family: var(--navio-font);
+}
+
+.navio-auth.pf-v5-c-login {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  align-items: stretch;
+  min-height: 100dvh;
+  padding: 0;
+  background: var(--navio-bg);
+}
+
+/* ---------- Art panel (left) --------------------------------------------- */
+
+/* An inset, rounded panel that stays one viewport tall and sticky, so a long
+   registration form scrolls beside it. */
+.navio-art {
+  position: sticky;
+  top: 0.75rem;
+  align-self: start;
+  height: calc(100dvh - 1.5rem);
+  margin: 0.75rem;
   overflow: hidden;
-  border: 1px solid var(--navio-border);
+  isolation: isolate;
   border-radius: 1.75rem;
-  background: rgb(23 28 43 / 96%);
-  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 35%);
+  background: linear-gradient(160deg, var(--navio-art-top), var(--navio-art-bottom));
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 25%),
+    0 1.5rem 3rem -1.5rem oklch(0.34 0.2 268 / 60%);
 }
 
-.pf-v5-c-login__main-header {
+.navio-art__glow {
+  position: absolute;
+  z-index: -1;
+  width: 70%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  filter: blur(5rem);
+  mix-blend-mode: screen;
+  opacity: 0.75;
+}
+
+.navio-art__glow--blue {
+  top: 15%;
+  left: -10%;
+  background: var(--navio-art-glow-blue);
+}
+
+.navio-art__glow--cyan {
+  top: -20%;
+  right: -25%;
+  background: var(--navio-art-glow-cyan);
+  opacity: 0.55;
+}
+
+.navio-art__glow--green {
+  bottom: -30%;
+  right: -10%;
+  background: var(--navio-art-glow-green);
+  opacity: 0.5;
+}
+
+.navio-art__ribbon {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.navio-art__stop--blue { stop-color: var(--navio-art-line-start); }
+.navio-art__stop--cyan { stop-color: var(--navio-art-line-mid); }
+.navio-art__stop--green { stop-color: var(--navio-art-line-end); }
+
+.navio-art__lines,
+.navio-art__pulses {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.navio-art__lines {
+  stroke-width: 1.5;
+  opacity: 0.6;
+}
+
+.navio-art__pulses {
+  stroke-width: 3.5;
+  stroke-dasharray: 0.07 0.93;
+  filter: drop-shadow(0 0 6px var(--navio-art-glow-cyan));
+}
+
+/* With reduced motion the pulses rest at spread-out points along the lines. */
+.navio-art__pulses path {
+  stroke-dashoffset: var(--navio-pulse-rest, -0.5);
+}
+
+.navio-art__drift {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .navio-art__drift {
+    animation: navio-drift 18s ease-in-out infinite alternate;
+  }
+
+  .navio-art__pulses path {
+    stroke-dashoffset: 1;
+    animation: navio-pulse var(--navio-pulse-duration, 7s) linear var(--navio-pulse-delay, 0s) infinite;
+  }
+
+  .navio-art__glow--blue {
+    animation: navio-glow-a 22s ease-in-out infinite alternate;
+  }
+
+  .navio-art__glow--cyan {
+    animation: navio-glow-b 26s ease-in-out infinite alternate;
+  }
+
+  .navio-art__glow--green {
+    animation: navio-glow-a 30s ease-in-out -8s infinite alternate-reverse;
+  }
+}
+
+@keyframes navio-drift {
+  from { transform: translateY(-2%) rotate(-3deg) scale(1.02); }
+  to { transform: translateY(3%) rotate(4deg) scale(1.08); }
+}
+
+@keyframes navio-pulse {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes navio-glow-a {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(18%, -14%) scale(1.2); }
+}
+
+@keyframes navio-glow-b {
+  from { transform: translate(0, 0) scale(1.1); }
+  to { transform: translate(-22%, 18%) scale(0.9); }
+}
+
+/* ---------- Brand (right, above the form) -------------------------------- */
+
+.navio-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  margin-bottom: var(--navio-space-4);
+}
+
+.navio-logo {
+  width: 1.75rem;
+  height: 2.15rem;
+  color: var(--navio-primary);
+}
+
+.navio-brand__name {
+  color: var(--navio-text);
+  font-size: 1.375rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* ---------- Form panel (right) -------------------------------------------- */
+
+.navio-auth__panel.pf-v5-c-login__container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: var(--navio-space-6) clamp(var(--navio-space-3), 5vw, 5rem);
+  grid-template-areas: none;
+  grid-template-columns: none;
+}
+
+.navio-auth .pf-v5-c-login__main {
+  align-self: center;
+  width: 100%;
+  max-width: 26rem;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--navio-text);
+}
+
+.navio-auth .pf-v5-c-login__main-header {
+  display: block;
+  margin-bottom: var(--navio-space-4);
+  padding: 0;
   border-top: 0;
-  padding: 2rem 2rem 1.25rem;
 }
 
-.pf-v5-c-login__main-body,
-.pf-v5-c-login__main-footer,
-.pf-v5-c-login__main-footer-band {
+.navio-auth .pf-v5-c-login__main-header-utilities {
+  margin-top: var(--navio-space-2);
+}
+
+.navio-auth #kc-page-title {
+  margin: 0;
+  color: var(--navio-text);
+  font-family: var(--navio-font);
+  font-size: 1.875rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
+.navio-auth .pf-v5-c-login__main-body,
+.navio-auth .pf-v5-c-login__main-footer {
+  padding: 0;
   background: transparent;
   color: var(--navio-muted);
 }
 
-.pf-v5-c-login__main-body {
-  padding: 1rem 2rem 2rem;
+.navio-auth .pf-v5-c-form {
+  gap: 1.25rem;
 }
 
-#kc-header-wrapper {
-  color: var(--navio-text) !important;
-  font-size: 1.65rem;
-  font-weight: 800;
-  letter-spacing: -0.025em;
-  text-transform: none;
-}
-
-#kc-header-wrapper::before {
-  display: block;
-  width: 2.75rem;
-  height: 2.75rem;
-  margin: 0 auto 1rem;
-  border: 1px solid rgb(69 169 198 / 22%);
-  border-radius: 1rem;
-  background:
-    radial-gradient(circle at 36% 36%, #15803d 0 12%, transparent 13%),
-    radial-gradient(circle at 64% 36%, rgb(21 128 61 / 55%) 0 12%, transparent 13%),
-    radial-gradient(circle at 36% 64%, #15803d 0 12%, transparent 13%),
-    radial-gradient(circle at 64% 64%, #15803d 0 12%, transparent 13%),
-    #172938;
-  content: "";
-}
-
-.pf-v5-c-title,
-.pf-v5-c-form__label,
-.pf-v5-c-check__label {
+.navio-auth .pf-v5-c-form__label,
+.navio-auth .pf-v5-c-check__label {
   color: var(--navio-text);
+  font-size: 0.875rem;
 }
 
-.pf-v5-c-form__label-text {
-  font-weight: 650;
+.navio-auth .pf-v5-c-form__label-text {
+  font-weight: 600;
 }
 
-.pf-v5-c-form-control,
-input[type="email"],
-input[type="text"],
-input[type="password"] {
+/* PatternFly draws input borders with pseudo-elements; replace them with one
+   real border so the field reads as a single, clearly bounded box. */
+.navio-auth .pf-v5-c-form-control:not(input, select, textarea) {
+  --pf-v5-c-form-control--BackgroundColor: var(--navio-surface);
+  --pf-v5-c-form-control--Color: var(--navio-text);
   min-height: 3rem;
-  border-color: var(--navio-border);
-  border-radius: 0.75rem;
-  background: var(--navio-card-muted);
-  color: var(--navio-text);
-  box-shadow: none;
+  border: 1px solid var(--navio-input-border);
+  border-radius: var(--navio-radius-md);
+  background: var(--navio-surface);
+  font-family: var(--navio-font);
 }
 
-.pf-v5-c-form-control:focus-within,
-input[type="email"]:focus,
-input[type="text"]:focus,
-input[type="password"]:focus {
+.navio-auth .pf-v5-c-form-control::before,
+.navio-auth .pf-v5-c-form-control::after {
+  display: none;
+}
+
+.navio-auth .pf-v5-c-form-control > input,
+.navio-auth .pf-v5-c-form-control > select {
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  min-height: calc(3rem - 2px);
+  padding-inline: var(--navio-space-2);
+  color: var(--navio-text);
+  font-size: 1rem;
+}
+
+.navio-auth .pf-v5-c-form-control:not(input, select, textarea):focus-within {
   border-color: var(--navio-primary);
-  outline: 3px solid rgb(69 169 198 / 22%);
-  outline-offset: 1px;
+  outline: 3px solid var(--navio-focus);
+  outline-offset: 0;
 }
 
-.pf-v5-c-button {
-  min-height: 3rem;
-  border-radius: 0.75rem;
-  font-weight: 700;
+.navio-auth .pf-v5-c-form-control:has(input[aria-invalid="true"]) {
+  border-color: var(--navio-danger);
 }
 
-.pf-v5-c-button.pf-m-primary {
-  background: var(--navio-primary);
-  color: #0d1820;
+/* Password field: the reveal button sits inside the same bordered box. */
+.navio-auth .pf-v5-c-input-group {
+  position: relative;
 }
 
-.pf-v5-c-button.pf-m-primary:hover,
-.pf-v5-c-button.pf-m-primary:focus-visible {
-  background: var(--navio-primary-hover);
+.navio-auth .pf-v5-c-input-group .pf-v5-c-form-control > input {
+  padding-inline-end: 3.25rem;
 }
 
-.pf-v5-c-button.pf-m-link,
-a {
+.navio-auth .pf-v5-c-input-group > .pf-v5-c-input-group__item:not(.pf-m-fill) {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0.25rem;
+  display: flex;
+  align-items: center;
+  border: 0;
+}
+
+.navio-auth .pf-v5-c-button.pf-m-control {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--navio-radius-sm);
+  background: transparent;
+  color: var(--navio-muted);
+}
+
+.navio-auth .pf-v5-c-button.pf-m-control::before,
+.navio-auth .pf-v5-c-button.pf-m-control::after {
+  display: none;
+}
+
+.navio-auth .pf-v5-c-button.pf-m-control:hover {
+  color: var(--navio-text);
+}
+
+/* Only the "Forgot password?" row moves right; field errors stay under the label. */
+.navio-auth .pf-v5-c-form__helper-text .pf-v5-c-helper-text:has(a) {
+  justify-content: flex-end !important;
+}
+
+.navio-auth a {
+  border-radius: 0.25rem;
   color: var(--navio-primary);
+  font-weight: 600;
+  text-underline-offset: 0.2em;
 }
 
-.pf-v5-c-helper-text__item.pf-m-error,
-.kc-feedback-text,
-.pf-v5-c-alert.pf-m-danger {
+.navio-auth a:hover {
+  color: var(--navio-primary-hover);
+}
+
+.navio-auth a:focus-visible,
+.navio-auth .pf-v5-c-button:focus-visible {
+  outline: 3px solid var(--navio-focus);
+  outline-offset: 2px;
+}
+
+.navio-auth .pf-v5-c-helper-text__item.pf-m-error,
+.navio-auth .pf-v5-c-helper-text__item-text,
+.navio-auth .kc-feedback-text {
+  font-size: 0.875rem;
+}
+
+.navio-auth .pf-v5-c-helper-text__item.pf-m-error {
   color: var(--navio-danger);
 }
 
-.pf-v5-c-alert {
-  border: 1px solid rgb(255 92 104 / 35%);
-  border-radius: 0.75rem;
-  background: rgb(255 92 104 / 10%);
+/* ---------- Buttons ------------------------------------------------------- */
+
+.navio-auth .pf-v5-c-button.pf-m-primary,
+.navio-auth .pf-v5-c-button.pf-m-secondary {
+  min-height: 3rem;
+  border-radius: 999px;
+  font-family: var(--navio-font);
+  font-size: 1rem;
+  font-weight: 700;
 }
 
-#kc-info-wrapper,
-.pf-v5-c-login__main-footer-band {
-  border-color: var(--navio-border);
-  background: rgb(29 35 53 / 70%);
+.navio-auth .pf-v5-c-button.pf-m-primary {
+  background: var(--navio-primary);
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 22%),
+    0 1px 2px oklch(0.157 0.049 271 / 18%);
+  color: var(--navio-on-primary);
 }
 
-@media (max-width: 480px) {
-  .pf-v5-c-login__container {
-    padding: 0.75rem;
+.navio-auth .pf-v5-c-button.pf-m-primary:hover {
+  background: var(--navio-primary-hover);
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 22%),
+    0 4px 12px oklch(0.641 0.197 253 / 28%);
+}
+
+.navio-auth .pf-v5-c-button.pf-m-secondary {
+  justify-content: center !important;
+  gap: 0.75rem;
+  border: 1px solid var(--navio-border);
+  background: var(--navio-surface);
+  color: var(--navio-text);
+}
+
+.navio-auth .pf-v5-c-button.pf-m-secondary::after {
+  display: none;
+}
+
+.navio-auth .pf-v5-c-button.pf-m-secondary:hover {
+  border-color: var(--navio-input-border);
+  background: var(--navio-bg);
+}
+
+.navio-auth .pf-v5-c-button.pf-m-link {
+  color: var(--navio-primary);
+}
+
+/* ---------- Social sign-in and footer ------------------------------------ */
+
+.navio-auth .pf-v5-c-login__main-footer-band {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.navio-auth .pf-v5-c-login__main-footer-band:first-child {
+  margin-block-start: var(--navio-space-4);
+}
+
+/* "Or continue with" becomes a divider line with the label in the middle. */
+.navio-auth .pf-v5-c-login__main-footer-band:has(+ #kc-social-providers) .pf-v5-c-login__main-footer-band-item {
+  display: flex;
+  align-items: center;
+  gap: var(--navio-space-2);
+  color: var(--navio-muted);
+  font-size: 0.875rem;
+}
+
+.navio-auth .pf-v5-c-login__main-footer-band:has(+ #kc-social-providers) .pf-v5-c-login__main-footer-band-item::before,
+.navio-auth .pf-v5-c-login__main-footer-band:has(+ #kc-social-providers) .pf-v5-c-login__main-footer-band-item::after {
+  flex: 1;
+  height: 1px;
+  background: var(--navio-border);
+  content: "";
+}
+
+.navio-auth #kc-social-providers {
+  margin-top: var(--navio-space-2);
+}
+
+.navio-auth #kc-info {
+  margin-top: var(--navio-space-4);
+}
+
+.navio-auth #kc-info-wrapper {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--navio-muted);
+  font-size: 0.9375rem;
+  text-align: center;
+}
+
+/* ---------- Alerts -------------------------------------------------------- */
+
+.navio-auth .pf-v5-c-alert {
+  margin-bottom: var(--navio-space-3);
+  border: 1px solid var(--navio-border);
+  border-radius: var(--navio-radius-md);
+  background: var(--navio-surface);
+  box-shadow: none;
+  color: var(--navio-text);
+}
+
+.navio-auth .pf-v5-c-alert::before {
+  display: none;
+}
+
+.navio-auth .pf-v5-c-alert.pf-m-danger {
+  border-color: oklch(from var(--navio-danger) l c h / 40%);
+  background: var(--navio-danger-surface);
+}
+
+.navio-auth .pf-v5-c-alert.pf-m-danger .kc-feedback-text,
+.navio-auth .pf-v5-c-alert.pf-m-danger .pf-v5-c-alert__icon {
+  color: var(--navio-danger);
+}
+
+/* ---------- Responsive ---------------------------------------------------- */
+
+@media (max-width: 64rem) {
+  .navio-auth.pf-v5-c-login {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
   }
 
-  .pf-v5-c-login__main-header,
-  .pf-v5-c-login__main-body {
-    padding-right: 1.25rem;
-    padding-left: 1.25rem;
+  .navio-art {
+    position: relative;
+    top: 0;
+    height: 9rem;
+    border-radius: 1.25rem;
+  }
+
+  .navio-auth .pf-v5-c-login__main {
+    align-self: flex-start;
+  }
+
+  .navio-auth__panel.pf-v5-c-login__container {
+    align-items: flex-start;
+    padding: var(--navio-space-3) var(--navio-space-3) var(--navio-space-6);
+  }
+}
+
+@media (max-width: 30rem) {
+  .navio-art {
+    height: 6rem;
   }
 }
