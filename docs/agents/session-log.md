@@ -1718,3 +1718,9 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 **Verified:** not recorded.
 
 **Not done / left uncommitted:** two client type errors (`itinerary-section.tsx`, `tests/planner/data.ts`); premade plan copy would have failed trip creation; nothing committed. Picked up by the Claude session above.
+## 2026-10-13 - Codex - Release canonical energy and pull latest team changes
+
+**Request:** Complete the plan while leaving Phase 4C.1 deferred, commit/push the finished work through `main`, then pull the latest Git state.
+**Release:** Integrated the saved energy work onto current remote histories in isolated worktrees, preserving newer UI/transit work. Published Trip Planning `72f01f6`, Mobility/EV `533850b`, server `7630e41`, client `19a6e1e`, and root `ab94c35` through release branches, `dev`, and `main`. Run `38288732387` passed revision, PostgreSQL, build, and deployment jobs; production health/web returned `200` and unauthenticated trips returned `401`.
+**Pull:** During synchronization, newer team work appeared. Pulled client `f3c63ca`, server `05ed0cf`, Trip Planning `2e4b051`, Mobility/EV `c8a5e2a`, User Management `512a884`, and Community `5f0cf41`; root remote `dev` is `e79baac` and `main` is `3f96715`. Preserved divergent local documentation history with a merge rather than forcibly moving the branch. Team deployment run `38384565267` is successful, and production rechecked at `200`/`401`/`200`.
+**Checks/preservation:** Energy release evidence: client 190/190 plus TypeScript/ESLint, Trip Planning 217/217, Mobility/EV 82/82, both backend suites using disposable real PostgreSQL. Exact nested pins were verified before release and again after the pull. Stopped temporary config server and PostgreSQL container. Kept local reports/output/handoff text, `CLAUDE.md`, and service logs uncommitted. Phase 4C.1 remains deferred unless reproduced.
