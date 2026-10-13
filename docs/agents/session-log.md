@@ -1727,3 +1727,6 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 ## 2026-10-13 - Codex - Pull from main
 
 **Request/result:** Pulled `origin/main` into every active repository using `--ff-only`, ordered from child services/client through server and root. All pulls returned already up to date, with no conflict or tracked-file change. Repositories remain on `dev`; preserved local-only reports, `CLAUDE.md`, and service logs were not modified.
+## 2026-10-13 - Codex - Diagnose missing TipTap module
+
+**Request/result:** Diagnosed the Next/Turbopack `Can't resolve '@tiptap/core'` build error without fixing it. TipTap `3.31.4` is present in both committed dependency files, but absent from local `node_modules` and its installed-tree lock. `npm ls` and `require.resolve` independently confirm the missing installation. Local install metadata is older than the pulled package files, so the root cause is a stale local dependency tree after Git synchronization, not a missing import declaration or missing lockfile entry. No application or dependency changes were made.
