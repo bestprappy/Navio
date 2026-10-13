@@ -81,6 +81,164 @@ tags:
 - name: Geo Provider
 - name: Budgeting
 paths:
+  /v1/users/me/guides:
+    get:
+      tags: [User Management Service]
+      summary: List your own guides, including drafts
+      description: Requires a session. Only the resolved caller owns these drafts. Optional term, status, page and size (1-100, default 20). Every ownership mismatch returns 404. See user-guides.md.
+      responses:
+        '200': {description: Page of guide summaries}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+    post:
+      tags: [User Management Service]
+      summary: Create your private draft guide
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [guide]
+              properties:
+                guide: {$ref: '#/components/schemas/DestinationGuideFields'}
+      responses:
+        '201': {description: Created guide with status, version, fields and attribution}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+  /v1/users/me/guides/{id}:
+    parameters:
+    - {name: id, in: path, required: true, schema: {type: string, format: uuid}}
+    get:
+      tags: [User Management Service]
+      summary: Read your own guide
+      responses:
+        '200': {description: Guide with draft/published status, version, fields and attribution}
+        '404': {description: Guide not found}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+    put:
+      tags: [User Management Service]
+      summary: Update your own guide
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [guide, expectedVersion]
+              properties:
+                guide: {$ref: '#/components/schemas/DestinationGuideFields'}
+                expectedVersion: {type: integer, format: int64, minimum: 0}
+      responses:
+        '200': {description: Saved guide and incremented version}
+        '409': {description: Another session saved a newer version}
+        '422': {description: Invalid document relationships or removal of every published place}
+        '404': {description: Guide not found}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+    delete:
+      tags: [User Management Service]
+      summary: Delete your own guide
+      parameters:
+      - {name: expectedVersion, in: query, required: true, schema: {type: integer, format: int64, minimum: 0}}
+      responses:
+        '204': {description: Deleted}
+        '409': {description: Another session saved a newer version}
+        '404': {description: Guide not found}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+  /v1/users/me/guides/{id}/publish:
+    parameters:
+    - {name: id, in: path, required: true, schema: {type: string, format: uuid}}
+    post:
+      tags: [User Management Service]
+      summary: Publish your own guide for traveler discovery
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/DestinationGuideVersionRequest'}
+      responses:
+        '200': {description: Published guide and incremented version}
+        '409': {description: Another session saved a newer version}
+        '422': {description: Add at least one place before publishing}
+        '404': {description: Guide not found}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+  /v1/users/me/guides/{id}/unpublish:
+    parameters:
+    - {name: id, in: path, required: true, schema: {type: string, format: uuid}}
+    post:
+      tags: [User Management Service]
+      summary: Return your own guide to private draft
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/DestinationGuideVersionRequest'}
+      responses:
+        '200': {description: Draft guide and incremented version}
+        '409': {description: Another session saved a newer version}
+        '404': {description: Guide not found}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+  /v1/traveler-guides:
+    get:
+      tags: [User Management Service]
+      summary: Search published traveler guides across the complete library
+      security: []
+      parameters:
+      - {name: term, in: query, schema: {type: string, maxLength: 100}, description: Case-insensitive title, destination or country search}
+      - {name: country, in: query, schema: {type: string, maxLength: 100}, description: Exact country name or ISO code}
+      - name: city
+        in: query
+        style: form
+        explode: true
+        schema: {type: array, maxItems: 30, items: {type: string, minLength: 1, maxLength: 200}}
+        description: Exact destination names; multiple cities are combined with OR
+      - name: destination
+        in: query
+        style: form
+        explode: true
+        schema: {type: array, maxItems: 30, items: {type: string, pattern: '^(GOOGLE|MAPBOX):[A-Za-z0-9_-]{1,255}$'}}
+        description: Provider identities; combined with cities using OR, country and term using AND
+      - {name: page, in: query, schema: {type: integer, minimum: 0, default: 0}}
+      - {name: size, in: query, schema: {type: integer, minimum: 1, maximum: 100, default: 20}}
+      responses:
+        '200':
+          description: Page of published guide cards ordered by publication descending then ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  content: {type: array, items: {$ref: '#/components/schemas/TravelerGuideSummary'}}
+                  totalElements: {type: integer}
+                  totalPages: {type: integer}
+                  number: {type: integer}
+        '400': {description: Invalid filters or pagination}
+  /v1/traveler-guides/{id}:
+    parameters:
+    - {name: id, in: path, required: true, schema: {type: string, format: uuid}}
+    get:
+      tags: [User Management Service]
+      summary: Read a published traveler guide
+      security: []
+      responses:
+        '200':
+          description: Authored document with public display-name byline and timestamps
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: {type: string, format: uuid}
+                  guide: {$ref: '#/components/schemas/DestinationGuideFields'}
+                  author: {$ref: '#/components/schemas/TravelerGuideAuthor'}
+                  publishedAt: {type: string, format: date-time}
+                  updatedAt: {type: string, format: date-time}
+        '404': {description: Missing, unpublished or private guide}
   /v1/admin/guides:
     get:
       tags: [User Management Service]
@@ -278,6 +436,82 @@ paths:
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
+  /v1/groups/{slug}/icon:
+    parameters:
+    - name: slug
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - Community Service
+      summary: Read a visible group icon
+      description: Public like the banner. Clients add ?v={iconMediaId} so a replaced icon is fetched again.
+      security:
+      - {}
+      responses:
+        '200':
+          description: 'Validated, re-encoded image; Cache-Control: no-store and X-Content-Type-Options:
+            nosniff.'
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags:
+      - Community Service
+      summary: Upload or replace a group icon as an authorized content editor
+      description: PNG or JPEG up to 5 MiB, 4096 px per side and 12 megapixels. The previous icon object is deleted after commit.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '413':
+          description: Picture too large
+        '503':
+          description: Picture storage unavailable
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupDetailResponse'
+    delete:
+      tags:
+      - Community Service
+      summary: Remove a group icon as an authorized content editor
+      responses:
+        '204':
+          description: Icon and stored image removed
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
   /v1/users/by-subject/{subject}:
     parameters:
     - name: subject
@@ -424,6 +658,66 @@ paths:
               schema:
                 type: string
                 format: binary
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/posts/{postId}/comments/{commentId}/reactions/{reaction}:
+    parameters:
+    - name: postId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: commentId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: reaction
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/CommunityReaction'
+    put:
+      tags:
+      - Community Service
+      summary: Add the caller's reaction to a comment as an active member
+      description: Idempotent; repeating it never counts the caller twice. A member may leave several different reactions.
+      responses:
+        '200':
+          description: The comment with updated reaction counts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunityCommentResponse'
+        '400':
+          description: Unknown reaction, or the comment was deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Archived community
+    delete:
+      tags:
+      - Community Service
+      summary: Remove the caller's reaction from a comment
+      responses:
+        '204':
+          description: Reaction removed (or was not present)
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
         '404':
           $ref: '#/components/responses/NotFound'
   /v1/posts/{postId}/comments/{commentId}/vote:
@@ -3119,6 +3413,7 @@ paths:
           maxLength: 200
       - name: sort
         in: query
+        description: new = newest first; top = highest score; best = score plus half-weighted comments, decayed by age.
         schema:
           type: string
           enum:
@@ -3126,6 +3421,12 @@ paths:
           - top
           - best
           default: new
+      - name: joined
+        in: query
+        description: Without group, true limits the feed to communities the caller has joined (Home). Anonymous callers get an empty page.
+        schema:
+          type: boolean
+          default: false
     post:
       tags:
       - Community Service
@@ -5428,6 +5729,31 @@ components:
       name: X-Internal-Auth
       description: Shared secret for service-to-service calls on localhost
   schemas:
+    TravelerGuideAuthor:
+      type: object
+      required: [displayName]
+      properties:
+        id: {type: [string, 'null'], format: uuid, description: Existing public profile UUID}
+        displayName: {type: string}
+        avatarMediaId: {type: [string, 'null'], format: uuid}
+    TravelerGuideSummary:
+      type: object
+      required: [id, name, country, destinationName, destinationProvider, destinationPlaceId, description, coverPlaceId, placeCount, categories, author, publishedAt, updatedAt]
+      properties:
+        id: {type: string, format: uuid}
+        name: {type: string}
+        country: {type: string}
+        countryCode: {type: [string, 'null']}
+        destinationName: {type: string}
+        destinationProvider: {type: string, enum: [GOOGLE, MAPBOX]}
+        destinationPlaceId: {type: string}
+        description: {type: string}
+        coverPlaceId: {type: string}
+        placeCount: {type: integer, minimum: 0}
+        categories: {type: array, items: {type: object}}
+        author: {$ref: '#/components/schemas/TravelerGuideAuthor'}
+        publishedAt: {type: string, format: date-time}
+        updatedAt: {type: string, format: date-time}
     DestinationGuideVersionRequest:
       type: object
       required: [expectedVersion]
@@ -5479,7 +5805,36 @@ components:
           - string
           - 'null'
           format: uuid
+        iconMediaId:
+          description: Stored icon; read it from /v1/groups/{slug}/icon. Also present on group list items.
+          type:
+          - string
+          - 'null'
+          format: uuid
       additionalProperties: true
+    CommunityReaction:
+      type: string
+      enum:
+      - helpful
+      - love
+      - funny
+      - thanks
+      - want_to_go
+    CommunityReactionSummary:
+      type: object
+      required:
+      - reaction
+      - count
+      - reacted
+      properties:
+        reaction:
+          $ref: '#/components/schemas/CommunityReaction'
+        count:
+          type: integer
+          minimum: 1
+        reacted:
+          type: boolean
+          description: Whether the caller left this reaction.
     CommunityPostResponse:
       type: object
       required:
@@ -5509,6 +5864,12 @@ components:
           type: string
         groupName:
           type: string
+        groupIconMediaId:
+          description: The community's icon, for feed rows.
+          type:
+          - string
+          - 'null'
+          format: uuid
         title:
           type: string
         body:
@@ -5568,6 +5929,11 @@ components:
           type: integer
         viewerVote:
           type: integer
+        reactions:
+          description: Reactions with at least one member, in display order. Empty for deleted comments.
+          type: array
+          items:
+            $ref: '#/components/schemas/CommunityReactionSummary'
     CommunityUpdatePostRequest:
       type: object
       required:
