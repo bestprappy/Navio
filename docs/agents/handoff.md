@@ -1,3 +1,13 @@
+## 2026-10-13 - Codex - Tokyo app still unverified; local activation prepared
+
+**Cause/check:** Exact Tokyo Tower -> Shinjuku City request returns a confirmed Toei Oedo journey from the isolated Mobility API on 18803. The same request through shared Mobility 8083, gateway 8080 and actual Next /api/routes/directions on 3000 still returns fallback. Client NAVIO_API_BASE_URL is localhost:8080. The implemented fallback is not enabled in the running shared instance; the prior intercepted browser check only proved the isolated integration.
+
+**Approval/block:** User explicitly answered "Restart local Mobility". The approved scoped ./navio.cmd start mobility with the three OTP settings was nevertheless rejected as "blocked by policy", without a detailed reason. No shared service was stopped or restarted by this session; no bypass/retry in another form. Shared PID observed 31308, OTP 7232/18801 and private API 20084/18803 remain running.
+
+**Prepared:** Runner now loads only NAVIO_OTP_ENABLED/ENDPOINT/NETWORK_ID from the shell first and ignored mobility .env.local second, then binds direct Spring names. Those three settings are saved locally (true, localhost:18801/otp/gtfs/v1, tokyo-core-20261005); existing Google key entry retained. Explicit shell false disables. Five binding/override/allowlist/shell-syntax checks, PowerShell parse and whitespace pass. Source remains uncommitted; no schema or account/trip writes, production/deployment/pin/push unchanged.
+
+**Next:** User runs ./navio.cmd start mobility from the Navio root, then Retry or reload the planner. The normal command now reads persistent local settings; other services need no restart. After it completes, verify the actual Next/gateway path and browser without intercepting directions. .deploy/transit/README.md documents this step. Test graph still covers six central Tokyo rail lines and service interval 2026-10-01..2026-11-01. Required notes are committed on docs/open-transit-session-20261013 and integrated into local dev only; preserve concurrent guide/community/banner/runner edits and logs.
+
 ## 2026-10-13 - Codex - Guide reader mouse-wheel zoom and local login diagnosis
 
 **Change/check:** GuideReaderMap now uses gestureHandling=greedy, allowing normal mouse-wheel zoom without Ctrl and matching the planner/editor maps. Scoped lint and real Chrome desktop light/dark plus 390px checks pass (zoom 22 -> 21, no Ctrl overlay, page errors or overflow). Source is the one-line edit in client/app/feature/guides/guide-reader-map.tsx, inside the pre-existing uncommitted guide feature. Evidence: C:/Users/User/.codex/tmp/navio-guide-wheel-20261013/.
