@@ -1,3 +1,11 @@
+## 2026-10-13 - Codex - Destination photos for trip card banners
+
+**Goal:** On `feat/user-guides`, use a plan's country for its banner until it has cities, then use the first city listed on the card.
+**Done:** Created root/client `feat/user-guides` from synced dev. Client dashboard scenery now fetches the selected destination's live photo through the existing cached place-details query. Snapshot stats retain destination place IDs in their displayed order; an initial city takes priority, otherwise the first added destination replaces the country. Both summary and featured cards use this rule. Photo lookup waits for snapshot stats to avoid briefly fetching/showing the country for a trip with cities. Missing/failed photos leave the themed background. Five client dashboard files remain uncommitted for review; no backend/schema change.
+**Verified:** Whole-client TypeScript, changed-file ESLint and diff whitespace pass. Read-only local API/photo requests for Japan, Taiwan, Tokyo and Bangkok return/load real photos. An authenticated synthetic Chrome fixture verifies country-only, initial-city priority, first added city, reordered/removed cities, missing/broken photos, place/snapshot failures, desktop light/dark, 390px, keyboard focus and no page errors/overflow. Script, screenshots and results: C:/Users/User/.codex/tmp/navio-trip-banners-20261013/. No real trip/account writes.
+**Not done / left uncommitted:** Feature source is unstaged in client `feat/user-guides`. Existing reports, local client CLAUDE.md and service/JVM logs remain untouched. Required agent notes are committed on `docs/user-guides-banners-session-20261013` and integrated into local root dev only; root returns to `feat/user-guides` with those notes. No application commit, push, main merge, submodule pin or deployment.
+**Follow-ups:** Reload the local dashboard to review destination banners. Commit/release the feature when requested; production remains the verified login-cache release in the entry below. Phase 4C.1 remains deferred.
+
 ## 2026-10-13 - Codex - Restore the new production login design
 
 **Goal:** Investigate why production still shows the old login card and restore the split-screen login design included in the previous release.
