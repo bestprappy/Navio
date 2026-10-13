@@ -53,6 +53,7 @@ install -d -m 0755 \
   "${DEPLOY_ROOT}/config" \
   "${DEPLOY_ROOT}/keycloak" \
   "${DEPLOY_ROOT}/keycloak/themes/navio/login/resources/css" \
+  "${DEPLOY_ROOT}/keycloak/themes/navio/login/messages" \
   "${DEPLOY_ROOT}/nginx" \
   "${DEPLOY_ROOT}/postgres" \
   "${DEPLOY_ROOT}/tls" \
@@ -78,6 +79,10 @@ install -m 0644 "${SOURCE_ROOT}/.deploy/keycloak/themes/navio/login/theme.proper
   "${DEPLOY_ROOT}/keycloak/themes/navio/login/theme.properties"
 install -m 0644 "${SOURCE_ROOT}/.deploy/keycloak/themes/navio/login/resources/css/navio.css" \
   "${DEPLOY_ROOT}/keycloak/themes/navio/login/resources/css/navio.css"
+install -m 0644 "${SOURCE_ROOT}/.deploy/keycloak/themes/navio/login/template.ftl" \
+  "${DEPLOY_ROOT}/keycloak/themes/navio/login/template.ftl"
+install -m 0644 "${SOURCE_ROOT}/.deploy/keycloak/themes/navio/login/messages/messages_en.properties" \
+  "${DEPLOY_ROOT}/keycloak/themes/navio/login/messages/messages_en.properties"
 install -m 0644 "${SOURCE_ROOT}/.deploy/nginx/navio.conf" "${DEPLOY_ROOT}/nginx/navio.conf"
 install -m 0644 "${SOURCE_ROOT}/.deploy/postgres/init-keycloak.sql" "${DEPLOY_ROOT}/postgres/init-keycloak.sql"
 
@@ -409,7 +414,8 @@ readonly KEYCLOAK_LOGIN_HTML="$(curl --fail --silent --show-error \
   'https://navio.sit.kmutt.ac.th/realms/navio/protocol/openid-connect/auth')"
 if [[ "${KEYCLOAK_LOGIN_HTML}" != *'name="username"'* ]] \
   || [[ "${KEYCLOAK_LOGIN_HTML}" != *'name="password"'* ]] \
-  || [[ "${KEYCLOAK_LOGIN_HTML}" != *'navio.css'* ]]; then
+  || [[ "${KEYCLOAK_LOGIN_HTML}" != *'navio.css'* ]] \
+  || [[ "${KEYCLOAK_LOGIN_HTML}" != *'navio-art'* ]]; then
   echo "Expected the themed Keycloak email/password login form." >&2
   exit 1
 fi
@@ -478,6 +484,9 @@ verify_api_route POST '/v1/groups' 401
 verify_api_route GET '/v1/shared-plans?page=0&size=1' 200
 verify_api_route GET '/v1/vehicle-models?page=0&size=1' 200
 verify_api_route GET '/v1/admin/audit-events' 401
+verify_api_route GET '/v1/guides?page=0&size=1' 200
+verify_api_route GET '/v1/admin/guides' 401
+verify_api_route POST '/v1/admin/guides' 401
 
 # The Next.js admin pages share the /admin/ prefix with Keycloak's console.
 # An anonymous request must reach Next.js (proxy.ts redirects to sign-in),
@@ -497,13 +506,12 @@ for auth_path in sign-in sign-up; do
     --cacert "${TLS_CERT_FILE}" \
     --resolve navio.sit.kmutt.ac.th:443:127.0.0.1 \
     "https://navio.sit.kmutt.ac.th/${auth_path}")"
-  expected_email_action='Continue with email &amp; password'
+  expected_auth_status='Opening log in'
   if [[ "${auth_path}" == "sign-up" ]]; then
-    expected_email_action='Sign up with email'
+    expected_auth_status='Opening sign up'
   fi
-  if [[ "${auth_page_html}" != *'Continue with Google'* ]] \
-    || [[ "${auth_page_html}" != *"${expected_email_action}"* ]]; then
-    echo "Expected /${auth_path} to render email/password and Google authentication actions." >&2
+  if [[ "${auth_page_html}" != *"${expected_auth_status}"* ]]; then
+    echo "Expected /${auth_path} to render the Keycloak authentication handover." >&2
     exit 1
   fi
 done

@@ -97,6 +97,19 @@ replace this flow with Direct Access Grants: that would make the web app handle
 raw passwords and would bypass browser-flow capabilities such as required
 actions and identity brokering.
 
+`themes/navio/login/template.ftl` is a copy of the Keycloak 26.7.3 `keycloak.v2`
+layout with one change: the page body is a split layout, with decorative
+animated art on the left and the Navio logo plus Keycloak's unmodified form
+markup on the right. The art's ribbon paths are generated, not hand-drawn, so
+regenerate them rather than editing individual coordinates. When upgrading
+Keycloak, re-copy the new parent `template.ftl` and reapply only the block
+between `<body>` and `<main>`. Wording overrides live in
+`messages/messages_en.properties`. `deploy.sh` installs theme files one by one,
+so add any new theme file there as well.
+
+The Next.js `/sign-in` and `/sign-up` pages send visitors straight to this
+theme, so it is the only login screen people see.
+
 ### Why `verifyEmail` is off
 
 `verifyEmail` is deliberately `false` and `deploy.sh` reasserts that on every
