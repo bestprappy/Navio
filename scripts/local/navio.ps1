@@ -116,6 +116,21 @@ function Get-MapsServerKey {
   return $null
 }
 
+function Get-LocalTransitSetting([string]$Setting) {
+  if ($Setting -notin @('NAVIO_OTP_ENABLED', 'NAVIO_OTP_ENDPOINT', 'NAVIO_OTP_NETWORK_ID')) {
+    throw 'Unsupported local transit setting'
+  }
+  $value = [Environment]::GetEnvironmentVariable($Setting)
+  if ($value) { return $value }
+  $localEnv = Join-Path $ServerDir 'mobility-and-ev-service\.env.local'
+  if (Test-Path -LiteralPath $localEnv) {
+    $pattern = '^' + [regex]::Escape($Setting) + '=(.+)$'
+    $line = Select-String -LiteralPath $localEnv -Pattern $pattern | Select-Object -Last 1
+    if ($line) { return $line.Matches[0].Groups[1].Value.Trim().Trim('"').Trim("'") }
+  }
+  return $null
+}
+
 function Get-ServiceEnv($Svc) {
   # Defaults in the config server assume Docker hostnames (kafka:9092, the
   # container hostname for Eureka); these make every service work on localhost.
@@ -138,6 +153,17 @@ function Get-ServiceEnv($Svc) {
       $key = Get-MapsServerKey
       if ($key) { $vars.GOOGLE_MAPS_SERVER_API_KEY = $key }
       else { Write-Warn 'No Google Maps key found; mobility-and-ev-service will refuse to start.' }
+      foreach ($setting in @('NAVIO_OTP_ENABLED', 'NAVIO_OTP_ENDPOINT', 'NAVIO_OTP_NETWORK_ID')) {
+        $value = Get-LocalTransitSetting $setting
+        if ($value) {
+          # These values enter the existing cmd launcher. Reject shell syntax and quoted values.
+          if ($value -match '[&|<>^%"\r\n]') { throw "Invalid characters in $setting" }
+          $vars[$setting] = $value
+          $propertySuffix = @{ NAVIO_OTP_ENABLED='ENABLED'; NAVIO_OTP_ENDPOINT='ENDPOINT'; NAVIO_OTP_NETWORK_ID='NETWORKID' }[$setting]
+          # Also bind directly, so local changes do not require restarting the shared config server.
+          $vars["NAVIO_MOBILITY_PROVIDERS_OTP_$propertySuffix"] = $value
+        }
+      }
     }
     'community-service' {
       $vars.AWS_ACCESS_KEY_ID = 'navio-local'
@@ -151,14 +177,25 @@ function Get-ServiceEnv($Svc) {
 # --- infrastructure ----------------------------------------------------------
 
 function Test-InfraRunning {
-  $state = & docker inspect navio-postgres --format '{{.State.Health.Status}}' 2>$null
-  return ($LASTEXITCODE -eq 0 -and $state -eq 'healthy')
+  foreach ($container in @('navio-postgres', 'navio-kafka')) {
+    $state = & docker inspect $container --format '{{if .State.Running}}{{.State.Health.Status}}{{end}}' 2>$null
+    if ($LASTEXITCODE -ne 0 -or $state -ne 'healthy') { return $false }
+  }
+  # Container health alone does not prove that Windows can reach published ports.
+  return ((Get-HttpCode "$KeycloakIssuer/.well-known/openid-configuration") -eq '200' -and
+          (Get-HttpCode 'http://localhost:9000/minio/health/live') -eq '200')
 }
 
 function Start-Infra {
   Write-Step 'Starting Docker infrastructure'
   & docker info *> $null
   if ($LASTEXITCODE -ne 0) { throw 'Docker is not running. Start Docker Desktop first.' }
+
+  $keycloakState = & docker inspect navio-keycloak --format '{{if .State.Running}}{{.State.Health.Status}}{{end}}' 2>$null
+  $discoveryUrl = "$KeycloakIssuer/.well-known/openid-configuration"
+  if ($LASTEXITCODE -eq 0 -and $keycloakState -eq 'healthy' -and (Get-HttpCode $discoveryUrl) -eq '000') {
+    throw "Keycloak is healthy inside Docker, but Windows cannot reach $discoveryUrl. Check Docker Desktop port forwarding; see docs/local-development.md. Restarting Keycloak resets local accounts."
+  }
 
   Push-Location $Root
   try {
@@ -169,7 +206,7 @@ function Start-Infra {
 
   $ok = (Wait-Until 'Postgres healthy' { (& docker inspect navio-postgres --format '{{.State.Health.Status}}' 2>$null) -eq 'healthy' } 120) -and
         (Wait-Until 'Kafka healthy' { (& docker inspect navio-kafka --format '{{.State.Health.Status}}' 2>$null) -eq 'healthy' } 120) -and
-        # Keycloak's and MinIO's container healthchecks are broken, so probe them directly.
+        # Probe the host endpoints as well as the containers' internal health.
         (Wait-Until 'Keycloak realm ready' { (Get-HttpCode "$KeycloakIssuer/.well-known/openid-configuration") -eq '200' } 180) -and
         (Wait-Until 'MinIO ready' { (Get-HttpCode 'http://localhost:9000/minio/health/live') -eq '200' } 60)
   if (-not $ok) { throw 'Infrastructure did not become ready. Check: docker compose ps' }
@@ -204,16 +241,50 @@ function Stop-Infra {
 # --- services ----------------------------------------------------------------
 
 function Stop-NavioService($Svc) {
+  if ($Svc.Name -eq 'mobility-and-ev-service') {
+    # A targeted routing restart must never stop an unrelated process using this port.
+    foreach ($listenerId in (Get-PortPids $Svc.Port)) {
+      $listener = Get-CimInstance Win32_Process -Filter "ProcessId=$listenerId"
+      if (-not $listener) { continue } # The listener exited after the port snapshot.
+      if ($listener.Name -ne 'java.exe' -or
+          $listener.CommandLine -notmatch 'com\.navio\.mobilityandevservice\.MobilityAndEvServiceApplication') {
+        throw "Port $($Svc.Port) belongs to an unverified process; no process was stopped."
+      }
+    }
+  }
   $pidPath = Get-PidPath $Svc
   if (Test-Path $pidPath) {
     $launcher = [int](Get-Content $pidPath -Raw)
+    $launcherAlive = Test-ProcessAlive $launcher
+    if ($Svc.Name -eq 'mobility-and-ev-service' -and $launcherAlive) {
+      $launchProcess = Get-CimInstance Win32_Process -Filter "ProcessId=$launcher"
+      $servicePath = Join-Path $ServerDir $Svc.Name
+      if (-not $launchProcess) { $launcherAlive = $false }
+      elseif ($launchProcess.CommandLine -notmatch [regex]::Escape($servicePath) -or
+          $launchProcess.CommandLine -notmatch 'mvnw\.cmd') {
+        throw 'Mobility launcher identity does not match this workspace; no process was stopped.'
+      }
+    }
     # /T takes down the whole tree: cmd -> Maven JVM -> forked application JVM.
-    if (Test-ProcessAlive $launcher) { & taskkill.exe /PID $launcher /T /F *> $null }
+    if ($launcherAlive) { & taskkill.exe /PID $launcher /T /F *> $null }
     Remove-Item $pidPath -Force -ErrorAction SilentlyContinue
   }
   # Fallback for instances started some other way (IntelliJ, a manual mvnw run).
-  foreach ($p in (Get-PortPids $Svc.Port)) { Stop-Process -Id $p -Force -ErrorAction SilentlyContinue }
-  $null = Wait-Until "$($Svc.Name) stopped" { -not (Get-PortPids $Svc.Port) } 20
+  foreach ($p in (Get-PortPids $Svc.Port)) {
+    if ($Svc.Name -eq 'mobility-and-ev-service') {
+      $remaining = Get-CimInstance Win32_Process -Filter "ProcessId=$p"
+      if (-not $remaining) { continue } # taskkill may finish between these two queries.
+      if ($remaining.Name -ne 'java.exe' -or
+          $remaining.CommandLine -notmatch 'com\.navio\.mobilityandevservice\.MobilityAndEvServiceApplication') {
+        throw 'Mobility port changed owner during restart; refusing to stop it.'
+      }
+    }
+    Stop-Process -Id $p -Force -ErrorAction SilentlyContinue
+  }
+  $stopped = Wait-Until "$($Svc.Name) stopped" { -not (Get-PortPids $Svc.Port) } 20
+  if (-not $stopped -and $Svc.Name -eq 'mobility-and-ev-service') {
+    throw 'Mobility port is still occupied after shutdown; no replacement was started.'
+  }
 }
 
 function Start-NavioService($Svc) {
