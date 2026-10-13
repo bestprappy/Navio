@@ -1,0 +1,20 @@
+# Optional overlay: combine with compose.production.yml only after building a graph.
+services:
+  transit-router:
+    image: opentripplanner/opentripplanner:2.10.0
+    command: ["--load", "--serve"]
+    restart: unless-stopped
+    init: true
+    mem_limit: ${NAVIO_OTP_MEMORY_LIMIT:-2g}
+    environment:
+      JAVA_TOOL_OPTIONS: ${NAVIO_OTP_JAVA_OPTIONS:--Xmx1536m -XX:ActiveProcessorCount=2}
+    volumes:
+      - ${NAVIO_OTP_DATA_DIR:?NAVIO_OTP_DATA_DIR must contain a built graph.obj}:/var/opentripplanner:ro
+    networks: [backend]
+    security_opt: [no-new-privileges:true]
+    # The router has no public port; only the Mobility service calls it.
+  mobility-and-ev-service:
+    environment:
+      NAVIO_OTP_ENABLED: "true"
+      NAVIO_OTP_ENDPOINT: http://transit-router:8080/otp/gtfs/v1
+      NAVIO_OTP_NETWORK_ID: ${NAVIO_OTP_NETWORK_ID:?Set a new network revision whenever rebuilding the graph}
