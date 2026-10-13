@@ -1,6 +1,6 @@
 # Transit coverage beyond Google
 
-Status: implemented and verified locally, 2026-10-13. OpenTripPlanner is disabled by default; an isolated Mobility instance has confirmed central Tokyo journeys. The shared local service and production have not enabled it.
+Status: implemented, enabled and verified in the local app, 2026-10-13. OpenTripPlanner remains disabled by default; local settings enable the verified central Tokyo graph for the shared Mobility service. Production has not enabled it.
 
 ## Confirmed cause
 
@@ -64,7 +64,11 @@ The isolated Mobility API on localhost:18803 uses the real router on localhost:1
 
 Backend: 117 tests, zero failures/errors, one ordinary schema-check skip; includes an explicitly enabled live OTP check. Client: whole-project TypeScript, scoped lint and 50 existing transit tests pass. A synthetic-account browser test requests actual API routes while intercepting all trip/account writes: real Tokyo directions, route attribution, selection save/reload and desktop/mobile/light/dark pass. The first parallel browser/test attempt hit host JVM attach/resource failures; serial tests with an explicit Mockito agent and a subsequent browser run pass.
 
-Evidence and graph: `C:/Users/User/.codex/tmp/navio-open-transit-20261013/`. Application edits remain uncommitted across Mobility/client/server/root; no schema change or real account/trip write. Automatic approval review rejected the shared local Mobility restart without a detailed reason. The shared service was left running, and the successful checks used a separate API instance. Production is unchanged.
+The shared service is now enabled locally. Tokyo Tower -> Shinjuku City returns a confirmed Toei Oedo journey through Mobility 8083, gateway 8080 and actual Next `/api/routes/directions` on 3000; Shinjuku -> Skytree, driving and Taipei transit also pass at the Next boundary. The updated browser regression defaults to this normal app path, with unchanged directions responses and intercepted account/trip writes only. Exact Tower -> Shinjuku directions, source credit, selection/save/reload and desktop/mobile/light/dark pass with 19 real API responses.
+
+Initial automatic review rejected the scoped restart. The user's manual command stopped the old process but exposed a shutdown race: a missing process after a stale port snapshot was falsely treated as a changed owner. The runner now tolerates exited listener/launcher processes, rejects unrelated owners and fails when the port remains occupied. Ten isolated process-operation tests cover the guard. After confirming port 8083 was free, the authorized start succeeded and the app uses OTP. The runner loads three persisted allowlisted OTP settings from local `.env.local`, with shell values taking precedence; explicit false disables it.
+
+Evidence and graph: `C:/Users/User/.codex/tmp/navio-open-transit-20261013/`; activated app checks are `activated-app-regression.json` and `browser-activated/`. Application edits remain uncommitted across Mobility/client/server/root; no schema change or real account/trip write. Production is unchanged.
 
 ## Acceptance for additional coverage
 
