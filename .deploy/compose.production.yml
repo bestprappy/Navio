@@ -82,6 +82,10 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.7.3
+    labels:
+      # Recreate on theme changes so the production theme/message/gzip caches
+      # cannot survive an update of the bind-mounted files.
+      io.navio.keycloak-theme-revision: ${NAVIO_KEYCLOAK_THEME_REVISION:-unversioned}
     command:
       - start
       - --http-enabled=true
