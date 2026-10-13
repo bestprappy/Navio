@@ -2742,6 +2742,34 @@ curl -X DELETE 'https://api.navio.local/v1/posts/post_01HX/comments/comment_01HX
   -H 'Authorization: Bearer <JWT>'
 ```
 
+### `PUT /v1/posts/{postId}/comments/{commentId}/reactions/{reaction}` — React to a comment
+
+**Does:** Adds the caller's reaction. `reaction` is one of `helpful`, `love`, `funny`, `thanks`, `want_to_go`. Repeating it is a no-op; a member may leave several different reactions on one comment. Deleted comments cannot receive reactions, and soft-deleting a comment clears its reactions.
+**Auth:** Bearer JWT required; active member of the post's community
+**Success:** `200` `CommunityCommentResponse` with `reactions: [{ reaction, count, reacted }]`, in the fixed order above and only for reactions with at least one member
+**Errors:** `400` unknown reaction or deleted comment; `403` not an active member; `404` post or comment not visible; `409` archived community
+
+```bash
+curl -X PUT 'https://api.navio.local/v1/posts/post_01HX/comments/comment_01HX/reactions/want_to_go' \
+  -H 'Authorization: Bearer <JWT>'
+```
+
+### `DELETE /v1/posts/{postId}/comments/{commentId}/reactions/{reaction}` — Remove a comment reaction
+
+**Does:** Removes the caller's reaction of that kind, if present.
+**Auth:** Bearer JWT required; active member
+**Success:** `204` no body
+
+### `POST|DELETE|GET /v1/groups/{slug}/icon` — Community icon
+
+**Does:** Works exactly like `/v1/groups/{slug}/banner`: owners and moderators upload (`multipart/form-data`, part `file`, PNG/JPEG up to 5 MiB, 4096 px per side, re-encoded before storage) or remove the icon; anyone who can see the community reads it. The detail response and every group list item carry `iconMediaId` and `bannerMediaId`; posts carry `groupIconMediaId`. Clients load `/v1/groups/{slug}/icon?v={iconMediaId}`.
+**Auth:** `GET` public; `POST`/`DELETE` Bearer JWT, content editor
+**Success:** `201` `GroupDetailResponse` on upload, `204` on delete, image bytes on read
+
+### `GET /v1/posts?joined=true` — Home feed
+
+**Does:** Without `group`, `joined=true` returns only posts from communities the caller has joined (state `joined`). Anonymous callers get an empty page. `sort=best` ranks by `(score + comments × 0.5 + 1) / (age in hours + 2)^1.5`; `top` is score; `new` is newest first.
+
 ### `PUT /v1/posts/{postId}/vote` — Vote on post
 
 **Does:** Upserts current user's vote. direction=1 upvote, -1 downvote, 0 retract.
@@ -3220,3 +3248,8 @@ Destination guides are implemented in User Management. See [Destination guides](
 12. AI Planning with Spring AI using either Ollama or a hosted provider
 
 Transit route choices also compare earlier alighting followed by walking, using an already confirmed transit prefix and a separate provider-confirmed street walk from the exact station coordinate. Nearby distance is only a prefilter, never proof of a usable connection. Extra walking calls are bounded to two per rail/bus option and reject walks over 2.5 km or 30 minutes; partial-route fares remain unknown. Balanced recommendations consider journey time, walking effort and transfers, and every confirmed alternative remains selectable. The same recommendation rules apply across cities. The provider routing preference follows the [official Routes API transit options](https://developers.google.com/maps/documentation/routes/transit-route).
+
+
+## Implemented user guides (2026-10-13)
+
+Every authenticated traveler can manage their own guides through `/v1/users/me/guides` (list/create/detail/update/publish/unpublish/delete). Drafts are private; ownership mismatches return 404 and every mutation uses `expectedVersion`. Anonymous discovery at `/v1/traveler-guides` searches the complete published library by title, destination or country and supports exact city, country and provider/destination filters. Published cards include author public profile IDs, display names, avatar media IDs and place counts; documents load on demand. Author fields never include emails or authentication subjects. These routes are separate from admin guides, which retain their existing itinerary placement. See [user-guides.md](user-guides.md) and the OpenAPI paths for request/response details.

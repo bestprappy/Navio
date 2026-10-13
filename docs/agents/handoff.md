@@ -1,3 +1,10 @@
+## 2026-10-13 - Claude - Guides, community redesign and transit fallback released
+
+**Live:** All outstanding application work is on every repository's main: traveler guides (V8, `/v1/users/me/guides`, `/v1/traveler-guides`), Reddit-style community (V7 icons, comment reactions, joined feed, create wizard), open-transit fallback code (OTP disabled in production by default), gateway routes and client UI. Pins: community `47a0439`, user-management `6138990`, mobility `010e4ef`, trip-planning `2e4b051` (unchanged), server `bc0d0dd`, client `3b16acd`. The root main push triggers deploy-backend.yml.
+**Checks:** Backend full suites (gateway, community, user-management, mobility), client TypeScript, lint and 328/328 node tests passed before release. Run client tests with `node --experimental-transform-types --test` on Node 25.
+**Uncommitted on purpose:** `docs/report/`, client `tsconfig.json` dev-server paths, `CLAUDE.md`, logs. Feature branches (`feat/user-guides`, `feat/community-reddit-redesign`, `feat/open-transit-fallback`) are merged and can be deleted.
+**Next:** Verify the deploy run and production smoke checks. Production transit fallback activation requires a built OTP graph plus `.deploy/compose.transit.yml`; see `.deploy/transit/README.md`. Phase 4C.1 stays deferred.
+
 ## 2026-10-13 - Codex - Japan transit activated in the local app
 
 **Fixed/live:** The user's manual Mobility restart stopped the old JVM, then falsely rejected a stale port snapshot whose process had exited. Runner now tolerates vanished listeners/launchers, still rejects unrelated identities and refuses replacement if shutdown leaves the port occupied. Port 8083 was confirmed free; the already authorized normal start succeeded in 37 seconds. Shared Mobility PID 6796 is healthy with persisted OTP enabled; router PID 7232 remains on 18801. Actual Next/gateway/Mobility now route Tokyo Tower -> Shinjuku City via Toei Oedo and Shinjuku -> Skytree. Tokyo driving and Taipei Google transit still pass.

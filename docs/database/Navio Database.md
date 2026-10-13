@@ -299,6 +299,7 @@ erDiagram
 | `ev`     | `outbox`                   | Transactional event outbox for EV events                                                                                |
 | `social` | `groups`                   | Community groups such as Thailand Restaurants or EV road-trip groups                                                    |
 | `social` | `group_profiles`           | Group banner, summary, and display metadata                                                                             |
+| `social` | `comment_reactions`        | One row per member, comment and reaction (`helpful`, `love`, `funny`, `thanks`, `want_to_go`); community-service V7     |
 | `social` | `group_memberships`        | Joined, muted, moderator, and banned group membership states                                                            |
 | `social` | `group_rules`              | Ordered group rules displayed in sidebars and create flows                                                              |
 | `social` | `group_flairs`             | Post and user flair definitions scoped to one group                                                                     |
@@ -1411,7 +1412,7 @@ Stores community groups such as Thailand Restaurants, Bangkok Food Routes, and T
 
 | Table | Purpose |
 | ----- | ------- |
-| `social.group_profiles` | One row per group for banner URL/media ID, summary, and moderator display data |
+| `social.group_profiles` | One row per group for banner URL/media ID, icon media ID (V7), summary, and moderator display data |
 | `social.group_memberships` | One row per group/user with role and state: `member`, `moderator`, `admin`, `muted`, `banned`, or `left` |
 | `social.group_rules` | Ordered rules with title and description |
 | `social.group_flairs` | Group-scoped post and user flairs with label and tone |
@@ -3137,3 +3138,10 @@ This database design is appropriate for the finalized Navio architecture. It kee
 For the capstone, the most important implementation discipline is to avoid shortcut cross-schema joins. Even though all schemas are physically inside one PostgreSQL instance, the codebase should behave as if every schema belongs to a separate database.
 
 PostgreSQL should remain the system of record for the community module. MongoDB is not recommended for this project because the community data needs constraints, one-vote-per-user uniqueness, moderation consistency, group membership state, and transactional counter updates. Redis can be introduced later as a cache or view-count batching layer, but the v1 implementation should keep comments, likes/votes, views, bookmarks, group membership, and counters durable in PostgreSQL.
+
+
+# Implemented user guides (2026-10-13)
+
+User Management migration `V8__user_guides.sql` adds the independent `iam.user_guides` table. It has the same validated destination/document fields, JSONB content, publication lifecycle and optimistic version as `iam.guides`, plus a required immutable `owner_id` referencing `iam.users` with ON DELETE CASCADE. Creator/editor references remain nullable with ON DELETE SET NULL. The owner/update, published-date and published-destination indexes support private library and public city discovery queries. No destination uniqueness applies: one traveler may write several guides for a city, and many travelers may cover the same city.
+
+All private operations require the resolved owner, including callers with ADMIN/OWNER roles. Public endpoints select only PUBLISHED rows. The existing admin table, seed and destination uniqueness are unchanged. Both tables inherit the shared mapped document fields; startup validation covers both. See [user guide API](../api/user-guides.md).

@@ -105,7 +105,8 @@ Set `NEXT_PUBLIC_PLACE_DATA_SOURCE=mock` to use local fixtures for places and ch
 | Profile or garage shows "service temporarily unavailable" | The gateway cannot reach user-management. Run `.\navio status`. If it is UP, wait 30 seconds and retry. Otherwise check `.\navio logs user`. |
 | `A dependency is missing from the local Maven cache` | Re-run with `-Online`. |
 | Sign-in fails right after the stack starts | Keycloak can take a minute to import the realm. `.\navio start` waits for it, but a manual `docker compose up` does not. |
-| Keycloak or MinIO shows `unhealthy` in `status` | Their container health checks are broken. If the services start, they are fine. |
+| User management fails to resolve `http://localhost:8180/realms/navio`, or discovery returns `Empty reply from server` | Check `curl.exe --noproxy "*" http://localhost:8180/realms/navio/.well-known/openid-configuration`. If the container is healthy and discovery works inside Docker, Docker Desktop's published port forwarding is failing. Restart Docker Desktop, wait for the containers, then run `.\navio start`. This resets in-memory local Keycloak accounts; production accounts and the Postgres volume are unaffected. Targeted starts now check Keycloak and the other infrastructure before restarting a service. |
+| Keycloak or MinIO shows `unhealthy` in `status` | Check the service logs and the host endpoints. The runner probes Keycloak realm discovery and MinIO readiness directly. |
 | Port 3000 is taken | Grafana also uses 3000. Start only what you need (`.\navio infra` does), not a bare `docker compose up`. |
 | Media uploads fail | The `navio-community` bucket is missing. `.\navio infra` recreates it. |
 
