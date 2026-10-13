@@ -1,11 +1,26 @@
 openapi: 3.1.0
 x-navio-implemented-travel-options:
   status: Implemented locally; coordinated client, Trip Planning and Mobility deployment required.
-  plannerCapability: cycling-legs-v1
-  arrivalModes: [drive, transit, bike, walk]
+  plannerCapabilities: [cycling-legs-v1, transit-preferences-v1, transit-route-choice-v1]
+  arrivalModes: [drive, transit, rail, bus, bike, walk]
   cycling: Bike legs use the CYCLING provider profile and never consume the car battery.
-  railPreference: Automatic transit between two rail stations sends railOnly true; an explicit transit choice allows all public transit.
-  suggestions: The client compares individual legs on demand using POST /v1/routes/directions. Transit steps expose provider line names, boarding and arrival stops, stop counts and walking connections.
+  transitPreferences: Saved rail and bus modes are available for all place pairs, including day anchors, airports and hotels. Google mode preferences are checked against every ride; balanced and fewer-transfer searches are compared without forcing one preference. Legacy automatic station-to-station transit still sends railOnly true.
+  suggestions: The single leg icon opens shadcn mode controls and journey accordions. All transit merges confirmed general, rail and bus alternatives; selecting a mode or journey previews its geometry, dotted walks and exact station markers on both map providers. Departure-time controls are omitted.
+  directionsRequest:
+    includeTransitAlternatives: Optional boolean; defaults to false.
+    transitRoutingPreference: Optional FEWER_TRANSFERS or LESS_WALKING; absent retains provider-balanced routing. Caches are separate per preference.
+    departureTime: Optional RFC3339 instant supported for API compatibility; bounded to the past 7 days or next 100 days. The planner UI does not set it.
+  transitJourneys:
+    segmentField: journeys
+    maximumPerProviderQuery: 4
+    fields: [id, provider, geometry, distanceMeters, durationSeconds, walkingSeconds, departureTime, arrivalTime, timeZone, fare, currency, steps]
+    stepFields: [travelMode, geometry, distanceMeters, durationSeconds, line, departureStop, arrivalStop, stopCount, departureTime, arrivalTime, headsign, departureLocation, arrivalLocation]
+    coordinates: Boarding and arrival coordinates use longitude-latitude arrays; missing coordinates do not create exact station markers.
+    unknownValues: Schedule and fare fields are nullable; unavailable fares do not imply free travel.
+    duration: Alternative duration includes provider transfer waits when available and excludes waiting before leaving the origin. Legacy segment duration retains walking and riding time.
+    persistence: arrivalMode saves the mode; nullable arrivalRouteKey saves a versioned line and station sequence, validated and capped at 4096 characters. V18 adds its nullable text column. Saved choices are matched to current alternatives and confirmed final walking paths, never to stored timetable IDs. An unavailable saved route becomes an explicit fallback. Clients guard saves using transit-route-choice-v1 before PUT.
+    ranking: Balanced and fewer-transfer searches are merged and deduplicated. Elapsed journey time plus extra walking effort and a small transfer penalty determine the recommendation; the user can select any confirmed route.
+    walkingAlternatives: Earlier alighting candidates reuse confirmed transit steps and exact stop coordinates. At most two station-to-destination walks per restricted mode are checked, only within 1.8 km direct distance. A candidate requires a routed street walk of at most 2.5 km and 30 minutes. Fares for truncated rides stay unknown.
   stationInsertion: Station names are resolved through place search; the traveller confirms a provider place before inserting it into the itinerary.
   unavailable: Fallback geometry is an unverified direct connection; it must not be presented as navigation or given a travel-time estimate.
 x-navio-implemented-phase4c:
@@ -66,6 +81,129 @@ tags:
 - name: Geo Provider
 - name: Budgeting
 paths:
+  /v1/admin/guides:
+    get:
+      tags: [User Management Service]
+      summary: List every admin's guides, including drafts
+      description: Requires ADMIN or OWNER. Shared library; no creator/owner filter. Optional term, status, page and size (1-100). See destination-guides.md for response fields.
+      responses:
+        '200': {description: Page of guide summaries}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+    post:
+      tags: [User Management Service]
+      summary: Create a shared draft guide
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [guide]
+              properties:
+                guide: {$ref: '#/components/schemas/DestinationGuideFields'}
+      responses:
+        '201': {description: Created guide with status, version, fields and attribution}
+        '409': {description: Destination already has a guide}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+  /v1/admin/guides/{id}:
+    parameters:
+    - {name: id, in: path, required: true, schema: {type: string, format: uuid}}
+    get:
+      tags: [User Management Service]
+      summary: Read any guide as ADMIN or OWNER
+      responses:
+        '200': {description: Guide with draft/published status, version, fields and attribution}
+        '404': {description: Guide not found}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+    put:
+      tags: [User Management Service]
+      summary: Update any guide as ADMIN or OWNER
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [guide, expectedVersion]
+              properties:
+                guide: {$ref: '#/components/schemas/DestinationGuideFields'}
+                expectedVersion: {type: integer, format: int64, minimum: 0}
+      responses:
+        '200': {description: Saved guide and incremented version}
+        '409': {description: Another admin saved a newer version}
+        '422': {description: Invalid document relationships or removal of every published place}
+        '404': {description: Guide not found}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+    delete:
+      tags: [User Management Service]
+      summary: Delete the guide for all admins and travelers
+      parameters:
+      - {name: expectedVersion, in: query, required: true, schema: {type: integer, format: int64, minimum: 0}}
+      responses:
+        '204': {description: Deleted}
+        '409': {description: Another admin saved a newer version}
+        '404': {description: Guide not found}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+  /v1/admin/guides/{id}/publish:
+    parameters:
+    - {name: id, in: path, required: true, schema: {type: string, format: uuid}}
+    post:
+      tags: [User Management Service]
+      summary: Publish a guide for travelers as ADMIN or OWNER
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/DestinationGuideVersionRequest'}
+      responses:
+        '200': {description: Published guide and incremented version}
+        '409': {description: Another admin saved a newer version}
+        '422': {description: Add at least one place before publishing}
+        '404': {description: Guide not found}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+  /v1/admin/guides/{id}/unpublish:
+    parameters:
+    - {name: id, in: path, required: true, schema: {type: string, format: uuid}}
+    post:
+      tags: [User Management Service]
+      summary: Return a shared guide to draft as ADMIN or OWNER
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/DestinationGuideVersionRequest'}
+      responses:
+        '200': {description: Draft guide and incremented version}
+        '409': {description: Another admin saved a newer version}
+        '404': {description: Guide not found}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+  /v1/guides:
+    get:
+      tags: [User Management Service]
+      summary: Read published destination guides
+      security: []
+      parameters:
+      - {name: page, in: query, schema: {type: integer, minimum: 0, default: 0}}
+      - {name: size, in: query, schema: {type: integer, minimum: 1, maximum: 100, default: 50}}
+      responses:
+        '200': {description: Page of published guides with authored fields and timestamps}
+  /v1/guides/{id}:
+    parameters:
+    - {name: id, in: path, required: true, schema: {type: string, format: uuid}}
+    get:
+      tags: [User Management Service]
+      summary: Read a published guide
+      security: []
+      responses:
+        '200': {description: Published guide with authored fields and timestamps}
+        '404': {description: Missing guide or draft}
   /v1/groups/{slug}/banner:
     parameters:
     - name: slug
@@ -5290,6 +5428,38 @@ components:
       name: X-Internal-Auth
       description: Shared secret for service-to-service calls on localhost
   schemas:
+    DestinationGuideVersionRequest:
+      type: object
+      required: [expectedVersion]
+      properties:
+        expectedVersion: {type: integer, format: int64, minimum: 0}
+    DestinationGuideFields:
+      type: object
+      description: Authored fields; see docs/api/destination-guides.md for the editor document and DTO limits.
+      required: [name, country, destination, description, coverPlaceId, content]
+      properties:
+        name: {type: string, minLength: 1, maxLength: 120}
+        country: {type: string, maxLength: 100}
+        countryCode: {type: [string, 'null'], pattern: '^[A-Z]{2}$'}
+        description: {type: string, maxLength: 4000}
+        coverPlaceId: {type: string, minLength: 1, maxLength: 300}
+        destination:
+          type: object
+          required: [provider, providerPlaceId, name, lat, lng]
+          properties:
+            provider: {type: string, enum: [GOOGLE, MAPBOX]}
+            providerPlaceId: {type: string, minLength: 1, maxLength: 255}
+            name: {type: string, minLength: 1, maxLength: 200}
+            lat: {type: number, minimum: -90, maximum: 90}
+            lng: {type: number, minimum: -180, maximum: 180}
+        content:
+          type: object
+          required: [categories, lists, places, body]
+          properties:
+            categories: {type: array, maxItems: 30, items: {type: object}}
+            lists: {type: object, maxProperties: 200, additionalProperties: {type: object}}
+            places: {type: object, maxProperties: 600, additionalProperties: {type: object}}
+            body: {type: string, maxLength: 200000}
     GroupDetailResponse:
       type: object
       properties:

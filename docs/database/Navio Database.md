@@ -1,3 +1,7 @@
+# Implemented transit route choice (2026-10-13)
+
+Trip migration V18__selected_transit_route.sql adds nullable trip.block_item.arrival_route_key text with a 4096-character check, mapped to a plain Java String. It stores a versioned transit line and station sequence; it does not store provider map geometry, fares or timetables. There is no backfill. Existing rows and older releases continue to use arrival_mode, and the new service preserves omitted choices, clears explicit null and clears choices when the mode changes. The client requires transit-route-choice-v1 before saving a specific journey. Schema, historical migration upgrade, and real persistence/reload/clear are verified in PostgresSchemaTests against a separate disposable database.
+
 # Navio Database Design
 
 ## Phase 4C precise charging state (2026-10-13)
@@ -3119,6 +3123,12 @@ For cross-service data:
 14. Implement provider-neutral AI tables only after the core user + trip + EV + community flow works. The same schema supports Ollama and hosted-provider profiles.
 
 ---
+
+# Implemented destination guides (2026-10-13)
+
+User Management migration `V7__destination_guides.sql` adds `iam.guides`: UUID identity; title/country; provider destination ID/name/coordinates; description/cover place; JSONB categories, lists, remembered places and block-editor markdown; DRAFT/PUBLISHED status; optimistic-lock version; nullable creator/editor references (ON DELETE SET NULL); creation/edit/publication timestamps. All ADMIN/OWNER accounts share the same library. Creator IDs provide attribution, without restricting access.
+
+A unique provider/destination-place index prevents duplicate destination guides. Coordinate, status, country-code and publication-timestamp constraints protect the stored data. V7 seeds the Bangkok prototype as published with 24 places. The migration only adds a new table and is compatible with the previous application release. PostgreSQL tests run Flyway plus Hibernate `validate`, clear the persistence context to prove JSONB reload, and verify that a second admin can read/edit/publish/delete a guide while stale versions are rejected.
 
 # 24. Final Recommendation
 
