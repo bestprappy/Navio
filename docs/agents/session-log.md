@@ -1,3 +1,11 @@
+## 2026-10-13 - Codex - Diagnose missing TipTap dependency after pull
+
+**Goal:** Fix the friend's `Can't resolve '@tiptap/core'` build error after pulling the client.
+**Done:** Confirmed client HEAD f3c63ca already commits all 11 direct TipTap dependencies and matching lock entries at 3.31.4, including the failing block-keymap import. Added nine lines to client/README.md explaining that pulls do not install dependencies: stop Next, run `npm ci` inside client, then restart `npm run dev`. No package, editor or application behavior change is needed.
+**Verified:** A detached checkout of the committed client with independent node_modules installs 898 packages using `npm ci --no-audit --no-fund`; all 13 TipTap import specifiers used by the actual block editor resolve. Full Next 16.3.4 Turbopack production build, TypeScript and 31 generated static pages pass with a temporary one-worker config and 1 GB Node heap. Both dependency files remain byte-identical to HEAD. README whitespace check passes. The friend's own installation cannot be changed from this workspace; they must run the recovery commands locally.
+**Not done / left uncommitted:** README remains an owned uncommitted client edit alongside ongoing user-guide/banner work. Preserve all concurrent root/client/server/user/mobility/community application changes, reports, local agent files and logs. Mandatory agent notes committed on docs/client-dependency-session-20261013 from synced root dev and merged to local dev only; working copies on root feat/user-guides retain the same new note as an unstaged change. No push, main merge, submodule pin, service restart, database change or deployment.
+**Follow-ups:** Friend stops the dev process, runs `cd client`, `npm ci`, `npm run dev` and reloads the dashboard. No source dependency fix is outstanding. Prior feature/release work and deferred Phase 4C.1 continue independently.
+
 ## 2026-10-13 - Codex - User guide writing and discovery ready locally
 
 **Goal:** Build `feat/user-guides` with frontend-design and shadcn: Your Guides below Explore plans on the dashboard, traveler guide discovery, country/city search, and guides matching every trip city. The user's follow-up explicitly removes any Your Guides sidebar entry.
