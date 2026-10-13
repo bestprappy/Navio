@@ -81,11 +81,14 @@ services:
       NAVIO_WEB_ORIGIN: http://localhost:3000
       KEYCLOAK_WEB_CLIENT_SECRET: local-dev-web-secret
       KEYCLOAK_ADMIN_CLIENT_SECRET: local-dev-admin-secret
+      # Health endpoints are off by default and live on the management port
+      # (9000), not 8080. Same probe as .deploy/compose.production.yml.
+      KC_HEALTH_ENABLED: "true"
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "exec 3<>/dev/tcp/localhost/8080 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200'",
+          "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '200 OK' <&3",
         ]
       interval: 15s
       timeout: 5s

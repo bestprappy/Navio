@@ -12,7 +12,13 @@ services:
     volumes:
       - community-object-data:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      # Bash built-ins only: the image has no grep, and its curl/mc are not
+      # guaranteed (they are zero-filled in some local copies of this tag).
+      test:
+        [
+          "CMD-SHELL",
+          "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /minio/health/live HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && read -r status <&3 && case \"$$status\" in *' 200 '*) exit 0;; *) exit 1;; esac",
+        ]
       interval: 5s
       timeout: 3s
       retries: 20
