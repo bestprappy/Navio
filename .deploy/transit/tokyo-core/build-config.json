@@ -1,0 +1,5 @@
+{
+  "transitServiceStart": "2026-10-05",
+  "transitServiceEnd": "2027-04-05",
+  "includeEllipsoidToGeoidDifference": false
+}

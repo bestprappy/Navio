@@ -251,6 +251,31 @@ services:
       retries: 15
       start_period: 60s
 
+  # OpenTripPlanner with the Tokyo graph baked into the image. No public port:
+  # only Mobility calls it. Mobility does not wait for it, because its circuit
+  # breaker already treats an unavailable router as "no fallback journey".
+  transit-router:
+    image: ${NAVIO_IMAGE_PREFIX:?NAVIO_IMAGE_PREFIX is required}-transit-router:${NAVIO_IMAGE_TAG:?NAVIO_IMAGE_TAG is required}
+    restart: unless-stopped
+    init: true
+    # The verified graph serves in ~360 MB resident.
+    mem_limit: 768m
+    environment:
+      JAVA_OPTS: -Xmx512m -XX:ActiveProcessorCount=2
+      TZ: Asia/Bangkok
+    networks:
+      - backend
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      # The image has no curl; OTP opens its port only after the graph loads.
+      # /dev/tcp is a bash feature; the image's /bin/sh may not support it.
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/127.0.0.1/8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 60s
+
   mobility-and-ev-service:
     <<: *java-service
     image: ${NAVIO_IMAGE_PREFIX:?NAVIO_IMAGE_PREFIX is required}-mobility-and-ev-service:${NAVIO_IMAGE_TAG:?NAVIO_IMAGE_TAG is required}
@@ -271,6 +296,13 @@ services:
       MOBILITY_DB_USERNAME: ${POSTGRES_USER:-tripplanner}
       MOBILITY_DB_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
       GOOGLE_MAPS_SERVER_API_KEY: ${GOOGLE_MAPS_SERVER_API_KEY:?GOOGLE_MAPS_SERVER_API_KEY is required}
+      # Transit fallback for areas Google cannot route (Japan). Set
+      # NAVIO_OTP_ENABLED=false in the VM .env to switch it off without a release.
+      # Change the network ID whenever the baked graph's inputs change: it
+      # separates the route cache and the graph's mode inventory.
+      NAVIO_OTP_ENABLED: "${NAVIO_OTP_ENABLED:-true}"
+      NAVIO_OTP_ENDPOINT: http://transit-router:8080/otp/gtfs/v1
+      NAVIO_OTP_NETWORK_ID: tokyo-core-20261005-20270405
     healthcheck:
       test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8083/actuator/health"]
       interval: 10s
