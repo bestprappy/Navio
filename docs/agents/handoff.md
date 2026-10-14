@@ -1,3 +1,6 @@
+## 2026-10-14 - Claude - Planner ⋯ menus follow-up
+
+**Behavior:** Itinerary toolbar is now Collapse all days + ⋯ Itinerary options (Route lines on map All/Day/Place, Export table). Day ⋯ Times section is a grouped Calculate / Recalculate all control. User-set time chips are solid day colour, no pin. All uncommitted alongside the time-calculation work below; checks pass.
 ## 2026-10-14 - Claude - Itinerary time calculation implemented locally
 
 **Behavior:** Day ⋯ Block options has a Times section: Calculate times keeps every time the traveller set (pinned chips) and fills the rest (dashed chips) from visit lengths and routed travel; impossible gaps keep both fixed times and show "You need N more minutes to reach X on time." on the card. Recalculate all times opens a review dialog of replaced times (Cancel / Replace and calculate). Undo sits next to the status. Moved stops, routes or durations show Times need updating, plus a warning dot on ⋯. Newly added cards get a suggested calculated time automatically. Editing a time fixes it; the time popover can hand it back to calculation.
