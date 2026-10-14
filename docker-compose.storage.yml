@@ -1,7 +1,15 @@
 # Local S3-compatible storage. Start with: docker compose -f docker-compose.storage.yml up -d
+#
+# Docker Hub no longer serves minio/minio or minio/mc. This is the public image the
+# release pipeline builds from source (.deploy/docker/community-storage.Dockerfile);
+# it contains both the MinIO server and the mc client.
+x-storage-image: &storage-image ghcr.io/bestprappy/navio-community-storage:056953bcc048cdfb3dbbc7840997fd6464ad938f
+
 services:
   minio:
-    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    image: *storage-image
+    # Volumes created by the earlier upstream image are owned by root.
+    user: "0:0"
     command: server /data --console-address :9001
     ports:
       - "127.0.0.1:9000:9000"
@@ -12,18 +20,12 @@ services:
     volumes:
       - community-object-data:/data
     healthcheck:
-      # Bash built-ins only: the image has no grep, and its curl/mc are not
-      # guaranteed (they are zero-filled in some local copies of this tag).
-      test:
-        [
-          "CMD-SHELL",
-          "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /minio/health/live HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && read -r status <&3 && case \"$$status\" in *' 200 '*) exit 0;; *) exit 1;; esac",
-        ]
+      test: ["CMD", "curl", "-fsS", "http://localhost:9000/minio/health/live"]
       interval: 5s
       timeout: 3s
       retries: 20
   minio-init:
-    image: minio/mc:RELEASE.2025-04-16T18-13-26Z
+    image: *storage-image
     depends_on:
       minio:
         condition: service_healthy
@@ -31,6 +33,7 @@ services:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-navio-local}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-navio-local-storage}
       COMMUNITY_S3_BUCKET: ${COMMUNITY_S3_BUCKET:-navio-community}
+      MC_CONFIG_DIR: /tmp/mc
     entrypoint:
       - /bin/sh
       - -ec

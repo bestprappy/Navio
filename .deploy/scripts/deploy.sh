@@ -513,6 +513,8 @@ verify_api_route GET '/v1/admin/audit-events' 401
 verify_api_route GET '/v1/guides?page=0&size=1' 200
 verify_api_route GET '/v1/admin/guides' 401
 verify_api_route POST '/v1/admin/guides' 401
+verify_api_route GET '/v1/traveler-guides?page=0&size=1' 200
+verify_api_route GET '/v1/users/me/guides' 401
 
 # The Next.js admin pages share the /admin/ prefix with Keycloak's console.
 # An anonymous request must reach Next.js (proxy.ts redirects to sign-in),

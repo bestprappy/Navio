@@ -215,17 +215,10 @@ function Start-Infra {
 }
 
 function Initialize-MediaBucket {
-  # minio-init cannot run (minio/mc was removed from Docker Hub), so the bucket
-  # is created with the AWS CLI on MinIO's own network namespace.
+  # minio-init uses the mc client bundled in the storage image and is idempotent.
   Push-Location $Root
-  try { $minio = (& docker compose -f $StorageCompose ps -q minio) | Select-Object -First 1 } finally { Pop-Location }
-  $aws = @('run', '--rm', '--network', "container:$minio",
-    '-e', 'AWS_ACCESS_KEY_ID=navio-local', '-e', 'AWS_SECRET_ACCESS_KEY=navio-local-storage',
-    '-e', 'AWS_DEFAULT_REGION=us-east-1', 'amazon/aws-cli:2.27.0', '--endpoint-url', 'http://localhost:9000')
-  & docker @aws s3api head-bucket --bucket $MediaBucket *> $null
-  if ($LASTEXITCODE -eq 0) { Write-Ok "Bucket $MediaBucket exists"; return }
-  & docker @aws s3 mb "s3://$MediaBucket" *> $null
-  if ($LASTEXITCODE -eq 0) { Write-Ok "Bucket $MediaBucket created" }
+  try { & docker compose -f $StorageCompose run --rm minio-init *> $null } finally { Pop-Location }
+  if ($LASTEXITCODE -eq 0) { Write-Ok "Bucket $MediaBucket ready" }
   else { Write-Warn "Could not create bucket $MediaBucket; community media uploads will fail." }
 }
 
