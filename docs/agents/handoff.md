@@ -1,6 +1,6 @@
 ## 2026-10-14 - Claude - Released: itinerary table, PDF handout, times, auto plan, transit, sharing
 
-**Live (pending deploy result below):** Root main carries client 095efad and server 6e09360 (trip-planning 5c089d5). Client commits: 79d3582 times + stop moments, 54f3b52 auto plan, 5fa977b transit route choices, 7446f5d share dialog/retry, 095efad itinerary table + PDF handout. Trip-planning V19 time_source and V20 schedule (both nullable, additive) passed PostgresSchemaTests on disposable PostGIS.
+**Live:** Deployed 2026-10-14 from root main 56e401e (run 38579825854: revisions, PostgreSQL schema, all ten image builds and the VM deploy succeeded; /health 200, /v1/trips 401 afterwards). Root main carries client 095efad and server 6e09360 (trip-planning 5c089d5). Client commits: 79d3582 times + stop moments, 54f3b52 auto plan, 5fa977b transit route choices, 7446f5d share dialog/retry, 095efad itinerary table + PDF handout. Trip-planning V19 time_source and V20 schedule (both nullable, additive) passed PostgresSchemaTests on disposable PostGIS.
 **Not released, still local:** client tsconfig.json (local build-dir include), r1-r6.json scratch files, CLAUDE.md, tests/planner/.output; root docs/report (capstone report files); untracked hs_err/replay/logs in mobility and community services.
 **Known test gaps:** trip-planning's two full-context tests need local Postgres and Kafka (stack was stopped); 239/241 pass otherwise. Shared-plan table view is not browser-checked.
 
