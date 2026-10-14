@@ -1,3 +1,7 @@
+## 2026-10-14 - Claude - Auto plan lives in Block options
+
+**State:** Auto plan opens from the first row of each day's ⋯ menu (Block options); the header button is gone. Code is in client feat/guide-auto-plan, uncommitted: auto-plan/auto-plan-dialog.tsx (was auto-plan-button.tsx), block/block-option-action.tsx, block-options-popover.tsx, trip-block.tsx, day-times-section.tsx, tests/planner/auto-plan.browser.mjs.
+
 ## 2026-10-14 - Claude - Stop schedule ("moments") follow-ups done
 
 **State:** Stop schedule (trip-planning V20 `block_item.schedule`, capability `item-schedule-v1`) is complete locally and uncommitted: client feat/guide-auto-plan, trip-planning feat/itinerary-time-calculation (stacked on V19 `time_source`), root docs on fix/traveler-guides-route-local-minio. The browser fixture tests/planner/stop-schedule.browser.mjs passes end to end, PostgresSchemaTests 3/3 passed on disposable Postgres, and the API, OpenAPI and database docs describe `schedule`.

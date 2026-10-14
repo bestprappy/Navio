@@ -1,3 +1,10 @@
+## 2026-10-14 - Claude - Auto plan moved into the day's ⋯ menu
+
+**Done (client feat/guide-auto-plan, uncommitted):** The day header no longer has an Auto plan button; it shows date, day-color dot and ⋯. Auto plan is the first row of Block options (icon, title, hint "Orders your places around meals and opening hours."). Choosing it closes the menu and opens the dialog, which lives outside the menu and returns focus to ⋯ on close. auto-plan/auto-plan-button.tsx became auto-plan-dialog.tsx (controlled `AutoPlanDialog` + `useCanAutoPlan`; the time refiner still mounts with it). The Times rows and the Auto plan row share the new block/block-option-action.tsx (`BlockOptionAction`, extracted from day-times-section.tsx). trip-block.tsx no longer imports Auto plan.
+**Verified:** tsc and scoped ESLint clean. tests/planner/auto-plan.browser.mjs now opens Auto plan from the menu (keyboard, Escape focus return to ⋯, apply/move/undo) and passes light 1440, dark 390 and dark 1440; day-timing.browser.mjs passes. Menu screenshots reviewed.
+**Note:** A notes commit briefly emptied session-log.md on local dev (a script truncated the file before failing); it was unpushed and was reset to 899d70e before this entry was recommitted.
+**Follow-ups:** None required. Commit with the rest of the client Auto plan work.
+
 ## 2026-10-14 - Claude - Stop schedule follow-ups: browser fixture, Postgres check, docs
 
 **Done:** Fixed the notes step in client tests/planner/stop-schedule.browser.mjs. The editor was fine: the press only swaps the static notes for the lazily loaded block editor, and the script typed before it mounted. The step now waits for the contenteditable editor to have focus and for the slash menu's selected option before pressing Enter. Documented `schedule` / `item-schedule-v1` / V20 in docs/api/Navio Api Documentation.md, docs/api/Navio Open API.yaml (`x-navio-implemented-stop-schedule`) and docs/database/Navio Database.md.
