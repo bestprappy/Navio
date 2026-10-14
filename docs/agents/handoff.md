@@ -1,3 +1,9 @@
+## 2026-10-14 - Codex - Friend's MinIO build: network download interruption
+
+**Diagnosis:** Friend manually ran `docker build -f .deploy/docker/community-storage.Dockerfile -t minio/minio:RELEASE.2025-04-22T22-12-26Z .`. Full log shows `unexpected EOF` fetching/verifying several pinned Go dependencies from `proxy.golang.org` and `sum.golang.org`. Go 1.25 and the upstream release tags are present; this attempt fails in dependency retrieval. The exact network cause and retry outcome remain unverified.
+**Next:** Retry the same command with `--progress=plain`, retaining caches. If it repeats, change network or inspect VPN/proxy/Docker Desktop proxy settings; retain checksum verification. After success, `docker compose -f docker-compose.storage.yml up -d`. Normal local storage Compose uses prebuilt images. No application code change was made.
+**State:** Root/client/server and changed community/mobility service checkouts started on main; preserve client tsconfig.json/CLAUDE.md, docs/report and service logs/crash dumps. Session notes only are committed on docs/minio-build-diagnosis-20261014 and integrated into local dev (mirrored here); no push/main merge/deploy, image build or runtime/data change. The previous release verification follow-up remains below.
+
 ## 2026-10-13 - Claude - Guides, community redesign and transit fallback released
 
 **Live:** All outstanding application work is on every repository's main: traveler guides (V8, `/v1/users/me/guides`, `/v1/traveler-guides`), Reddit-style community (V7 icons, comment reactions, joined feed, create wizard), open-transit fallback code (OTP disabled in production by default), gateway routes and client UI. Pins: community `47a0439`, user-management `6138990`, mobility `010e4ef`, trip-planning `2e4b051` (unchanged), server `bc0d0dd`, client `3b16acd`. The root main push triggers deploy-backend.yml.

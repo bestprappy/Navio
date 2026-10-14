@@ -1,3 +1,11 @@
+## 2026-10-14 - Codex - Diagnose friend's MinIO build download failure
+
+**Goal:** Explain and resolve the reported failure in the community-storage Docker build.
+**Done:** Located the failing Go install in `.deploy/docker/community-storage.Dockerfile` (Go 1.25, pinned MinIO/mc releases). The friend's full log identifies interrupted HTTPS requests to `sum.golang.org` (checksum tiles/lookups) and `proxy.golang.org` (module metadata), all reporting `unexpected EOF`. This attempt fails while fetching/verifying dependencies; there is no compiler error or unknown release. Both exact upstream release tags were independently verified. The particular network intermediary or endpoint causing the interruption is not known.
+**Verified:** Inspected the Dockerfile, local storage Compose file, deployment build matrix, actual root/client/server/service status, upstream release/module files and official Go/Docker documentation. No reproduction on the friend's network or successful retry is claimed. No application source, database, running service, image, volume or checksum policy was changed.
+**Not done / left uncommitted:** The friend must retry the original build (optionally with `--progress=plain`; existing cache mounts retain successful downloads). If EOF repeats, try another network or check VPN/proxy and Docker Desktop proxy configuration. Local Compose uses prebuilt images and does not normally require this source build; the friend explicitly invoked it with a local MinIO image tag. Preserve unrelated client tsconfig/CLAUDE.md, docs/report and service logs/crash dumps. Required notes are committed on docs/minio-build-diagnosis-20261014 and merged into local root dev only; working-copy notes are mirrored for the next session. No push, main merge or deployment.
+**Follow-ups:** Obtain the retry outcome. After a successful build, start storage with `docker compose -f docker-compose.storage.yml up -d`. No Dockerfile/version/checksum change is justified by this log alone.
+
 ## 2026-10-13 - Claude - Release traveler guides, community redesign and open-transit fallback
 
 **Goal:** User asked to commit all outstanding work and deploy to main.
