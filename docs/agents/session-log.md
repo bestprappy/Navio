@@ -1,3 +1,11 @@
+## 2026-10-14 - Codex - Auto plan dialog redesign
+
+**Goal:** Redesign the Auto plan UI using existing shadcn components and frontend-design / anti-ai-ui-review skills.
+**Done:** Refined only auto-plan/{auto-plan-button,auto-plan-settings,auto-plan-timeline,auto-plan-unplanned}.tsx in client feat/guide-auto-plan. Wider desktop dialog pairs a settings sidebar with a scrolling itinerary; mobile stacks sections with persistent actions. Replaced the unlabeled day ribbon with clear time/travel summary, added an aggregate timing warning from existing plan data, softened numbered markers, used purple for fixed times, wrapped per-stop warnings, and moved explanatory notes into the existing shadcn Accordion. Inputs, select, checkbox, dialog and buttons retain the shared shadcn primitives and theme tokens. Planning/apply/undo logic unchanged.
+**Verified:** Whole-client TypeScript, scoped ESLint, whitespace, and all 16 existing Auto plan tests pass. Existing intercepted Chrome fixture passes light 1440 / dark 390 apply, move, undo and focus return. Additional isolated conflict fixture passes dark 1440, light 390 and dark 320: fixed-time labels, aggregate warnings, invalid input disabling Apply, accordion, focus containment/return and no content overflow. Screenshots visually reviewed. Existing fixture logs known guide-stub shape errors; improved conflict fixture has valid guide stubs and no page errors. One parallel browser run hit host memory exhaustion; sequential reruns passed. Evidence and pre-edit copies: C:/Users/User/.codex/tmp/navio-auto-plan-redesign-20261014/.
+**Not done / left uncommitted:** Four owned UI files remain uncommitted alongside pre-existing auto-plan, timing, transit and schedule work; do not stage the entire untracked auto-plan folder as this session's work. No application commit/push, submodule pin, schema or runtime change, production release or real account write. Required notes only committed on docs/auto-plan-redesign-session-20261014 and merged into local root dev.
+**Follow-ups:** Reload Auto plan to review. Existing scheduler data and timing semantics were not changed by this visual redesign; preserve concurrent sessions' edits and release follow-ups.
+
 ## 2026-10-14 - Codex - Recommend time color for stop timetable
 
 **Goal:** Recommend the time color in the supplied dark planner card screenshot.

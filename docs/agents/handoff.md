@@ -1,3 +1,9 @@
+## 2026-10-14 - Codex - Auto plan dialog redesigned locally
+
+**Behavior:** Auto plan now uses a wider desktop settings/sidebar-and-itinerary layout, stacked mobile layout and persistent footer actions. The summary names estimated travel and flags existing timing conflicts; fixed times use soft purple, long warnings wrap below stops, markers are quieter and About this plan uses shadcn Accordion. Existing planner/apply/undo logic remains unchanged.
+**Checks:** TypeScript, scoped ESLint, whitespace and 16 Auto plan tests pass. Intercepted Chrome verifies apply/move/undo at light 1440 / dark 390; conflict/invalid-input/accordion/keyboard/overflow checks pass dark 1440, light 390 and dark 320. Evidence: C:/Users/User/.codex/tmp/navio-auto-plan-redesign-20261014/.
+**State/next:** Only four UI files in client auto-plan/{auto-plan-button,auto-plan-settings,auto-plan-timeline,auto-plan-unplanned}.tsx were edited on feat/guide-auto-plan; all remain uncommitted with existing work. Reload Auto plan to review. Preserve concurrent scheduling/timing/transit changes. Notes only use docs/auto-plan-redesign-session-20261014 and local root dev; no application commit, push, main merge, pin or deployment.
+
 ## 2026-10-14 - Codex - Time color recommendation
 
 **Decision:** Retain soft purple for time chips, timetable labels and dots, with a subtle connector and neutral activity text. Existing theme-aware premade token already implements the purple direction; teal is the card selection accent.
