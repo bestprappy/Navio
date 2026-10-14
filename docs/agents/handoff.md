@@ -1,3 +1,9 @@
+## 2026-10-14 - Codex - Block options warning dot pings at top right
+
+**Behavior:** The block options three-dot button's stale-time warning dot sits at its top-right corner, with an expanding ping halo and steady center. Reduced-motion preferences hide the halo; warning visibility, accessible label and menu interactions remain connected to existing timing state.
+**Checks:** Whole-client TypeScript, scoped ESLint and whitespace pass. Intercepted Chrome checks corner geometry, infinite ping, reduced motion, keyboard open/Escape/focus return, dark/light, 1440/390px and no overflow/page errors. Evidence: C:/Users/User/.codex/tmp/navio-block-dot-20261014/.
+**State/next:** Only owned styling hunk in client block/block-options-popover.tsx remains uncommitted on feat/guide-auto-plan. Preserve prior timing/menu/auto-plan/transit work and all other session edits. Required notes only use docs/block-dot-session-20261014 and local root dev; no application commit/push/pin/main merge/deployment. Reload the planner to review a stale-time dot.
+
 ## 2026-10-14 - Codex - Purple time badges
 
 **Behavior:** User explicitly chose purple for time. Fixed time badges and editing triggers now use soft purple fills/text/borders from the existing theme-aware premade token; calculated times use purple text and dashed borders. This replaces the earlier slate treatment while retaining the request for softer colors.

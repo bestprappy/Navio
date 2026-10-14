@@ -1,3 +1,11 @@
+## 2026-10-14 - Codex - Top-right ping on block options
+
+**Goal:** Move the warning dot on the block's three-dot options button to its top-right corner and add a ping effect.
+**Done:** Styling-only change in client block/block-options-popover.tsx: top-0/right-0 indicator with an expanding warning-token halo around a steady dot. The halo is hidden with reduced motion; the indicator ignores pointer events. Existing stale-time condition, accessible label and menu behavior are preserved.
+**Verified:** Whole-client TypeScript, scoped ESLint and whitespace pass. Temporary intercepted Chrome fixture confirms corner geometry, running infinite ping, steady center, reduced-motion halo removal, keyboard menu open/Escape/focus return, no overflow/page errors, dark/light and 1440/390px. Screenshot inspected. Evidence: C:/Users/User/.codex/tmp/navio-block-dot-20261014/. No real account/trip/provider writes.
+**Not done / left uncommitted:** Only this session's styling hunk in client block/block-options-popover.tsx remains uncommitted on the existing feat/guide-auto-plan tree, alongside prior timing/menu changes. Preserve all other concurrent work. Required notes only use docs/block-dot-session-20261014 and merge into local root dev; no application commit, push, submodule pin, main merge or deployment.
+**Follow-ups:** Reload the planner to review the ping on any day whose calculated times need updating.
+
 ## 2026-10-14 - Codex - Apply the user's purple time color
 
 **Goal:** Implement the user's explicit purple preference for time badges after the earlier slate recommendation.
