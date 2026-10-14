@@ -1,3 +1,11 @@
+## 2026-10-14 - Codex - Shadcn time pickers for Auto plan
+
+**Goal:** Replace the native time popup shown in Plan settings with shadcn UI.
+**Done:** Added reusable client components/ui/time-picker.tsx composed from existing shadcn Popover, Select, Label and Button. Hour, every minute and AM/PM selectors display a 12-hour clock and emit HH:mm to the existing live preview. Auto-plan/auto-plan-settings.tsx uses it for Start and Finish by. Theme tokens, invalid state/error description, keyboard navigation and Done/Escape focus return are supported. Planner logic unchanged.
+**Verified:** Whole-client TypeScript, scoped ESLint and whitespace pass. Isolated Chrome checks at 1440/390px in light/dark cover native inputs removed, keyboard open/selection/Escape, nested menu dismissal, focus return, arbitrary minutes, noon/midnight, invalid time range disabling Apply, restoration of the preview, no backend writes/page errors or horizontal overflow. Mobile popover screenshots reviewed. Temporary fixture corrected menu-animation ambiguity and awaited outer-dialog focus restoration; no application correction was needed. Evidence: C:/Users/User/.codex/tmp/navio-shadcn-time-picker-20261014/.
+**Not done / left uncommitted:** Only this session's new time-picker component and targeted Auto plan settings replacements remain uncommitted on client feat/guide-auto-plan. Preserve all other concurrent client scheduling/auto-plan/transit/place-preview, trip service migrations/schedules, root docs/report and service logs. Required notes only are committed on docs/shadcn-time-picker-session-20261014 and merged into local root dev; no application commit, push, main merge, pin, schema/runtime change or deployment.
+**Follow-ups:** Reload Auto plan to review the themed Start and Finish by pickers. Stage the owned hunks separately when committing coordinated application work.
+
 ## 2026-10-14 - Codex - Auto plan dialog redesign
 
 **Goal:** Redesign the Auto plan UI using existing shadcn components and frontend-design / anti-ai-ui-review skills.

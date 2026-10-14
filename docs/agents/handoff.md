@@ -1,3 +1,9 @@
+## 2026-10-14 - Codex - Shadcn time pickers ready locally
+
+**Behavior:** Auto plan Start and Finish by now use reusable shadcn Popover/Select time pickers, with hour/minute/AM-PM controls and Done. Every minute is available; 12-hour display maps to the existing HH:mm state/live preview and validation.
+**Checks:** TypeScript, scoped ESLint and whitespace pass. Intercepted Chrome verifies keyboard, nested Escape/focus return, noon/midnight, invalid range, no writes/page errors/overflow and light/dark at 1440/390px. Mobile screenshots reviewed. Evidence: C:/Users/User/.codex/tmp/navio-shadcn-time-picker-20261014/.
+**State/next:** New client components/ui/time-picker.tsx and targeted auto-plan/auto-plan-settings.tsx replacements are uncommitted on feat/guide-auto-plan. Preserve concurrent client/backend/docs work. Notes only use docs/shadcn-time-picker-session-20261014 and local root dev; no application commit, push, main merge, pin or deployment. Reload Auto plan to review.
+
 ## 2026-10-14 - Codex - Auto plan dialog redesigned locally
 
 **Behavior:** Auto plan now uses a wider desktop settings/sidebar-and-itinerary layout, stacked mobile layout and persistent footer actions. The summary names estimated travel and flags existing timing conflicts; fixed times use soft purple, long warnings wrap below stops, markers are quieter and About this plan uses shadcn Accordion. Existing planner/apply/undo logic remains unchanged.
