@@ -1,3 +1,10 @@
+## 2026-10-15 - Codex - Implement Places discovery and safe planner append
+
+**Goal:** Execute the approved season-aware Places design with restrained UI, factual provider data, independent Explore tabs, and safe My List integration; new search algorithms deferred.
+**Done:** Implemented destination/month collections, deterministic Bayesian/hidden-gem rules and reviewed regional seasons, public read endpoints and rate/concurrency protection, official attribution, responsive split reader, account-scoped explicit plan context, autosave flush navigation, paginated plan/list choice, duplicate-safe narrow append, and consistent trip-first snapshot/append locking. Added contracts and targeted tests. Source lives on feature branches uncommitted; existing unrelated workspace materials were preserved.
+**Verified:**12 client tests,19 Mobility tests,29 Trip tests,7 gateway tests pass. Scoped lint and TypeScript pass; production build with Places enabled passes. Reviewed and corrected collection context, tablet portrait switching, fractional month validation, plan paging, stale-list409 retries, cross-card save acknowledgement, inactive-tab feed requests, photo failure fallback, and request queue cancellation.
+**Remaining:**3 PostgreSQL concurrency tests skip because Docker is stopped and no dedicated DB URL is set. Browser automation repeatedly fails to initialize (OS error3); no screenshot, actual map interaction, responsive visual QA or live disposable-trip add/reopen claim. Production flag stays opt-in; normal local dev exposes Places. New endpoints require rebuilding local Mobility/Trip/Gateway before preview. No source push/main merge/deployment, database/schema change, account mutation, or shared runtime restart. Detailed handoff: `docs/features/places-discovery.md`.
+
 ## 2026-10-15 - Codex - Publish planner Explore and sidebar polish to dev
 
 **Goal:** Put the completed Explore/sidebar work in Git while preserving newer teammate commits and all unrelated local work.

@@ -1,3 +1,9 @@
+## 2026-10-15 - Codex - Places discovery implemented locally; live review gate remains
+
+**Built:** New Explore Places tab, separate Plans/Guides query state, destination/month controls, Google-backed collections with conservative Thailand seasonal profiles, split responsive place reader, Google/photo attribution, and narrow owned My List append. Request queues/budgets bound paid provider access. Planner Explore all flushes autosave and carries explicit plan context. Source remains uncommitted on client/server/mobility `feat/places-discovery`, trip `feat/places-list-append`; unrelated reports, CLAUDE files, service logs preserved.
+**Verified:**12 client,19 Mobility,29 Trip,7 gateway tests pass; scoped ESLint/TypeScript and production build with Places enabled pass.3 real PostgreSQL tests are skipped because Docker engine is absent and no dedicated test database URL exists. Browser runtime fails OS error3; visual responsive/map and live append/save/reopen verification remain outstanding. Do not claim glitch-free UX or release readiness.
+**Next:** See `docs/features/places-discovery.md`. Restore browser automation, start the normal local backend safely, rebuild the three changed services, then verify end-to-end on a disposable trip and PostgreSQL concurrency. Local dev exposes Places by default; production requires explicit `NEXT_PUBLIC_PLACES_ENABLED=true`. No production rollout/push. No schema changes. Existing Mobility place detail lacks closure status, so append itself cannot independently recheck it; discovery/reader handle closure display.
+
 ## 2026-10-15 - Codex - Planner Explore polish published to client dev
 
 **Published:** Client commit `ab24542` is on `origin/dev` and `origin/feat/planner-explore-polish`. It contains the responsive Shared Plans/Travel Guides presentation, bounded Shadcn carousels, compact planner card variants, reordered Discover/Trips navigation, and the selected-sidebar treatment without the thin blue left marker.
