@@ -1,3 +1,9 @@
+## 2026-10-14 - Codex - Purple time badges
+
+**Behavior:** User explicitly chose purple for time. Fixed time badges and editing triggers now use soft purple fills/text/borders from the existing theme-aware premade token; calculated times use purple text and dashed borders. This replaces the earlier slate treatment while retaining the request for softer colors.
+**Checks:** Whole-client TypeScript, scoped ESLint and whitespace pass. Intercepted Chrome checks fixed/calculated badges, editing trigger, keyboard open/Escape, unchanged fixed values and no overflow/page errors in light/dark at 1440/390px. Evidence: C:/Users/User/.codex/tmp/navio-purple-time-chips-20261014/.
+**State/next:** Styling-only hunks in client block/items/{trip-place-card,place-time-popover}.tsx remain uncommitted on feat/guide-auto-plan. Preserve concurrent timing/auto-plan/transit work. Required notes only use docs/purple-time-chips-session-20261014 and local root dev; no application commit, push, pin, main merge or deployment.
+
 ## 2026-10-14 - Codex - Colored transit filter chips
 
 **Behavior:** The route chooser now gives Metro blue, Train violet, Monorail pink, Tram green, Bus teal and Ferry cyan tints; All retains the day/brand accent. Each chip has a compact count badge, stronger selected border/tint, matching hover color and visible keyboard focus. Existing theme tokens supply the palette; scoped CSS lifts All text in dark mode when a day accent is too dark. Fixed time badges and their editing trigger now use a quiet slate surface/soft text instead of the bright solid day color requested in the follow-up; calculated times retain their dashed outline. Filtering and timing behavior are unchanged.
