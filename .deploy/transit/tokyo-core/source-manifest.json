@@ -1,0 +1,19 @@
+{
+  "gtfsSha256": "4bf745770e619ba6a6af962d1cc4100557d2e7f1ca2b589be8cd9d5269a6633e",
+  "osmSha256": "c85a824be42086b61a0b4ae6413bf1b9cb9f111d532e50a589d9c5b4e0dc6d53",
+  "selectedRoutes": [
+    "JR-East.ChuoSobuLocal",
+    "Toei.Asakusa",
+    "Toei.Oedo",
+    "Toei.Shinjuku",
+    "TokyoMetro.Hanzomon",
+    "TokyoMetro.Marunouchi"
+  ],
+  "streetBounds": [
+    139.68,
+    35.65,
+    139.84,
+    35.74
+  ],
+  "notice": "Original timetables and dates preserved. Route/street selection limits coverage."
+}

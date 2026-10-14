@@ -2,7 +2,16 @@
 
 Navio can use OpenTripPlanner (OTP) when Google returns no transit journey or its transit provider is unavailable. The adapter uses the existing journey, step and saved route contracts. Road routing stays with Google. Each provider has a separate circuit breaker; cache keys include the configured graph revision. Unsupported vehicle modes are detected from the graph's route inventory and do not count as outages.
 
-The integration is disabled by default. It accepts coordinates worldwide, but can only supply networks and service dates represented by the loaded GTFS and street data. The tested local graph covers six central Tokyo rail lines, not all of Japan or every country. It includes published schedules and real OSM walking paths. Fares and real-time delay information are not supplied by this example feed.
+The integration is disabled by default in service configuration and enabled in production by `compose.production.yml`. It accepts coordinates worldwide, but can only supply networks and service dates represented by the loaded GTFS and street data. The production graph covers six central Tokyo rail lines, not all of Japan or every country. It includes published schedules and real OSM walking paths. Fares and real-time delay information are not supplied by this feed.
+
+## Production
+
+The `transit-router` image (`.deploy/docker/transit-router.Dockerfile`) builds the graph in CI from the committed inputs in `.deploy/transit/tokyo-core/` (see its `NOTICE.md` for sources and licenses) and serves it with OTP 2.10.0. Every release rebuilds and deploys it with the other images; the VM needs no data files. Mobility reaches it at `http://transit-router:8080/otp/gtfs/v1`; it has no public port.
+
+- **Service window:** `build-config.json` serves 2026-10-05 to 2027-04-05. Before that ends, prepare fresh inputs, update `build-config.json`, and change `NAVIO_OTP_NETWORK_ID` in `compose.production.yml`. A full-year window exhausted an 8 GB local Docker VM during the build; six months built and served within limits.
+- **Memory:** the six-month graph serves in about 360 MB resident; the container is limited to 768 MB with a 512 MB heap.
+- **Switch off without a release:** set `NAVIO_OTP_ENABLED=false` in `/opt/navio/.env` and recreate `mobility-and-ev-service`. Google routing is unaffected either way.
+- **Changing coverage:** replace the inputs with `scripts/transit/prepare-otp-data.py`, build the image locally (`docker build -f .deploy/docker/transit-router.Dockerfile .`), verify journeys with real dates, then update the network ID and release.
 
 ## Data
 
@@ -50,7 +59,7 @@ The first shared restart was blocked by automatic review. The user's manual rest
 
 ## Containers and verification
 
-`.deploy/compose.transit.yml` is an optional overlay for `compose.production.yml`. It mounts an already built graph read-only, keeps the router off public ports, and supplies the internal endpoint to Mobility. Set `NAVIO_OTP_DATA_DIR` and a new `NAVIO_OTP_NETWORK_ID`. The ordinary deployment script still uses the base Compose file: include the overlay in the deployment configuration before enabling this in production, and keep it included on future releases. Review resource budgets and follow `docs/agents/release.md` before deploying.
+Production runs the router from the `transit-router` image described under **Production** above; the former mount-a-graph overlay was removed.
 
 An explicitly enabled live backend check is `OpenTripPlannerRoutesAdapterTests#mapsLiveTokyoGraphWhenExplicitlyEnabled` with `-Dnavio.test.otp.endpoint=http://localhost:18801/otp/gtfs/v1`. Ordinary unit tests do not contact the router. `client/tests/planner/open-transit.browser.mjs` uses an isolated synthetic account and intercepted trip writes; directions pass unchanged through the actual Next/gateway/Mobility path by default. An explicit `NAVIO_TEST_MOBILITY_ORIGIN` diagnoses a separate API instead. Set `NAVIO_TEST_TOKYO_ROUTE=tower-shinjuku` for the user's Tokyo Tower -> Shinjuku City route. It checks directions, source attribution, save/reload and mobile/light/dark presentation. No real account or trip writes are made. The shutdown guard regression is `powershell -NoProfile -File scripts/local/tests/mobility-restart.tests.ps1`, with all process/file operations mocked.
 
