@@ -176,6 +176,9 @@ jobs:
             dockerfile: .deploy/docker/web-client.Dockerfile
           - image: community-storage
             dockerfile: .deploy/docker/community-storage.Dockerfile
+          # OpenTripPlanner with the Tokyo graph built from .deploy/transit/tokyo-core.
+          - image: transit-router
+            dockerfile: .deploy/docker/transit-router.Dockerfile
 
     steps:
       - name: Check out deployment repository
