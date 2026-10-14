@@ -1,7 +1,7 @@
 ## 2026-10-15 - Codex - Planner Explore polish published to client dev
 
 **Published:** Client commit `ab24542` is on `origin/dev` and `origin/feat/planner-explore-polish`. It contains the responsive Shared Plans/Travel Guides presentation, bounded Shadcn carousels, compact planner card variants, reordered Discover/Trips navigation, and the selected-sidebar treatment without the thin blue left marker.
-**Verification:** After rebasing onto the five newer client commits, focused tests passed 6/6, scoped ESLint and TypeScript passed, and the Next 16.3.4 production build completed successfully. The feature branch and client `dev` were pushed. Root `dev` was updated from `origin/dev`; its client submodule pin and these reconciled notes are being published separately. Root `main` was intentionally left unchanged because it deploys production.
+**Verification:** After rebasing onto the five newer client commits, focused tests passed 6/6, scoped ESLint and TypeScript passed, and the Next 16.3.4 production build completed successfully. The feature branch and client `dev` were pushed. Root `dev` was updated from the 22 newer remote commits, then pushed at `9cc6dfd` with the client pin and reconciled notes. Root `main` was intentionally left unchanged because it deploys production.
 **Preserve:** Local `client/CLAUDE.md`, reports, output, runtime files, and unrelated dirty server services remain uncommitted. The `/help` link still has no page in this checkout.
 
 ## 2026-10-14 - Codex - Planner Explore and selected sidebar states redesigned locally

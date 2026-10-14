@@ -3,7 +3,7 @@
 **Goal:** Put the completed Explore/sidebar work in Git while preserving newer teammate commits and all unrelated local work.
 **Done:** Committed the 13 intended client source/test files as `feat(planner): polish Explore and sidebar navigation`, rebased the feature cleanly onto current `origin/dev`, pushed `feat/planner-explore-polish`, fast-forwarded client `dev`, and pushed client `dev` at `ab24542`. Pulled the 22 newer root `dev` commits with autostash. Reconciled the two agent-note conflicts by retaining the newest remote history plus the seven local entries that were not yet published. No server-service source, environment file, report, output, editor file, or local `CLAUDE.md` was staged.
 **Verified:** On the rebased client state, focused Explore/sidebar tests pass 6/6, scoped ESLint passes, `npx tsc --noEmit` passes, `npm run build` passes, and staged whitespace checks pass. Root `main` was not merged or pushed, so no production deployment was triggered.
-**State / follow-up:** Client feature and `dev` are remote. Publish the reconciled root notes on a `docs/...` branch, then publish the client submodule pin on a `chore/...` branch and merge both into root `dev`. Preserve unrelated dirty server submodules and local artifacts.
+**State / follow-up:** Client `dev` is remote at `ab24542`; root `dev` is remote at `9cc6dfd`. The feature, docs, and chore branches are also remote. Root `main` and production remain unchanged. Preserve the unrelated dirty server submodules, local `client/CLAUDE.md`, reports, output, and runtime artifacts.
 
 ## 2026-10-14 - Codex - Redesign planner Explore and stabilize sidebar selection
 
