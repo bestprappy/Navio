@@ -1,3 +1,8 @@
+## 2026-10-14 - Codex - Time color recommendation
+
+**Decision:** Retain soft purple for time chips, timetable labels and dots, with a subtle connector and neutral activity text. Existing theme-aware premade token already implements the purple direction; teal is the card selection accent.
+**State/next:** Advice only. Preserve all concurrent application/service/docs work. Required notes only use docs/time-color-advice-20261014 and local root dev; no application edits, push, main merge or deployment.
+
 ## 2026-10-14 - Codex - Block options warning dot pings at top right
 
 **Behavior:** The block options three-dot button's stale-time warning dot sits at its top-right corner, with an expanding ping halo and steady center. Reduced-motion preferences hide the halo; warning visibility, accessible label and menu interactions remain connected to existing timing state.

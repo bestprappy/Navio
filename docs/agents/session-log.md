@@ -1,3 +1,11 @@
+## 2026-10-14 - Codex - Recommend time color for stop timetable
+
+**Goal:** Recommend the time color in the supplied dark planner card screenshot.
+**Done:** Recommended retaining Navio's soft purple time token across the stop time chip, timetable labels and dots; use a subtle connector and neutral activity text. Teal continues to identify the selected card. Advice only; no application edits.
+**Verified:** Reviewed screenshot, frontend-design guidance, prior purple-time decision, globals.css light/dark premade tokens and time/schedule styling. Checked root/client/server and changed service branches/status. No runtime tests needed or performed for design advice.
+**Not done / left uncommitted:** Preserve all existing concurrent client timing/auto-plan/transit, trip service migrations/schedules, root API/database/report/notes and service logs. Required notes only committed on docs/time-color-advice-20261014 and merged into local root dev; no push, main merge or deployment.
+**Follow-ups:** Retain the current theme-aware purple; any styling implementation requires a later request.
+
 ## 2026-10-14 - Codex - Top-right ping on block options
 
 **Goal:** Move the warning dot on the block's three-dot options button to its top-right corner and add a ping effect.
