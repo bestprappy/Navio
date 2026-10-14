@@ -1,3 +1,8 @@
+## 2026-10-14 - Claude - Stop schedule ("moments") follow-ups done
+
+**State:** Stop schedule (trip-planning V20 `block_item.schedule`, capability `item-schedule-v1`) is complete locally and uncommitted: client feat/guide-auto-plan, trip-planning feat/itinerary-time-calculation (stacked on V19 `time_source`), root docs on fix/traveler-guides-route-local-minio. The browser fixture tests/planner/stop-schedule.browser.mjs passes end to end, PostgresSchemaTests 3/3 passed on disposable Postgres, and the API, OpenAPI and database docs describe `schedule`.
+**Next:** Commit and release with the V19/V20 work. Trip-planning V20 must ship before the client relies on `item-schedule-v1`. Follow-ups: schedule in published/shared plans (PublicItemDto) and the itinerary export, and formatted (not raw markdown) notes in the export.
+
 ## 2026-10-14 - Codex - Shadcn time pickers ready locally
 
 **Behavior:** Auto plan Start and Finish by now use reusable shadcn Popover/Select time pickers, with hour/minute/AM-PM controls and Done. Every minute is available; 12-hour display maps to the existing HH:mm state/live preview and validation.

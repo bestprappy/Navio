@@ -1,3 +1,10 @@
+## 2026-10-14 - Claude - Stop schedule follow-ups: browser fixture, Postgres check, docs
+
+**Done:** Fixed the notes step in client tests/planner/stop-schedule.browser.mjs. The editor was fine: the press only swaps the static notes for the lazily loaded block editor, and the script typed before it mounted. The step now waits for the contenteditable editor to have focus and for the slash menu's selected option before pressing Enter. Documented `schedule` / `item-schedule-v1` / V20 in docs/api/Navio Api Documentation.md, docs/api/Navio Open API.yaml (`x-navio-implemented-stop-schedule`) and docs/database/Navio Database.md.
+**Verified:** stop-schedule.browser.mjs passes dark 1440 (twice) and light 390 with NAVIO_PLAYWRIGHT_MODULE=file:///C:/Users/User/.codex/tmp/navio-profile-check/node_modules/playwright/index.mjs; its console errors are the known guides-stub noise. trip-planning PostgresSchemaTests 3/3 against a disposable postgis/postgis:16-3.5-alpine on port 55432 (container removed), with configuration-server on 8888 (stopped afterwards) and the Mockito javaagent argLine. OpenAPI YAML parses. Confirmed PlannerService reuses saved items by client id, so an omitted schedule is really kept.
+**Not done / left uncommitted:** No application commit. The client fixture edit, the doc edits and every earlier V19/V20, client and docs change stay uncommitted on their branches (client feat/guide-auto-plan, trip-planning feat/itinerary-time-calculation, root fix/traveler-guides-route-local-minio). Only this entry and its handoff note are committed, on docs/stop-schedule-followups-session-20261014 merged into local root dev.
+**Follow-ups:** Schedule in published/shared plans (PublicItemDto) and the itinerary export; render export notes as formatted text, not raw markdown.
+
 ## 2026-10-14 - Codex - Shadcn time pickers for Auto plan
 
 **Goal:** Replace the native time popup shown in Plan settings with shadcn UI.
