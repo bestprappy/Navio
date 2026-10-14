@@ -1,3 +1,9 @@
+## 2026-10-14 - Claude - Planner menus and time chip follow-ups
+
+**Goal:** User follow-ups to the itinerary time feature: drop the pin icon and colour user-set times; move the itinerary Routes switch and Export table into a ⋯ menu; redesign the Times buttons (frontend-design).
+**Done (client, uncommitted, same mixed `feat/guide-auto-plan` tree):** Fixed time chips and the editing trigger use the day colour solid (`bg-primary text-primary-foreground`, no icon); calculated chips are a quiet dashed outline with the route icon. New `itinerary/itinerary-options-popover.tsx` (⋯ "Itinerary options" beside Collapse all days) holds `RouteLineModeSwitch` (now a stacked "Route lines on map" radio group with a description of the selected mode) and Export table; `ExportItineraryDialog` is now controlled (`open`/`onOpenChange`, no built-in trigger). `day-times-section.tsx` redesigned: one grouped control with Calculate times (tinted, solid when stale) and Recalculate all times rows, each with title + hint (aria-labelledby/-describedby), "Needs updating" badge beside the heading, results/Undo/problems on one live line below. itinerary-section.tsx edits are targeted (guide session also edits it).
+**Verified:** whole-client tsc clean, scoped ESLint clean (only pre-existing empty-itinerary-callout warning), 367/367 node tests, Chrome fixture tests/planner/day-timing.browser.mjs (now also covers the itinerary menu: keyboard End selects Place, Export table opens the dialog) passes dark 1440 and light 390.
+**Not done:** No application commit/push/deploy.
 ## 2026-10-14 - Claude - Itinerary time calculation (fixed and calculated times)
 
 **Goal:** Implement the agreed proposal: per-day Calculate times that keeps edited times fixed, a separate reviewed Recalculate all times with Undo, Times need updating, persistence. Mid-session the user asked to put the controls in the day's ⋯ Block options menu and to auto-time newly added cards.
