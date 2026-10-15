@@ -29,6 +29,10 @@
 5. **Verification and review**: production build, targeted gateway/Mobility tests, responsive browser review, real provider/read/add integration where runtime is available. Fresh reviewer checks whole diff, fix material findings and rerun checks. Record evidence, remaining acceptance limits and required agent notes without source commits.
 
 ## Execution record
+
+- User-review correction: supersedes the prior Any-country destination-prompt ruling and narrow no-fallback seasonal coverage. User explicitly requires inspiring default collections and seasonal adaptation across every collection; chose reviewed evidence first, then believable algorithmic/category fill.
+- Added GlobalDiscoveryDestinations and SeasonalInspiration. Global live provider pools span14 named city/country starting points with per-collection ordering. Named themes alter each section's search; month-based fallback uses candidate hemisphere outside tropics without inventing local rain seasons. Selected-country discovery combines ordinary and themed pools, ranking reviewed guidance first. Explicit query/hard filters remain intact. UI distinguishes Navio inspiration from regional/calendar references.
+- Follow-up review fixes: retain pagination on empty source-free seasonal pages; diagonal schedule varies global countries/types and includes city specificity. Regression tests observed red then green.18 frontend and39 Mobility tests pass; scoped lint/full TypeScript/Places-enabled build pass. Browser inventory remains empty, so visual acceptance is open.
 - Baseline: root dev; client/server/Mobility feat/places-discovery; Trip feat/places-list-append. Existing feature source, profile fix notes, reports and logs preserved.
 - Pre-flight: provider DTO feeds Explore DTO; Explore DTO feeds client Zod; pure state feeds controls/orchestrator; reader still imports PhotoCredit. Keep PhotoCredit export compatible. No schema migrations.
 - Ruling: user asked for implementation before another review, overriding skill's repeat-plan approval; proceed inline. Existing dirty feature workspace retained to preserve the unfinished feature rather than split it across checkouts.
