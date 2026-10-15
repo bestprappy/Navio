@@ -1,3 +1,9 @@
+## 2026-10-15 - Codex - Specify Places search, seasons and premium layout
+
+**Goal:** Proceed with the agreed Places rework while preserving existing correct features and requiring clear labels, aligned layouts and visually anchored content.
+**Done:** Inspected handoff/log, root/client/server and four service statuses/branches, existing discovery/provider/reader integration, Next search-parameter docs and Git rules. Wrote and self-reviewed `docs/superpowers/specs/2026-10-15-places-search-design.md`. Researched official Google Text Search/Autocomplete and JMA/BOM climate sources. Spec makes country locks distinct from provider bias, limits seasonal claims to sourced regions, retains two discovery/result modes and specifies recommendation quality/row/dedup rules and responsive visual acceptance.
+**Verified / limits:** Read-only source/state checks and documentation self-review only; no new runtime tests needed or claimed because no application source was changed. Existing uncommitted work remains intact. Browser QA, source implementation and the implementation plan have not started. Brainstorming's explicit written-spec review gate requires the user's review next. Docs/spec-only commit on a docs branch, merged root dev only; no push/main/deploy/data/runtime action.
+
 ## 2026-10-15 - Codex - Correct Explore link rendered as button
 
 **Done:** Diagnosed Base UI warning at SharedPlansSection's empty-state dashboard link; added nativeButton=false for its rendered Next Link, leaving global Button defaults intact. Scoped lint and full client TypeScript pass. Source remains uncommitted with the Places feature; no data, runtime or deployment change.

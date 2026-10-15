@@ -1,3 +1,9 @@
+## 2026-10-15 - Codex - Places search and premium UI written specification
+
+User approved the conversational design and requested proceeding. Inspected real root/client/server/service state and preserved all uncommitted Places/append/gateway work, local reports and logs. Written design: `docs/superpowers/specs/2026-10-15-places-search-design.md`. It covers Country/Search/Filters/Month & season; discovery-vs-results matrix; grouped multi-select filters; strong-only 2–5 responsive recommendation rows without duplicates; hard country verification; bounded Google search/suggestions/pagination; sourced regional seasons; clear premium responsive alignment; tests and compatibility. Official Google/JMA/BOM docs reviewed. No application code or runtime/data changes this session.
+
+**Next gate:** The brainstorming skill explicitly requires user review of the written spec before implementation planning. Ask for that review, then use writing-plans and execute inline unless the user chooses otherwise. The season coverage choice is explicit: existing Thai regional profiles plus Japan initially; unsupported combinations retain normal scoped results with a notice. This avoids pretending worldwide seasonal data exists. Visual/browser QA remains required, with the prior browser OS error3 limitation unverified this session. Required notes/spec committed on a docs branch and merged to root dev only; no source commit/push/release.
+
 ## 2026-10-15 - Codex - Explore empty-state link semantics corrected
 
 SharedPlansSection's Go to my trips uses Button rendered as Next Link. Set nativeButton=false at that call site to resolve Base UI's native-button warning; shared Button defaults unchanged. Scoped ESLint and whole-client TypeScript pass. One-line source edit remains on client feature branch; no runtime/data/deployment changes.
