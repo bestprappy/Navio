@@ -1,3 +1,8 @@
+## 2026-10-15 - Codex - Local profile identity binding repaired
+
+**Cause / repair:** Local `/api/users/me` logged500 from duplicate email provisioning after Keycloak identity recreation. Read-only admin/database comparison found exactly one active, nondeleted profile whose old subject no longer existed, with exactly one enabled same-email replacement identity and no conflicting replacement binding. User authorized repair. Updated only that profile's auth_subject plus normal updated_at/version metadata using guarded SQL; PostgreSQL confirmed UPDATE1. Original profile ID and all owned data were retained. Binding metadata backup is in the local Temp folder `navio-profile-binding-before-20261015.json`.
+**Verification:** Database confirms exactly one repaired binding and zero old-subject bindings. Anonymous gateway profile probe correctly returned401; the signed-in browser `/api/users/me` needs refresh to complete end-to-end confirmation. No code, schema, Keycloak credential, role, other profile, trip, service restart, or production change. Do not introduce automatic account linking by email to mask this local reset issue.
+
 ## 2026-10-15 - Codex - Places discovery implemented locally; live review gate remains
 
 **Built:** New Explore Places tab, separate Plans/Guides query state, destination/month controls, Google-backed collections with conservative Thailand seasonal profiles, split responsive place reader, Google/photo attribution, and narrow owned My List append. Request queues/budgets bound paid provider access. Planner Explore all flushes autosave and carries explicit plan context. Source remains uncommitted on client/server/mobility `feat/places-discovery`, trip `feat/places-list-append`; unrelated reports, CLAUDE files, service logs preserved.

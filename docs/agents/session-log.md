@@ -1,3 +1,8 @@
+## 2026-10-15 - Codex - Repair local profile after identity recreation
+
+**Goal:** Repair profile500 without affecting other features or owned data.
+**Done / verified:** Confirmed current client uses local `npm run dev` and user-service logs show duplicate email uniqueness violation followed by an aborted-transaction fallback. Compared local Keycloak identities and PostgreSQL profiles without printing credentials/email values. Exactly one nondeleted profile had an absent old subject and one enabled same-email replacement with no existing binding. Backed up original binding metadata to Temp, then guarded UPDATE changed one auth_subject plus updated_at/version. Confirmed one replacement binding and zero stale bindings. Kept the profile UUID and every owned data reference. Anonymous gateway probe returned401 as expected; authenticated browser refresh remains to verify profile200. No source fix, automatic email linking, schema change, password/role change, service restart, or production mutation.
+
 ## 2026-10-15 - Codex - Implement Places discovery and safe planner append
 
 **Goal:** Execute the approved season-aware Places design with restrained UI, factual provider data, independent Explore tabs, and safe My List integration; new search algorithms deferred.
