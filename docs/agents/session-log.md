@@ -1,3 +1,7 @@
+## 2026-10-15 - Codex - Correct Explore link rendered as button
+
+**Done:** Diagnosed Base UI warning at SharedPlansSection's empty-state dashboard link; added nativeButton=false for its rendered Next Link, leaving global Button defaults intact. Scoped lint and full client TypeScript pass. Source remains uncommitted with the Places feature; no data, runtime or deployment change.
+
 ## 2026-10-15 - Codex - Repair local profile after identity recreation
 
 **Goal:** Repair profile500 without affecting other features or owned data.

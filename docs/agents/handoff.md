@@ -1,3 +1,7 @@
+## 2026-10-15 - Codex - Explore empty-state link semantics corrected
+
+SharedPlansSection's Go to my trips uses Button rendered as Next Link. Set nativeButton=false at that call site to resolve Base UI's native-button warning; shared Button defaults unchanged. Scoped ESLint and whole-client TypeScript pass. One-line source edit remains on client feature branch; no runtime/data/deployment changes.
+
 ## 2026-10-15 - Codex - Local profile identity binding repaired
 
 **Cause / repair:** Local `/api/users/me` logged500 from duplicate email provisioning after Keycloak identity recreation. Read-only admin/database comparison found exactly one active, nondeleted profile whose old subject no longer existed, with exactly one enabled same-email replacement identity and no conflicting replacement binding. User authorized repair. Updated only that profile's auth_subject plus normal updated_at/version metadata using guarded SQL; PostgreSQL confirmed UPDATE1. Original profile ID and all owned data were retained. Binding metadata backup is in the local Temp folder `navio-profile-binding-before-20261015.json`.
