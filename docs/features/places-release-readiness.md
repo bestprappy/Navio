@@ -6,7 +6,7 @@ The implementation is portable. Local success does not deploy the VM, and pullin
 
 Publish the matching client, Mobility service, Trip service and server Gateway revisions, then the server and root submodule pins. Use feature/dev branches; root main triggers production deployment.
 
-After those revisions have been published and the root dev pins updated, a teammate on dev can use:
+The matching development revisions have been prepared and published child-first: client `0691f9a`, server `774ace6`, Mobility `c298ead`, Trip `6ea2b13`; root pin commit `4f2bbee`. A teammate on dev can use:
 
 ```powershell
 git pull --ff-only origin dev
@@ -21,7 +21,7 @@ For a stopped stack, run `navio start` first to start its prerequisites. Targete
 
 Each machine retains its own uncommitted environment files. The local frontend needs `NAVIO_API_BASE_URL=http://localhost:8080` and a browser Google Maps key. The backend needs a valid `GOOGLE_MAPS_SERVER_API_KEY` with Places API access. Authentication settings must describe the same local Keycloak stack. Do not publish private environment files or credentials.
 
-Places is enabled by default for `npm run dev` unless `NEXT_PUBLIC_PLACES_ENABLED=false`. No new migrations are included in this Places work. Local users and trips belong to the configured local database/identity service, not the VM database.
+Places is enabled by default for `npm run dev` unless `NEXT_PUBLIC_PLACES_ENABLED=false`. This Places work adds no migrations, but integrated teammate Trip dev includes V19/V20 for time sources/schedules; Flyway applies these on service startup. Local users and trips belong to the configured local database/identity service, not the VM database.
 
 ## VM/production prerequisites
 
@@ -32,6 +32,6 @@ Places is enabled by default for `npm run dev` unless `NEXT_PUBLIC_PLACES_ENABLE
 
 ## Verified evidence and limitations
 
-39 frontend and38 focused Mobility/provider/controller/search tests pass; client TypeScript, scoped lint and Places-enabled production build pass. Earlier Trip append/hydration tests passed30. Local gateway reader returned three photos with three attribution sets and a description. Local services are healthy. Browser visual/focus/first-navigation QA and the authenticated save/reopen flow remain unverified by automation. The user confirmed that re-login resolves the expired-session profile401.
+Final staged client:39 focused tests, TypeScript, lint on all staged TypeScript files and Places-enabled production build pass. Full backend suites: Mobility154 tests/2skipped, Trip260/9skipped, Gateway15/1skipped, zero failures/errors. Environment-gated skipped tests are not claimed as verified. New teammate time-source/schedule tests retain their assertions and use the ownership-lock repository stub. Local gateway reader returned three credited photos and a description. Browser visual/focus/first-navigation QA and authenticated save/reopen remain unverified by automation. The user confirmed re-login resolves expired-session profile401.
 
-Application source is still uncommitted on existing feature branches. No source has been pushed and no production deployment has been triggered by this readiness assessment.
+Application source is committed and published to the corresponding feature/dev branches. Root dev carries matching child pins and documentation. No main branch was pushed and no production deployment was triggered. Private environments, local editor files, logs, reports and output artifacts remain local. A Trip pre-integration recovery stash is retained intentionally.
