@@ -1,3 +1,8 @@
+## 2026-10-15 - Codex - Design Add to Plan and saved-place day shortcut
+
+**Request:** Rename Choose a plan to Add to Plan; open a plan picker grouped Latest / Trip List; save to the chosen plan's My List; make collected places easy to schedule through a My List subsection and/or day-date shortcut.
+**Inspected:** Existing Explore plan-context append flow, MyListSection, account HOME/WORK saved-place API, recent-plan sidebar atom and itinerary insertion atom. Existing plan append/version/ownership/dedup protections remain applicable. Recent opened-plan tracking is currently in-memory; trip updatedAt is a different signal. Preserve multiple custom list support and all existing uncommitted source.
+**Proposed, not implemented:** Bounded UI extension: consistent Add to Plan picker on cards/reader; owned recent plan labelled Latest, remaining paginated/searchable Trip List; Places subsection in My List plus compact day-header Saved places popover sharing the same list data. Recommend retaining saved places when scheduling, indicating scheduled days and preventing accidental same-day duplicate inserts. Do not merge this with account HOME/WORK anchors. Await user's design approval; no application changes, runtime changes or tests claimed this session.
 ## 2026-10-15 - Codex - Restore inspiring default discovery and adapt all sections to time
 
 **Feedback / cause:** User expected an inspiring populated landing without selections, and month/season to adapt every section. Prior implementation deliberately gated Any-country/no-query and had climate profiles only for JP/Thai cities; other countries had no seasonal fallback and supported ones mostly reordered an unchanged pool. User requested source-backed priority followed by believable algorithmic fill.
