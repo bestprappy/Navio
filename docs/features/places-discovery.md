@@ -2,7 +2,22 @@
 
 Implemented locally on 2026-10-15. Application source is uncommitted on client/server/mobility `feat/places-discovery` and trip `feat/places-list-append`.
 
-## Behavior
+## Current search and presentation rework (2026-10-15)
+
+This section supersedes the initial city-only frontend behavior described below; legacy city API/read links remain compatible. Approved design: `docs/superpowers/specs/2026-10-15-places-search-design.md`; implementation record: `docs/superpowers/plans/2026-10-15-places-search.md`.
+
+- Toolbar: searchable Country (249 ISO countries/territories, Any country), submitted Search places with debounced provider/Navio suggestions, Filters with separate multi-select Interests and Place types and Apply/Cancel, and exclusive Month & season with Any time, Months and Seasons. Clear labels, wrapping chips, common field heights, restrained surfaces and consistent card geometry. Filters become a sheet below 640px.
+- Country/time alone retain discovery sections; interests alone select sections. Search or any place type switches to Recommendations and Matching places. Country/type/interest groups intersect, while selections within each group are OR. Geography predictions submit searches rather than opening a country/city as a place card.
+- Country locks use structured countryCode evidence. Time only influences supported regional discovery/recommendations, never excludes ordinary results by itself. Japanese temperate main-island season/calendar preferences and existing Thai city profiles are supported; unknown regions/seasons show a clear notice. Any time disables seasonal preference. No forecast, flowers/snow/events or global coverage claims.
+- Recommendation eligibility: first provider page, rating at least4.5, at least50 reviews, matching scope/filters and not permanently closed. Provider relevance takes precedence, then supported time preference/Bayesian quality. Capacity five responsive rows; minimum two rows of strong candidates, otherwise keep them in normal matches. Partitioning never loses/duplicates items on paging/resize; later pages do not refill recommendations.
+- With Any country and no query/type, prompt for country/search instead of presenting an IP-biased pool as global discovery. Broad searches remain provider-bounded, not an exhaustive world directory.
+- Added public GET `/v1/geo/places/explore` and `/v1/geo/places/explore/suggestions`, with narrow Next proxies and gateway rules. Explore query: country, query, repeated interest/type, time, collection, optional legacy destination, cursor. Response: items (existing reader/attribution envelope), recommendationIds, cursor, mode, seasonalNotice, seasonalSources. Suggestions: items with kind/label/value/placeId/interest and providerAvailable.
+- Provider text-search streams merge fairly with at most two calls per request; photo media resolves only returned items. Opaque UUID cursors bind the complete query, expire after ten minutes, hold only tokens/IDs/query state, and are bounded to256 entries. Existing rate/concurrency limits, no-store and cancellation remain. Expired continuation offers Start search again.
+- Validation:16 client +33 Mobility +8 gateway tests pass, scoped lint/full TypeScript/Places-enabled production build pass. Live Next/Gateway search and suggestions succeed; Osaka sushi returned24 verified JP places, nine strong candidates; a continuation returned24 with zero duplicates. JP Autumn scenic discovery stayed in discovery mode with one climate source. Real response passed client Zod validation; temporary provider-content snapshot was removed.
+- Fresh review findings on sparse pagination, type-stream ordering and legacy time edits were fixed. No production rollout, source commit, migration, account/data reset or broad restart. Selective local Mobility/Gateway reload only, prior logs backed up under output/places-search-runtime-before.
+- Still open: browser tools expose no available browser; no mobile/tablet/desktop screenshots, actual filter/keyboard interactions or new live My List save/reopen verification. Do not claim glitch-free visual completion. Existing Trip append tests/implementation remain preserved.
+
+## Initial city-only behavior (historical baseline)
 
 Explore has URL-backed Plans, Guides, and Places navigation. The tabs stay below the site header; each introduction and search area scrolls. Plans and Guides retain separate in-memory search text. New search algorithms are deferred. Places uses destination/month selection and the existing destination lookup, not a new search engine.
 
