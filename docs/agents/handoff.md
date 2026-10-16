@@ -1,3 +1,6 @@
+## 2026-10-16 - Codex - Revert sidebar spacing correction at user request
+
+User reported the preceding nav margin/padding correction broke the drawer and explicitly requested reverting it. Restored the exact original nav class string in client/components/sidebar/sidebar.tsx. git diff --exit-code for that file passes; client source is back to committed state with only existing untracked CLAUDE.md. No other application changes, new fix attempt, runtime action or push. Original highlight-clipping issue remains unresolved. Required notes recorded local docs/dev only.
 ## 2026-10-16 - Codex - Correct sidebar selection outline clipping
 
 **Request / cause:** User requests only fixing the clipped right edge of selected/focused sidebar rows, preserving highlight and visible shape. Inspected real state and sidebar hierarchy: nav overflow-y-auto clips the outer day-row focus ring at its horizontal scrollport edge; outer drawer has padding but it does not extend nav's clip region.
