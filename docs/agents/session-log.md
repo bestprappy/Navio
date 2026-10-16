@@ -1,3 +1,6 @@
+## 2026-10-16 - Codex - Enlarge planner map card photo25 percent
+
+**Request / change:** Increase map location card picture25-30%. Changed only planner compact banner h16 to h20 (64 to80px,25% taller). Existing short-map photo suppression, layout, shared preview sizing and actions unchanged.4 preview tests and whitespace pass; no live visual confirmation. Prior source preserved; no application commit/push. Required notes local docs/dev only.
 ## 2026-10-16 - Codex - Fit planner map preview without card scrolling
 
 **Request / clarification:** User asks map location card fit without scrolling, then clarifies current design is good and must remain recognizable. Preserve wide top photo/current theme/shape/detail hierarchy and add/navigation callbacks; no unrelated changes.
