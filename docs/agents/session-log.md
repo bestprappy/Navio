@@ -1,3 +1,8 @@
+## 2026-10-16 - Codex - Correct sidebar selection outline clipping
+
+**Request / cause:** User requests only fixing the clipped right edge of selected/focused sidebar rows, preserving highlight and visible shape. Inspected real state and sidebar hierarchy: nav overflow-y-auto clips the outer day-row focus ring at its horizontal scrollport edge; outer drawer has padding but it does not extend nav's clip region.
+**Fix:** One class-line change in client/components/sidebar/sidebar.tsx: nav -mx-1 plus px-1 gives4px horizontal outline room on each side while cancelling content offset/width changes. Row classes, radius, ring colour/width, selected surface, behaviour and drawer dimensions unchanged. Client local fix/sidebar-focus-clipping-20261016; source uncommitted, not pushed. All existing untracked logs/editor files/documents preserved.
+**Verified:**3 existing sidebar navigation tests, scoped ESLint, full TypeScript and whitespace pass. Browser visual confirmation not performed. No backend/env/data/runtime change. Required agent notes local docs/dev only.
 ## 2026-10-16 - Codex - Publish complete Places version to dev
 
 **Authorization / integration:** User explicitly approved publishing everything for this feature to dev first. Fetched/pulled root/client/server/Mobility/Trip dev. Server advanced to6e09360; Trip advanced to5c089d5 with teammate V19/V20 time-source/schedule work. Preserved Trip source in stash places-pre-dev-integration-20261016, applied cleanly, then corrected two new test mocks to use findOwnedForUpdate while retaining all timing/schedule assertions. Recovery stash retained. No unrelated source/report/environment/log/editor files staged.
