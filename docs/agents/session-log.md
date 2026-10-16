@@ -1,3 +1,9 @@
+## 2026-10-16 - Codex - Promote local account and contain sidebar focus outlines
+
+**Request:** User explicitly requests promoting current local account to Admin/highest role and sidebar rework, within preceding scope preserving drawer/highlight shape and unrelated areas.
+**Role action:** Verified supplied session subject against local navio-keycloak user, then granted existing OWNER realm role through Keycloak operator CLI. Independently verified effective OWNER and retained USER. Credentials stayed inside container and temporary CLI config removed. No production role, source authorization, realm import or database edits. Existing session must refresh; signout/signin recommended for immediate UI update.
+**Sidebar:** Two class-line changes only in client/components/sidebar/sidebar.tsx and sidebar.item.tsx: render existing 2px focus ring inset, remove external offset on navigation link rings. Existing radius, colour, selected background, dimensions, nav spacing, drawer structure and permissions preserved. Earlier nav margin/padding attempt remains reverted. Source uncommitted on existing fix/sidebar-focus-clipping-20261016 branch, not pushed.
+**Verified / limits:**3 existing sidebar navigation tests, full TypeScript, scoped ESLint, whitespace pass; installed Tailwind compiler emits expected inset ring CSS. Browser inventory apps/browsers empty, so no live visual verification claimed. Local role changes are account data and do not travel with Git. Existing untracked files/logs preserved. Mandatory notes local docs/dev only.
 ## 2026-10-16 - Codex - Audit Admin visibility and sidebar corner clipping
 
 **Request:** Investigate production/local Admin visibility and clipped selected day corner; preserve scope after user rejected prior drawer spacing fix.
