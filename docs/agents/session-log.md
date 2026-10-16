@@ -1,3 +1,8 @@
+## 2026-10-16 - Codex - Audit Admin visibility and sidebar corner clipping
+
+**Request:** Investigate production/local Admin visibility and clipped selected day corner; preserve scope after user rejected prior drawer spacing fix.
+**Evidence:** Client sidebar.tsx and auth.ts have no diff in Places commit0691f9a. Admin console gate and existing links trace to2ec2c330 (September26), Guides tof3c63cad. Admin remains conditional on session MODERATOR/ADMIN/OWNER; auth.ts clears roles on token error. Current browser roles are not verified; requested only user.roles/error from local session, never token/full payload. Do not infer account role or grant access.
+**Clipping:** Day button uses external focus ring at full row width within overflow-y-auto nav, clipping its right edge. Prior margin/padding attempt is still reverted. No application, authorization, layout, runtime or environment change this turn; no claim of browser verification or fix. Client source remains committed state with only existing untracked CLAUDE.md. Next: confirm local session roles, visually verify a strictly row-scoped correction before changing drawer layout. Notes local dev only, no push/deploy.
 ## 2026-10-16 - Codex - Revert sidebar spacing correction at user request
 
 User reported the preceding nav margin/padding correction broke the drawer and explicitly requested reverting it. Restored the exact original nav class string in client/components/sidebar/sidebar.tsx. git diff --exit-code for that file passes; client source is back to committed state with only existing untracked CLAUDE.md. No other application changes, new fix attempt, runtime action or push. Original highlight-clipping issue remains unresolved. Required notes recorded local docs/dev only.
