@@ -1,3 +1,6 @@
+## 2026-10-16 - Codex - Add breathing room above insertion buttons
+
+**Request / change:** Add a little space above plus button. Added6px (0.375rem) top padding to dedicated insertion gap only; button dimensions/hover animation/actions unchanged.2 gap tests, CSS Modules compilation and whitespace pass. Existing source preserved, no source commit/push. Mandatory notes local docs/dev only.
 ## 2026-10-16 - Codex - Move insertion controls into animated card gaps
 
 **Request / clarification:** User wants plus controls detached from card borders, between items; small at idle, grow on nearby hover, neighboring cards make room with first/last moving only lower/upper item. User explicitly chose small faint idle plus over invisible. Preserve all insertion actions and existing planner behavior.
