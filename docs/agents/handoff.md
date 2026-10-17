@@ -1,3 +1,8 @@
+## 2026-10-17 - Claude - Community mock data removed (client, uncommitted)
+
+**State:** Client dev working tree has uncommitted Community-only edits (data.ts slimmed, three dead components deleted, composer plan picker and `?planId` prefill removed, post-card trip attachments removed). These files do not overlap the other session's uncommitted planner work. tsc, ESLint, community tests 29/29 pass.
+**Next:** 1) Browser-check `/community`, a post detail and `/community/create?groupId=...` in light/dark. 2) Commit on client `refactor/community-remove-mock-data` from dev, staging only `app/feature/community/**` and `app/community/create/page.tsx`. 3) Build the recommended feature: attach a published plan token to a post (see the session log entry).
+
 ## 2026-10-17 - Claude - Day sections (multi-city days, colored breaks) implemented, uncommitted
 
 **State:** Feature complete locally and tested, nothing committed. Backend on server/trip-planning-service branch feat/day-sections (V21 migration, SECTION item type, day-sections-v1). Client changes sit on client dev alongside another session's uncommitted day-edge-stops work in the same files (sortable-block-items.tsx, trip-location-markers.ts, trip-builder.atoms.ts); separate them carefully when committing. Root docs/api and docs/database updated (uncommitted, ship with the release).
