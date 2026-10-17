@@ -1,3 +1,9 @@
+## 2026-10-17 - Claude - Day sections (multi-city days, colored breaks) implemented, uncommitted
+
+**State:** Feature complete locally and tested, nothing committed. Backend on server/trip-planning-service branch feat/day-sections (V21 migration, SECTION item type, day-sections-v1). Client changes sit on client dev alongside another session's uncommitted day-edge-stops work in the same files (sortable-block-items.tsx, trip-location-markers.ts, trip-builder.atoms.ts); separate them carefully when committing. Root docs/api and docs/database updated (uncommitted, ship with the release).
+**Next:** 1) Live browser check of the section divider (destination-card style, Change editor, folding, map colours) in light and dark. 2) Commit service -> server -> client -> root on feat/* branches per AGENTS.md; release backend (V21) before or with the client, since the client refuses to save sections without day-sections-v1. 3) Optional: sections in itinerary exports and the Explore listing view; per-section Auto plan.
+**Verify with:** trip-planning-service ./mvnw -o test with config server on 8888 and NAVIO_TEST_DB_URL on a disposable postgis (run from PowerShell); client node --experimental-transform-types --test tests/planner/day-sections.test.mjs.
+
 ## 2026-10-17 - Codex - Publish latest planner UI changes to dev
 
 **Authorization / integration:** User explicitly requests all latest changes pushed to dev. Fetched root/client/server; no newer remote dev changes. Client switched to dev, pulled ff-only, feature branch feat/planner-day-view-polish-20261017 created, preserving all pending work. Committed20 reviewed implementation/test files as b92a8ec, pushed feature then merged ff-only and pushed client dev. Root client pin b552afd integrated via chore/planner-client-pin-20261017; server pin unchanged774ace6. Main untouched; no production deployment.
