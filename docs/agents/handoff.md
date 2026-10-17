@@ -1,3 +1,9 @@
+## 2026-10-17 - Claude - Released to production (root main 29ccf32)
+
+**Live:** Deploy run 39015918216 succeeded (revision check, Postgres schema tests, 11 image builds, VM deploy). Released: community plan attachments, admin color palette (user-management V9), Places discovery (hidden: NEXT_PUBLIC_PLACES_ENABLED not wired into the build), planner UI updates. Every repo's main equals dev: user-management 38032ec, trip-planning f3bd3fa, mobility c298ead, community 1be61f1, server 19052e9, client ff7242a.
+**Smoke (curl -k):** /health 200, /v1/trips 401, /v1/palette-colors 200 (24 colors), /v1/shared-plans feed 200, unknown /summary 404, other token sub-path 401, /v1/admin/palette-colors anonymous 401.
+**Not verified:** authenticated browser flows (admin /admin/colors, attaching a plan to a post). Local client/root checkouts remain behind origin because another session's uncommitted edits overlap; see entries below.
+
 ## 2026-10-17 - Claude - Admin color palette pushed to dev
 
 **State (origin/dev):** user-management 38032ec (V9), trip-planning f3bd3fa, server 19052e9 (pins user-management, trip-planning, community 1be61f1), client ff7242a, root d14eefe (pins client+server; includes production gateway/community config fixes). main untouched, nothing deployed.
