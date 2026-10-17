@@ -1,4 +1,9 @@
 openapi: 3.1.0
+x-navio-implemented-color-palette:
+  status: Implemented 2026-10-14 on feat/admin-color-palette; see docs/api/color-palette.md.
+  colorId: "Pattern ^[a-z][a-z0-9-]{0,39}$; the 24 built-in ids are seeded by user-management V9."
+  sharedPlanDays: PublicDayDto adds nullable colorId, copied only when it matches the palette id format. SANITIZER_VERSION unchanged.
+  guides: Category colorId must exist in the palette (retired colors accepted).
 x-navio-implemented-travel-options:
   status: Implemented locally; coordinated client, Trip Planning and Mobility deployment required.
   plannerCapabilities: [cycling-legs-v1, transit-preferences-v1, transit-route-choice-v1]
@@ -183,6 +188,79 @@ paths:
         '404': {description: Guide not found}
         '401': {$ref: '#/components/responses/Unauthorized'}
         '403': {$ref: '#/components/responses/Forbidden'}
+  /v1/palette-colors:
+    get:
+      tags: [User Management Service]
+      summary: Read the color palette, retired colors included
+      security: []
+      responses:
+        '200':
+          description: Every color in picker order; pickers offer only colors with retired false
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 200
+                items:
+                  type: object
+                  required: [id, name, hex, retired]
+                  properties:
+                    id: {type: string, pattern: '^[a-z][a-z0-9-]{0,39}$'}
+                    name: {type: string, maxLength: 40}
+                    hex: {type: string, pattern: '^#[0-9a-f]{6}$'}
+                    retired: {type: boolean}
+  /v1/admin/palette-colors:
+    get:
+      tags: [User Management Service]
+      summary: List palette colors with admin metadata
+      responses:
+        '200': {description: 'Array of {id, name, hex, sortOrder, retired, retiredAt, createdAt, updatedAt}'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+    post:
+      tags: [User Management Service]
+      summary: Add a color to the end of the palette
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, hex]
+              properties:
+                name: {type: string, minLength: 1, maxLength: 40}
+                hex: {type: string, pattern: '^#[0-9A-Fa-f]{6}$'}
+      responses:
+        '201': {description: The new color; its id is derived from the name}
+        '400': {description: Invalid name or hex, with validationErrors}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '409': {description: The hex or name is already in the palette}
+        '422': {description: Invisible on the light or dark surface, or the palette is full}
+  /v1/admin/palette-colors/{id}/retire:
+    parameters:
+    - {name: id, in: path, required: true, schema: {type: string, pattern: '^[a-z][a-z0-9-]{0,39}$'}}
+    post:
+      tags: [User Management Service]
+      summary: Hide a color from pickers; saved trips and guides keep it
+      responses:
+        '200': {description: The retired color (idempotent)}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {description: Color not found}
+        '422': {description: It is the last active color}
+  /v1/admin/palette-colors/{id}/restore:
+    parameters:
+    - {name: id, in: path, required: true, schema: {type: string, pattern: '^[a-z][a-z0-9-]{0,39}$'}}
+    post:
+      tags: [User Management Service]
+      summary: Offer a retired color in pickers again
+      responses:
+        '200': {description: The restored color (idempotent)}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {description: Color not found}
+        '422': {description: The palette already offers 48 colors}
   /v1/traveler-guides:
     get:
       tags: [User Management Service]
