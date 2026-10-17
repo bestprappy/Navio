@@ -1,3 +1,12 @@
+## 2026-10-17 - Claude - Admin color palette committed, merged with dev; production route fixes
+
+**Why:** User could not find the admin color customisation: the 2026-10-14 palette work was never committed (worktrees `Navio-worktrees/admin-palette/*`).
+**Commits (branch feat/admin-color-palette, shared repos):** user-management 38032ec (V9 palette_colors, endpoints), trip-planning 6ae5414 + merge f3bd3fa, server 08f7da3 + merge ac9fc43, client 4b88f0c + merge ff7242a, root 46c9e03 + merges f117b29/d6e8da0. Conflicts: client sidebar icon import (kept Palette, dropped unused Compass), root OpenAPI x-navio header (kept both blocks). Other merges clean; gateway has both palette and plan-card permits.
+**Production fixes found while merging (root dev 2a400a6, ebcb497):** `.deploy/config/api-gateway.yml` lacked `/v1/shared-plans/{token}/summary` (plan attachments would 503 in production); community-service prod config now sets `navio.trip-planning.base-url` fallback `http://trip-planning-service:8082`.
+**Checks (palette worktrees after merge):** user-management 245 pass/23 Postgres-skipped (no change since its real-Postgres V9 run); gateway 16; trip-planning 276, 2 context tests need Postgres 5432 (down); client tsc + scoped ESLint clean, 482/483 (golden-fixture test needs ../server/mobility beside the worktree).
+**Integration state:** local dev fast-forwarded in user-management (38032ec), trip-planning (f3bd3fa, checkout still on the other session's feat/day-sections) and server (ac9fc43). Client and root local dev NOT merged: their main checkouts hold another session's uncommitted edits in files the palette also changes (client: publication-api.ts, shared-plan-blocks.ts, block-options-popover.tsx, types.ts, both planner maps; root: docs/api, docs/database). Nothing pushed; pins not bumped.
+**Heads-up for the day-sections session:** its uncommitted PlanPublicationSanitizer/PublicItemDto and client publication files will conflict with the palette (PublicDayDto.colorId) when it merges dev; section colorIds should come from the palette.
+
 ## 2026-10-17 - Claude - Community posts discuss real Explore plans (committed locally, not pushed)
 
 **Request:** After the mock-data removal, user said "yes lets do it" to building the recommended feature: attach a real published plan to a community post.
