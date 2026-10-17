@@ -1,3 +1,9 @@
+## 2026-10-17 - Claude - Community plan attachments ready on local dev (unpushed)
+
+**State:** Local `dev` in community-service (1be61f1), trip-planning (0db4349), server (55c472d, gateway+config) and client (9726bf9) contains the "discuss an Explore plan" feature and the community mock-data removal. Nothing pushed; pins not bumped. trip-planning checkout is on the other session's feat/day-sections (dirty), which does not yet include 0db4349.
+**Next:** 1) With the user's go-ahead, push children (community-service, trip-planning) -> bump pins + push server -> push client -> bump root pins on a chore branch to dev. 2) Release order: trip-planning + gateway/config before or with community-service (it calls the new card endpoint; without it every attached post returns 503) and the client. 3) Browser-check composer picker, feed card, detail card, unlisted state, and the "Discuss in Community" button in light/dark and at 390px. 4) Run trip-planning context tests against a disposable Postgres. 5) Commit the docs/api hunks once the other session's docs changes land.
+
+
 ## 2026-10-17 - Claude - Community mock data removed (client, uncommitted)
 
 **State:** Client dev working tree has uncommitted Community-only edits (data.ts slimmed, three dead components deleted, composer plan picker and `?planId` prefill removed, post-card trip attachments removed). These files do not overlap the other session's uncommitted planner work. tsc, ESLint, community tests 29/29 pass.
