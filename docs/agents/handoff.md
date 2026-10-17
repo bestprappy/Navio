@@ -1,3 +1,7 @@
+## 2026-10-17 - Claude - Community plan attachments pushed to dev
+
+**State:** On origin/dev: community-service 1be61f1, trip-planning 0db4349, server 775d405 (pins both), client 9726bf9, root 32a3a9c (pins client+server). main untouched, nothing deployed. Supersedes the "unpushed" entry below; its steps 2-5 still apply.
+
 ## 2026-10-17 - Claude - Community plan attachments ready on local dev (unpushed)
 
 **State:** Local `dev` in community-service (1be61f1), trip-planning (0db4349), server (55c472d, gateway+config) and client (9726bf9) contains the "discuss an Explore plan" feature and the community mock-data removal. Nothing pushed; pins not bumped. trip-planning checkout is on the other session's feat/day-sections (dirty), which does not yet include 0db4349.
