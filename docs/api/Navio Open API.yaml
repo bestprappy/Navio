@@ -1,9 +1,25 @@
 openapi: 3.1.0
 x-navio-implemented-color-palette:
-  status: Implemented 2026-10-14 on feat/admin-color-palette; see docs/api/color-palette.md.
+  status: Implemented 2026-10-14, merged to dev 2026-10-17; needs the user-management V9 release before the client relies on it. See docs/api/color-palette.md.
   colorId: "Pattern ^[a-z][a-z0-9-]{0,39}$; the 24 built-in ids are seeded by user-management V9."
   sharedPlanDays: PublicDayDto adds nullable colorId, copied only when it matches the palette id format. SANITIZER_VERSION unchanged.
   guides: Category colorId must exist in the palette (retired colors accepted).
+x-navio-implemented-itinerary-times:
+  status: Implemented locally (2026-10-14); needs the Trip Planning V19 release before the client relies on it.
+  plannerCapability: time-source-v1
+  itemField: timeSource on place items, "fixed" or "calculated". Omitted or null on older times, which clients treat as fixed.
+  persistence: V19 adds nullable trip.block_item.time_source varchar(16) with a check for the two values. Clearing both times clears it. An omitted timeSource keeps the saved one only while time and timeEnd are unchanged, so an older client's edit is never left marked calculated.
+  validation: Any other value is rejected with 400 (A stop's time source must be fixed or calculated).
+  clientGuard: Clients send timeSource only when the planner snapshot advertises time-source-v1; otherwise it stays in the local draft.
+x-navio-implemented-stop-schedule:
+  status: Implemented locally (2026-10-14); needs the Trip Planning V20 release before the client relies on it.
+  plannerCapability: item-schedule-v1
+  itemField: schedule on place items, an array of at most 40 entries { id, time, timeEnd?, label } planned inside the stop's visit, for example "09:00-09:10 Check in". time and timeEnd are HH:mm; id is unique within the stop (at most 64 characters); label is required and at most 200 characters, and may be empty. Non-place items never carry a schedule.
+  semantics: An omitted schedule keeps the saved one, so an older client cannot erase it; an empty array clears it. The service stores entries in the order sent and does not sort them or check them against the stop's time; the client sorts, warns about entries outside the stop's time and moves them when the stop's time moves.
+  persistence: V20 adds nullable trip.block_item.schedule text, the entries as a JSON array, with a 32000-character check. An unreadable stored value is logged and returned as no schedule.
+  validation: Rejected with 400 when there are more than 40 entries (A stop can have at most 40 scheduled times), an id is missing or repeated (Each scheduled time in a stop needs its own id), a time is not HH:mm (Scheduled times must use HH:mm format) or a label is missing or too long.
+  clientGuard: Clients send schedule only when the planner snapshot advertises item-schedule-v1; otherwise it stays in the local draft.
+  notIncluded: Published and shared plans (public item DTO) and the itinerary export do not include the schedule yet.
 x-navio-implemented-travel-options:
   status: Implemented locally; coordinated client, Trip Planning and Mobility deployment required.
   plannerCapabilities: [cycling-legs-v1, transit-preferences-v1, transit-route-choice-v1]
