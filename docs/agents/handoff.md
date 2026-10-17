@@ -1,3 +1,9 @@
+## 2026-10-17 - Claude - Admin color palette pushed to dev
+
+**State (origin/dev):** user-management 38032ec (V9), trip-planning f3bd3fa, server 19052e9 (pins user-management, trip-planning, community 1be61f1), client ff7242a, root d14eefe (pins client+server; includes production gateway/community config fixes). main untouched, nothing deployed.
+**Local checkouts behind origin/dev on purpose:** client and root main checkouts hold another session's uncommitted edits that overlap palette files (client: publication-api.ts, shared-plan-blocks.ts, block-options-popover.tsx, types.ts, planner maps; root: docs/api, docs/database). That session must commit or stash, then `git pull --ff-only origin dev` and resolve. trip-planning checkout stays on feat/day-sections, which will conflict with PublicDayDto.colorId in PlanPublicationSanitizer.
+**Release order:** user-management V9 + gateway config before the client; trip-planning card endpoint before community-service. View at /admin/colors with the administrator role. Supersedes the "ready to push" entry below.
+
 ## 2026-10-17 - Claude - Admin color palette ready to push (feat/admin-color-palette)
 
 **State:** Palette committed and merged with dev in all five repos (worktrees under Navio-worktrees/admin-palette). Local dev includes it for user-management, trip-planning and server; client/root branches are ready but their checked-out dev has another session's overlapping uncommitted edits. Production gateway/community config fixes for plan attachments are on root dev (2a400a6, ebcb497), unpushed.
