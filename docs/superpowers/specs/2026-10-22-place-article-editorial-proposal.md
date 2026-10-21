@@ -1,6 +1,6 @@
 # Places article revision - proposal for review
 
-Status: proposed, not approved for implementation. Date: 2026-10-22.
+Status: approved and implemented on 2026-10-22 with amendments: popularity is irrelevant; require official records and sufficient evidence. 350-450 words is a target; useful articles from250 words are allowed,500 maximum. See implementation plan and docs/places-editorial.md for actual behavior.
 
 ## Purpose and scope
 Offer one satisfying Navio editorial article for readers who want context beyond the practical place details. Prefer a worthwhile article or no article to a thin placeholder. Keep map sizing, drawer scrolling, planner, sidebar and Admin unchanged. Existing prewritten/on-demand distinction remains: no generation at page-open time.
@@ -56,4 +56,4 @@ Page opens read the already-published article; no research/generation and no ext
 - https://cloud.google.com/maps-platform/terms/maps-service-terms
 - https://developers.google.com/maps/documentation/places/web-service/place-summaries
 
-Next: user reviews proposed approach and reading budget. Implementation remains pending; no product code changed during this planning session.
+Implemented selectively for the existing three documented places. No on-demand generation or worldwide coverage claim. Live visual/keyboard review remains pending because no browser surface is connected.
