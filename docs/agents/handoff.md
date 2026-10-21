@@ -1,3 +1,9 @@
+## 2026-10-22 - Codex - Plan a single researched Places article
+
+**Request:** Plan longer worthwhile original articles (roughly one page), remove duplicate bottom Google Maps logo, reconsider Google-versus-Navio branch and review/activity evidence. Planning only; no application code changed.
+**Findings / proposal:** Current summary-first branch suppresses longer article even for one-line text; component/footer duplicate logo. Official Google docs require editorial text unchanged, API reviews maximum five, and standard terms restrict deriving/storing new content from Maps content. Recommend one original independently researched Navio article or omit section; 350-450 words/500 cap, prewritten/reviewed, no on-click generation. Sources/claim tracing, mandatory evidence gates (not fake confidence score), supported activities, refresh/publication states, modest first-three-place scope and attribution/visual verification specified in docs/superpowers/specs/2026-10-22-place-article-editorial-proposal.md. Google facts/photos remain separate attributed live provider content; Wikipedia only a path to references. Proposal is not implementation approval.
+**State:** Prior client source remains uncommitted and untouched; no tests run for planning-only edits. Mandatory notes/proposal committed on docs/place-article-editorial-plan-20261022 and merged locally to root dev only; no push/deployment. Next: user review/approval of plan, then implementation planning within approved scope. Existing logs/local artifacts preserved.
+
 ## 2026-10-22 - Codex - Fix duplicate Places reader section keys
 
 **Request / cause:** User reports duplicate React key for Tuileries. ReaderPhotos and newly added PlaceArticle were siblings both keyed with placeId; introduced by previous article work.
