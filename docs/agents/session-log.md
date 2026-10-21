@@ -1,3 +1,9 @@
+## 2026-10-22 - Codex - Fix duplicate Places reader section keys
+
+**Request / cause:** User reports duplicate React key for Tuileries. ReaderPhotos and newly added PlaceArticle were siblings both keyed with placeId; introduced by previous article work.
+**Done / scope:** Only two source lines in client/app/feature/explore/places/place-reader.tsx: namespace keys as photos:<placeId> and article:<placeId>. Both still remount/reset on place navigation; content/layout/map/planner unchanged. Existing unfinished source preserved.
+**Verified / state:** Seven existing reader/article tests, scoped ESLint, full TypeScript and whitespace pass. No live browser verification. Application changes remain uncommitted and unpushed; mandatory docs recorded on docs/place-reader-key-fix-20261022 and merged to local root dev only. Other prior catalog/shortcut changes remain as described below.
+
 ## 2026-10-22 - Codex - Add Places articles and planner saved-place shortcuts
 
 **Request / clarified design:** Add a short illustrated article below crucial Places reader information; prefer Google Maps text, otherwise a prewritten Navio article (not generated on click), collapsed with ownership and accuracy notice. Add existing plus insertion control to empty itinerary days and Saved places shortcut to plus menus. No sidebar/Admin/map preview changes.
