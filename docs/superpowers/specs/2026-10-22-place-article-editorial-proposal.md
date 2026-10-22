@@ -1,3 +1,6 @@
+> **DEFERRED / DISABLED / EXCLUDE_FROM_REPORT - PLACES_EDITORIAL (2026-10-22).**
+> Saved experiment and future reference only. Code and integration are commented out; the previous reader behavior is restored. Historical implemented/completed statements below are not current product claims. See [deferral and report-scope instructions](/docs/deferred/places-editorial.md). Do not resume or include in reports without the corresponding explicit user request.
+
 # Places article revision - proposal for review
 
 Status: approved and implemented on 2026-10-22 with amendments: popularity is irrelevant; require official records and sufficient evidence. 350-450 words is a target; useful articles from250 words are allowed,500 maximum. See implementation plan and docs/places-editorial.md for actual behavior.

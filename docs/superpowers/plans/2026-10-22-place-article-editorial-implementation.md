@@ -1,3 +1,6 @@
+> **DEFERRED / DISABLED / EXCLUDE_FROM_REPORT - PLACES_EDITORIAL (2026-10-22).**
+> Saved experiment and future reference only. Code and integration are commented out; the previous reader behavior is restored. Historical implemented/completed statements below are not current product claims. See [deferral and report-scope instructions](/docs/deferred/places-editorial.md). Do not resume or include in reports without the corresponding explicit user request.
+
 # Places editorial articles implementation plan
 
 > Use superpowers:executing-plans inline; preserve all existing unfinished work.

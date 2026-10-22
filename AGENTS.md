@@ -77,3 +77,7 @@ Backend (`server/`):
 - `docs/api/Navio Api Documentation.md` and `docs/api/Navio Open API.yaml` (the trip schemas there describe a planned design, not the current DTOs)
 - `docs/database/Navio Database.md` (target design, not a list of applied migrations)
 - `docs/summary/Navio Architecture.md`
+
+## 9. Deferred features and report scope
+
+Before drafting, rechecking or editing any report, read [docs/agents/report-scope.md](docs/agents/report-scope.md). Respect its explicit reporting exclusions even when historical logs/tests describe a completed experiment. `[DEFERRED][EXCLUDE_FROM_REPORT] PLACES_EDITORIAL` (long-form Places articles and their research/coverage system) is disabled and saved for future development; do not include it in reports, including future-work sections, without the user's explicit change to report scope. See [the deferral note](docs/deferred/places-editorial.md). Other Explore/Places and planner functionality remains in scope.
