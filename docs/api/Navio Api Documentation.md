@@ -1,5 +1,7 @@
 # Navio API Documentation
 
+**Implemented supplement (2026-10-22):** [Shared Plan card metrics and covers](Shared%20Plan%20Card%20Metrics.md) documents the additive Explore/detail response fields and successful-copy semantics. Updated backend required; not deployed by this task.
+
 **Version:** v1.3
 **Base URL:** `https://api.navio.local`
 **Auth:** Bearer JWT from Keycloak by default. Exceptions: `GET /v1/share/{token}` and public group discovery, detail, and search reads.

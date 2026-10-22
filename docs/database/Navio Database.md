@@ -1,3 +1,7 @@
+# Implemented Shared Plan copy ledger (2026-10-22)
+
+Trip migration V21__shared_plan_copy_events.sql adds trip.shared_plan_copy for transactional successful-copy events and aggregate total/distinct counts. It retains events after private-copy deletion and cascades on publication deletion. Backfill recovers only identifiable existing imports. Fresh and historical-upgrade checks passed against disposable real PostgreSQL; the configured VM was not migrated/deployed by this task. See [contract and persistence notes](../api/Shared%20Plan%20Card%20Metrics.md).
+
 # Implemented transit route choice (2026-10-13)
 
 Trip migration V20__block_item_schedule.sql adds nullable trip.block_item.schedule text with a 32000-character check, mapped to a plain Java String. It holds a stop's own timetable as a JSON array of { id, time, timeEnd, label } entries (at most 40, validated by the service, not the database). NULL means no schedule, which is every existing stop, so there is no backfill and older releases ignore the column. Only place items keep a value; an omitted schedule keeps the saved one and an empty list clears it. An unreadable stored value is logged and read as no schedule. The client requires item-schedule-v1 before sending it. Real-Postgres schema, V13 upgrade (V14-V20) and round-trip checks passed on 2026-10-14.
