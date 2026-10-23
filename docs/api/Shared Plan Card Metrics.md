@@ -8,7 +8,7 @@ Implemented locally on 2026-10-22 in client and trip-planning-service; not deplo
 
 - Views retain the existing public-read counter, not unique visitors. Card links disable prefetch to avoid speculative public reads.
 - Copies count every successful import, including repeated imports by one traveler. They do not mean completed trips.
-- `coverPlaceId` identifies a public stop in the published snapshot. A stored cover is preferred; missing/broken covers can use the existing Places reader endpoint for that stop. Photo requests are lazy, bounded and attributed. Unavailable photos show a neutral destination fallback, never an unrelated stock photo.
+- `coverPlaceId` identifies a public stop in the published snapshot. A stored cover is preferred; missing/broken covers can use the existing Places reader endpoint for that stop. Photo requests are lazy, bounded and attributed. Locally bundled, attributed destination photos now remain beneath stored/live photos (2026-10-24), covering all 31 currently listed plans across 30 destinations even with the older API. Unknown destinations without a stored/live image retain the neutral fallback; never substitute an unrelated city. The catalog and license records live in client/public/images/plan-covers/README.md.
 - Rating is deliberately `Not rated yet`; no rating submission or fabricated average is implemented.
 
 Trending requests six plans per page on both server and client. Load more appends another page. Fewer than six eligible plans cannot be supplemented with invented plans.
@@ -23,6 +23,6 @@ Migration `V21__shared_plan_copy_events.sql` adds `trip.shared_plan_copy`. A suc
 
 Backfill recovers existing trips whose `destination_id` still equals `shared-plan:<publication UUID>`. Already deleted or no longer identifiable historical copies cannot be recovered; historical totals must not be represented as exhaustive.
 
-Run the updated trip service so Flyway applies V21 before expecting the new fields. Updating the local client alone does not update the configured VM/backend. No production or VM deployment was performed in this task.
+Run the updated trip service so Flyway applies V21 before expecting the new fields. The bundled destination covers do not require that backend update. Updating the local client alone does not update the configured VM/backend. No production or VM deployment was performed in this task.
 
 Verification: frontend 471 tests, TypeScript, scoped lint and production build passed; backend 264 tests, zero failures/errors, three skips, including real disposable PostgreSQL fresh/upgrade checks. Browser visual review remains pending.
