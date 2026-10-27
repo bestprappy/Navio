@@ -1,3 +1,7 @@
+# Implemented Shared Plan copy ledger (2026-10-22)
+
+Trip migration V21__shared_plan_copy_events.sql adds trip.shared_plan_copy for transactional successful-copy events and aggregate total/distinct counts. It retains events after private-copy deletion and cascades on publication deletion. Backfill recovers only identifiable existing imports. Fresh and historical-upgrade checks passed against disposable real PostgreSQL; the configured VM was not migrated/deployed by this task. See [contract and persistence notes](../api/Shared%20Plan%20Card%20Metrics.md).
+
 # Implemented admin color palette (2026-10-14)
 
 User-management migration `V9__palette_colors.sql` adds `iam.palette_colors`: `id varchar(40)` primary key (checked `^[a-z][a-z0-9-]{0,39}$`), `name varchar(40)`, `hex varchar(7)` (checked lowercase `#rrggbb`), `sort_order integer`, nullable `retired_at timestamptz`, `created_by`/`updated_by` referencing `iam.users`, and `created_at`/`updated_at`. Unique indexes on `hex` and `lower(btrim(name))`. It seeds the 24 built-in colors with the ids the client always used, so existing `trip.list_block.block_color` values and guide category colors stay valid without a backfill. Rows are never deleted and `hex` is not updatable: retiring sets `retired_at`. Additive; the previous release ignores the table. Verified on disposable PostgreSQL 16/PostGIS with `PostgresSchemaTests` (Flyway V1–V9, `ddl-auto=validate`) and `PaletteColorPostgresTests`. Trip-planning has no schema change: shared-plan snapshots gain a nullable `colorId` inside the existing JSON.
