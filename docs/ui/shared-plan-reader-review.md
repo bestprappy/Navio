@@ -29,3 +29,16 @@ The isolated map supports both configured Google and Mapbox providers, grouped r
 Independent review found a nested thumbnail/credit interaction, which was fixed and covered by a render test, then reported no remaining important findings. Chrome was discovered but app-access approval timed out; no browser connector was available. Live visual, mobile, zoom/scroll interaction and keyboard review therefore remain for the user. Do not represent HTTP/source checks as completed browser visual QA.
 
 Normal planner/map components, Guides, Admin, backend/schema/configuration and deferred Places editorial were not changed by this redesign. Existing unrelated unfinished work remains intact.
+
+
+## 2026-10-27 feedback revision
+
+The hero now separates its image/gradient/title from one matching photo-credit footer, eliminating overlapping attribution and the exposed image strip. During live-photo replacement or an empty refresh, the loaded photo stays visible with its matching credit until a replacement loads or fails.
+
+Stop cards now pair photos and numbered markers with concise place facts, owner tips and explicit map navigation. Day headers have larger color-coded numbers, a tinted heading and summary so consecutive dates are easier to distinguish.
+
+Shared-only route rows reuse the planner routing/travel-options engine. Expand a leg to compare Drive, Transit, Bike and Walk, see line/walking details and focus its geometry on either map. The owner's published mode/validated transit sequence remains In plan; local comparisons have a restore control and never enter the copy request. Routes are current estimates, not the owner's historical journey. Only adjacent located public stops within one day are connected: no private anchors, lists, cross-day links or bridging across unlocated stops.
+
+Public transport metadata is an additive backend correction, described in ../api/Shared Plan Public Routes.md. Existing frozen snapshots may lack authored modes and then say Owner's mode not shared; drive is explicitly a suggested comparison. Running the updated trip service and republishing is required to expose owner choices for those snapshots. No migration, deployment or source commit was performed for this revision.
+
+Verification: 488 frontend tests pass; final cover edge-case regression, TypeScript/scoped lint and production build pass. Backend unit/controller suite: 264 run, zero failures/errors, 10 optional Postgres skips, using an isolated config location and excluding the two infrastructure startup tests. The ordinary full backend invocation could not start its contexts because the local config server was unavailable. Development preview HTTP200; current live listing API HTTP502, so real-plan end-to-end/provider geometry verification is pending. Fresh static review found and verified fixes for photo/credit refresh transitions, with no remaining important findings. Browser visual/mobile/keyboard/zoom acceptance is still pending; no successful interactive browser check is claimed. Normal planner visuals remain unchanged.
