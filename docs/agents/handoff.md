@@ -88,6 +88,45 @@
 
 **State / next:** Application edits remain uncommitted in client dev (9 modified files + new article component/data/test); no app commit, push or deployment requested. Root source pins unchanged. Existing CLAUDE.md, root reports/output/documents/recovery plan and server service logs preserved. Required notes only committed on docs/place-articles-shortcuts-20261022 and merged locally to root dev. Review visual behavior and expand the prepared catalog before claiming worldwide Navio article coverage.
 
+## 2026-10-17 - Claude - Released to production (root main 29ccf32)
+
+**Live:** Deploy run 39015918216 succeeded (revision check, Postgres schema tests, 11 image builds, VM deploy). Released: community plan attachments, admin color palette (user-management V9), Places discovery (hidden: NEXT_PUBLIC_PLACES_ENABLED not wired into the build), planner UI updates. Every repo's main equals dev: user-management 38032ec, trip-planning f3bd3fa, mobility c298ead, community 1be61f1, server 19052e9, client ff7242a.
+**Smoke (curl -k):** /health 200, /v1/trips 401, /v1/palette-colors 200 (24 colors), /v1/shared-plans feed 200, unknown /summary 404, other token sub-path 401, /v1/admin/palette-colors anonymous 401.
+**Not verified:** authenticated browser flows (admin /admin/colors, attaching a plan to a post). Local client/root checkouts remain behind origin because another session's uncommitted edits overlap; see entries below.
+
+## 2026-10-17 - Claude - Admin color palette pushed to dev
+
+**State (origin/dev):** user-management 38032ec (V9), trip-planning f3bd3fa, server 19052e9 (pins user-management, trip-planning, community 1be61f1), client ff7242a, root d14eefe (pins client+server; includes production gateway/community config fixes). main untouched, nothing deployed.
+**Local checkouts behind origin/dev on purpose:** client and root main checkouts hold another session's uncommitted edits that overlap palette files (client: publication-api.ts, shared-plan-blocks.ts, block-options-popover.tsx, types.ts, planner maps; root: docs/api, docs/database). That session must commit or stash, then `git pull --ff-only origin dev` and resolve. trip-planning checkout stays on feat/day-sections, which will conflict with PublicDayDto.colorId in PlanPublicationSanitizer.
+**Release order:** user-management V9 + gateway config before the client; trip-planning card endpoint before community-service. View at /admin/colors with the administrator role. Supersedes the "ready to push" entry below.
+
+## 2026-10-17 - Claude - Admin color palette ready to push (feat/admin-color-palette)
+
+**State:** Palette committed and merged with dev in all five repos (worktrees under Navio-worktrees/admin-palette). Local dev includes it for user-management, trip-planning and server; client/root branches are ready but their checked-out dev has another session's overlapping uncommitted edits. Production gateway/community config fixes for plan attachments are on root dev (2a400a6, ebcb497), unpushed.
+**Next:** With the user's go-ahead push in order: user-management dev, trip-planning dev, server (bump user-management + trip-planning pins), client `feat/admin-color-palette:dev`, root `feat/admin-color-palette` -> dev with client/server pin bump. Release user-management V9 + gateway before the client. Then view at /admin/colors (administrator role).
+
+
+## 2026-10-17 - Claude - Community plan attachments pushed to dev
+
+**State:** On origin/dev: community-service 1be61f1, trip-planning 0db4349, server 775d405 (pins both), client 9726bf9, root 32a3a9c (pins client+server). main untouched, nothing deployed. Supersedes the "unpushed" entry below; its steps 2-5 still apply.
+
+## 2026-10-17 - Claude - Community plan attachments ready on local dev (unpushed)
+
+**State:** Local `dev` in community-service (1be61f1), trip-planning (0db4349), server (55c472d, gateway+config) and client (9726bf9) contains the "discuss an Explore plan" feature and the community mock-data removal. Nothing pushed; pins not bumped. trip-planning checkout is on the other session's feat/day-sections (dirty), which does not yet include 0db4349.
+**Next:** 1) With the user's go-ahead, push children (community-service, trip-planning) -> bump pins + push server -> push client -> bump root pins on a chore branch to dev. 2) Release order: trip-planning + gateway/config before or with community-service (it calls the new card endpoint; without it every attached post returns 503) and the client. 3) Browser-check composer picker, feed card, detail card, unlisted state, and the "Discuss in Community" button in light/dark and at 390px. 4) Run trip-planning context tests against a disposable Postgres. 5) Commit the docs/api hunks once the other session's docs changes land.
+
+
+## 2026-10-17 - Claude - Community mock data removed (client, uncommitted)
+
+**State:** Client dev working tree has uncommitted Community-only edits (data.ts slimmed, three dead components deleted, composer plan picker and `?planId` prefill removed, post-card trip attachments removed). These files do not overlap the other session's uncommitted planner work. tsc, ESLint, community tests 29/29 pass.
+**Next:** 1) Browser-check `/community`, a post detail and `/community/create?groupId=...` in light/dark. 2) Commit on client `refactor/community-remove-mock-data` from dev, staging only `app/feature/community/**` and `app/community/create/page.tsx`. 3) Build the recommended feature: attach a published plan token to a post (see the session log entry).
+
+## 2026-10-17 - Claude - Day sections (multi-city days, colored breaks) implemented, uncommitted
+
+**State:** Feature complete locally and tested, nothing committed. Backend on server/trip-planning-service branch feat/day-sections (V21 migration, SECTION item type, day-sections-v1). Client changes sit on client dev alongside another session's uncommitted day-edge-stops work in the same files (sortable-block-items.tsx, trip-location-markers.ts, trip-builder.atoms.ts); separate them carefully when committing. Root docs/api and docs/database updated (uncommitted, ship with the release).
+**Next:** 1) Live browser check of the section divider (destination-card style, Change editor, folding, map colours) in light and dark. 2) Commit service -> server -> client -> root on feat/* branches per AGENTS.md; release backend (V21) before or with the client, since the client refuses to save sections without day-sections-v1. 3) Optional: sections in itinerary exports and the Explore listing view; per-section Auto plan.
+**Verify with:** trip-planning-service ./mvnw -o test with config server on 8888 and NAVIO_TEST_DB_URL on a disposable postgis (run from PowerShell); client node --experimental-transform-types --test tests/planner/day-sections.test.mjs.
+
 ## 2026-10-17 - Codex - Publish latest planner UI changes to dev
 
 **Authorization / integration:** User explicitly requests all latest changes pushed to dev. Fetched root/client/server; no newer remote dev changes. Client switched to dev, pulled ff-only, feature branch feat/planner-day-view-polish-20261017 created, preserving all pending work. Committed20 reviewed implementation/test files as b92a8ec, pushed feature then merged ff-only and pushed client dev. Root client pin b552afd integrated via chore/planner-client-pin-20261017; server pin unchanged774ace6. Main untouched; no production deployment.

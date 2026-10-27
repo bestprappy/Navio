@@ -10,6 +10,10 @@
 
 ## Global API Rules
 
+### Admin color palette (2026-10-14)
+
+Trip days, lists and guide categories use one admin-managed palette served by user-management: public `GET /v1/palette-colors`, and `GET`/`POST /v1/admin/palette-colors` plus `POST /v1/admin/palette-colors/{id}/retire|restore` for administrators. Colors are never deleted and their hex never changes. Shared-plan days now carry `colorId`. Full contract: [color-palette.md](color-palette.md).
+
 ### Precise charging contract (Phase 4C, 2026-10-13)
 
 Planner snapshots advertise `precise-charging-v1` and accept nullable `evCharger.chargingDurationMinutes` (continuous minutes, 0–2147483647) and `evCharger.plannedDepartureSocPct` (0–100). `estimatedChargeMinutes` remains the rounded legacy value. The optimizer target is separate from the user's `targetBatteryPct`: a manual target takes precedence and locks the stop, while an optimizer target does not create a user lock. Replay uses the precise duration before the legacy integer. An unchanged legacy snapshot preserves existing precise fields; changing its legacy duration or manual target replaces that charging instruction. Removing the charger clears its charging state.
