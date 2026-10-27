@@ -1,3 +1,9 @@
+## 2026-10-28 - Codex - Compact shared-reader current-day header
+
+**Request / change:** Move the newly added sticky day/date header beside In this plan inside the contents bar, resized without disturbing other functions. Added a compact color-coded current-day chip using existing reader selection; clicking jumps to that day's existing section. Contents selector and Save/Share previews remain. Desktop places it between navigation and actions; narrow drawers wrap it inside the same bar with truncated long text. Removed only sticky positioning from original in-content day headings, preserving expand/collapse and all published information. Only shared-reader.tsx and reader-itinerary.tsx application files changed this session. No map, route, normal planner or backend changes.
+**Verification / limits:** Ten existing shared-reader tests pass; TypeScript and scoped ESLint pass. No new tests for this low-impact layout change; no interactive visual/mobile acceptance claim. Existing unfinished source retained; no source commit/push/deploy. PLACES_EDITORIAL remains deferred/excluded. Next: user visual review of compact header and existing shared-reader improvements; previous gateway/runtime and old publication transport limitations remain.
+**Session docs:** Notes committed on docs/shared-reader-date-header-20261028 and merged to local root dev only, per AGENTS.md. Existing remote divergence untouched.
+
 ## 2026-10-27 - Codex - Shared reader cover, routes and visual feedback
 
 **Request / approval:** Fix hero seam/overlapping credits, restore multi-mode route details and map paths, improve stop cards/day distinction. User explicitly approved owner mode In plan plus isolated reader comparisons. User went to sleep and asked to halt only for an important unresolved question; none remained. Scope restricted to shared reader and public transport contract; normal planner visuals preserved.
