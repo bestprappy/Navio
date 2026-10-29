@@ -1,6 +1,6 @@
-# Saved content library - draft for adjustment
+# Saved content library - approved design
 
-Status: planning only, no feature implementation. User postponed Guides and prioritized persistent Save Place buttons on Explore Places list/cards and place reader, to the right of Add to Plan with appropriate consistent spacing. Build from existing functionality, integrating it rather than creating another disconnected collection.
+Status: approved for implementation on2026-10-29, including Community navbar access. Implementation is local and awaiting VM release. User postponed Guides and prioritized persistent Save Place buttons on Explore Places list/cards and place reader, to the right of Add to Plan with appropriate consistent spacing. Build from existing functionality, integrating it rather than creating another disconnected collection.
 
 ## Confirmed direction
 
@@ -37,4 +37,4 @@ Place cards offer Open / Add to Plan / remove or restore as appropriate. Plan ca
 
 Bookmarks are references, not copies of someone else's whole trip: use the latest published version when opened; private/revoked/deleted sources become unavailable and must not expose a stale public snapshot. Existing copied trips remain independent. User-owned private places stay private. Unsave affects only library membership, not authored trips/guides, comments/ratings, or copied plans. Restore keeps the original saved item identity and collection metadata, checks duplicates and quota atomically; re-saving a trashed item should restore it rather than create a duplicate. Show deletion age/time remaining and a clear permanent-delete boundary. Final purge must respect audit data relationships without retaining recoverable private bookmark content beyond the promised lifecycle.
 
-No code, schema, VM data, source push or deployment in this planning step. Pending user adjustment/approval before an implementation plan.
+Implementation plan: ../plans/2026-10-29-saved-content-library.md. No VM deployment/data migration has been performed yet. Guides/custom categories remain deferred.
