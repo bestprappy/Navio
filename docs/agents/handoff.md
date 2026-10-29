@@ -1,3 +1,8 @@
+## 2026-10-29 - Codex - Move sidebar Dashboard below Home
+
+**Change:** Moved the existing Dashboard link from Trips into Discover directly after Home. Preserved icon, route highlighting, collapsed labels and navigation/mobile-close callback. Trips retains saved trip content without a duplicate Dashboard. Only sidebar.menu.tsx, sidebar-trips.tsx and existing sidebar render expectations changed; prior shared-note changes preserved.
+**Verified / state:**3 sidebar tests, scoped ESLint, full TypeScript and whitespace pass. No backend/data/normal planner behavior, source push or deployment. Client changes remain local/uncommitted on dev for review. Mandatory notes committed docs branch and merged local dev only. Existing artifacts/logs/CLAUDE.md and deferred PLACES_EDITORIAL unchanged.
+
 ## 2026-10-29 - Codex - Shared reader notes fully expanded with Hide/Show
 
 **Request / scope:** All Shared Plan Read note content starts fully visible, including rich notes/checklists and attached visit schedule. Hide removes ordinary note content; Show Note restores it. Trip note alone retains its existing faded opening excerpt when collapsed, while starting expanded. Scope only shared reader; normal planner/map components, published content and VM records unchanged.
