@@ -31,3 +31,8 @@ C. Decide saved-card update behavior, revoked/unpublished handling, rating eligi
 D. Default proposed Saved library is private per account; Home/Work must never become public through a collection.
 
 Evidence: client/app/feature/planner/_components/share/reader/{reader-feedback,reader-ui,shared-reader,reader-place-panel}.tsx; server/trip-planning-service publication controller/DTOs; server/user-management-service guide/saved-place controllers/service; server/community-service CommentController/PostController and applied migration source. Deferred experiments excluded by report scope. No tests needed for this source-only audit; previous unfinished client changes preserved.
+
+
+## User scope refinement (2026-10-29)
+
+Guides deferred. First priority real Save/Saved beside Add to Plan on Explore Places cards and reader. Shared-plan place saving stores location only plus source-plan link/button; same Places collection, no owner notes/checklists. Proposed library navigation: Recents (Recently Saved top, Recently Opened below), All, Plans, Guides later, Places, Recently Deleted (7days), Custom Category TBD.50Plan/Guide interpreted as50each; Places unlimited, with paginated search. General saves must not change existing Home/Work/default start. See saved-content-library design draft for review; implementation not started.
