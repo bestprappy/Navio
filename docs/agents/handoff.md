@@ -1,3 +1,9 @@
+## 2026-10-29 - Codex - Inventory missing engagement and Saved backend before scope selection
+
+**User request:** List unimplemented comment/rating/saving backend first; user will adjust before implementation. Audited reader UI, frontend routes/API clients, all relevant backend controllers/models/migrations and report scope. No application/schema/UI changes or feature implementation.
+**Findings:** Shared-plan comments/ratings/Save plan/Save place are preview-only. Guide reader bookmarks and unified saved-content page/listing absent. Share button preview needs UI wiring; public-link backend already works. Existing personal favorite places CRUD (Home/Work/CUSTOM,50/user), trip My List/Add to Plan, publishing/copy/date choice/counts, guide authoring/publishing and Community post comments/replies/votes/reactions are working foundations, not missing backend. Optional guide social features, saved posts, notifications, collections/following explicitly separated from confirmed backlog.
+**Next / state:** Inventory/proposed Saved tabs in docs/ui/saved-content-backend-inventory.md, pending user adjustment. No tests for read-only source audit, no source push/deploy. Prior6dirty client files (shared notes/sidebar plus tests) preserved; artifacts/logs/CLAUDE.md and deferred exclusions untouched. Mandatory notes committed docs branch merged local dev only.
+
 ## 2026-10-29 - Codex - Move sidebar Dashboard below Home
 
 **Change:** Moved the existing Dashboard link from Trips into Discover directly after Home. Preserved icon, route highlighting, collapsed labels and navigation/mobile-close callback. Trips retains saved trip content without a duplicate Dashboard. Only sidebar.menu.tsx, sidebar-trips.tsx and existing sidebar render expectations changed; prior shared-note changes preserved.
