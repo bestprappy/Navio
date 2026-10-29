@@ -81,3 +81,8 @@ Backend (`server/`):
 ## 9. Deferred features and report scope
 
 Before drafting, rechecking or editing any report, read [docs/agents/report-scope.md](docs/agents/report-scope.md). Respect its explicit reporting exclusions even when historical logs/tests describe a completed experiment. `[DEFERRED][EXCLUDE_FROM_REPORT] PLACES_EDITORIAL` (long-form Places articles and their research/coverage system) is disabled and saved for future development; do not include it in reports, including future-work sections, without the user's explicit change to report scope. See [the deferral note](docs/deferred/places-editorial.md). Other Explore/Places and planner functionality remains in scope.
+
+
+## 10. Maintained Shared Plan samples
+
+When the user asks to add or update sample plans, maintain the actual Navio Team plans listed in Explore; a development preview is optional tooling and never a substitute or required user setup. Existing records must be updated in place with their trip identities, shared links, engagement and original itinerary content preserved. Keep Starting Part, mixed ordered My List, itinerary and illustrative editable budget complete; include real catalogue trip Garage where EV applies. Future samples follow the same standard. Never edit unrelated travelers or revive revoked shares. Use the backed-up, dry-run-first maintenance workflow in [.deploy/scripts/seed-explore/README.md](.deploy/scripts/seed-explore/README.md). Defer UI changes when the user asks only for sample content updates.

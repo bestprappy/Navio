@@ -51,3 +51,8 @@ The previous UI-only section boundaries above are historical. Starting Part, sel
 With npm run dev:vm, open /preview/shared-plan and choose among three complete varied examples. Prepare connected examples opens an explicit confirmation: after the updated backend is released, this creates caller-owned editable plans and listed shared links on the configured VM. Existing matching examples are reused without overwrite. It requires sign-in; no local backend is required for this workflow. Synthetic charging data is labeled, and does not represent verified charger availability.
 
 Review both retained/changed copy dates, editable Starting Part below saved Places, mixed list ordering, Garage select/edit/remove (trip-only), notes/checklists/timetables and linked budget expenses after reload. Backend integration has verified all three sources and both date choices via real HTTP/Postgres. Browser visual/keyboard review and actual VM preparation remain pending. Old public snapshots do not gain these sections until owners republish.
+
+
+## Existing sample correction, 2026-10-29 (supersedes preview setup requirement)
+
+All30 original Navio Team examples listed on Explore have now been enriched and republished at their existing links, preserving the original itineraries. They include Starting Part, mixed My List, illustrative budget and Garage for the two EV examples. Review those actual pages; no Prepare connected examples step is needed. The three Kyoto preview fixtures remain optional internal tooling, not the maintained sample collection. Future samples use the same complete source contract. Visual feedback fixes remain deferred to the user's next request.
