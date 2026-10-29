@@ -47,3 +47,8 @@ Final checks: frontend519 tests pass, full TypeScript/scoped ESLint/production b
 Reviewed regressions fixed with red/green checks: inactive imported EV editing must not select it; copied duration retains declared endDate; expanded readonly notes allow safe links; example source adapter retains authored day title rather than replacing it with Day1. Public energy fields never include private anchor-derived SoC/charge projections. Checklist checked/visited progress is intentionally reset, authored labels/order preserved.
 
 Sample limitation: demonstration charger is clearly synthetic/unverified; these examples prove content transport, not real charger search or charging feasibility. Ordinary sample places resolve real provider IDs before VM publication. Full visual/keyboard acceptance is not claimed. No source commit/push/deploy yet; release approval requested only after concrete implementation/verification because root main deploys production.
+
+
+## Authorized release follow-through
+
+User answered Release to VM. Client8dc522e/trip31a23c3/server8342d63 pushed through dev/main; root main08f2215 deployed successfully in workflow40844494271. CI revision/Postgres/build/deployment gates all passed; all services healthy at release SHA. Independent health200/protected401/public plans200/Explore200 checks passed. Backend is ready for dev:vm connected example setup; authenticated example creation and user visual acceptance still pending. No existing published sample overwritten. This explicit release authorization supersedes the earlier no-release boundary.
