@@ -1,3 +1,8 @@
+## 2026-10-29 - Codex - Refine save icons and Saved navigation placement
+
+**User refinement:** Save Place is icon-only, highlighted when saved. A Shared Plan place matching an Explore saved location stays one entry and gains Go to Plan provenance action. Saved page access is a top-navbar icon immediately left of theme; sidebar-only layouts get icon plus label directly below profile, superseding earlier below-Dashboard proposal. Suggested consistent name Saved covers all content types; collapsed/mobile access remains usable.
+**State:** Updated Saved library draft only, no application/backend/data edits or tests needed. Multiple source-plan chooser is a proposed QOL detail, not an independently requested feature. Prior6dirty client files and all artifacts preserved. Mandatory notes committed docs branch merged local dev only; no push/deploy. Await full draft approval/implementation instruction. Deferred exclusions unchanged.
+
 ## 2026-10-29 - Codex - Refine Saved library scope and Place-save priority
 
 **User direction:** Guides later. First priority persistent Save button to right of Add to Plan on Explore Places cards and reader, appropriate consistent spacing. Unified private Saved page nav Recents -> All -> Plans -> Guides -> Places -> Recently Deleted -> User Custom Category(TBD). Recents confirmed Recently Saved top plus Recently Opened below. Trash confirmed7days. User wants50 Plan/Guide limit (draft assumes50each) and unlimited Places. Basic-to-advanced search and integration with existing saved functionality, no disconnected preview.
