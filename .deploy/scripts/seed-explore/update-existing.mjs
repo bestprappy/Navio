@@ -49,7 +49,7 @@ async function main(){
  if(selected.some(slug=>!plans.some(plan=>plan.slug===slug)))throw new Error('Unknown sample slug');
  const directory=process.env.BACKUP_DIR??'./sample-backups';
  const run=new Date().toISOString().replace(/[:.]/g,'-');
- const call=async(method,path,body)=>{const response=await fetch(new URL(path,base),{method,headers:{'X-User-Id':TEAM_OWNER,'Content-Type':'application/json',Accept:'application/json'},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(30000)});if(!response.ok)throw new Error(`${method} ${path}: HTTP ${response.status}`);return response.json();};
+ const call=async(method,path,body)=>{const response=await fetch(new URL(path,base),{method,headers:{'X-User-Id':TEAM_OWNER,'Content-Type':'application/json',Accept:'application/json'},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(30000)});if(!response.ok){const problem=await response.json().catch(()=>null);const reason=problem?.message??problem?.detail;throw new Error(`${method} ${path}: HTTP ${response.status}${typeof reason==='string'?' '+reason.slice(0,240):''}`);}return response.json();};
  const results=await updateExistingSamples({owner:TEAM_OWNER,definitions:selected.length?plans.filter(plan=>selected.includes(plan.slug)):plans,call,apply,backup:async data=>{await mkdir(directory,{recursive:true,mode:0o700});await writeFile(`${directory}/${run}-${data.trip.id}.json`,JSON.stringify(data,null,2),{mode:0o600,flag:'wx'});}});
  console.log(JSON.stringify({mode:apply?'apply':'dry-run',results},null,2));
  if(results.some(result=>result.status==='skipped'))process.exitCode=2;

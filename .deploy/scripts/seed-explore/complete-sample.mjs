@@ -14,7 +14,7 @@ function exampleBudget(plan){
  const destination=plan.destination.toLowerCase();
  const [currency,daily]=destination.includes('thailand')?['THB',1800]:destination.includes('japan')?['JPY',15000]:destination.includes('taiwan')?['TWD',4000]:['USD',150];
  const amount=daily*plan.days.length;
- return {currency,amount,expenses:[{id:`${marker}${plan.slug}-food`,label:'Food allowance (illustrative)',categoryId:'food',amount:amount*.4},{id:`${marker}${plan.slug}-transport`,label:'Transport allowance (illustrative)',categoryId:'transport',amount:amount*.3},{id:`${marker}${plan.slug}-activities`,label:'Activities allowance (illustrative)',categoryId:'activities',amount:amount*.3}]};
+ return {currency,amount,expenses:[{id:`${marker}${plan.slug}-food`,label:'Food allowance (illustrative)',categoryId:'food',amount:amount*.4},{id:`${marker}${plan.slug}-transport`,label:'Transport allowance (illustrative)',categoryId:'transit',amount:amount*.3},{id:`${marker}${plan.slug}-activities`,label:'Activities allowance (illustrative)',categoryId:'activities',amount:amount*.3}]};
 }
 /** Merge complete sample content without replacing existing authored itinerary, IDs or settings. */
 export function completeSample(plan,planner,options={}){
