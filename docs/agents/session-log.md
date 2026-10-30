@@ -1,3 +1,11 @@
+## 2026-10-30 - Codex - Poster v5 follows user's sketch and exact new screenshots
+
+**Request:** User sketched layout: compact full header; large EV screenshot left, smaller transit and Shanghai guide stacked right; Planner/Explore/Community explanation row; architecture left and tech stack right; large members/advisor/QR footer. Styling delegated. Three original images subsequently supplied in Downloads/image1/2/3 (names include spaces).
+
+**Delivered:** output/poster/Navio_CS_DDay_A1_v5.pdf, v5.png, v5_Preview.png, editable HTML/scripts/README-v5. Uses supplied files byte-identically (SHA256 checked) at1860x875,1865x873,1678x841. No substituted/repainted UI. Architecture simplified with precise separate arrows/buses; 15-logo stack grid, 57mm voting QR and larger footer text. Official logos and original coastal decoration reused. Sticker unchanged.
+
+**Validation / context:** Real image dimensions checked in browser, no horizontal overflow or major-section overlap, no clipped footer. One-page exact594x841mm PDF, embedded fonts and required content verified; rendered preview and technical detail inspected. User/ advisor design-content acceptance and printed QR scan pending. Chat-inline originals initially inaccessible to builder; desktop retrieval failed (node_repl CreateProcessWithLogonW2 / CUA native pipe absent); resolved by user's supplied file paths, no further retrieval needed. Initial clearly labelled geometry placeholders were internal only and removed from actual-image check. No app edit, pull or deployment; pending client source preserved. Local rootdev diverges from origindev, do not automatically pull for artifact work. Mandatory notes committed docsbranch merged localdev only.
+
 ## 2026-10-30 - Codex - Poster v4 targeted diagram and footer refinement
 
 **User request:** Fix How it Works arrow/icon/text proportion and placement glitches; enlarge member/advisor/QR inside existing section dimensions. No broader poster redesign.
