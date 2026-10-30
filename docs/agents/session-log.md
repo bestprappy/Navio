@@ -1,3 +1,9 @@
+## 2026-10-30 - Codex - Final deadline detail addition v9
+
+**User:** Three minutes before submission, requested little-to-moderate extra information without losing clarity. Added one concise line per feature (checklists, seasonal discovery/editable copy, community posts/comments/photos) and short responsibility labels under four services. No layout/image/QR changes.
+
+**Delivered / checks:** FINAL.pdf, FINAL.png and FINAL_Preview.png now point to v9. Browser fit/native-source/footer checks pass; exact A1 one-page embedded-font PDF check pass. Decoded EV screenshot remains pixel-identical. Rendered v9 preview inspected, PNG300dpi regenerated. No app edits/pull/deploy. Previous versions retained. Mandatory notes docsbranch/dev only.
+
 ## 2026-10-30 - Codex - Final A1 poster v8; two QRs, headline, goose and safe image export
 
 **User steering / deadline:** Compact IDs/advisor left; keep voting QR in place; add website QR. Larger headline protected from scenery, goose-sticker-inspired accent/middle decoration. Then slightly open upper/middle word spacing, improve screenshot safely without regeneration, 10minute deadline, bold QR calls to action. Explained steering mid-task is fine; user was viewing small v6 Preview.png.
