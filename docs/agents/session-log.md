@@ -1,3 +1,9 @@
+## 2026-10-30 - Codex - Recover VM gateway routing with graceful NGINX reload
+
+**Authorization / scope:** User approved command-based recovery, minimizing changes. No application/configuration/schema edits or deployment authorized or performed.
+**Action / evidence:** Reused existing authenticated Remote SSH terminal. docker exec navio-nginx-1 nginx -t reported syntax OK/test successful; then docker exec navio-nginx-1 nginx -s reload reported signal process started (2026-10-30 10:12:29UTC). NGINX container subsequently healthy. Verified pinned-CA public /health200, /v1/shared-plans?size=1 200, anonymous /v1/users/me401 (expected auth requirement), Keycloak discovery200; local localhost3000/api/shared-plans?size=1 200. Prior stale gateway IP diagnosis confirmed by recovery without other changes. No authenticated profile/trips UI acceptance claimed; user can refresh/retry. No backend restart, data write, source edit or push.
+**Next / limitation:** Immediate502 outage resolved. Static NGINX upstream can become stale after future gateway replacement; durable dynamic-resolution/deployment-reload improvement remains unimplemented to respect limited scope. Prior dirty source/artifacts preserved. Mandatory notes committed docs branch merged localdev only.
+
 ## 2026-10-30 - Codex - Diagnose VM HTTP 502; no repair authorized
 
 **Request:** Diagnose sudden Dashboard/Explore/profile failures, report findings, do not fix yet.
