@@ -1,3 +1,11 @@
+## 2026-10-30 - Codex - Poster v4 targeted diagram and footer refinement
+
+**User request:** Fix How it Works arrow/icon/text proportion and placement glitches; enlarge member/advisor/QR inside existing section dimensions. No broader poster redesign.
+
+**Changes / artifacts:** output/poster/Navio_CS_DDay_A1_v4.pdf, v4.png, v4_Preview.png. Clean buses without junction arrowheads; separate destination arrows, consistent marker sizing, external-data crossing breaks and explicit provider/storage box-edge ports. Optical icon sizing and tighter NGINX SVG viewBox (source paths/source file preserved), label alignment. Roster font+25%, advisor+25%, QR40->49mm (+22.5%); section sizes/positions identical to v3. README-v4 and generation/check scripts retained.
+
+**Checks:** check-v4.mjs verifies identical diagram/footer bounds, font/QR increases, no footer clipping or overlapping nodes. Exact594x841mm one-page PDF and embedded-font/content checks pass. Render and architecture/footer crops inspected. Advisor approval/physical QR scan still pending. Other poster content and sticker unchanged; no app edits or push/deploy. Mandatory notes committed docsbranch merged localdev only.
+
 ## 2026-10-30 - Codex - Walk-by poster revision v3; sticker settled
 
 **User feedback:** v2 worse for physical A1; must read while walking past, compact explanations, 1-2 website screenshots, larger combined architecture/core stack and technology logos. Friend's dense decorative poster is completeness reference only. User supplied final goose road-trip sticker; leave unchanged.
