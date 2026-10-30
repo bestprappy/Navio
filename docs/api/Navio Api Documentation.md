@@ -905,6 +905,17 @@ curl 'https://api.navio.local/v1/trips/trip_01HX/permissions' \
 
 Supported catalogue query parameters include `q`, `destination`, `tags`, `sort`, `page`, and `size`. Trip Planning owns this search and enforces visibility.
 
+### Explore plan cards and community attachments (2026-10-17)
+
+| Method | Endpoint | Auth | Purpose |
+| --- | --- | --- | --- |
+| `GET` | `/v1/shared-plans/{token}/summary` | Anonymous | One plan's Explore card (`ExplorePlanSummary`, same shape as a feed item). |
+
+- Answers `200` only for a plan whose owner lists it on Explore right now. Unlisted, revoked, unknown and stale-sanitizer tokens all return the same `404` `ErrorResponse` ("This shared plan is no longer available"), so the route cannot confirm that a private link exists. `Cache-Control: no-store`.
+- A lookup does not increment the plan's view count, so feed cards cannot inflate the trending order.
+- The gateway permits exactly this GET as the one anonymous second segment under `/v1/shared-plans/{token}`; `/copies` and any other sub-path stay authenticated.
+- `POST /v1/posts` accepts `sharedTripId` as that share token (43 base64url characters, else `400` with `validationErrors.sharedTripId`). Community Service asks Trip Planning for the card before saving: not listed returns `400` "That plan is no longer listed on Explore..."; Trip Planning unreachable returns `503`. Posts store the token in `social.posts.shared_trip_id` (no schema change). Older posts may hold non-token ids; clients ignore them.
+
 ### Trip planning extensions (v1.3)
 
 These endpoints support detailed trip planning (dates, sections, places, itinerary, reservations, attachments, notes, budgeting, expenses, and tripmates). All endpoints in this section require Bearer JWT.

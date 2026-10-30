@@ -1,0 +1,64 @@
+# ============================================================================
+# Grafana Tempo for Navio Production
+# ============================================================================
+# Services export Zipkin spans to Alloy, which drops probe noise and forwards
+# OTLP here. Tempo stores the traces for Grafana Explore and its metrics
+# generator turns caller -> callee span pairs into traces_service_graph_*
+# series, remote-written to Prometheus. Those series drive the Navio Service
+# Graph dashboard.
+
+server:
+  http_listen_port: 3200
+  log_level: warn
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          # Tempo 2.7+ binds receivers to localhost unless told otherwise.
+          endpoint: 0.0.0.0:4317
+
+ingester:
+  max_block_duration: 5m
+
+compactor:
+  compaction:
+    # Traces are a debugging aid; a day is enough and keeps the disk small.
+    block_retention: 24h
+
+metrics_generator:
+  registry:
+    external_labels:
+      cluster: navio
+      environment: production
+  processor:
+    service_graphs:
+      # How long an unpaired client or server span waits for its partner.
+      # Gateway -> service hops finish well inside this.
+      wait: 10s
+      # Kafka publish/consume pairs become edges too.
+      enable_messaging_system_latency_histogram: true
+    # Default dimensions (service, span_name, span_kind, status_code) are
+    # enough: Spring names server spans "http <method> <route template>".
+    span_metrics: {}
+  storage:
+    path: /var/tempo/generator/wal
+    remote_write:
+      - url: http://prometheus:9090/api/v1/write
+        send_exemplars: true
+
+storage:
+  trace:
+    backend: local
+    wal:
+      path: /var/tempo/wal
+    local:
+      path: /var/tempo/blocks
+
+overrides:
+  defaults:
+    metrics_generator:
+      processors:
+        - service-graphs
+        - span-metrics

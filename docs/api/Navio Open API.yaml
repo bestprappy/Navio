@@ -4,6 +4,16 @@ x-navio-implemented-color-palette:
   colorId: "Pattern ^[a-z][a-z0-9-]{0,39}$; the 24 built-in ids are seeded by user-management V9."
   sharedPlanDays: PublicDayDto adds nullable colorId, copied only when it matches the palette id format. SANITIZER_VERSION unchanged.
   guides: Category colorId must exist in the palette (retired colors accepted).
+x-navio-implemented-day-sections:
+  status: Implemented locally (2026-10-17); needs the Trip Planning V23 release before the client relies on it.
+  plannerCapability: day-sections-v1
+  itemType: section, a divider inside a day. Items after it, up to the next section, belong to it.
+  itemFields: title (string, may be empty), colorId (palette name matching [a-z]{1,32}, or null to keep the day's colour), destination ({ id, name, lat, lng, country? } or null to keep the city of the part before it). Other item types never carry colorId or destination.
+  persistence: V23 adds nullable trip.block_item.section_color varchar(32) and section_destination_id/name/lat/lng/country with an all-or-nothing check (ck_item_section_destination). The item type is stored as SECTION.
+  validation: A colorId that is not a palette name, or a city with missing or out-of-range coordinates, is rejected with 400.
+  publication: Shared plans publish a section as { type section, name (its title), colorId, city (name only, never coordinates) }. Copying a shared plan keeps the title and colour but not the city.
+  clientGuard: Clients refuse to save a plan with sections (409, local changes kept) until the planner snapshot advertises day-sections-v1, because an older service rejects the unknown item type.
+  rollbackNote: A release older than V23 code cannot read a SECTION row. Rolling back after users have added sections needs those rows removed or the release re-shipped.
 x-navio-implemented-itinerary-times:
   status: Implemented locally (2026-10-14); needs the Trip Planning V19 release before the client relies on it.
   plannerCapability: time-source-v1
@@ -6069,7 +6079,8 @@ components:
           type:
           - string
           - 'null'
-          maxLength: 160
+          pattern: ^[A-Za-z0-9_-]{43}$
+          description: Share token of a plan listed on Explore. Not listed returns 400; Trip Planning unreachable returns 503.
     CommunityVoteRequest:
       type: object
       required:

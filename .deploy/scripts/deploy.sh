@@ -88,6 +88,7 @@ install -m 0644 "${SOURCE_ROOT}/.deploy/postgres/init-keycloak.sql" "${DEPLOY_RO
 install -m 0644 "${SOURCE_ROOT}/.deploy/observability/prometheus.yml" "${DEPLOY_ROOT}/observability/prometheus.yml"
 install -m 0644 "${SOURCE_ROOT}/.deploy/observability/loki-config.yaml" "${DEPLOY_ROOT}/observability/loki-config.yaml"
 install -m 0644 "${SOURCE_ROOT}/.deploy/observability/alloy-config.alloy" "${DEPLOY_ROOT}/observability/alloy-config.alloy"
+install -m 0644 "${SOURCE_ROOT}/.deploy/observability/tempo.yml" "${DEPLOY_ROOT}/observability/tempo.yml"
 install -m 0644 "${SOURCE_ROOT}/.deploy/observability/grafana/datasources.yml" \
   "${DEPLOY_ROOT}/observability/grafana/provisioning/datasources/datasources.yml"
 install -m 0644 "${SOURCE_ROOT}/.deploy/observability/grafana/dashboards.yml" \
