@@ -1,3 +1,8 @@
+## 2026-10-30 - Codex - Investigate photo-credit hydration warning
+
+**Evidence:** User supplied hydration trace in pasted attachment. Attribute mismatch is repeated target _top in pre-hydration DOM versus React expected _blank on destination photo credit/license anchors in PlanCover. App source consistently renders _blank, no _top rewriting found in application folders. Direct localhost3000/explore HTML contains36 target=_blank and zero target=_top, including affected Sydney credit. This points to external browser/preview/extension link rewriting, not prior VM502 outage; exact modifying tool not identified. React hydrateRoot primary documentation confirms identical markup expectation and attribute mismatch may remain unpatched.
+**State:** Asked whether warning occurs in VSCode embedded preview, regularChrome/Edge, or both to isolate environment. No application/configuration changes or warning suppression performed; do not claim fix or blame a specific extension without reproduction. Prior source preserved. Next verify in affected browser versus clean extension-free browser, then target responsible integration/settings if established. VM recovery from preceding entry remains verified.
+
 ## 2026-10-30 - Codex - Recover VM gateway routing with graceful NGINX reload
 
 **Authorization / scope:** User approved command-based recovery, minimizing changes. No application/configuration/schema edits or deployment authorized or performed.
