@@ -16,6 +16,7 @@
 // skipped, so a partial run can simply be re-run.
 
 import { plans } from "./plans.mjs";
+import { completeSample } from "./complete-sample.mjs";
 
 const env = process.env;
 const TRIP_URL = (env.TRIP_URL ?? "http://localhost:8082").replace(/\/$/, "");
@@ -240,17 +241,22 @@ async function seedPlan(plan, index, skipTitles) {
   });
 
   const planner = await trip("GET", `/v1/trips/${created.id}/planner`);
+  if (!planner.capabilities?.includes("publication-sections-v1") || !planner.capabilities?.includes("trip-vehicles-v1")) {
+    throw new Error("Update the backend before creating complete maintained samples.");
+  }
+  const complete = completeSample(plan, { ...planner, blocks });
   const saved = await trip("PUT", `/v1/trips/${created.id}/planner`, {
     version: planner.version,
-    blocks,
-    budget: planner.budget ?? undefined,
+    blocks: complete.blocks,
+    budget: complete.budget,
+    energyState: complete.energyState ?? undefined,
   });
 
   const publish = (expectedTripVersion) =>
     trip("PUT", `/v1/trips/${created.id}/publication`, {
       expectedTripVersion,
       expectedRevision: null,
-      options: { includeDates: false, includeNotes: true, includeBudget: false },
+      options: complete.options,
       listInExplore: true,
       authorDisplayName: AUTHOR,
       title: plan.title,

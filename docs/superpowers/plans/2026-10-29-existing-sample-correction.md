@@ -1,0 +1,11 @@
+# Existing Shared Plan sample correction
+
+User clarification is binding: update maintained existing Navio Team samples in place, and use the complete structure for future requested samples. Preview is an optional developer tool, never delivery or a prerequisite. Keep itinerary/place identities, public links, engagement and original source content; never alter unrelated travelers. Garage only where EV applies. Defer visual fixes.
+
+1. Add a tested complete-source builder to existing seed maintenance tooling: authored introduction from existing route/notes, ordered mixed My List, illustrative budget where absent, real pinned catalogue EV setup for designated EV examples. No synthetic charger or invented provider facts.
+2. Use the builder for newly seeded plans and add an explicit dry-run-default updater for exact manifest titles owned by dedicated Navio Team, checking byline/active publication. Read/merge/save/republish via existing APIs with versions and existing token. Verify reload/public selected sections. Refuse unexpected identities/capabilities and preserve original data.
+3. Run contract regressions for preservation, idempotence, all manifest entries, no unrelated mutation and token/option preservation. Prepare VM command. Apply only through trusted private maintenance network; current configured SSH rejects authentication, so live update remains pending connection access.
+4. Update handoff/standards so no future agent substitutes preview copies for actual examples. No UI/visual changes and no automatic production deployment.
+
+
+Outcome: completed all4 steps. User provided authenticated VS Code Remote SSH terminal; no access configuration changed. Maintenance scripts59e893a/00b6a2b pushed dev only.10 local tests/6 VM tests pass; corrected rejected transport category to transit with real backend contract regression, no partial write. Dry-run30ready,2canaries+28updated. Backups retained on VM. Private comparison verified original itinerary blocks and tokens for all30. Independent public check31same links/30complete/2EVGarages/1unrelated unchanged; no metrics reset or duplicate preview data. No root main push, redeploy or UI edits this task. Actual Explore samples are now the review target.

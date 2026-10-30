@@ -59,3 +59,36 @@ does per result) on the production Google key.
 
 Sign in as the seed account and use Stop sharing or delete the trips; deleting a
 trip cascades its publication.
+
+
+## Complete maintained sample standard (2026-10-29)
+
+The actual Explore samples are the deliverable. `/preview/shared-plan` is only an optional developer tool; its separate Kyoto fixtures and creation button do not update this collection and are not required for review.
+
+New runs now save and publish Starting Part, an ordered mixed My List (note, checklist and a saved reference), itinerary and budget together. Existing route content is reused, never invented from a preview. The two designated EV examples also include an actual Navio catalogue model as trip-scoped Garage data; other examples remain non-EV. Budget allowances are explicitly illustrative, not quoted prices. Existing real charger stops are preserved; no synthetic charger is added. Future requested examples must follow this complete-source standard.
+
+### Upgrade the existing Navio Team samples in place
+
+`update-existing.mjs` is dry-run by default. It checks exact manifest titles within the known dedicated Team owner, and only updates active, listed publications with the Navio Team byline. It never creates/deletes trips, overwrites itinerary identities, changes the public link, or revives revoked shares. Original snapshots/options are backed up with private filesystem permissions before each save. It uses expected trip versions and publication revisions and stops on error; rerunning merges additions without duplicating them.
+
+Run inside the VM's existing private network using an already installed Node-capable web image. Download/copy this seed folder to a new maintenance directory first. Do not expose internal API ports or change SSH settings.
+
+```sh
+# From a maintenance directory containing this folder's scripts:
+umask 077
+mkdir -p backups
+IMAGE=$(docker inspect -f '{{.Config.Image}}' navio-navio-web-1)
+docker run --rm --network navio-backend \
+  -v "$PWD:/seed:ro" -v "$PWD/backups:/backups" -w /seed \
+  -e BACKUP_DIR=/backups --entrypoint node "$IMAGE" update-existing.mjs
+# Inspect dry-run results, then first apply one canary:
+docker run --rm --network navio-backend \
+  -v "$PWD:/seed:ro" -v "$PWD/backups:/backups" -w /seed \
+  -e BACKUP_DIR=/backups -e APPLY=1 -e ONLY=th-chiang-mai \
+  --entrypoint node "$IMAGE" update-existing.mjs
+# After checking the existing link, repeat without ONLY for all maintained samples.
+```
+
+There are 30 definitions in this original manifest; any unrelated 31st feed record must remain untouched. Missing/ambiguous/unlisted records are reported and skipped. Backups contain private owned trip data and stay on the VM; do not commit or publish them. If a save succeeds but publication fails, the prior public snapshot stays intact; use the retained backup and rerun after resolving the reported error. Never bypass an ownership/revision check.
+
+Verification: `node --test .deploy/scripts/seed-explore/*.test.mjs` from the repository root covers preservation/idempotence, all definitions, real pinned catalogue identity, non-EV/EV future seed publication, dry-run, same-link updates and unrelated/revoked account guards.
