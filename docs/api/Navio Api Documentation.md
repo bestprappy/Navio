@@ -3274,3 +3274,8 @@ Transit route choices also compare earlier alighting followed by walking, using 
 ## Implemented user guides (2026-10-13)
 
 Every authenticated traveler can manage their own guides through `/v1/users/me/guides` (list/create/detail/update/publish/unpublish/delete). Drafts are private; ownership mismatches return 404 and every mutation uses `expectedVersion`. Anonymous discovery at `/v1/traveler-guides` searches the complete published library by title, destination or country and supports exact city, country and provider/destination filters. Published cards include author public profile IDs, display names, avatar media IDs and place counts; documents load on demand. Author fields never include emails or authentication subjects. These routes are separate from admin guides, which retain their existing itinerary placement. See [user-guides.md](user-guides.md) and the OpenAPI paths for request/response details.
+
+
+## Saved content library (2026-10-29; VM release pending)
+
+Private account bookmarks, canonical Place saves and verified Shared Plan references, paged search/Recents and seven-day recovery are implemented. See [Saved content API](saved-content.md) for endpoints, quotas, source validation, legacy personal-anchor integration and the compatible saved-location append contract. Guide saving and social engagement remain separate backlog.
