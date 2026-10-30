@@ -1,3 +1,11 @@
+## 2026-10-30 - Codex - CS D-Day A1 poster concept
+
+**User request:** Poster first for exhibition; A1 portrait 594x841mm, current project facts, light Navio palette, relaxed premium travel style, required architecture/tools/team/advisor/voting. Sticker later. User supplied portfolio URL https://seniorproject.sit.kmutt.ac.th/showproject/CS66-BU75; web tool could not open it, voting behavior not independently verified.
+
+**Delivered:** Built-in imagegen concept copied to output/poster/Navio_CS_DDay_A1_Concept_v1.png (1054x1492). Exact-size one-page A1 draft PDF plus deterministic vector QR from ReportLab, reusable SVG and rendered PNG preview. PDF page dimensions and QR annotation destination verified; render inspected. README records generation brief and limitations. No app changes, dependency installs or deployment. Existing frontend edits preserved.
+
+**Review limitations / next:** This is concept approval, NOT print-ready: raster ~45dpi at A1, central UI illustrative, generated architecture arrows need precise redraw, actual logo/screenshot and vector typography needed before print; advisor/team spelling and actual voting workflow need confirmation. Read README. No invented AI claims or excluded editorial feature. Two-page profile not changed; sticker not started. Mandatory notes committed docs branch merged dev locally only; no push.
+
 ## 2026-10-30 - Codex - Restore insertion gaps and full shared introduction
 
 **User decision:** Prioritize our animated between-card + insertion controls; retain friend's My List rework, Before you go placement and itinerary controls. Shared-plan introduction opens in full by default. No broad revert.
