@@ -94,6 +94,92 @@ otelcol.exporter.otlp "tempo" {
 }
 
 // ============================================================================
+// Resources: host (node) + containers (cAdvisor) -> Prometheus remote write
+// ============================================================================
+// Spring actuator metrics only cover the JVM services and only the heap part
+// of their memory. These add the VM itself and every container's real memory
+// against its mem_limit, for the Navio Infrastructure dashboard.
+//
+// Containers come from the standalone cadvisor service, not Alloy's built-in
+// prometheus.exporter.cadvisor: the cAdvisor bundled in Alloy v1.12 predates
+// support for Docker's containerd image store (the VM's storage driver is
+// overlayfs / io.containerd.snapshotter.v1) and fails to register any
+// container. Revisit once Alloy ships cAdvisor v0.54 or later.
+
+prometheus.exporter.unix "host" {
+	procfs_path = "/host/proc"
+	sysfs_path  = "/host/sys"
+	rootfs_path = "/host/root"
+
+	// netdev is left out: it would read Alloy's own network namespace, not
+	// the host's. Per-container network comes from cAdvisor instead.
+	set_collectors = ["cpu", "diskstats", "filesystem", "loadavg", "meminfo", "pressure", "stat", "vmstat"]
+
+	filesystem {
+		fs_types_exclude     = "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|erofs|sysfs|tmpfs|tracefs)$"
+		mount_points_exclude = "^/(dev|proc|run|sys|snap|var/lib/docker/.+|var/lib/containerd/.+)($|/)"
+	}
+}
+
+prometheus.scrape "resources" {
+	targets         = array.concat(prometheus.exporter.unix.host.targets, [{"__address__" = "cadvisor:8080"}])
+	scrape_interval = "15s"
+	forward_to      = [prometheus.relabel.resources.receiver]
+}
+
+prometheus.relabel "resources" {
+	// Keep only what the Navio Infrastructure dashboard reads. cAdvisor and
+	// the node exporter emit several thousand series otherwise.
+	rule {
+		source_labels = ["__name__"]
+		regex         = "node_(cpu_seconds_total|memory_(MemTotal|MemAvailable|MemFree|Buffers|Cached|SwapTotal|SwapFree)_bytes|load(1|5|15)|filesystem_(size|avail)_bytes|disk_(read_bytes|written_bytes|io_time_seconds)_total|vmstat_(oom_kill|pswpin|pswpout)|pressure_(cpu|memory|io)_waiting_seconds_total|pressure_(memory|io)_stalled_seconds_total|boot_time_seconds)|container_(cpu_usage_seconds_total|memory_(working_set|rss|cache|swap)_bytes|spec_memory_limit_bytes|oom_events_total|network_(receive|transmit)_bytes_total|fs_(reads|writes)_bytes_total|start_time_seconds)"
+		action        = "keep"
+	}
+
+	// cAdvisor also reports the root cgroup, which has no container name.
+	rule {
+		source_labels = ["__name__", "name"]
+		regex         = "container_.+;"
+		action        = "drop"
+	}
+
+	// cadvisor only exports the Compose service label (see its command in
+	// compose.production.yml). As `service` it matches the label Prometheus
+	// puts on the actuator scrapes, so container and JVM series join.
+	rule {
+		source_labels = ["container_label_com_docker_compose_service"]
+		target_label  = "service"
+	}
+
+	// Without the cgroup id a recreated container continues the same series,
+	// so a restart shows up as a change in container_start_time_seconds.
+	rule {
+		regex  = "container_label_com_docker_compose_service|id|image"
+		action = "labeldrop"
+	}
+
+	// The exporters' default instance is Alloy's container hostname, which
+	// changes every time Alloy is recreated.
+	rule {
+		target_label = "instance"
+		replacement  = "navio-vm"
+	}
+
+	forward_to = [prometheus.remote_write.prometheus.receiver]
+}
+
+prometheus.remote_write "prometheus" {
+	external_labels = {
+		cluster     = "navio",
+		environment = "production",
+	}
+
+	endpoint {
+		url = "http://prometheus:9090/api/v1/write"
+	}
+}
+
+// ============================================================================
 // Alloy Server Configuration
 // ============================================================================
 

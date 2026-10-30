@@ -386,6 +386,9 @@ services:
   prometheus:
     image: prom/prometheus:v3.14.0
     restart: unless-stopped
+    labels:
+      # Digest of the mounted config, set by deploy.sh so a change recreates it.
+      io.navio.config-revision: ${NAVIO_PROMETHEUS_CONFIG_REVISION:-unversioned}
     mem_limit: 400m
     networks:
       - backend
@@ -414,6 +417,9 @@ services:
   loki:
     image: grafana/loki:3.6.4
     restart: unless-stopped
+    labels:
+      # Digest of the mounted config, set by deploy.sh so a change recreates it.
+      io.navio.config-revision: ${NAVIO_LOKI_CONFIG_REVISION:-unversioned}
     mem_limit: 350m
     networks:
       - backend
@@ -437,6 +443,9 @@ services:
   tempo:
     image: grafana/tempo:2.8.2
     restart: unless-stopped
+    labels:
+      # Digest of the mounted config, set by deploy.sh so a change recreates it.
+      io.navio.config-revision: ${NAVIO_TEMPO_CONFIG_REVISION:-unversioned}
     mem_limit: 384m
     networks:
       - backend
@@ -460,6 +469,9 @@ services:
   grafana:
     image: grafana/grafana:12.3.2
     restart: unless-stopped
+    labels:
+      # Digest of the mounted config, set by deploy.sh so a change recreates it.
+      io.navio.config-revision: ${NAVIO_GRAFANA_CONFIG_REVISION:-unversioned}
     mem_limit: 300m
     networks:
       - backend
@@ -506,6 +518,9 @@ services:
   alloy:
     image: grafana/alloy:v1.12.2
     restart: unless-stopped
+    labels:
+      # Digest of the mounted config, set by deploy.sh so a change recreates it.
+      io.navio.config-revision: ${NAVIO_ALLOY_CONFIG_REVISION:-unversioned}
     mem_limit: 250m
     networks:
       - backend
@@ -519,8 +534,48 @@ services:
       - ./observability/alloy-config.alloy:/etc/alloy/config.alloy:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - alloy-data:/var/lib/alloy/data
+      # Host resource metrics (prometheus.exporter.unix), all read-only.
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/host/root:ro,rslave
     healthcheck:
       test: ["CMD", "/bin/alloy", "--version"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # Per-container CPU, memory against mem_limit, network and disk I/O for the
+  # Navio Infrastructure dashboard. Alloy scrapes it and remote-writes to
+  # Prometheus. v0.54+ is required: older cAdvisor cannot read containers on
+  # Docker's containerd image store, which this VM uses. Not published on any
+  # host port.
+  cadvisor:
+    image: ghcr.io/google/cadvisor:v0.60.6
+    restart: unless-stopped
+    mem_limit: 128m
+    networks:
+      - backend
+    security_opt:
+      - no-new-privileges:true
+    # Reads every container's cgroup; a private cgroup namespace would only
+    # show its own.
+    cgroup: host
+    command:
+      - --docker_only=true
+      - --store_container_labels=false
+      - --whitelisted_container_labels=com.docker.compose.service
+      - --enable_metrics=cpu,diskIO,memory,network,oom_event
+      - --housekeeping_interval=15s
+    volumes:
+      - /:/rootfs:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk:/dev/disk:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /run/containerd/containerd.sock:/run/containerd/containerd.sock:ro
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080/healthz"]
       interval: 15s
       timeout: 5s
       retries: 5
