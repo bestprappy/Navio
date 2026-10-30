@@ -1,3 +1,11 @@
+## 2026-10-31 - Codex - Poster v11 supplied upscales and feature/mascot polish
+
+**Request:** Replace current screenshots with provided upscales, keep old sizes; flip first goose to left; add graphics, improve feature organization/icons and add pleading vote goose left of voting QR.
+
+**Changes / files:** output/poster/Navio_A1_v11.html, export/verification scripts, README-v11.md; Navio_CS_DDay_A1_v11.pdf, v11.png (300dpi), v11_Preview.png. All 3 provided 4x images copied byte-for-byte into new assets. Printed sizes unchanged. Pointing goose flipped/moved left; feature text benefit/capabilities hierarchy, 3 matching SVG icons, accent line; core-flow/service-owned-data caption. Transparent pleading-eye goose generated from original goose reference, outside QR areas with Please vote for us! text. Existing sticker/layout versions untouched.
+
+**Verified:** Exact A1 one-page PDF, embedded fonts/required text; no section overflow/overlap/footer clipping. Three screenshot printed size pairs exactly equal v10 and every embedded decoded RGB image equals supplied upscale. Two57mmQRs/URL annotations retained. Final PDF render inspected; PNG7016x9934/300dpi generated. PDF about72MB to preserve high-resolution screenshots losslessly. No app changes/pull/push/deploy. Existing client edits and service logs preserved. Physical scan/advisor review not claimed. Notes committed on docs branch, merged local dev only.
+
 ## 2026-10-31 - Codex - Poster v10 richer review version
 
 **Request:** User asked for a little more information, more mascots/design and distinctive identity. Created separate v10 review version, retaining the versioned v9 artifacts unchanged for comparison.
