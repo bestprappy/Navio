@@ -1,3 +1,11 @@
+## 2026-10-31 - Codex - Poster v12 mascot correction and QR-level callout
+
+**Request:** User clarified first duck meant top map-reading goose; revert unintended pointing/camera moves. Pleading duck beside voting QR at same level, shift website QR left. Headline box opaque-left to transparent-right. Icons immediately after titles.
+
+**Changes:** Separate output/poster/Navio_A1_v12.html and v12 PDF/preview/300dpi PNG. Restored pointing duck right/orientation/original size (slightly lower to clear feature panel), camera v10 position/size. Intended map duck mirrored/moved left below laptop caption. Footer columns rearranged: website QR38mmleft, pleading duck between QRs; voting QR horizontal position retained, both57mm. Headline CSS gradient, adjacent feature icons. No regenerated assets; v11 upscales/printed screenshot sizes preserved. README-v12 documents specifics.
+
+**Checks:** Exact A1 single page/fonts/content, browser no overflow/section overlap/footer clipping, rendered visual review, preserved screenshot size/pixel checks and two QR links; 300dpi PNG export. No app changes/pull/push/deploy, existing client edits/service logs preserved. User review/physical scan/advisor approval not claimed. Notes docs branch -> localdev only.
+
 ## 2026-10-31 - Codex - Poster v11 supplied upscales and feature/mascot polish
 
 **Request:** Replace current screenshots with provided upscales, keep old sizes; flip first goose to left; add graphics, improve feature organization/icons and add pleading vote goose left of voting QR.
