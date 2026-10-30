@@ -47,6 +47,53 @@ loki.write "default" {
 }
 
 // ============================================================================
+// Traces: services -> Alloy (Zipkin) -> Tempo (OTLP)
+// ============================================================================
+// Services keep their Zipkin exporter. Prometheus scrapes and container health
+// checks hit /actuator on every service, and each of those requests starts its
+// own trace. Left in, they draw a fake "user -> <service>" edge for every
+// service on the service graph, so they are dropped here before Tempo sees them.
+
+otelcol.receiver.zipkin "services" {
+	endpoint = "0.0.0.0:9411"
+
+	output {
+		traces = [otelcol.processor.filter.probes.input]
+	}
+}
+
+otelcol.processor.filter "probes" {
+	error_mode = "ignore"
+
+	traces {
+		span = [
+			`IsMatch(name, "^http [a-z]+ /actuator")`,
+			`attributes["uri"] != nil and IsMatch(attributes["uri"], "^/actuator")`,
+		]
+	}
+
+	output {
+		traces = [otelcol.processor.batch.traces.input]
+	}
+}
+
+otelcol.processor.batch "traces" {
+	output {
+		traces = [otelcol.exporter.otlp.tempo.input]
+	}
+}
+
+otelcol.exporter.otlp "tempo" {
+	client {
+		endpoint = "tempo:4317"
+
+		tls {
+			insecure = true
+		}
+	}
+}
+
+// ============================================================================
 // Alloy Server Configuration
 // ============================================================================
 

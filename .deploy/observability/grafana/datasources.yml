@@ -23,22 +23,29 @@ datasources:
     jsonData:
       # Spring Boot prefixes every log line with [<app>,<traceId>,<spanId>] once
       # a tracer is on the classpath, so the trace id can be lifted straight out
-      # of the log text and turned into a link into Zipkin. The doubled $$ is
+      # of the log text and turned into a link into Tempo. The doubled $$ is
       # Grafana provisioning escaping — a single $ would be read as an env var
       # and interpolated away before Grafana ever sees the field.
       derivedFields:
         - name: TraceID
           matcherRegex: '\[[^,\]]*,([0-9a-f]{32}),[0-9a-f]{16}\]'
           url: '$${__value.raw}'
-          datasourceUid: zipkin
+          datasourceUid: tempo
 
-  - name: Zipkin
-    uid: zipkin
-    type: zipkin
+  - name: Tempo
+    uid: tempo
+    type: tempo
     access: proxy
-    url: http://zipkin:9411
+    url: http://tempo:3200
     editable: false
     jsonData:
+      # The Service Graph query type reads Tempo's traces_service_graph_*
+      # series from this Prometheus and returns ready-made nodes and edges for
+      # the node graph panel.
+      serviceMap:
+        datasourceUid: prometheus
+      nodeGraph:
+        enabled: true
       tracesToLogsV2:
         datasourceUid: loki
         spanStartTimeShift: -1m
