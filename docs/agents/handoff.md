@@ -1,3 +1,13 @@
+## 2026-10-30 - Codex - Restore insertion gaps and full shared introduction
+
+**User decision:** Prioritize our animated between-card + insertion controls; retain friend's My List rework, Before you go placement and itinerary controls. Shared-plan introduction opens in full by default. No broad revert.
+
+**Local changes:** Restored item-insertion.module.css and separate insertion gaps in SortableBlockItems/InsertItemRow: faint idle plus, larger hover/focus/open state, adjacent-card motion, first/last edge handling, top spacing, touch and reduced-motion support. Preserved Saved Places, Start a new section, empty-day insertion, destination bias, EV actions and friend's day-section logic. ReaderIntroduction defaults expanded with fold/reopen retained. Regression tests updated. No My List data, backend, schema, itinerary controls or published examples changed.
+
+**Verification:** Red confirmed first; 574 frontend tests pass, TypeScript and scoped ESLint pass. Isolated headless Chrome verified actual note insertion, neighboring motion, idle/hover dimensions, Saved/section menu, introduction fold/reopen, mobile width and zero runtime page errors. Temporary QA route removed. Evidence output/restore-insertion-intro-*.log, output/restore-insertion-browser.log and restore-ui screenshots. Fixture uses plain HTML-like text only for height testing, not publication data. Signed-in VM data flows not re-exercised by this isolated check.
+
+**State / next:** Client source is local, uncommitted/unpushed for user review; client HEAD35cf53d and live rootmain6a9d7d6 unchanged. Pre-existing tsconfig edit, CLAUDE, source stash and artifacts preserved. Mandatory notes commit on docs branch merged localdev only. Earlier audit did find superseded UI (see previous entry), so do not claim nothing had changed; user has now chosen the two restorations above.
+
 ## 2026-10-30 - Codex - Audit whether pull replaced prior work
 
 **Read-only comparison:** Client8dc522e plus preserved pre-pull stash vs current35cf53d; pulledfb3083b inspected.29of31pending clientfiles byte-identical;2merged files retain Saved features and add marker/intro changes. IAMSaved implementation/V10 preserved, callback/test added; TripHEAD ebb51d4 unchanged. No blanket pending-source overwrite.
