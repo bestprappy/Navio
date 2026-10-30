@@ -1,3 +1,11 @@
+## 2026-10-30 - Codex - Poster v6 laptop and decorative polish
+
+**Request:** User says v5 layout nicely done but bland; add laptop around first screenshot, revise caption and decorate a little while keeping clarity/sharp quality. Preserve approved layout.
+
+**Delivered:** output/poster/Navio_CS_DDay_A1_v6.pdf, v6.png, v6_Preview.png. CSS/SVG graphite laptop with silver base contains exact EV screenshot; no generated/repainted UI. Revised caption Your EV trip, in one workspace. Richer existing coastal art, journey ribbon, caption rules, numbered feature markers and restrained accent/tint details. Three-image positions, simplified architecture/stack, footer/57mmQR and selected sticker retained. README-v6/source scripts saved.
+
+**Checks / state:** Browser native-image/fit checks and one-page exact594x841mm embedded-font PDF verification pass; preview visually inspected. Final PNG rendered from normalized PDF at300dpi; original EV screenshot hash reconfirmed. Design/ advisor acceptance and physical QR scan pending. No app edit/pull/deploy; existing pending source preserved. Mandatory notes committed docsbranch merged localdev only.
+
 ## 2026-10-30 - Codex - Poster v5 follows user's sketch and exact new screenshots
 
 **Request:** User sketched layout: compact full header; large EV screenshot left, smaller transit and Shanghai guide stacked right; Planner/Explore/Community explanation row; architecture left and tech stack right; large members/advisor/QR footer. Styling delegated. Three original images subsequently supplied in Downloads/image1/2/3 (names include spaces).
