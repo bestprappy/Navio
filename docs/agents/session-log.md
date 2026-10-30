@@ -1,3 +1,11 @@
+## 2026-10-30 - Codex - Correct poster using authentic Navio assets
+
+**Feedback / correction:** User rejected generated v1 UI/scenery and requested sharp, calm premium styling, fewer glitches, official KMUTT/SIT logos top-left and strictly real website screenshots. Supplied SIT-Logo.zip and screenshots. Rebuilt as deterministic HTML/CSS/SVG -> PDF, not another full imagegen composition. Existing v1 retained as history.
+
+**Artifacts:** output/poster/Navio_CS_DDay_A1_v2.pdf, v2.png and v2_Preview.png; editable Navio_A1_v2.html and export/verification scripts. Official combined logo extracted unchanged, exact Navio SVG paths and actual Plus Jakarta Sans font reused. Main screen captured from real public Sydney shared itinerary at 5400px; user's actual transit/charging screenshots incorporated. No fake UI or generated scenery. Details/provenance in README-v2.md. QR retains supplied portfolio URL. No app code or user data modification.
+
+**Validation / limits:** One-page PDF normalized exactly594x841mm, embedded fonts/selectable text and required IDs/sections checked. Browser no horizontal overflow, main feature/tech/footer boundaries nonoverlapping; final PDF rendered and inspected. Content/voting physical scan and advisor verification still pending; style awaits user review. No source push/deploy; prior planner local changes preserved. Sticker not started. Mandatory docs commit merged localdev only.
+
 ## 2026-10-30 - Codex - CS D-Day A1 poster concept
 
 **User request:** Poster first for exhibition; A1 portrait 594x841mm, current project facts, light Navio palette, relaxed premium travel style, required architecture/tools/team/advisor/voting. Sticker later. User supplied portfolio URL https://seniorproject.sit.kmutt.ac.th/showproject/CS66-BU75; web tool could not open it, voting behavior not independently verified.
