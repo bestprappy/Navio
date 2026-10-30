@@ -1,3 +1,11 @@
+## 2026-10-31 - Codex - Poster v10 richer review version
+
+**Request:** User asked for a little more information, more mascots/design and distinctive identity. Created separate v10 review version, retaining FINAL/v9 unchanged for comparison.
+
+**Changes / files:** output/poster/Navio_CS_DDay_A1_v10.pdf, v10.png (300dpi), v10_Preview.png plus README-v10/source. Added purpose line, transit/guide caption details, database schema context and EV/seasonal-rule technique note. Two new transparent map-reading/camera goose assets generated with built-in imagegen from existing goose reference; placed in open margins, alongside restrained photo-corner accents. Original sticker/screenshots/QRs untouched.
+
+**Verified:** Browser screenshot dimensions/section fit/footer bounds and exact594x841mm one-page embedded-font PDF checks pass; final render inspected. EV image decoded pixels exactly match source; both QR URLs retained. Separate300dpi image generated, existing FINAL retained. User review/physical scan/advisor approval not claimed. No app edits/pull/deploy; pending source preserved. Mandatory notes docsbranch merged localdev only.
+
 ## 2026-10-30 - Codex - Final deadline detail addition v9
 
 **User:** Three minutes before submission, requested little-to-moderate extra information without losing clarity. Added one concise line per feature (checklists, seasonal discovery/editable copy, community posts/comments/photos) and short responsibility labels under four services. No layout/image/QR changes.
