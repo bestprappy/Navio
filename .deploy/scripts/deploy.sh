@@ -215,6 +215,10 @@ reload_edge_proxy() {
   # re-reads stale configuration. Compare what the container actually has
   # against what was just installed, and recreate it when they differ. The same
   # cmp also covers the container being absent on a first deploy.
+  #
+  # start_application_stack leaves NGINX out, so apply any change to its own
+  # Compose definition here, without waiting on its gateway-dependent probe.
+  compose up -d --no-deps nginx
   if compose exec -T nginx cmp -s /etc/nginx/conf.d/default.conf - \
     < "${DEPLOY_ROOT}/nginx/navio.conf"; then
     compose exec -T nginx nginx -t
@@ -222,6 +226,33 @@ reload_edge_proxy() {
   else
     compose up -d --force-recreate --no-deps nginx
   fi
+}
+
+start_application_stack() {
+  # Wait on everything except NGINX. Its health probe goes through the gateway,
+  # so it stays unhealthy until reload_edge_proxy points it at the recreated
+  # containers. Including it here deadlocks every later deploy and rollback once
+  # one failed attempt has left it unhealthy: Compose gives up on the first
+  # unhealthy container before the reload can ever run.
+  local services
+  mapfile -t services < <(compose config --services | grep -vx nginx)
+  compose up -d --remove-orphans --wait --wait-timeout 420 "${services[@]}"
+}
+
+wait_for_edge_proxy() {
+  local attempt
+  local container_id
+  local health
+
+  container_id="$(compose ps -q nginx)"
+  for ((attempt = 0; attempt < 30; attempt++)); do
+    health="$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{end}}' \
+      "${container_id}" 2>/dev/null || true)"
+    [[ "${health}" == "healthy" ]] && return 0
+    sleep 3
+  done
+  echo "NGINX did not become healthy after reloading its upstreams." >&2
+  return 1
 }
 
 verify_authjs_keycloak_start() {
@@ -307,6 +338,7 @@ NODE
 deployment_diagnostics() {
   local container_id
   local health
+  local restarts
   local service
   local state
 
@@ -321,7 +353,11 @@ deployment_diagnostics() {
     health="$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}' \
       "${container_id}" 2>/dev/null || true)"
 
-    if [[ "${state}" != "running" || "${health}" == "unhealthy" ]]; then
+    restarts="$(docker inspect --format '{{.RestartCount}}' "${container_id}" 2>/dev/null || true)"
+
+    # A crash-looping service is often back in "starting" by the time this
+    # runs, so a restart count is the only trace that it failed.
+    if [[ "${state}" != "running" || "${health}" == "unhealthy" || "${restarts:-0}" != "0" ]]; then
       echo "Diagnostics for ${service} (state=${state:-unknown}, health=${health:-unknown}):" >&2
       docker inspect --format '{{json .State}}' "${container_id}" >&2 || true
       compose logs --no-color --tail 200 "${service}" >&2 || true
@@ -343,10 +379,10 @@ rollback() {
     echo "Deployment failed; rolling back to ${previous_tag}." >&2
     cp "${PREVIOUS_ENV_FILE}" "${ENV_FILE}"
     chmod 0600 "${ENV_FILE}"
-    if ! compose up -d --remove-orphans --wait --wait-timeout 420; then
+    if ! start_application_stack; then
       echo "Rollback did not restore a healthy stack." >&2
       deployment_diagnostics
-    elif ! reload_edge_proxy; then
+    elif ! reload_edge_proxy || ! wait_for_edge_proxy; then
       echo "Rollback restored the stack, but NGINX could not reload its upstream addresses." >&2
       deployment_diagnostics
     fi
@@ -386,9 +422,10 @@ if grep -Eq '^COMMUNITY_S3_ENDPOINT=http://community-storage:9000[[:space:]]*$' 
   "${storage_compose[@]}" run --rm --no-deps community-storage-init
 fi
 
-compose up -d --remove-orphans --wait --wait-timeout 420
+start_application_stack
 configure_keycloak_authentication
 reload_edge_proxy
+wait_for_edge_proxy
 verify_authjs_keycloak_start
 
 curl --fail --silent --show-error \
