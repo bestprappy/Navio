@@ -1,3 +1,11 @@
+## 2026-10-30 - Codex - Walk-by poster revision v3; sticker settled
+
+**User feedback:** v2 worse for physical A1; must read while walking past, compact explanations, 1-2 website screenshots, larger combined architecture/core stack and technology logos. Friend's dense decorative poster is completeness reference only. User supplied final goose road-trip sticker; leave unchanged.
+
+**Revision:** output/poster/Navio_CS_DDay_A1_v3.pdf, v3.png, v3_Preview.png and editable HTML/scripts. One actual high-resolution Navio shared-itinerary screenshot. Separate original imagegen coastal illustration adds header decoration only, never fake UI. Larger headline/feature/diagram type, three concise feature stories, logo-based core technology architecture with identity/4services/database/maps/media plus deployment/events/observability rail. Verified MinIO S3 integration/current monitoring config, no invented AI. All official institutional artwork retained.
+
+**Checks / state:** One exact594x841mm page, embedded fonts, required content and IDs verified; no horizontal overflow, section boundaries checked, PDF render inspected. Representative core stack, not every dependency; secondary labels/team smaller than core messaging. Print-distance readability/user design approval, advisor verification and physical QR scan remain pending. README-v3.md has asset provenance/generation brief. No application edits or push/deploy; previous pending source preserved. Mandatory notes committed docs branch merged localdev only.
+
 ## 2026-10-30 - Codex - Correct poster using authentic Navio assets
 
 **Feedback / correction:** User rejected generated v1 UI/scenery and requested sharp, calm premium styling, fewer glitches, official KMUTT/SIT logos top-left and strictly real website screenshots. Supplied SIT-Logo.zip and screenshots. Rebuilt as deterministic HTML/CSS/SVG -> PDF, not another full imagegen composition. Existing v1 retained as history.
