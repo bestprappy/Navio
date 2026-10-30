@@ -8,6 +8,8 @@
 
 ## 2026-10-30 - Codex - Condense signed technical profile to two pages
 
+**Follow-up:** User requested date next to signature. Added 30 / 10 / 2026 to existing date blanks only; documents/reports/Navio_Technical_Profile_Signed_Two_Pages_Dated_2026-10-30.pdf. Two-page count and rendered signature/date crop verified. Previous undated PDF retained. This adds user-requested date text; acknowledgment is otherwise unchanged.
+
 **Request:** User reports maximum two pages and professor authorization to shorten student content while retaining his completed review/signature. Supplied signed original PDF and web-converted DOCX in Downloads.
 **Done:** documents/reports/Navio_Technical_Profile_Signed_Two_Pages_2026-10-30.pdf. Condensed six-domain matrix and four reflection answers, retaining all names/IDs and self-ratings. Preserved the whole advisor acknowledgment directly from original PDF as one unchanged vector region, including comments and handwriting. Original files untouched. Kept reviewed-version status claims rather than updating project scope under the signature.
 **Verified:** Exactly two A4 pages; both rendered and visually checked. Advisor region renders pixel-identically at 2x between original and final. Required IDs and advisor text checked. PDF has no cryptographic signature field; visible handwriting preserved. Script/evidence in output/technical-profile-20261030/condense-signed.py and two-page-final-*.png. Native Word preflight unavailable in sandbox; PDF generated directly, web-converted DOCX not used. No app edits, deployment or push. Prior planner work preserved.
