@@ -1,3 +1,8 @@
+## 2026-10-30 - Codex - Confirm Starting Part relocation in pulled planner changes
+
+**User report / finding:** User noticed Add Starting Part missing from My List after pull. Verified clientfb3083b explicitly removed AddStartingPart/StartingPart from my-list-section and replaced with BeforeYouGoSection in planner-detail above Explore, using Add note under Before you go. Existing starting-part-* IDs/storage path retained; no blanket data deletion in this diff. Earlier assurance that pulled changes only added deployment fixes was too broad: planner changes were integrated in the earlier release batch, not the final IAM recovery pull. Explain that distinction candidly.
+**State:** Read-only source/history check; no UI reversion or app modification yet. User's original approved placement was My List; await their desired next adjustment rather than silently undoing teammate changes. Existing local files preserved. Mandatory notes committed docs branch/dev only.
+
 ## 2026-10-30 - Codex - Verify friend's successful corrected production release
 
 **User:** Asked to try again after friend fixed deployment. Fetched latest state first; no duplicate retry or deployment initiated. Corrected rootmain6a9d7d6549271759f540ddfeda2dfde8bf641b2c already deployed successfully in run41061525842; all13jobs success including revision gate, PostgreSQL gate, all10images and VM deployment. Latest original Saved client35cf53d retained, server8ca38f6, IAM76077eb, Tripebb51d4.
