@@ -1,3 +1,11 @@
+## 2026-10-30 - Codex - Final A1 poster v8; two QRs, headline, goose and safe image export
+
+**User steering / deadline:** Compact IDs/advisor left; keep voting QR in place; add website QR. Larger headline protected from scenery, goose-sticker-inspired accent/middle decoration. Then slightly open upper/middle word spacing, improve screenshot safely without regeneration, 10minute deadline, bold QR calls to action. Explained steering mid-task is fine; user was viewing small v6 Preview.png.
+
+**Delivered:** output/poster/Navio_CS_DDay_A1_FINAL.pdf and FINAL.png (7016x9934,300dpi), FINAL_Preview.png. Source Navio_A1_v8.html (v7 retained). Two57mmQRs with bold blue-highlighted Visit our website! / Vote for NAVIO; website encodes https://navio.sit.kmutt.ac.th/ and voting retains supplied portfolio URL. Footer columns compacted; headline~32%larger with pale backdrop and stronger contrast. Separate transparent goose generated from supplied final sticker reference, original sticker untouched; restrained dotted-trail/speech accent in existing gap. Word spacing +.45mm body /+.7mm headline. README-FINAL records provenance/limits.
+
+**Safe quality diagnosis / checks:** CSS laptop drop-shadow filter flattened screenshot into4474x2353composite. Removed filter (kept local frame shadow) so PDF directly embeds original1860x875. Decoded PDF image RGB pixels exactly equal original via ImageChops; no AI UI changes/upscaling/sharpening. Browser native screenshot/section bounds/no footer clipping and one-page exact594x841mm embedded-font checks pass. Both PDF link destinations verified. Final preview visually inspected; 300dpi image rendered from normalized PDF. Advisor approval/phone scan not claimed. No app changes/pull/deploy. Mandatory notes committed docsbranch merged localdev only.
+
 ## 2026-10-30 - Codex - Poster v6 laptop and decorative polish
 
 **Request:** User says v5 layout nicely done but bland; add laptop around first screenshot, revise caption and decorate a little while keeping clarity/sharp quality. Preserve approved layout.
