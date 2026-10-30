@@ -6,6 +6,13 @@
 
 **Validation / context:** Real image dimensions checked in browser, no horizontal overflow or major-section overlap, no clipped footer. One-page exact594x841mm PDF, embedded fonts and required content verified; rendered preview and technical detail inspected. User/ advisor design-content acceptance and printed QR scan pending. Chat-inline originals initially inaccessible to builder; desktop retrieval failed (node_repl CreateProcessWithLogonW2 / CUA native pipe absent); resolved by user's supplied file paths, no further retrieval needed. Initial clearly labelled geometry placeholders were internal only and removed from actual-image check. No app edit, pull or deployment; pending client source preserved. Local rootdev diverges from origindev, do not automatically pull for artifact work. Mandatory notes committed docsbranch merged localdev only.
 
+## 2026-10-30 - Codex - Condense signed technical profile to two pages
+
+**Request:** User reports maximum two pages and professor authorization to shorten student content while retaining his completed review/signature. Supplied signed original PDF and web-converted DOCX in Downloads.
+**Done:** documents/reports/Navio_Technical_Profile_Signed_Two_Pages_2026-10-30.pdf. Condensed six-domain matrix and four reflection answers, retaining all names/IDs and self-ratings. Preserved the whole advisor acknowledgment directly from original PDF as one unchanged vector region, including comments and handwriting. Original files untouched. Kept reviewed-version status claims rather than updating project scope under the signature.
+**Verified:** Exactly two A4 pages; both rendered and visually checked. Advisor region renders pixel-identically at 2x between original and final. Required IDs and advisor text checked. PDF has no cryptographic signature field; visible handwriting preserved. Script/evidence in output/technical-profile-20261030/condense-signed.py and two-page-final-*.png. Native Word preflight unavailable in sandbox; PDF generated directly, web-converted DOCX not used. No app edits, deployment or push. Prior planner work preserved.
+**Next:** User submits revised PDF; poster work continues independently in other chat.
+
 ## 2026-10-30 - Codex - Poster v4 targeted diagram and footer refinement
 
 **User request:** Fix How it Works arrow/icon/text proportion and placement glitches; enlarge member/advisor/QR inside existing section dimensions. No broader poster redesign.
