@@ -1,3 +1,9 @@
+## 2026-10-31 - Codex - Read-only latest-push audit
+
+**Request:** Did latest push include everything; anything besides poster since then?
+
+**Findings:** Live git ls-remote confirms rootmain6a9d7d6, clientmain35cf53d and servermain8ca38f6. Root origin/main pins exactly those child commits. Since that release, approved restoration of animated between-card plus insertion controls (3 source files including new CSS + regression tests) and full-by-default shared-plan introduction remain local/uncommitted/unpushed. No new backend source changes; two services only untracked logs. Additional local tsconfig build includes/formatting change, poster/report artifacts and mandatory agent-note commits. Explained latest release is not inclusive of the two subsequent frontend restorations. No pull/fetch/merge of app branches, source edits or push performed for audit.
+
 ## 2026-10-31 - Codex - Poster v14 architecture context and heading capitalization
 
 **Request:** A little more System Architecture detail; capitalize Architecture and Stack.
