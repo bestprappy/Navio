@@ -1,3 +1,10 @@
+## 2026-10-31 - Claude - Simpler Keycloak password policy (root .deploy, uncommitted)
+
+**Request:** Change the Keycloak password rule to: at least 8 characters, a mix of upper/lower case, numbers and special characters, where an uppercase letter makes a special character unnecessary. Keep it simple.
+**Done (root working tree, not committed, not released):** `passwordPolicy` in `.deploy/keycloak/navio-realm.json` and the `kcadm update` in `.deploy/scripts/deploy.sh` are now `length(8) and regexPattern((?=.*[a-z])(?=.*[0-9])(?=.*[^a-z0-9]).*) and notUsername and notEmail and passwordHistory(3)` (was `length(12) ...`). Meaning: lowercase + digit + (uppercase OR special). An all-caps password fails (no lowercase). `navio` login theme `messages_en.properties` overrides `invalidPasswordMinLengthMessage` and `invalidPasswordRegexPatternMessage` with plain wording instead of Keycloak's "fails to match regex pattern(s)". Keycloak README policy list updated.
+**Verified:** `bash -n deploy.sh`; regex checked with Python fullmatch (Java `matches()` semantics): Password1, pass@word1, abcdefg1! pass; password1, PASSWORD1, Password, pass1A fail. The regex has no `$` or single quote, so it survives the `bash -euc '...'` wrapper. Not verified: a real Keycloak registration against the new policy.
+**Next:** Commit `.deploy` on a `chore/` branch from dev and release; `deploy.sh` applies the policy on every deploy (the realm JSON only matters on a fresh import). Existing passwords are unaffected; the rule applies at registration and password change.
+
 ## 2026-10-31 - Claude - Palette color picker redesign, per-theme label text, permanent delete (uncommitted)
 
 **Request:** Redesign the admin palette color picker to look like a reference picker (saturation area, eyedropper + hue slider, format menu + channel fields), let admins choose the label text on a color (white in both themes, black in both, or white/black differing per theme), and add a permanent delete for removed colors that reverts everyone's saved uses to the default color. frontend-design skill.
