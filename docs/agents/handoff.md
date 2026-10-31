@@ -1,3 +1,11 @@
+## 2026-10-31 - Codex - Kafka notification design consultation
+
+**Goal:** Explain how Kafka-backed follower notifications can appear while a user is planning, and refine the feature prompt before implementation.
+**Done:** Read architecture sections 4.9 and 8 and inspected the current Community notification controller/service. Recommended cross-service Trip outbox -> Kafka -> Community persisted inbox -> authenticated SSE -> app-wide toast/bell, with same-domain Community notifications created transactionally. Public publish/significant-update events only, no private draft/autosave alerts. SSE is a proposal, not an existing verified capability.
+**Verified:** Repository branches/status checked, including changed services. Local profile-social work already includes notification REST endpoints and a plan-shared announcement endpoint; no SSE/KafkaListener found in the scoped Community/Trip source scan. Consulted MDN EventSource documentation. No runtime tests or production checks for this consultation.
+**Not done / left uncommitted:** No feature implementation requested or performed. Existing profile, palette, deployment, planner, guide, and service changes preserved. Only this session's two agent-note additions committed on a docs branch and merged to local dev; no production deployment.
+**Follow-ups:** User reviews refined requirements. Implementation should inspect concurrent profile-social work, replace reliance on browser-triggered plan announcements with committed backend events, deduplicate per event/recipient, reconcile missed notifications after reconnect, enforce current visibility/block/preferences, and verify delivery through actual proxies without disturbing planner state.
+
 ## 2026-10-31 - Claude - Planner stop cards show full notes when closed (client, uncommitted)
 
 **Request:** On an unselected itinerary stop card, show all of the notes instead of cutting them off with a fade.
