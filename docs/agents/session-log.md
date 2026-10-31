@@ -1,3 +1,11 @@
+## 2026-10-31 - Codex - Full profile and live-notification implementation plan
+
+**Goal:** Write an in-depth root plan.md covering the proposed profile/settings/public-profile/social/privacy/Kafka/SSE feature; explicitly require shadcn/ui, /frontend-design, and frontend color variety. User requested planning only.
+**Done:** Created plan.md with current-working-tree reuse inventory, product defaults, visual/token contract and wireframes, account/Keycloak/media flows, privacy/block/report rules, API/service ownership, additive schema requirements, outbox/consumer/fan-out design, authenticated streaming and recovery, phased tasks, acceptance matrix, and rollout/rollback criteria. Optional EV display and explicit substantial-update announcements included as later phases; closed-app push/email excluded from the initial feature. No application implementation.
+**Verified:** Read frontend-design, client instructions, database/release rules, actual social DTOs/migration/controllers and profile/token configuration. Checked root/client/server/changed-service state; reviewed plan requirements and whitespace. Runtime tests are not applicable to this documentation-only task; no feature is claimed verified/live.
+**Not done / left uncommitted:** Existing application, deployment, palette, profile-social, planner, report and artifact changes preserved. Documentation prepared in an isolated docs/profile-social-plan-2026-10-31 worktree from local dev, then merged to local dev only. No push/deployment. Pull origin dev --ff-only was attempted before commit and refused because remote dev advanced with teammate release/history changes; remote application pin integration was deliberately left outside this planning task.
+**Follow-ups:** User reviews plan.md and explicitly requests implementation before any feature work. Re-audit concurrent profile/social code and remote branch changes at implementation start; do not treat proposed API paths/defaults or uncommitted baseline code as shipped functionality.
+
 ## 2026-10-31 - Codex - Rounded community comment connectors
 
 **Goal:** Match the supplied YouTube-style rounded comment thread reference.
@@ -5,6 +13,7 @@
 **Verified:** Targeted ESLint passed; client diff whitespace check passed. Browser appearance not verified.
 **Left uncommitted:** Client UI change only; unrelated working changes preserved. Root dev sync conflicted in agent notes; the attempted merge was aborted. Notes saved locally; remote reconciliation remains required.
 **Next:** Inspect expanded/nested/collapsed threads in light/dark themes and mobile; commit the client change separately from existing profile/palette work.
+
 ## 2026-10-31 - Codex - Kafka notification design consultation
 
 **Goal:** Explain how Kafka-backed follower notifications can appear while a user is planning, and refine the feature prompt before implementation.
