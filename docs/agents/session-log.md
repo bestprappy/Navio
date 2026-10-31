@@ -1,3 +1,10 @@
+## 2026-10-31 - Claude - Live notifications released (root main 5c29d9f)
+
+**Result:** Run https://github.com/bestprappy/Navio/actions/runs/41216102028 succeeded on every job (revision gate, PostgreSQL schema gate with trip V25 and community V9, all image builds, Deploy to Navio VM, no rollback). Pushed feat -> dev -> main as fast-forwards: community ca13f09, trip a2450b5, server 3878d39, client 3599672, root 5c29d9f (includes the session notes).
+**Checked live (anonymous, pinned CA):** /health, /explore, /v1/shared-plans 200; /v1/trips, /v1/users/me, /v1/notifications/unread-count, /v1/admin/notification-events, /v1/notifications/stream, /api/notifications/stream 401.
+**Still to confirm with a signed-in account:** the stream stays open past NGINX's 65 s timeout (heartbeats), and a followed account's new Explore listing shows a toast within seconds. If hints do not arrive, the bell's 60 s polling still works; see docs/features/live-notifications.md.
+**Open:** IAM OutboxRelay likely fails the same serializer way (see previous entry). Worktrees under `Navio-worktrees/live-notifications/` can be removed.
+
 ## 2026-10-31 - Claude - Live notifications: trip outbox -> Kafka -> Community -> SSE (local commits, not pushed or released)
 
 **Request:** Proceed with docs/agents/notification-plan.md. Phases 2-6 (profiles, follow/block/report, REST inbox) were already live (root main 6d5e7e4), so this session built what remained: Phase 7 (Kafka delivery) and Phase 8 (live delivery).
