@@ -1,3 +1,9 @@
+## 2026-10-31 - Claude - Profile release blocked at the PostgreSQL schema gate (nothing deployed)
+
+**State:** Root main acf6048 run https://github.com/bestprappy/Navio/actions/runs/41205955925 failed in "Verify migrations and entity mappings on PostgreSQL" after 35 s; build and deploy were skipped, so production still runs aaede25. All child repos are already on main (client cec317d, server cbb4c6d, community a338d53, trip ad1be8f, IAM fadacc1), so the previous entry's "Released" applies to git only.
+**Checked:** local trees equal the pinned commits; the CI sequence (fresh shared `tripplanner` PostGIS, local config server, `-Dtest=PostgresSchemaTests` for IAM, trip, mobility, community in that order) passes locally (6/6/1/1). Public annotations only say exit code 1; job logs need a signed-in account.
+**Next:** get the step log tail (job 124551002538), fix the cause, then push a new root main commit. Do not re-run blind.
+
 ## 2026-10-31 - Claude - Released profile redesign, public profiles, following, blocking, reports, notifications
 
 **Request:** Redesign the profile experience end to end (settings, public profiles, follow, privacy/safety, in-app notifications) with backend integration, then commit and deploy.
