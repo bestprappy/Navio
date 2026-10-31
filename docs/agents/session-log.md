@@ -1,3 +1,11 @@
+## 2026-10-31 - Codex - Main release deployed successfully
+
+**Completed:** User-authorized latest push released rootmain aaede25796e269cea9de2cd30452481699de814c with clientmain37663fe61b2789cdc534721f401a85fe23449bfb and unchanged server8ca38f6. Client feature -> dev -> main published; root chore/planner-release-20261031 -> dev -> main published. Includes the two approved UI restorations plus friend's already-merged shareddev monitoring dashboard/config-reload update; no app source overwritten. Root local main lives in another existing worktree, so remote main fast-forwarded from integrated dev without changing that worktree.
+
+**Verified live:** GitHub Actions run41185862707 succeeded, all13jobs including pin gate, real PostgreSQL schema gate, all10image builds (production Next build included) and VM deployment. https://github.com/bestprappy/Navio/actions/runs/41185862707 . Pinned client/certs/navio-vm.pem smoke probes: health200, explore200, shared-plans200, anonymoustrips401. Live main hashes rechecked. Frontend574/574, staged-source TypeScript and scoped ESLint passed before release. Signed-in manual UI acceptance not claimed.
+
+**Remaining local only:** Generated/pre-existing clienttsconfig.json edit, CLAUDE, service logs, poster/report output and other previously untracked local artifacts deliberately excluded. Client source restoration files now clean/committed. Allversioned poster assets remain on disk; no poster artifacts pushed. This completion note goes docsbranch -> dev only, no extra main deployment.
+
 ## 2026-10-31 - Codex - Release planner insertion and shared introduction fixes
 
 **Authorization:** User requested pushing latest work to main. Read release/git rules. Client origin/dev/main35cf53d synchronized before staging; root shareddev integrated (friend's pending infrastructure dashboard/config-revision update preserved unchanged). Only two agent-history conflicts resolved by keeping both histories. No app source conflicts.
