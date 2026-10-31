@@ -1,3 +1,10 @@
+## 2026-10-31 - Codex - Rounded community comment connectors
+
+**Goal:** Match the supplied YouTube-style rounded comment thread reference.
+**Done:** Updated community-comment-thread.tsx: rounded border elbows, sibling-owned vertical rails, replies outside the parent row so its rail ends at the branch, no background masking patches, no dangling rail for collapsed/depth-limited threads. Existing tokens, avatars and controls retained.
+**Verified:** Targeted ESLint passed; client diff whitespace check passed. Browser appearance not verified.
+**Left uncommitted:** Client UI change only; unrelated working changes preserved. Root dev sync conflicted in agent notes; the attempted merge was aborted. Notes saved locally; remote reconciliation remains required.
+**Next:** Inspect expanded/nested/collapsed threads in light/dark themes and mobile; commit the client change separately from existing profile/palette work.
 ## 2026-10-31 - Codex - Kafka notification design consultation
 
 **Goal:** Explain how Kafka-backed follower notifications can appear while a user is planning, and refine the feature prompt before implementation.
