@@ -1,3 +1,11 @@
+## 2026-10-31 - Codex - Poster v14 architecture context and heading capitalization
+
+**Request:** A little more System Architecture detail; capitalize Architecture and Stack.
+
+**Changes:** Separate output/poster/Navio_A1_v14.html and v14 PDF/preview/300dpi PNG. Headings System Architecture and Tech Stack. Added REST API / JWT keys / SQL connection labels plus compact Eureka + Config Server platform-support note (service discovery/configuration). Keycloak wording Sign-in & access tokens. No diagram node geometry or other poster content changes. Deployment workflow/configuration files verified Eureka/Config Server and gateway issuer/JWK settings; no future AI/editorial claims added.
+
+**Verified:** Browser fit/no section overflow/footer clipping; exact594x841mm one-page PDF with embedded fonts/headings/team text. Technical render inspected; source screenshots unchanged, embedded pixel matches/QR links checked and300dpi image rendered. Existing app edits/service logs preserved; no app code changes/pull/push/deploy. Mandatory notes docsbranch -> localdev only. User review/physical scan/advisor approval not claimed.
+
 ## 2026-10-31 - Codex - Poster v13 footer readability and third duck move
 
 **Request:** Larger Members/Advisor text. Restore top map duck to its original location, move/flip third camera duck left. No other changes requested.
