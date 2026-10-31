@@ -1,3 +1,10 @@
+## 2026-10-31 - Claude - Planner stop cards show full notes when closed (client, uncommitted)
+
+**Request:** On an unselected itinerary stop card, show all of the notes instead of cutting them off with a fade.
+**Done (client, current branch `feat/profile-page-rework`, uncommitted, not mixed with that branch's other work):** `trip-place-card.tsx` passes `clamped={false}` to `PlaceNotesPreview` at both closed-card sites (place stops and charger stops), so the 6rem `max-h-24` clamp and mask fade no longer apply. `place-notes.tsx` doc comment updated. Default `clamped = true` is kept for the shared reader's collapsed disclosure preview (`reader-ui.tsx`), which has its own Show/Hide.
+**Verified:** ESLint clean on both files; tsc shows no errors for them; full client suite 591/591 (`node --experimental-transform-types --test "tests/**/*.test.mjs"`). Not checked in a browser (needs a signed-in trip with long notes).
+**Next:** User checks a long-note stop in the planner. Commit on its own `feat/` branch from dev, excluding the profile-rework files.
+
 ## 2026-10-31 - Claude - New guide dialog spacing (client, uncommitted)
 
 **Request:** Fix spacing in the "Where is your guide for?" dialog (frontend-design skill).
