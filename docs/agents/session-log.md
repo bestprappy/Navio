@@ -1,3 +1,13 @@
+## 2026-10-31 - Codex - Release planner insertion and shared introduction fixes
+
+**Authorization:** User requested pushing latest work to main. Read release/git rules. Client origin/dev/main35cf53d synchronized before staging; root shareddev integrated (friend's pending infrastructure dashboard/config-revision update preserved unchanged). Only two agent-history conflicts resolved by keeping both histories. No app source conflicts.
+
+**Frontend:** Client37663fe committed on fix/planner-insertion-intro-release-20261031 -> dev, feature/dev/main pushed. Six approved files only: between-card faint/animated insertion gaps+CSS, full-by-default shared introduction, regression tests. Local generated tsconfig edit and CLAUDE excluded/preserved. No poster/report/log/env artifacts staged.
+
+**Verification:** Isolated staged-source copy, original tracked tsconfig; all574 tests pass with --experimental-transform-types, TypeScript noEmit clean, scoped ESLint clean, diff check clean. Initial test harness issues corrected only in temporary setup (required Node transform flag and sibling server fixture junction), no source edits. All4backend service pins equal live remote main; server8ca38f6 unchanged. Shareddev deployment script bash syntax and dashboard JSON pass; infrastructure files exactly match shareddev, previously VM compose-validated by author.
+
+**Next:** Update root client pin to37663fe on chore branch -> dev -> main, push triggers deployment; monitor Actions and public health. Root main currently6a9d7d6 until release. Do not claim live until deployment verified. Existing source/artifacts preserved.
+
 ## 2026-10-31 - Codex - Read-only latest-push audit
 
 **Request:** Did latest push include everything; anything besides poster since then?
