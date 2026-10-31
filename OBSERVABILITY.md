@@ -216,7 +216,7 @@ Only Grafana is proxied. Prometheus, Loki, and Alloy publish no host ports and a
 |------|---------|
 | `.deploy/observability/prometheus.yml` | Production scrape config — container DNS targets, `environment: production` |
 | `.deploy/observability/loki-config.yaml` | Loki with 14-day retention and compaction enabled |
-| `.deploy/observability/alloy-config.alloy` | Docker-only log collection (no host log directory on the VM) |
+| `.deploy/observability/alloy-config.alloy` | Docker log collection, Zipkin traces to Tempo, and host + cAdvisor resource metrics remote-written to Prometheus |
 | `.deploy/observability/grafana/datasources.yml` | Prometheus + Loki datasources (no Zipkin) |
 | `.deploy/observability/grafana/dashboards.yml` | Read-only dashboard provider |
 
@@ -224,7 +224,7 @@ Alert rules (`prometheus/rules/`) and dashboard JSON (`grafana/dashboards/`) are
 
 ### Resource footprint
 
-The four observability containers add roughly **1.3 GB** of memory limits (Prometheus 400 MB, Loki 350 MB, Grafana 300 MB, Alloy 250 MB) on top of the ~6.1 GB already allocated to the backend services. Confirm the VM has headroom before deploying. Prometheus retains 15 days or 2 GB, whichever comes first; Loki retains 14 days.
+The six observability containers add **1,812 MiB** of memory limits (Prometheus 400, Loki 350, Tempo 384, Grafana 300, Alloy 250, cAdvisor 128) on top of what is allocated to the backend services; see the memory budget in `.deploy/observability/README.md`. Confirm the VM has headroom before deploying. Prometheus retains 15 days or 2 GB, whichever comes first; Loki retains 14 days.
 
 ### Verifying after deploy
 

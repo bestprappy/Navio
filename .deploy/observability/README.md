@@ -12,9 +12,23 @@ If Prometheus reports a down target, inspect that specific service and its `/act
 
 `Navio > Navio Service Graph` (`/grafana/d/navio-service-graph`) draws which service calls which. The path is: services export Zipkin spans to Alloy on `alloy:9411`, Alloy drops `/actuator` probe spans and forwards OTLP to Tempo, and Tempo's metrics generator remote-writes `traces_service_graph_*` and `traces_spanmetrics_*` to Prometheus (`--web.enable-remote-write-receiver`). The node graph panel uses the Tempo datasource's Service Graph query, which reads those series from Prometheus. With 10% sampling, edges need a few minutes of real traffic. The `user` node is where a request entered the system. If the graph is empty but traces exist, run the "Service graph edges" probe in `check-observability.sh`.
 
+## Infrastructure dashboard
+
+`Navio > Navio Infrastructure` (`/grafana/d/navio-infrastructure`) shows VM CPU, memory, swap, disk and pressure (PSI); every container's memory working set against its `mem_limit`, plus CPU, network, disk I/O, restarts and OOM events; how each JVM's heap, non-heap and native memory fit in its container; and per-service request rate and p50/p95/p99 latency.
+
+Host metrics come from Alloy's built-in `prometheus.exporter.unix`, reading the host `/proc`, `/sys` and `/` mounted read-only into Alloy. Container metrics come from the `cadvisor` service, which Alloy scrapes. Both go through one `prometheus.relabel` filter that keeps only the series the dashboard uses (about 300) and maps each container's Compose service name to the `service` label, the same label the actuator scrapes carry. Alloy then remote-writes them to Prometheus.
+
+cAdvisor runs as its own container, not Alloy's `prometheus.exporter.cadvisor`. Docker on the VM uses the containerd image store (`docker info` reports storage driver `overlayfs`, `io.containerd.snapshotter.v1`). The cAdvisor bundled in Alloy v1.12 predates support for it and registers no containers, logging `failed to identify the read-write layer ID`. Standalone cAdvisor v0.54+ supports it, given the containerd socket.
+
+The local stack has no node exporter or cAdvisor, so this dashboard is empty there.
+
+## Config changes on deploy
+
+`deploy.sh` stores a digest of each observability service's mounted config in `.env` (`NAVIO_<SERVICE>_CONFIG_REVISION`), and Compose puts it on the container as the `io.navio.config-revision` label. When a config file changes, the label changes and `compose up` recreates that service. Without it, Prometheus, Loki, Tempo, Grafana and Alloy kept running the previous config after a deploy, because their images are pinned and their single-file mounts stay on the replaced file. New dashboard JSON needs no restart: Grafana rescans `grafana/dashboards/` every minute.
+
 ## Memory budget
 
-The current production Compose limits sum to **9,168 MiB**, including **1,684 MiB** for Prometheus (400), Loki (350), Tempo (384), Grafana (300), and Alloy (250). Persistent community storage adds **384 MiB**, for **9,552 MiB** total, before the host, Docker, runner, and the temporary storage initialization container (128 MiB). These are ceilings, not allocations or measured usage. Optional Compose services may not all be running.
+The current production Compose limits sum to **9,296 MiB**, including **1,812 MiB** for Prometheus (400), Loki (350), Tempo (384), Grafana (300), Alloy (250) and cAdvisor (128). Persistent community storage adds **384 MiB**, for **9,680 MiB** total, before the host, Docker, runner, and the temporary storage initialization container (128 MiB). These are ceilings, not allocations or measured usage. Optional Compose services may not all be running.
 
 The README describes an 8 GB application VM. That does not provide enough RAM for every container to reach its ceiling simultaneously. Use actual `MemAvailable`, swap use, `docker stats`, OOM/restart history and representative traffic before enabling additional services or increasing limits. Do not reduce application heaps blindly to make the arithmetic fit. Monitoring is already declared in the production stack; first establish which services are actually running and consuming memory.
 

@@ -114,6 +114,37 @@ else
   printf '\nNAVIO_KEYCLOAK_THEME_REVISION=%s\n' "${KEYCLOAK_THEME_REVISION}" >> "${ENV_FILE}"
 fi
 
+# Observability configs are bind-mounted, and Compose only recreates a
+# container when its definition or image changes. Their images are pinned, so a
+# config change alone left Prometheus, Loki, Tempo, Grafana and Alloy running
+# the previous config: single-file mounts stay pinned to the old inode that
+# install(1) replaced, and Grafana reads its provisioning only at startup.
+# Each service's io.navio.config-revision label is a digest of what it mounts,
+# so `compose up` recreates exactly the services whose config changed.
+# Grafana's dashboards directory is left out: Grafana rescans it every minute.
+config_revision() {
+  (cd "${DEPLOY_ROOT}" && find "$@" -type f -print0 | sort -z | xargs -0 sha256sum) \
+    | sha256sum | cut -c 1-16
+}
+
+set_env_value() {
+  local variable_name="$1"
+  local value="$2"
+
+  if grep -q "^${variable_name}=" "${ENV_FILE}"; then
+    sed -i "s/^${variable_name}=.*/${variable_name}=${value}/" "${ENV_FILE}"
+  else
+    printf '\n%s=%s\n' "${variable_name}" "${value}" >> "${ENV_FILE}"
+  fi
+}
+
+set_env_value NAVIO_PROMETHEUS_CONFIG_REVISION \
+  "$(config_revision observability/prometheus.yml observability/prometheus/rules)"
+set_env_value NAVIO_LOKI_CONFIG_REVISION "$(config_revision observability/loki-config.yaml)"
+set_env_value NAVIO_TEMPO_CONFIG_REVISION "$(config_revision observability/tempo.yml)"
+set_env_value NAVIO_GRAFANA_CONFIG_REVISION "$(config_revision observability/grafana/provisioning)"
+set_env_value NAVIO_ALLOY_CONFIG_REVISION "$(config_revision observability/alloy-config.alloy)"
+
 compose() {
   docker compose --env-file "${ENV_FILE}" -f "${COMPOSE_FILE}" "$@"
 }
