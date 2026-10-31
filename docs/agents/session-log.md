@@ -1,3 +1,10 @@
+## 2026-10-31 - Claude - New guide dialog spacing (client, uncommitted)
+
+**Request:** Fix spacing in the "Where is your guide for?" dialog (frontend-design skill).
+**Done (`client/app/feature/guides/new-guide-dialog.tsx` only, on the current client branch `feat/profile-page-rework`, uncommitted, not mixed with that branch's other work):** dialog padding 1rem -> 1.5rem with 1.5rem between header, field and footer; close button moved to 1rem from the corner so it lines up with the title; header `pr-8` so text never runs under it. The "private draft" note and the error now sit under the input in the field group (0.5rem apart, note `text-xs`) instead of floating between field and footer. Footer bleed adjusted to match (`-mx-6 -mb-6 px-6 py-4`). The shared `components/ui/dialog.tsx` primitive is untouched (about 20 other dialogs use it).
+**Verified:** tsc shows no errors for the file; ESLint clean. Temporary preview route (deleted) on the user's dev server :3000, Playwright via installed Edge: dark, light and 375px screenshots inspected, no horizontal overflow, no page errors.
+**Next:** Commit with the next client guides/UI change on its own `feat/`/`style/` branch from dev; exclude the profile-rework files.
+
 ## 2026-10-31 - Claude - Simpler Keycloak password policy (root .deploy, uncommitted)
 
 **Request:** Change the Keycloak password rule to: at least 8 characters, a mix of upper/lower case, numbers and special characters, where an uppercase letter makes a special character unnecessary. Keep it simple.
