@@ -34,7 +34,7 @@ spring:
             - id: shared-plans
               uri: http://trip-planning-service:8082
               predicates:
-                - Path=/v1/shared-plans,/v1/shared-plans/{token},/v1/shared-plans/{token}/copies,/v1/shared-plans/{token}/summary
+                - Path=/v1/shared-plans,/v1/shared-plans/{token},/v1/shared-plans/{token}/copies,/v1/shared-plans/{token}/summary,/v1/shared-plans/{token}/pin,/v1/shared-plans/{token}/author,/v1/shared-plans/by-author/{owner}
             - id: user-management-service
               uri: http://user-management-service:8081
               predicates:
@@ -46,7 +46,7 @@ spring:
             - id: community-service
               uri: http://community-service:8084
               predicates:
-                - Path=/v1/community/**,/v1/groups/**,/v1/posts/**,/v1/feed/**,/v1/notifications/**,/v1/media/**
+                - Path=/v1/community/**,/v1/groups/**,/v1/posts/**,/v1/feed/**,/v1/notifications/**,/v1/media/**,/v1/social/**,/v1/reports,/v1/admin/reports,/v1/admin/reports/**
 
 eureka:
   client:
