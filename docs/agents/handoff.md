@@ -1,3 +1,9 @@
+## 2026-10-31 - Claude - Profile release deployed (root main 6d5e7e4)
+
+**Result:** Run https://github.com/bestprappy/Navio/actions/runs/41206926564 succeeded on every job, including Deploy to Navio VM. The first run (acf6048) stopped at the schema gate because trip PostgresSchemaTests still expected 12 upgrade migrations (a Codex edit for its removed V25); fixed in trip 1dffe95, server 6594732. Local runs had passed on a stale `target/` test class: delete `target/` before verifying (the offline clean plugin is broken locally).
+**Checked live:** /health, /explore, /v1/shared-plans 200; /v1/trips, /v1/users/me, /v1/users/by-username/x, /v1/social/settings, /v1/notifications/unread-count, /v1/admin/reports 401; /settings/profile and /u/x redirect to sign-in. Signed-in flows not exercised.
+**Palette session:** rename the uncommitted IAM `V11__palette_text_color_and_deletion.sql` to `V12` before merging.
+
 ## 2026-10-31 - Claude - Profile release blocked at the PostgreSQL schema gate (nothing deployed)
 
 **State:** Root main acf6048 run https://github.com/bestprappy/Navio/actions/runs/41205955925 failed in "Verify migrations and entity mappings on PostgreSQL" after 35 s; build and deploy were skipped, so production still runs aaede25. All child repos are already on main (client cec317d, server cbb4c6d, community a338d53, trip ad1be8f, IAM fadacc1), so the previous entry's "Released" applies to git only.
