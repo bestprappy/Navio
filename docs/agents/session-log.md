@@ -1,3 +1,11 @@
+## 2026-10-31 - Codex - Poster v13 footer readability and third duck move
+
+**Request:** Larger Members/Advisor text. Restore top map duck to its original location, move/flip third camera duck left. No other changes requested.
+
+**Changes:** output/poster/Navio_A1_v13.html and v13 PDF/preview/300dpi PNG plus export/check scripts. Member names6->7.1mm, IDs5.8->6.8mm, advisor7->8.2mm, only team/advisor headings5.8->6.5mm. QR typography unchanged. Map duck restored x339/y349mm,size35x28mm, no flip. Camera duck moved x26/y713mm,size30x31mm, mirrored inward; clear of database and logic note. Previous versions and all other poster content retained.
+
+**Verified:** Layout fit/no overflow/section overlap/footer clipping; exact594x841mm single-page PDF with embedded fonts/required text; final render visually inspected. All3 embedded screenshot pixels equal supplied upscales; QR links retained. PNG7016x9934 at300dpi generated. No app edits/pull/push/deploy; pending client/service state preserved. Notes docs branch -> localdev only.
+
 ## 2026-10-31 - Codex - Poster v12 mascot correction and QR-level callout
 
 **Request:** User clarified first duck meant top map-reading goose; revert unintended pointing/camera moves. Pleading duck beside voting QR at same level, shift website QR left. Headline box opaque-left to transparent-right. Icons immediately after titles.
