@@ -408,7 +408,7 @@ Operational configuration follows the [Confluent KRaft Docker reference](https:/
 | Topic | Producer | Consumers | Examples |
 | --- | --- | --- | --- |
 | `user.events.v1` | User Management | Trip, Community, Mobility & EV | `UserRegistered`, `UserProfileUpdated`, `UserRoleChanged`, `UserSuspended` |
-| `trip.events.v1` | Trip Planning | Community | `TripPublished`, `TripUpdated`, `TripDeleted`, `TripCopied` |
+| `trip.events.v1` | Trip Planning | Community | Implemented: `SharedPlanListed.v1` (a plan became listed on Explore under its owner's name; consumed into follower notifications). Planned: `TripPublished`, `TripUpdated`, `TripDeleted`, `TripCopied` |
 | `community.events.v1` | Community | Notification/audit module | `PostCreated`, `CommentCreated`, `ReplyCreated`, `PostReported` |
 | `mobility.events.v1` | Mobility & EV | Community/admin consumers | `ChargerSubmitted`, `ChargerVerified`, `ChargerStatusChanged` |
 

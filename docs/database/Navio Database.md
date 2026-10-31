@@ -947,6 +947,10 @@ Transactional outbox for trip events.
 | `last_error`       |         `TEXT` |       No | Last publishing error                     |
 | `created_at`       |  `TIMESTAMPTZ` |      Yes | Creation time                             |
 
+### As implemented (trip V25, 2026-10-31)
+
+`V25__trip_events_outbox.sql` differs from the target above: `id` is the event id (no separate `event_id`), `attempt_count` and `next_attempt_at` replace `published`/`publish_attempts` (unpublished means `published_at IS NULL`), and there is no `headers_jsonb` (the trace id travels in the payload). Indexes: pending scan `(next_attempt_at, created_at) WHERE published_at IS NULL`; retention sweep `(published_at) WHERE published_at IS NOT NULL`. Published rows are kept 14 days so an operator can replay with the original id by setting `published_at = NULL`. Only `SharedPlanListed.v1` is produced today.
+
 ---
 
 # 8. `iam` Schema Design
@@ -1688,6 +1692,10 @@ Deduplicates Kafka events consumed by notification workers.
 | `processed_at`  |  `TIMESTAMPTZ` |      Yes | Processing time   |
 
 Primary key: `(event_id, consumer_name)`
+
+### As implemented (community V8 and V9)
+
+Implemented tables differ from 12.1-12.4: `notif.preferences` (per-type booleans) and `notif.notifications` (type, actor, post or plan subject, `dedupe_key` unique per recipient) come from V8. V9 adds `notif.processed_events` (primary key `(consumer, event_id)` with `event_type`, `outcome`, `processed_at`; the consumer is `community-notifications`) in place of `consumed_events`, and `notif.quarantined_events` (raw record, topic/partition/offset unique, error, replay time and outcome) for events that failed after retries. There is no `delivery_log`: only in-app delivery exists.
 
 ---
 

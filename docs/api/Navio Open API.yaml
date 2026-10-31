@@ -4207,6 +4207,96 @@ paths:
         schema:
           type: string
         description: id path parameter
+  /v1/notifications/stream:
+    get:
+      tags:
+      - Community Service
+      summary: Live inbox hints (Server-Sent Events)
+      description: >-
+        Opens a text/event-stream for the caller only; the recipient is the validated
+        token subject and no parameter can name anyone else. Frames carry no
+        notification content: `ready` on connect (reconcile the inbox through the REST
+        API), `inbox.changed` with `{"kind":"created"|"removed"}`, `read-state.changed`
+        with `{"kind":"read_state"}`, and a `:hb` comment every 25 s. The stream ends
+        when the access token expires (at most 30 minutes) and nothing is replayed;
+        clients reconcile on every `ready`. Browsers use the same-origin proxy
+        `/api/notifications/stream` because EventSource cannot send a bearer token.
+      operationId: getNotificationsStream
+      responses:
+        '200':
+          description: Event stream; `Cache-Control: no-store`, `X-Accel-Buffering: no`.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '503':
+          description: This instance holds its maximum number of streams. Empty body, `Retry-After` header.
+  /v1/admin/notification-events:
+    get:
+      tags:
+      - Community Service
+      summary: List quarantined notification events
+      description: >-
+        trip.events.v1 records the notification consumer could not handle after
+        retries (malformed, or a dependency down past the retry window). Platform
+        ADMIN or OWNER token roles only; moderators receive 403.
+      operationId: getAdminNotificationEvents
+      parameters:
+      - name: open
+        in: query
+        schema:
+          type: boolean
+          default: true
+        description: Only events not yet replayed
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        schema:
+          type: integer
+          default: 20
+      responses:
+        '200':
+          description: Page of quarantined events (id, topic, partition, offset, eventId, eventType, payload, error, quarantinedAt, replayedAt, replayOutcome)
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /v1/admin/notification-events/{id}/replay:
+    post:
+      tags:
+      - Community Service
+      summary: Replay a quarantined notification event
+      description: >-
+        Runs the stored record through the live consumer. Safe to repeat: an event
+        already processed returns outcome DUPLICATE and notifies nobody again.
+        Outcomes NOTIFIED, NOT_LISTED, STALE, DUPLICATE, IGNORED.
+      operationId: postAdminNotificationEventReplay
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: '{"id": "...", "outcome": "NOTIFIED"}'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: The record is still malformed and cannot be replayed (ErrorResponse).
+        '503':
+          description: Trip planning is unavailable; retry the replay later (ErrorResponse).
   /v1/ai/plan/suggest:
     post:
       tags:

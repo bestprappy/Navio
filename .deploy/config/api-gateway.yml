@@ -46,7 +46,7 @@ spring:
             - id: community-service
               uri: http://community-service:8084
               predicates:
-                - Path=/v1/community/**,/v1/groups/**,/v1/posts/**,/v1/feed/**,/v1/notifications/**,/v1/media/**,/v1/social/**,/v1/reports,/v1/admin/reports,/v1/admin/reports/**
+                - Path=/v1/community/**,/v1/groups/**,/v1/posts/**,/v1/feed/**,/v1/notifications/**,/v1/media/**,/v1/social/**,/v1/reports,/v1/admin/reports,/v1/admin/reports/**,/v1/admin/notification-events,/v1/admin/notification-events/**
 
 eureka:
   client:

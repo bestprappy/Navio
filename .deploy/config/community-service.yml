@@ -77,6 +77,24 @@ server:
   port: 8084
 
 navio:
+  notifications:
+    trip-events:
+      # Consumes trip.events.v1 (SharedPlanListed.v1) into follower notifications.
+      enabled: ${COMMUNITY_TRIP_EVENTS_ENABLED:true}
+      topic: trip.events.v1
+      # Older events are recorded but not delivered, so a backlog never floods inboxes.
+      max-age: P3D
+    stream:
+      # Live inbox hints over SSE. Disabling keeps the durable inbox and its polling.
+      enabled: ${COMMUNITY_NOTIFICATION_STREAM_ENABLED:true}
+      per-user: 5
+      max-connections: 500
+      max-lifetime: PT30M
+      heartbeat-ms: 25000
+    legacy-plan-announcements:
+      # Browser-triggered POST /v1/notifications/plan-shared fan-out. Off while the
+      # trip outbox relay is on; turn on only if TRIP_OUTBOX_RELAY_ENABLED is false.
+      enabled: ${COMMUNITY_LEGACY_PLAN_ANNOUNCEMENTS:false}
   trip-planning:
     # Used only when Eureka has no trip-planning instance: post attachments check plan cards here.
     base-url: ${TRIP_PLANNING_BASE_URL:http://trip-planning-service:8082}
