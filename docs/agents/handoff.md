@@ -1,3 +1,11 @@
+## 2026-11-02 - Codex - Shared Plan live search proposal, no implementation
+
+**User:** Design normal advanced live search with Ban destination/title suggestions, country metadata matching beyond titles, Places-style country dropdown, visual-only keyword filter and trip duration. Review plan first.
+
+**Inspection / proposal:** Remote client origin/dev search still filters loaded recent feed cards; propose catalogue-wide read-only server search/suggestions, dedicated to Plans and respecting visibility. Desktop Country/Search/Filters/Trip duration; 2-char/250ms live results + grouped destination/title suggestions, strict AND constraints, token/alias/relevance matching, URL/back restoration, one paginated result grid when constrained. Keywords filter preview only; duration inclusive day-count presets/custom proposal. Reuse Places country selector without behavior regression. W3C combobox + Algolia interaction reference checked; no external search dependency proposed. Draft docs/superpowers/specs/2026-11-02-shared-plan-search-draft.md for user review, not implementation authorization.
+
+**Boundaries:** No app edits, child checkout updates, migration allocation or deployment. Backend search cannot be completed only by UI filtering; publication query integration requires coordination with friend's reserved areas. Existing local state preserved. Notes/spec docs branch -> localdev only.
+
 ## 2026-11-02 - Codex - Coordination update: supplied text predates released profile/live notifications
 
 **Supersedes the preceding inventory's unpublished/migration assumptions:** Mandatory rootdev synchronization fast-forwarded73abf00->7be1754 and exposed newer Oct31 handoffs: profile/social released, then live notifications released root5c29d9f/run41216102028. Rootdev now pins client3599672/server3878d39; nested working checkouts were deliberately NOT updated, so their local source is older. Remote fetch of Trip/Community/IAM refs only confirmed TripV24+V25, CommunityV8+V9, IAMV11public_profile_fields. Pending palette V11 must move to V12 per newer release note. Treat next coordination baseline as TripV26+, CommunityV10+, IAMV13+ with V12 reserved, recheck before actual migrations. Do not act on the old text's claim IAMprofile staysV12.
