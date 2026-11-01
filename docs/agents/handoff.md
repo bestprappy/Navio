@@ -1,3 +1,9 @@
+## 2026-11-02 - Codex - Coordination update: supplied text predates released profile/live notifications
+
+**Supersedes the preceding inventory's unpublished/migration assumptions:** Mandatory rootdev synchronization fast-forwarded73abf00->7be1754 and exposed newer Oct31 handoffs: profile/social released, then live notifications released root5c29d9f/run41216102028. Rootdev now pins client3599672/server3878d39; nested working checkouts were deliberately NOT updated, so their local source is older. Remote fetch of Trip/Community/IAM refs only confirmed TripV24+V25, CommunityV8+V9, IAMV11public_profile_fields. Pending palette V11 must move to V12 per newer release note. Treat next coordination baseline as TripV26+, CommunityV10+, IAMV13+ with V12 reserved, recheck before actual migrations. Do not act on the old text's claim IAMprofile staysV12.
+
+**Safe-work recommendation unchanged with care:** Shared Plan search/page first on current origin/dev, preserve new bylines/profile pins/publication events/live notifications. Backend publication changes require coordination, not an assumption of isolated UI. AutoAdd audit/rework next on dedicated optimization path with persistence boundary tests. Guides then isolated community visual polish. Guide dialog reservation remains contradictory; clarify before editing. User asked only for list/planning; no feature changes, child checkout updates, push or deployment. Root synchronization did bring already-committed shared config/notes/pins; retained all local artifacts.
+
 ## 2026-11-02 - Codex - Work-area coordination from friend's handoff
 
 **Request:** Read Downloads/message (7).txt, list safe work areas; prioritize Shared Plan search/page, then Plan charging stops rework, Guides and community UI. Planning/inventory only, no feature implementation authorized this turn.
