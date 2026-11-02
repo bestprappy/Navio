@@ -3,7 +3,8 @@ x-navio-implemented-color-palette:
   status: Implemented 2026-10-14, merged to dev 2026-10-17; needs the user-management V9 release before the client relies on it. See docs/api/color-palette.md.
   colorId: "Pattern ^[a-z][a-z0-9-]{0,39}$; the 24 built-in ids are seeded by user-management V9."
   sharedPlanDays: PublicDayDto adds nullable colorId, copied only when it matches the palette id format. SANITIZER_VERSION unchanged.
-  guides: Category colorId must exist in the palette (retired colors accepted).
+  guides: Category colorId must exist in the palette (retired and deleted colors accepted).
+  labelTextAndDelete: "Implemented 2026-10-31 (user-management V12). Per-theme label text (textOnLight/textOnDark: auto|white|black), PATCH /v1/admin/palette-colors/{id}, DELETE /v1/admin/palette-colors/{id}. A deleted id stays reserved and is still listed by GET /v1/palette-colors with deleted true and the default color's (teal) hex, so saved references render the default."
 x-navio-implemented-day-sections:
   status: Implemented locally (2026-10-17); needs the Trip Planning V23 release before the client relies on it.
   plannerCapability: day-sections-v1
@@ -226,21 +227,24 @@ paths:
             application/json:
               schema:
                 type: array
-                maxItems: 200
+                description: Up to 200 colors followed by the reserved ids of deleted colors
                 items:
                   type: object
-                  required: [id, name, hex, retired]
+                  required: [id, name, hex, retired, deleted, textOnLight, textOnDark]
                   properties:
                     id: {type: string, pattern: '^[a-z][a-z0-9-]{0,39}$'}
-                    name: {type: string, maxLength: 40}
-                    hex: {type: string, pattern: '^#[0-9a-f]{6}$'}
-                    retired: {type: boolean}
+                    name: {type: string, maxLength: 40, description: '"Deleted color" for a deleted id'}
+                    hex: {type: string, pattern: '^#[0-9a-f]{6}$', description: For a deleted id, the default color's hex}
+                    retired: {type: boolean, description: Always true for a deleted id}
+                    deleted: {type: boolean, description: Saved references to this id render the default color}
+                    textOnLight: {type: string, enum: [auto, white, black], description: Label text drawn on the color in the light theme; auto picks the better contrast}
+                    textOnDark: {type: string, enum: [auto, white, black]}
   /v1/admin/palette-colors:
     get:
       tags: [User Management Service]
       summary: List palette colors with admin metadata
       responses:
-        '200': {description: 'Array of {id, name, hex, sortOrder, retired, retiredAt, createdAt, updatedAt}'}
+        '200': {description: 'Array of {id, name, hex, sortOrder, retired, retiredAt, createdAt, updatedAt, textOnLight, textOnDark}; deleted colors are not listed'}
         '401': {$ref: '#/components/responses/Unauthorized'}
         '403': {$ref: '#/components/responses/Forbidden'}
     post:
@@ -256,13 +260,46 @@ paths:
               properties:
                 name: {type: string, minLength: 1, maxLength: 40}
                 hex: {type: string, pattern: '^#[0-9A-Fa-f]{6}$'}
+                textOnLight: {type: string, enum: [auto, white, black], default: auto}
+                textOnDark: {type: string, enum: [auto, white, black], default: auto}
       responses:
-        '201': {description: The new color; its id is derived from the name}
+        '201': {description: The new color; its id is derived from the name and never reuses a deleted color's id}
         '400': {description: Invalid name or hex, with validationErrors}
         '401': {$ref: '#/components/responses/Unauthorized'}
         '403': {$ref: '#/components/responses/Forbidden'}
         '409': {description: The hex or name is already in the palette}
         '422': {description: Invisible on the light or dark surface, or the palette is full}
+  /v1/admin/palette-colors/{id}:
+    parameters:
+    - {name: id, in: path, required: true, schema: {type: string, pattern: '^[a-z][a-z0-9-]{0,39}$'}}
+    patch:
+      tags: [User Management Service]
+      summary: Change the label text drawn on a color in each theme; name and hex stay fixed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [textOnLight, textOnDark]
+              properties:
+                textOnLight: {type: string, enum: [auto, white, black]}
+                textOnDark: {type: string, enum: [auto, white, black]}
+      responses:
+        '200': {description: The updated color (unchanged values are not re-audited)}
+        '400': {description: Missing or unknown text color, with validationErrors}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {description: Color not found}
+    delete:
+      tags: [User Management Service]
+      summary: Permanently delete a removed (retired) color; its id stays reserved and saved references render the default color
+      responses:
+        '204': {description: Deleted}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {description: Color not found}
+        '422': {description: The color is still in the palette, or it is the default color (teal) that replaces deleted ones}
   /v1/admin/palette-colors/{id}/retire:
     parameters:
     - {name: id, in: path, required: true, schema: {type: string, pattern: '^[a-z][a-z0-9-]{0,39}$'}}
