@@ -31,7 +31,9 @@ Follows and new community posts never touch Kafka: Community creates those notif
 | Blocks, per-person alerts, type preferences and the 3-per-hour burst cap apply as to every notification. | SQL in `NotificationRepository` |
 | Stream frames carry no content; counts and items come from the authorised REST API. | `NotificationStreamHub` |
 | A stream ends when its access token expires (30 min cap); 5 streams per account (oldest closed), 500 per instance (503 + `Retry-After`). | `navio.notifications.stream.*` |
-| Toasts never move focus; on `/planner/<id>` the View link opens a new tab. Seeing a toast does not mark it read; opening it does. | `NotificationToaster` |
+| Toasts never move focus; on `/planner/<id>` the toast's link opens a new tab. Seeing a toast does not mark it read; opening it does. More than 3 arrivals at once become one summary toast. | `showNotificationToasts` |
+| Toasts stay 8 s, paused by hover, keyboard focus or a hidden tab. Other pages use the same cards through `notify`. | `PausableToast`, `notify` |
+| If the stream is down, a rise in the 60 s polled unread count still produces toasts. | `NotificationLiveProvider` |
 | One browser holds one stream (Web Locks); other tabs get signals over BroadcastChannel. | `NotificationLiveProvider` |
 
 ## Switches
@@ -40,7 +42,7 @@ Follows and new community posts never touch Kafka: Community creates those notif
 | --- | --- | --- |
 | `navio.outbox.relay.enabled` (`TRIP_OUTBOX_RELAY_ENABLED`) | true | Events accumulate in `trip.outbox`; nothing is lost. |
 | `navio.notifications.trip-events.enabled` (`COMMUNITY_TRIP_EVENTS_ENABLED`) | true | Consumer stops; offsets stay where they were and resume later. |
-| `navio.notifications.stream.enabled` (`COMMUNITY_NOTIFICATION_STREAM_ENABLED`) | true | `/v1/notifications/stream` is gone (404). The inbox, bell polling (60 s) and refetch on focus keep working. |
+| `navio.notifications.stream.enabled` (`COMMUNITY_NOTIFICATION_STREAM_ENABLED`) | true | `/v1/notifications/stream` is gone (404). The inbox, bell polling (60 s), toasts from that poll and refetch on focus keep working. |
 | `navio.notifications.legacy-plan-announcements.enabled` (`COMMUNITY_LEGACY_PLAN_ANNOUNCEMENTS`) | false | `POST /v1/notifications/plan-shared` still verifies ownership and answers `{"notified":0}`. Turn on only if the Trip relay is off. |
 
 ## Health signals
