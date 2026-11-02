@@ -1,3 +1,9 @@
+## 2026-11-02 - Codex - Contextual search VM release approved and prepared
+
+**Approval:** User explicitly answered "Release this revision to the VM" to the new revision's release question. This supersedes the preceding pending-approval entry.
+**Release inputs:** Client378bac2 and Trip9a3b1d8 pushed throughdev/main; serverb7f8207 pins Trip. Other services retain IAM6d6c2ca/communityca13f09/mobilityc298ead. No newer remote app changes found. Exact committed client copy also passed TypeScript, excluding generated localtsconfig. Previous verification643frontend, full347backend/0fail/3skip with realPG, build/lint/browser/review passed; no source changes since those checks.
+**Next:** Root pins commit and authorizedmain push trigger deployment. Watch every CI gate and verify real multiword queries/related titles, country/duration constraints and space preservation afterward. No schema changes or VM data maintenance. Existing unrelated work left intact.
+
 ## 2026-11-02 - Codex - Contextual search implemented, new VM release approval pending
 
 **Request:** Proceed with reviewed search plan; real related titles must appear if strong titles do not match. Fix whitespace urgently; retain phrase suggestions independently; Matching/Related result sections.
