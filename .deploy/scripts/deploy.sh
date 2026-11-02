@@ -228,7 +228,7 @@ configure_keycloak_authentication() {
       -s registrationAllowed=true \
       -s verifyEmail=false \
       -s loginTheme=navio \
-      -s "passwordPolicy=length(12) and notUsername and notEmail and passwordHistory(3)" \
+      -s "passwordPolicy=length(8) and regexPattern((?=.*[a-z])(?=.*[0-9])(?=.*[^a-z0-9]).*) and notUsername and notEmail and passwordHistory(3)" \
       >/dev/null
   '
 }
