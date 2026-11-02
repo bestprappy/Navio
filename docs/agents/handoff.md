@@ -1,3 +1,10 @@
+## 2026-11-02 - Codex - Contextual Shared Plan search LIVE and verified
+
+**Release:** User-authorized rootf6f2f0b / client378bac2 / serverb7f8207 / Trip9a3b1d8 deployed successfully. Run https://github.com/bestprappy/Navio/actions/runs/41461424001 passed revision/PostgreSQL gates, every image build and VM deployment. This supersedes earlier pending-approval/release entries.
+**Live API:** Thailand Huahin1matching/4related; Huahin scenary and food trip0/5; Thailand Food Trip0/5; California Food Focus Trip0/2; UK food trip0/1. These are actual catalogue results, not invented exact matches. Related real title fallback present, disjoint groups/pages, genuine no-match state, hard country/duration constraints passed. Frontend proxy200, health200, protected anonymous trips401, pinned TLS certificate used.
+**Live browser:** Trailing spaces and subsequent words preserved; multiword city completion, real related-title fallback, Matching/Related sections and empty states, pagination without duplicates, mobile width and blank default feeds all passed with no runtime errors. Evidence output/contextual-search-live-api.log, contextual-search-live-browser.log, contextual-search-live-desktop.png. Normal local dev:vm left running; refresh Explore to discard pre-release query cache.
+**Workspace:** Childmain pins match release; root staysdev (remote main fast-forwarded without altering main's existing external worktree). Existing generated clienttsconfig/CLAUDE, service logs and unrelated output/documents remain untouched/uncommitted. Exact-source verification junctions removed without touching node_modules/.next targets. No migrations, live DB maintenance, extra dependencies or unrelated code edits. Post-release notes go to docs branch ->dev only, not another standalone main deployment.
+
 ## 2026-11-02 - Codex - Contextual search VM release approved and prepared
 
 **Approval:** User explicitly answered "Release this revision to the VM" to the new revision's release question. This supersedes the preceding pending-approval entry.
