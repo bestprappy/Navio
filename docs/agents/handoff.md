@@ -1,3 +1,11 @@
+## 2026-11-02 - Codex - Tutorial implementation plan
+
+**Request:** Create docs/agents/tutorial-plan.md for the proposed beautiful tutorial landing page.
+**Done:** Added the Motion-based implementation plan: public /learn route, five-step local sample-trip walkthrough, task tutorials/tips, visual and responsive contract, accessibility, proposed components, phased delivery, verification checklist, and optional Driver.js/MDX expansion. No application implementation or dependencies changed.
+**Verified:** Inspected current homepage, routes, theme/dependency baseline, repository instructions, and changed-repository status. Reviewed the plan and checked whitespace; runtime tests are not applicable to documentation-only work.
+**Git:** This plan and only this session's note additions are prepared on docs/tutorial-plan-2026-11-02 from local dev for a local dev-only merge. Existing unfinished application and note edits are preserved outside the commit. No push or deployment; remote synchronization is outside this documentation-only change.
+**Next:** Implement Phase 1 after an implementation request; recheck actual feature behavior and current working state first. The document is a proposal, not evidence of shipped functionality.
+
 ## 2026-10-31 - Codex - Full profile and live-notification implementation plan
 
 **Goal:** Write an in-depth root plan.md covering the proposed profile/settings/public-profile/social/privacy/Kafka/SSE feature; explicitly require shadcn/ui, /frontend-design, and frontend color variety. User requested planning only.
