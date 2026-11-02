@@ -1,3 +1,9 @@
+## 2026-11-02 - Codex - Shared Plan search LIVE, verified after release
+
+**Result:** Authorized release rootedfc40a / clientaf157fa / serverc1cf7a5 / Trip96f4bea deployed successfully. GitHub run https://github.com/bestprappy/Navio/actions/runs/41424774475 passed revision gate, realPostgreSQL gate, every build and VM deployment.
+**Live verification:** Pinned-CA HTTPS /v1/shared-plans/search?term=Jap returned200, Japan destination suggestion,5matching plans and real titles (Hakone, Hokkaido, Osaka, Tokyo). Frontend /api/shared-plans/search returned200; /health200; anonymous /v1/trips401. Headless deployed-browser smoke passed Japan completion, related travel phrases, real plan-title options, live result grid and Bangladesh completion with no runtime errors. The earlier "not available on this server yet" was the undeployed endpoint and is now resolved. General completions remain available if the service later fails. Live evidence output/shared-search-live-browser.log and shared-search-live-jap.png.
+**Workspace:** Root remainsdev; remote main fast-forwarded from dev because localmain is occupied by existing temp worktree (left untouched). Client/server/Tripmain match their released remote pins. Existing generated clienttsconfig, CLAUDE, service logs and unrelated documents/output remain uncommitted. Only owned temporary Next3108/config18888 test processes stopped. No migration additions or live data maintenance. Feature reference docs/features/shared-plan-search.md. Post-release notes committed to docs branch and dev only; no standalone docs deployment.
+
 ## 2026-11-02 - Codex - Shared Plan live autocomplete correction and authorized release
 
 **Request / approval:** User clarified Google-like reactive travel suggestions plus real shared-plan titles, and explicitly approved releasing search to VM via async answer "Release the search update to the VM".
