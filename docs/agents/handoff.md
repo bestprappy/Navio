@@ -1,3 +1,10 @@
+## 2026-11-02 - Codex - Contextual search revision proposal, no implementation
+
+**Request:** Organize follow-up plan for multiword suggestions/real title empty state, urgent space-loss while typing, Matching versus Related result groups; screenshots Thailand Huahin, Huahin scenary and food trip, Thailand Food Trip, California Food Focus Trip.
+**Findings:** Draft resets from trimmed URL query during self-originated debounced updates can overwrite spaces/newer edits. Generic completions use whole-phrase prefix matching; service requires every token and builds suggestions only after strict rejection. Current simple-country success does not cover multiword intent.
+**Proposal:** Isolated raw-draft ownership fix first; then multiword location/theme parsing, aliases/bounded typo corrections, independent phrase and actual-title suggestions, compact no-title-match status; weighted strong versus related public-plan pools with distinct counts/reasons/stable pagination/no duplication. Preserve hard country/duration, geographic relevance, private publication eligibility, unchanged blank landing and visual-only Interests. Do not fabricate related plans when no evidence exists.
+**Status:** Planning only: docs/superpowers/plans/2026-11-02-shared-plan-contextual-search.md saved for review; no app/backend/dependency changes, tests or deployments this turn. Urgent fix proposed separately first. Existing clienttsconfig/CLAUDE, logs/output/documents preserved. Notes branch fromdev -> localdev only.
+
 ## 2026-11-02 - Claude - Notification toasts merged with live delivery and released (root main c0213b5)
 
 **Request:** Fix the collision between the uncommitted toast/popup work and the deployed live notifications, release the client work, run the signed-in and IAM relay checks, commit. The `/learn` tutorial is to be built last, after every other feature.
