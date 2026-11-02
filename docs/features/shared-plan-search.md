@@ -1,4 +1,4 @@
-﻿# Shared Plan search
+# Shared Plan search
 
 ## Interaction
 
@@ -21,3 +21,14 @@ This initial schema-free implementation streams the eligible public catalogue pe
 ## Verification (2026-11-02)
 
 Combined frontend suite: 621 passing; Trip suite: 337 total with zero failures and 18 environment-dependent skips. Seven real PostgreSQL schema/search eligibility checks passed during implementation. Production build and scopedlint passed. Browser checks deliberately used an unavailable live API and verified immediate country/travel/title suggestions, keyboard/click selection, country-filter independence, stale suggestion removal and mobile width with no runtime errors. Temporary review route removed. Release run and live smoke results are recorded in docs/agents/handoff.md.
+
+
+## Contextual revision (implemented, VM release pending)
+
+Raw input and normalized request text are independent. Typed spaces and newer edits survive URL acknowledgement; Back/Forward deliberately restores external state. Multiword country/city/travel-term completions, controlled aliases and offered corrections keep phrase suggestions useful independently of catalogue count. Real strong title matches appear first; if none qualify, real related plan titles are labelled as Related. Zero real matches are a compact status within that group, not a replacement for phrase suggestions.
+
+New optional response fields: `matching`, `related`, `matchingTotal`, `relatedTotal`, `matchingLast`, `relatedLast`, `relatedPlans`, `reasons` (token to plain-text explanation) and nullable `correction`. Both pools use the page index independently. New clients load more while either exhaustion flag is false. Legacy `content`/`recommendations`/`totalElements`/`matchedCount`/`last` keep their original meaning. UI always retains Matching plans for text searches, then Related plans; counts and cards are disjoint. No arbitrary unrelated fallback fills an empty pool.
+
+Country and exact duration remain hard constraints; typed known geography constrains theme relaxation. Place type/name, public title and transport/charger facts support broad travel themes; specific subtypes remain required for strong matches. Public descriptions can match ordinary words but are not sufficient alone to claim a themed stop. Country hints and selected filters disambiguate same-name cities. Search uses existing sanitized publications only, never private trips or editorial research. Vocabulary-based relevance is deterministic, not Google personalization or unrestricted semantic understanding.
+
+Verification for this revision:643 frontend tests, full backend347 total with zero failures and three skips, real PostgreSQL integration/schema checks, browser input/IME/history/race/related-title/group checks and production build. See the contextual-search implementation plan and agents handoff for release status.
