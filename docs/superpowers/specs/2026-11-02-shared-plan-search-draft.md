@@ -50,3 +50,7 @@ Dedicated read-only search/suggest handler/service or narrow existing feed query
 - Existing author links/pins, publishing notifications, copying and saving remain unchanged.
 
 References: https://www.w3.org/WAI/ARIA/apg/patterns/combobox/ ; https://www.algolia.com/doc/guides/building-search-ui/ui-and-ux-patterns/query-suggestions/in-depth/query-suggestions-faq/angular (interaction reference only, no Algolia dependency proposed).
+
+## Approved implementation refinements
+
+User subsequently approved numeric duration plus Days/Months/Years (replacing proposed presets); exact itinerary-day matching with explicit30/365 conversions. No query/country/duration preserves default Trending/Recent, including blank Enter. Active criteria use recommendations plus paginated remaining matches without duplicates. Keyword/interests Filters remain an explicitly labelled preview. Implementation/verification status is tracked in the2026-11-02 implementation plan.
