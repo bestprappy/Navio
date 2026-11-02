@@ -1,3 +1,11 @@
+## 2026-11-02 - Codex - Private messaging product consultation
+
+**Request:** Advise whether Navio should add chat for each user; assumed user-to-user private messages rather than AI assistance.
+**Done:** Applied llm-council with five independent perspectives and peer review, grounded in current project context. Advisors recommend deferring a general inbox pending demonstrated private coordination needs; scoped, consent-based plan conversations are a candidate to validate, not an approved feature. Consulted OWASP WebSocket guidance for implementation obligations.
+**Verified:** Repository state and current notes reviewed. Consultation only; no feature changes, runtime tests, or claims of user-demand metrics.
+**Git:** Only this session's notes committed on a docs branch from local dev and merged locally to dev; existing concurrent edits preserved. No remote sync, push, or deployment.
+**Next:** Identify a real traveler task that needs private communication before designing chat. Tutorial plan unchanged.
+
 ## 2026-11-02 - Codex - Tutorial implementation plan
 
 **Request:** Create docs/agents/tutorial-plan.md for the proposed beautiful tutorial landing page.
