@@ -1,3 +1,10 @@
+## 2026-11-03 - Codex - Stricter search relevance proposal, awaiting review
+
+**User:** Rejects arbitrary country-only Related titles and fixed itinerary/road/weekend phrase templates. Wants Matching (90-100% intent) plus Relevant titles; Thailand Christmas must have Christmas text or defensible public December evidence, not arbitrary coastal plans. Explicit latest instruction: detailed plan first, user will revise/review together. DO NOT implement/deploy yet.
+**Findings:** `PlanSearchQuery.match` and client `knownPlanSuggestions` both allow country-only Related; `buildPlanSuggestions` hardcodes three suffixes. Public dates removed unless includeDates; never join private dates. Prior deployed version remains live, but its successful tests do not establish new relevance quality.
+**Saved proposal:** docs/superpowers/specs/2026-11-03-shared-plan-search-relevance.md and docs/superpowers/plans/2026-11-03-shared-plan-search-relevance.md. Recommends mandatory intent gates, separate ranking, public-only temporal evidence, separate Matching/Relevant groups, corpus-backed and vocabulary completions, judged quality tests. Proposed Christmas December window (18-31 priority) is NOT approved yet. No app changes or new test runs this turn; research/read-only investigation and documentation only.
+**Next:** Review user adjustments, approve behavioral design before execution. Root dev; client/server/Trip main unchanged. Existing client tsconfig/CLAUDE, service logs and output/documents untouched. Primary references saved in spec. Notes commit to docs branch -> dev only, no main push/release.
+
 ## 2026-11-02 - Codex - Contextual Shared Plan search LIVE and verified
 
 **Release:** User-authorized rootf6f2f0b / client378bac2 / serverb7f8207 / Trip9a3b1d8 deployed successfully. Run https://github.com/bestprappy/Navio/actions/runs/41461424001 passed revision/PostgreSQL gates, every image build and VM deployment. This supersedes earlier pending-approval/release entries.

@@ -1,3 +1,10 @@
+## 2026-11-03 - Codex - Research and plan stricter Shared Plan relevance
+
+**Request:** Professional search, Matching vs Relevant titles, Christmas-aware relevance, replace repetitive country templates. User then explicitly requested detailed plan to revise and review before implementation.
+**Findings:** Country anchor alone admits related plans in backend and frontend fallback; phrase generator explicitly appends itinerary/road trip/weekend trip. Snapshot dates are public only with owner opt-in. Read official Elastic boolean/ranking evaluation and Algolia Query Suggestions references; proposed constraint eligibility separate from ranking, evidence-aware dates and contextual/corpus completions.
+**Done:** Saved detailed proposed spec and five-task implementation plan dated 2026-11-03. Includes file map, essential-intent rules, public date privacy, proposed Christmas date windows, both title groups, fallback semantics, judged precision/negative examples, accessibility and raw-input regression checks.
+**Verification/state:** Inspected root/client/server/Trip status/branches and exact code; root dev pull already up to date. No app edits/tests/deployment; previous release remains live. Existing generated/untracked work preserved. Design approval pending; do not implement yet. Docs branch -> dev only.
+
 ## 2026-11-02 - Codex - Contextual Shared Plan search LIVE and verified
 
 **Release:** User-authorized rootf6f2f0b / client378bac2 / serverb7f8207 / Trip9a3b1d8 deployed successfully. Run https://github.com/bestprappy/Navio/actions/runs/41461424001 passed revision/PostgreSQL gates, every image build and VM deployment. This supersedes earlier pending-approval/release entries.
