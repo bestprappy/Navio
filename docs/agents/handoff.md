@@ -1,3 +1,9 @@
+## 2026-11-03 - Codex - Search relevance/yearless revision LIVE
+
+**Release:** Explicit user yes authorized VM release. Root `65a4105`, client `85f2e1f`, server `714bdc9`, Trip `e33812d` pushed child-first through dev/main. Workflow https://github.com/bestprappy/Navio/actions/runs/41617858398 completed successfully, including revision/PostgreSQL gates, all images and VM rollout. No additional release needed for this revision.
+**Live verification:** Real VM API and deployed Chrome passed catalogue phrases, strict essential-intent relevance, Christmas/year limitations, hard country/duration, disjoint pagination, proxy, health200/protected401, spaces while typing, keyboard and mobile/no runtime errors. User's localhost3000 dev:vm proxy now includes querySuggestions and zero arbitrary Weekend alternatives. Christmas has zero qualifying current public results, honestly empty. Selected live sample hides dates; visible-date/copy round trips rely on isolated PostgreSQL/HTTP tests, no authenticated production writes performed. Evidence in output/search-yearless-vm-results.json and search-yearless-live-browser.log/screenshots.
+**State:** Root dev after post-release notes merge; remote main remains deployed65a4105. Childmain pins unchanged. Existing modified client tsconfig, CLAUDE, service logs and unrelated output/documents preserved. No application changes this release turn, schema changes, VM maintenance or restarts of user dev frontend. Post-release docs go to dev only; do not push them alone to main. Detailed report and feature/spec/plan status updated. Next: user can refresh Explore and review actual UI/results.
+
 ## 2026-11-03 - Codex - VM release authorized, child revisions published
 
 **Approval:** User explicitly answered yes to releasing the verified revision to the VM. This supersedes pending-release entries below. No further approval needed for this release.

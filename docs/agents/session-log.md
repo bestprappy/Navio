@@ -1,3 +1,10 @@
+## 2026-11-03 - Codex - Complete authorized search/yearless VM release
+
+**Request:** User answered yes to deploy the verified backend revision.
+**Changes:** Published client85f2e1f / Trip e33812d, server714bdc9 pins and root65a4105 through child-first dev/main release flow. No new application edits. Recorded LIVE status in report, feature docs, spec/plan and handoff.
+**Verification:** Workflow41617858398 success (revision/PostgreSQL gates, image builds, VM deployment). Fresh actual VM API plus deployed Chrome checks passed strict relevance, catalogue phrases, year notice, constraints/pagination, typing spaces, keyboard/mobile and no runtime errors. Local dev:vm proxy confirmed new querySuggestions/zero country-only Weekend alternatives. Health200 and anonymous protected401. Live sample hides dates; earlier realPG/HTTP suite covers visible date/copy cases, no authenticated production writes tested.
+**Remaining:** User UI review; bounded English lexical vocabulary/event rules and O(catalogue) scan remain documented limits. Christmas currently honestly empty. Existing generated files, logs and unrelated artifacts preserved. Post-release docs committed on docs branch fromdev and merged/pusheddev only; productionmain stays65a4105.
+
 ## 2026-11-03 - Codex - Begin authorized search/yearless VM release
 
 **Authorization:** Explicit yes to releasing the verified revision to the VM.

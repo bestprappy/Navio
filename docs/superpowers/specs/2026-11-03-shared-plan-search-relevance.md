@@ -1,6 +1,6 @@
 # Shared Plan search: intent relevance revision
 
-Status: User approved proceeding. Implemented and verified locally 2026-11-03; not deployed. Execution ledger and detailed implementation/test report supersede earlier proposal status wording. Month/day-only publication overrides original year-verification paragraphs below.
+Status: User approved implementation and subsequently approved VM release. Released and live-verified 2026-11-03 as root `65a4105`, workflow `41617858398` successful. Execution ledger and detailed implementation/test report supersede earlier proposal status wording. Month/day-only publication overrides original year-verification paragraphs below.
 
 ## 2026-11-03 amendment: published dates omit year
 

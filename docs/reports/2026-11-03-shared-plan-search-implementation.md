@@ -1,6 +1,8 @@
 # Shared Plan search and yearless publication — 2026-11-03
 
-Status: implementation complete and verified locally; not pushed, merged into application main or deployed to the VM. Client commit `85f2e1f`; Trip commit `e33812d`, both on `fix/plan-search-relevance-20261103`. Parent application pins remain at the previous deployed release until a separately authorized release.
+Status: implemented, released and live-verified on 2026-11-03 after explicit user approval. Root `65a4105`, client `85f2e1f`, server `714bdc9`, Trip `e33812d`. Workflow `41617858398` passed revision checks, PostgreSQL gates, image builds and VM deployment.
+
+Live verification: real API catalogue suggestions, strict Weekend/Christmas relevance, year limitation, country/duration constraints, disjoint pagination, frontend proxy, health 200 and protected anonymous trips 401 passed. Deployed Chrome checks passed for contextual phrases, separate title groups, spaces, keyboard, mobile width and no runtime page errors. Local dev:vm proxy also exposes the new catalogue suggestions. Thailand Christmas currently has no qualifying public matches; unrelated Thai trips are not used to fill it. The chosen live public sample hides dates; visible month/day and copy round trips were verified in the isolated PostgreSQL/HTTP suite, with no authenticated production writes. Evidence: `output/search-yearless-vm-results.json`, `search-yearless-vm-check.log`, `search-yearless-live-browser.log` and live desktop/mobile screenshots.
 
 ## Implementation report
 
@@ -44,6 +46,6 @@ Local evidence (not committed): `output/plan-relevance-client-final.log`, `plan-
 
 ## Delivery limits
 
-The existing dev:vm backend still runs the earlier release until this revision is released. The new frontend accepts legacy responses and sends explicit copy dates, but complete revised relevance, yearless public payloads and new corpus suggestions require the backend update. Older clients may fall back to Day N for the new month/day format; they must not be given a fabricated original year to mask that limitation. Live post-deployment checks are still required after release authorization.
+The VM and dev:vm proxy now use this revision. The frontend accepts legacy responses and sends explicit copy dates. Older cached clients may fall back to Day N for the new month/day format; refresh to load the released frontend. They must not be given a fabricated original year to mask that limitation.
 
 Relevant vocabulary and fixed-event rules are bounded and primarily English. Movable/local holidays and arbitrary semantic intent are not claimed to be fully understood. Empty or sparse results are preferred over unsupported recommendations. The reported counts and regression outcomes do not imply a measured universal 90% search accuracy.

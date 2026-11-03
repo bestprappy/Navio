@@ -14,7 +14,9 @@ The numeric duration control matches exact itinerary day count. Days, Months and
 
 The service searches eligible listed ACTIVE publications at the current sanitizer version, using their sanitized public snapshots. It never loads private planner state, writes a trip, or increments views/copies. Matching includes normalized title, primary city/country and public place addresses/names; country metadata works even when absent from the title. Country, duration and query tokens intersect. Recommendations and paginated results share stable ranking and exclude duplicates. General autocomplete is topic completion, not a Google service or personalized browsing-history model.
 
-## Intent relevance revision (implemented locally 2026-11-03, not deployed)
+## Intent relevance revision (released and live-verified 2026-11-03)
+
+Released as root `65a4105` (client `85f2e1f`, server `714bdc9`, Trip `e33812d`), workflow `41617858398` successful. Real VM API, deployed Chrome and local dev:vm proxy checks passed: catalogue phrases, strict relevance, year notice, hard country/duration filters, disjoint pagination, typing spaces, keyboard and mobile layout. No authenticated production writes were tested.
 
 This supersedes the older country-only related fallback and fixed three country suffixes described in historical entries below. Matching requires every essential geographic/activity/specific-word condition. Relevant alternatives must also satisfy those conditions: date-only Christmas/New Year compatibility or bounded close spelling can qualify, but country overlap alone cannot. A sushi query cannot be rescued by a generic food plan, and a named city does not relax to its entire country.
 

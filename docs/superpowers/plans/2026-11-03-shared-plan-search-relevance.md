@@ -2,7 +2,7 @@
 
 ## Execution ledger — completed locally 2026-11-03
 
-User explicitly authorized proceeding after adding thorough-test and month/day-only publication requirements. This ledger supersedes the original pending-approval text below. No VM deployment was authorized or performed for this revision.
+User explicitly authorized proceeding after adding thorough-test and month/day-only publication requirements, then separately approved release. This ledger supersedes the original pending-approval text below. Released as root `65a4105`, workflow `41617858398` successful. Real VM API, deployed Chrome and local dev:vm proxy verification passed. No authenticated production writes were tested. Earlier local-only rulings below record implementation-stage history and are superseded by this release entry.
 
 - Task 0: complete. Real MonthDay public DTOs, legacy snapshot projection and relative offsets/span; private dates unchanged, hidden generated titles removed, explicit copy start/year and leap validation. New client sends explicit change/start to remain safe against the old retain behavior.
 - Task 1: complete. Required country/city/activity/specific-term constraints replace permissive related OR gates; negative country-only Christmas/food and subtype tests observed failing then passing.

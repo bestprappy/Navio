@@ -1,6 +1,6 @@
 # Published travel dates: month and day only
 
-Implemented on local fix branches 2026-11-03; not deployed.
+Released 2026-11-03 as root `65a4105`, workflow `41617858398` successful. Real VM search/year-limitation and legacy public read checks passed. The selected live sample hides dates, so visible-date and copy round-trip assertions rely on the earlier real-PostgreSQL/HTTP integration suite; no authenticated production writes were tested.
 
 Private planner dates remain full `LocalDate` values. Public snapshot start/end/day dates are `MonthDay` values serialized as `MM-dd`, with no original year or fabricated replacement year. Existing reference endpoints may use ISO MonthDay `--MM-dd`; the reader accepts both formats and legacy full ISO dates without displaying their year. Publication timestamps and freely authored prose are separate from structured travel dates.
 
