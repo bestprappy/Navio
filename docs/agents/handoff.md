@@ -1,3 +1,9 @@
+## 2026-11-03 - Codex - VM release authorized, child revisions published
+
+**Approval:** User explicitly answered yes to releasing the verified revision to the VM. This supersedes pending-release entries below. No further approval needed for this release.
+**Inputs:** Client85f2e1f, Trip e33812d, server714bdc9 pushed through dev/main, no newer teammate changes found. Unchanged IAM6d6c2ca / mobilityc298ead / communityca13f09. Verified source unchanged since client650pass, exact committed-tsconfig tsc/scopedlint/build, backend371total/0fail/3skip all-context disposablePG, browser/review checks.
+**Next:** Commit root client/server pins on chore branch from dev, push dev then fast-forward remote main to trigger deployment (root local main belongs to an existing external worktree; do not disturb it). Watch workflow stages and run live search/date/health checks before reporting release complete. Existing generated clienttsconfig/CLAUDE/service logs and unrelated artifacts preserved. No new source changes or DB maintenance this release turn.
+
 ## 2026-11-03 - Codex - Diagnose missing Weekend phrase suggestion
 
 **User:** Screenshot Thailand Weekend has Matching/Relevant groups but no Suggested searches. Read-only diagnosis, no source changes.

@@ -1,3 +1,9 @@
+## 2026-11-03 - Codex - Begin authorized search/yearless VM release
+
+**Authorization:** Explicit yes to releasing the verified revision to the VM.
+**Preflight/result:** Read release rules, inspected all repo state and fetched all remotes; no newer teammate source found. Reconfirmed exact client85f2e1f and Trip e33812d source unchanged since green checks (client650, backend371total/0fail/3skip, committed-config tsc/lint/build/browser/review). Published Trip, server714bdc9 pin, and client through dev/main. Other services unchanged and equal origin/main. No unrelated local generated/untracked work committed.
+**Next:** Root pin/release push -> monitor all workflow stages -> live checks; remote main fast-forward from dev because local rootmain is in an existing worktree. Do not claim live until deployment and verification succeed. No further release approval needed.
+
 ## 2026-11-03 - Codex - Diagnose missing Thailand Weekend suggestion
 
 **Request:** Why screenshot shows no phrase suggestions for Thailand Weekend.
