@@ -10,6 +10,21 @@
 
 **Spec:** `docs/superpowers/specs/2026-11-03-shared-plan-search-relevance.md` (proposal, pending user review).
 
+## Latest user amendment (takes precedence over year rules below)
+
+User requires thorough search tests before completion and month/day-only published dates with no carried-over year. Plan/spec review is still the current workflow; no application implementation has started. Read the spec amendment first. Existing statements about verifying a typed year against original public trip dates are superseded: that year will no longer be public.
+
+### Additional Task 0: Define and verify yearless publication compatibility
+
+- [ ] Inventory all public snapshot endpoints, DTOs, preview/summarizer/read paths, copy-date flow, JSON schemas and existing published data. Determine the additive/versioned contract before implementation; do not convert LocalDate fields to month/day strings in place without consumer compatibility.
+- [ ] Specify a real month/day value and ordered offsets, never a synthetic year masquerading as the owner's year. Readers omit weekday names. includeDates=false omits month/day as well; private trip full dates are unchanged.
+- [ ] Update API/schema and UI plan for publication date options, yearless preview/readers, summaries and copy prompt. Keep original month/day only with reader-selected year or ask for new dates; preview Feb 29 and year rollover explicitly. Existing approval of retaining dates cannot silently mean retaining a hidden original year.
+- [ ] Test legacy stored publications projected to yearless public reads without revoking links or leaking structured years. Confirm old/new client/API compatibility strategy before deployment. Freely authored prose is not automatically rewritten.
+- [ ] Add red-then-green tests across publisher -> public reader/search -> copy -> private planner, with leap days, Dec/Jan, no dates, missing data, conflicting year query and malformed inputs. Verify source private dates are unmodified and transport-dependent data remains coherent.
+- [ ] Adjust temporal search fixtures: month/day/event matching only; no claim that a yearless plan confirms a typed year. State the limitation explicitly. Year-specific movable holidays require a separately reviewed public-evidence rule rather than private-year lookup.
+
+Task 0 expands the original search-only scope at the user's request. It crosses publication and copy contracts and must be designed/reviewed carefully before any DTO or serialization changes. Add the exact affected files after inventory; no migration is assumed. Complete thorough quality and regression checks in Task 5 before claiming completion.
+
 ## Global Constraints
 
 - Shared Plans only; preserve Places search, default Explore landing, preview-only Interests and exact duration behavior.

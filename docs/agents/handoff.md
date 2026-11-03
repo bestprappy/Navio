@@ -1,3 +1,9 @@
+## 2026-11-03 - Codex - Plan amendment: thorough tests and yearless publication
+
+**Latest user:** Requires thorough search tests before implementation finishes. Published plans should carry month/day only, no year. Saved plan/spec amended with overriding requirements and Task 0; no application code changed. Current detailed-plan review workflow not bypassed.
+**Critical:** Do not simply hide year or assign a fake year. Public structured payloads (including legacy snapshots/read paths), previews/readers/summaries/copy need compatible yearless contract; private planner full dates unchanged. No weekdays without known year. Copy asks reader's dates/year; preserve ordering/duration, Feb 29 and Dec/Jan. includeDates=false still hides all dates. Prior search proposal's original-year verification is superseded. Review exact serialization/legacy compatibility before DTO edits; never join private dates or revoke old links to shortcut conversion.
+**Next:** Finish affected-path inventory, revise detailed date contract with user, then implement approved search/date work. No app tests run or deployment this amendment turn. Mandatory quality suite includes judged positive/negative relevance plus full publication/read/search/copy round-trip and privacy/date edge cases. Existing generated files/logs untouched. Documentation only -> dev, no main push.
+
 ## 2026-11-03 - Codex - Stricter search relevance proposal, awaiting review
 
 **User:** Rejects arbitrary country-only Related titles and fixed itinerary/road/weekend phrase templates. Wants Matching (90-100% intent) plus Relevant titles; Thailand Christmas must have Christmas text or defensible public December evidence, not arbitrary coastal plans. Explicit latest instruction: detailed plan first, user will revise/review together. DO NOT implement/deploy yet.

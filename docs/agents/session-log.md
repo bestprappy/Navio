@@ -1,3 +1,9 @@
+## 2026-11-03 - Codex - Add yearless publication and thorough-test requirements to plan
+
+**Request:** Thorough search testing before finishing; published plan dates carry only month/day, no year.
+**Done:** Inspected sanitizer/public DTO, confirmed current structured LocalDate payload carries full year. Updated proposed spec/plan with overriding yearless public contract, legacy read compatibility, private planner preservation, copy date-choice implications, weekday omission and leap/New Year tests. Added Task 0 before search implementation; original public-year verification proposal superseded.
+**Status:** Planning amendments only; no app/backend/schema edits, app tests, push or deployment. Detailed review still needed for cross-consumer yearless representation and rolling API compatibility. Existing generated client files/untracked artifacts preserved. Mandatory notes committed on docs branch and merged local dev only.
+
 ## 2026-11-03 - Codex - Research and plan stricter Shared Plan relevance
 
 **Request:** Professional search, Matching vs Relevant titles, Christmas-aware relevance, replace repetitive country templates. User then explicitly requested detailed plan to revise and review before implementation.

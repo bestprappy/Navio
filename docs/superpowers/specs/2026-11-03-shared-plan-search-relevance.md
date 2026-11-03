@@ -1,6 +1,16 @@
 # Shared Plan search: intent relevance revision
 
-Status: researched proposal; approach confirmation pending. No implementation or release in this session.
+Status: researched proposal, detailed review requested. User added mandatory thorough search testing and month/day-only published dates. No implementation or release in this session.
+
+## 2026-11-03 amendment: published dates omit year
+
+The user requests that published plans carry only month and day, not the original year. This overrides all explicit-year/public-year matching proposals below. Private planner dates remain full dates. Structured public API payloads, publication previews, readers, summaries and copy responses must not expose the original year; merely hiding it in UI is insufficient. Do not strip years from freely authored prose, which is separate from structured travel-date publication.
+
+Introduce an explicit month/day public value with ordered itinerary/day offsets rather than assigning a fake constant year. Preserve duration and ordering across Dec/Jan. Display e.g. Dec 25 or Day 1; weekday names require a year and must not be inferred. includeDates=false still omits month/day too. Seasonal relevance uses published month/day and public event text, never private years. A typed year cannot be verified against a yearless plan; communicate that limitation rather than claim a year match or infer an author's original travel year. Event instances that require a specific year need explicit independently public evidence and reviewed handling.
+
+Copying retains the previously approved date-choice flow but cannot offer original full-date retention once the original year is no longer published. Offer the same month/day with a reader-selected year or new dates; require an explicit destination trip start date before creating full planner dates. Preview Feb 29 adjustments and Dec/Jan rollover; no silent invalid-date normalization or original-year reuse. Recheck all publication/copy consumers and existing published snapshots: project legacy dates into yearless public values on reads; no read path (including raw public snapshot endpoints) may leak legacy structured years. Never make old published links disappear solely because a new date representation is introduced. Define rolling-version API compatibility before coding; preserving privacy can conflict with old consumers expecting ISO LocalDate. Do not claim this is only a label-formatting change.
+
+Thorough pre-completion testing is mandatory: representative judged search queries, top-result precision and negative relevance, both autocomplete groups, whitespace/caret/IME/races, hard filters, pages/deduplication, privacy, API failure, and real PostgreSQL. Add yearless publishing/read/copy round-trip, existing snapshot compatibility, Feb 29, crossing New Year, omitted dates and absence of year/weekday leakage. Source plan private full dates must remain unchanged. Concrete updated implementation contract requires review before date DTO changes.
 
 ## Findings
 
