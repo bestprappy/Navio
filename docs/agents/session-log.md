@@ -1,3 +1,9 @@
+## 2026-11-03 - Codex - Diagnose missing Thailand Weekend suggestion
+
+**Request:** Why screenshot shows no phrase suggestions for Thailand Weekend.
+**Verified:** Standalone helper and helper with live public feed/remote destinations return `Thailand weekend trip`. Fresh Chrome on user's exact localhost3000 URL displays Suggested searches group and that phrase; missing phrase not reproduced in current fresh UI. Proxy response has no querySuggestions field and uses old `Also in Thailand` fallback, confirming backend revision still not deployed. Existing-tab/earlier render explanation is an inference, not a confirmed extension issue.
+**Changes/state:** Read-only diagnosis; no application code edits, service restart, test-suite run, push or deployment. New screenshot/scripts remain output-only. client85f2e1f/Trip e33812d unchanged. Recommend hard-refresh for current local frontend; full catalogue-suggestion/relevance revision needs VM release authorization. Mandatory notes commit to docs branch -> rootdev only.
+
 ## 2026-11-03 - Codex - Implement stricter search relevance and yearless publication
 
 **Request:** Proceed with approved plan; thorough tests and separate detailed implementation/test reporting.

@@ -1,3 +1,9 @@
+## 2026-11-03 - Codex - Diagnose missing Weekend phrase suggestion
+
+**User:** Screenshot Thailand Weekend has Matching/Relevant groups but no Suggested searches. Read-only diagnosis, no source changes.
+**Evidence:** Local helper with both empty/live catalogue data returns `Thailand weekend trip`. Fresh Chrome on the exact screenshot URL at localhost3000 renders that option in Suggested searches (group count1), plus the screenshot's real plan titles. Existing-tab/render cache is a possible explanation, not proven. Local proxy response still lacks `querySuggestions` and gives `Also in Thailand` reasons, confirming dev:vm uses the old backend; new strict relevance/corpus suggestions remain unreleased. Do not attribute all missing local completions to backend deployment: local phrase completion is independent and was verified working.
+**State:** client85f2e1f / Trip e33812d scoped branches unchanged; no new app commit/test/deployment or restart. Diagnostics output/diagnose-weekend-suggestion.mjs and diagnose-weekend-browser.mjs, screenshot output/weekend-suggestion-live.png. User can hard-refresh to load current frontend; full feature requires separately authorized VM release. Existing uncommitted generated files preserved. Notes -> docs branch -> dev only.
+
 ## 2026-11-03 - Codex - Search relevance/yearless publication implemented, not deployed
 
 **Authorization/result:** User said proceed and requested separate detailed implementation/test reports. Completed client85f2e1f and Trip e33812d on local fix/plan-search-relevance-20261103 branches. No app merge/push/VM deployment; root/server application pins deliberately remain previous release. Report docs/reports/2026-11-03-shared-plan-search-implementation.md; feature docs and plan execution ledger updated.
