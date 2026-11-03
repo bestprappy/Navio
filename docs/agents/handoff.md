@@ -1,3 +1,8 @@
+## 2026-11-03 - Codex - Search empty-state plan refinement
+
+**User refinement:** NoMatching with Relevant keeps compact Matching notice plus actual Relevant/alternatives. If both result groups empty, combine their notice above alternatives. If no suitable alternatives either, one larger polite empty state. Refined copy/state matrix saved in smart-search spec and frontend task4. Alternatives mean labelled explicit search-query changes, not fabricated/broader cards silently fetched. Errors/loading/conflicts must never be represented as no-results; use current fingerprint totals. No implementation/deployment yet.
+**State/next:** Review proposal, then implement only when authorized. Live65a4105 unchanged; existing unrelated generated files/logs preserved. Docs branch->localdev only.
+
 ## 2026-11-03 - Codex - Smart search final proposal, planning only
 
 **User:** Wants natural reconstructed travel searches, relevant evidence-grounded plans, a final challenged/tested plan before implementation. No application implementation or release authorized for this new proposal.

@@ -104,6 +104,24 @@ Christmas direct text with contradictory public February dates cannot be Matchin
 
 Keep existing controls, card design and page structure. Add a quiet interpretation summary only for nontrivial parsing, alternatives, conflicts or uncertainty. Keep Matching and Relevant result sections and separate deduplicated pagination. Suggestions stay within the viewport below the field, with grouped headings and clear labels, no overflowing tall list. Empty title groups use compact status rows, not huge panels. Loading, unavailable and zero-results are distinct.
 
+### Result-section empty states (user refinement)
+
+Use the completed first-page totals for the current fingerprint, not just the currently loaded card arrays. Never decide “no results” from a pending request, an empty later page, a failed service or stale data. Conflicts/unsupported required constraints show their resolution notice before normal empty-result messaging.
+
+| Matching total | Relevant total | Useful alternatives | Page rendering |
+|---|---|---|---|
+| Positive | Positive | Any | Matching plans, then Relevant plans; optional compact Alternative searches only if useful |
+| Positive | Zero | Any | Matching plans; omit the empty Relevant section; optional useful alternatives |
+| Zero | Positive | Any | Matching plans with one compact “No matching plans found.” message; Relevant plans below; useful Alternative searches last |
+| Zero | Zero | Present | One combined “Matching and relevant plans” section with “No matching or relevant plans found.” and “Explore an alternative search below.” Then Alternative searches only; do not render two empty panels |
+| Zero | Zero | Absent | One larger, calm empty-state panel; no empty Matching, Relevant or Alternatives sections |
+
+Full-empty copy: heading “No plans found for this search.” Body “Sorry, we couldn’t find any published plans matching your search and selected filters. Try different keywords or adjust your filters.” Show the query/filter context safely, plus Edit search (focus/select search text) and Clear filters only when filters are active. With no active filters, offer Browse all plans to explicitly return to the existing default landing. Avoid exaggerated apologies or implying the system has searched the whole internet. No-results is not a technical failure.
+
+Alternative searches are explicit query refinements/broadenings, not invented plan cards or secretly relaxed results. Cards from a broader query remain absent until the reader chooses that query. Show a brief changed-intent label such as “Broader dates: December.” Exclude exact duplicates, meaningless changes and alternatives confirmed to have no results; if support is unknown but the idea is defensible, label it “Search idea” without a count or promise. Do not count generic Edit search/Clear filters buttons or the unchanged literal search as available alternatives. The autocomplete can still offer inventory-independent meaning-preserving suggestions under its separate contract.
+
+Keep compact notices when real plans are visible. Reserve the larger panel for a genuinely completed all-empty search. It should fit the page design, not fill the entire viewport. Retain current result sections while loading additional pages or displaying a next-page error. Announce one concise result-state change via aria-live, avoiding duplicate announcements across empty sections.
+
 Backend owns interpretation, evidence classification and compositional phrases. Frontend owns raw draft, small safe destination/unfinished-word fallback, UI and keyboard. It must not recreate a second semantic matcher from incomplete feed summaries.
 
 Keep current endpoint and legacy fields. Add optional `searchAssist` with schemaVersion=1, fingerprint, conceptVersion, interpretation/facet notices, typed suggestions `{text, kind, changedFacets, availability, action}` and catalogueRevision. Keep existing `querySuggestions` text/source enum for old clients; do not introduce new enum values there. Fingerprint includes query, country, duration, sort and interpretation version. No internal snapshot/token beyond existing public titles/links in notices. Query input max256 Unicode code points, consistently validated; retain raw input and show explicit validation instead of silent truncation. Roll backend compatibility first before new client sends >100 characters; expose capability before lifting client bound.

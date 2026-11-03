@@ -1,3 +1,9 @@
+## 2026-11-03 - Codex - Refine empty search presentation
+
+**Request:** Progressive empty states for Matching, Relevant and Alternatives, with clearer formal copy and a larger all-empty message.
+**Changes:** Planning docs only: state truth table, compact versus combined/final empty notices, actionable Alternative searches, filter-aware recovery, authoritative current-query totals and error/loading exceptions. Added frontend acceptance checks to task4. No source changes, tests of application behavior, service calls/restarts or deployments.
+**Verification/state:** Checked root/client/server/Trip status and current notes; unrelated generated files/logs retained. Reviewed all result-presence combinations plus loading/error/next-page cases in the design. Mandatory docs commit->localdev only; implementation still awaits authorization.
+
 ## 2026-11-03 - Codex - Research and challenge final smart-search plan
 
 **Request:** Final comprehensive plan for reconstructed natural travel queries/suggestions, challenge alternatives and test ideas to minimize later rework.
