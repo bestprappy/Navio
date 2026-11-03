@@ -1,3 +1,10 @@
+## 2026-11-03 - Codex - Research and challenge final smart-search plan
+
+**Request:** Final comprehensive plan for reconstructed natural travel queries/suggestions, challenge alternatives and test ideas to minimize later rework.
+**Work:** Inspected current public search/parser/client/API/publication revision model and repo instructions. Researched primary PostgreSQL16, Elastic synonym/hybrid, Algolia suggestion and W3C combobox documentation. Saved full proposed design, concrete task plan, evaluation note and reproducible offline policy spike. Selected structured intent + directional concepts + compositional grammar + evidence ranking in existing service; deferred hosted LLM/vector infrastructure until measured value.
+**Verification:**16 live public read-only queries;42 annotated admission/composition checks and192 evidence combinations pass. Prototype first failed Christmas+weekend due to temporal early-return; corrected design to evaluate all constraints before grouping. Inputs annotated, so NOT proof of actual NLP, embeddings, UI, DB or latency. Planned acceptance240 judged raw queries plus isolated Postgres/browser/load/privacy tests. No application edits/private writes/deployment/restarts; current live release65a4105 unchanged.
+**State:** Proposal awaits user review; implementation/release not authorized. Existing unrelated generated files/logs preserved. Mandatory docs branch->dev only; no main push.
+
 ## 2026-11-03 - Codex - Complete authorized search/yearless VM release
 
 **Request:** User answered yes to deploy the verified backend revision.

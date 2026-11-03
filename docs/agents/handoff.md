@@ -1,3 +1,10 @@
+## 2026-11-03 - Codex - Smart search final proposal, planning only
+
+**User:** Wants natural reconstructed travel searches, relevant evidence-grounded plans, a final challenged/tested plan before implementation. No application implementation or release authorized for this new proposal.
+**Deliverables:** docs/superpowers/specs/2026-11-03-smart-shared-plan-search.md, companion smart-search-design-evaluation.md; task plan docs/superpowers/plans/2026-11-03-smart-shared-plan-search.md; reproducible docs/superpowers/experiments/2026-11-03-smart-search-policy-lab.mjs. Recommend structured intent/directional travel concepts, compositional phrases, labelled refinements/broadenings, hard eligibility before rank. No per-keystroke LLM/new search service initially; compatible later retrieval extension only if measured need. Preserve default/filters/Places/planner and teammate UI.
+**Evidence:**16 read-only live API queries confirmed narrow current completion/interpretation; zero inventory does not itself prove search failure. Offline42 annotated policy/phrase cases +192 evidence combinations passed after catching a Christmas early-return bypass of weekend. These do not test production NLP/models/UI/DB/performance. Full240 judged raw queries and isolated Postgres/browser/load gates remain planned, not passed. No VM data writes/source edits/restarts/deployments. Live65a4105 unchanged.
+**Next:** User review/adjustment of proposal, then implementation only when authorized. Existing clienttsconfig/CLAUDE, service logs and unrelated artifacts unchanged. Notes/design commit on docs branch fromdev->dev only; no standalone main push.
+
 ## 2026-11-03 - Codex - Search relevance/yearless revision LIVE
 
 **Release:** Explicit user yes authorized VM release. Root `65a4105`, client `85f2e1f`, server `714bdc9`, Trip `e33812d` pushed child-first through dev/main. Workflow https://github.com/bestprappy/Navio/actions/runs/41617858398 completed successfully, including revision/PostgreSQL gates, all images and VM rollout. No additional release needed for this revision.
