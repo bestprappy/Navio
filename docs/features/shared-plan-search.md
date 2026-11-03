@@ -14,6 +14,18 @@ The numeric duration control matches exact itinerary day count. Days, Months and
 
 The service searches eligible listed ACTIVE publications at the current sanitizer version, using their sanitized public snapshots. It never loads private planner state, writes a trip, or increments views/copies. Matching includes normalized title, primary city/country and public place addresses/names; country metadata works even when absent from the title. Country, duration and query tokens intersect. Recommendations and paginated results share stable ranking and exclude duplicates. General autocomplete is topic completion, not a Google service or personalized browsing-history model.
 
+## Intent relevance revision (implemented locally 2026-11-03, not deployed)
+
+This supersedes the older country-only related fallback and fixed three country suffixes described in historical entries below. Matching requires every essential geographic/activity/specific-word condition. Relevant alternatives must also satisfy those conditions: date-only Christmas/New Year compatibility or bounded close spelling can qualify, but country overlap alone cannot. A sushi query cannot be rescued by a generic food plan, and a named city does not relax to its entire country.
+
+Christmas text can establish a Matching plan; public December dates alone establish Relevant, ranked by closeness to December 25. New Year uses explicit text or a bounded year-turn date window. Public English month names are supported. Unknown years and movable local holidays are not inferred from private data. Date-only matching never proves that holiday activities exist. These rules are deterministic, conservative evidence rules, not general natural-language understanding or a displayed probability percentage.
+
+The dropdown displays Matching plans and Relevant plans independently. Literal search is a separate action. General destination/travel-word completion remains available without inventory, while optional `querySuggestions` come from actual eligible public catalogue content and preserve the typed constraints. The same itinerary/road/weekend suffixes are no longer appended to every country. The optional `notice` explains why a year-specific query cannot be verified from yearless dates. Existing response fields remain compatible, including legacy pagination semantics.
+
+Public introductions and attached notes can supply affirmative activity/event evidence; conservative negative/speculative/question filtering prevents an optional question from becoming a confident activity claim. No private notes or dates are loaded. This heuristic is intentionally conservative and is not a language model. Incomplete local feed summaries do not guess missing temporal evidence while waiting for the API.
+
+See `yearless-publication-dates.md` for the publication/copy contract. Implementation and testing evidence: `../reports/2026-11-03-shared-plan-search-implementation.md`.
+
 ## Scale and limits
 
 This initial schema-free implementation streams the eligible public catalogue per request, with bounded top-candidate memory and response sizes. Its scan cost is O(catalogue size); measure latency and traffic before introducing a persisted index. Country extraction from public addresses is conservative and not a substitute for structured country metadata for every stop. Token matching is deterministic lexical matching, not an LLM or unrestricted semantic engine. Live catalogue results require the backend release; local generic completions alone do not substitute for complete search.

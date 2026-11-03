@@ -1,6 +1,25 @@
 # Shared Plan Intent Relevance Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking. Implementation is NOT authorized yet: user requested a detailed plan to revise and review together.
+## Execution ledger — completed locally 2026-11-03
+
+User explicitly authorized proceeding after adding thorough-test and month/day-only publication requirements. This ledger supersedes the original pending-approval text below. No VM deployment was authorized or performed for this revision.
+
+- Task 0: complete. Real MonthDay public DTOs, legacy snapshot projection and relative offsets/span; private dates unchanged, hidden generated titles removed, explicit copy start/year and leap validation. New client sends explicit change/start to remain safe against the old retain behavior.
+- Task 1: complete. Required country/city/activity/specific-term constraints replace permissive related OR gates; negative country-only Christmas/food and subtype tests observed failing then passing.
+- Task 2: complete. Public-only Christmas/New Year/month evidence, nearer Christmas date ranking, year cannot-verify notice, hidden/contradictory/malformed/date-title coverage. No inferred private year or movable-event calendar.
+- Task 3: complete. Fixed suffixes removed; bounded vocabulary/destination completions and full-catalogue phrases validated against original intent. Literal search action separated; local summaries do not invent temporal relevance. Query suggestion wire shape is optional `{text,source}` records, plus optional `notice`.
+- Task 4: complete. Independent Matching/Relevant title groups, genuine states/reasons, stable keyboard/indexing, raw-draft preservation and unchanged blank landing. Actual Explore route browser QA passed with controlled search fixtures.
+- Task 5: complete for local implementation. Final client650/0fail, backend371total/0fail/0error/3skip with every context on disposable realPG, exact committed-tsconfig typecheck, scoped lint and production build pass. 1,000-plan fixture checks counts/windows; local timings documented with limits. Fresh independent review's four Important issues plus speculative-question follow-up fixed with regressions. Source preserved on scoped fix branches; report and feature docs updated.
+
+Ruling: work in the current dedicated child fix branches to preserve the user's running dev:vm checkout and earlier workflow preference. Existing generated tsconfig/CLAUDE/logs and unrelated artifacts remain uncommitted. No app branch merges, pushes or parent-pin commits in this session; docs branch merges to root dev only under AGENTS.md.
+
+Ruling: month/day publication supersedes the previous explicit-year matching proposal. Year-specific searches receive an honest limitation notice rather than accessing private dates or claiming confirmation. Copy UI retains only the starting month/day with a selected year; later days follow original relative spacing, with visible explanation of calendar shifts.
+
+Verification/environment correction: early broad SpringBootTest contexts still used the configured local development datasource despite NAVIO_TEST_DB variables. Final run sets SPRING_DATASOURCE explicitly for every context and disables discovery/bus/outbox delivery. No VM data writes; generated local test records were not broadly deleted. The isolated integration suite exposed an empty-database assumption; repository test now checks its own fixture prefix without ignoring eligibility for any fixture row.
+
+Commits: client85f2e1f, Trip e33812d. Both `fix/plan-search-relevance-20261103`, saved locally only. Report: `docs/reports/2026-11-03-shared-plan-search-implementation.md`. Owned config18888, Next3108 and disposable PG56432 cleaned up; regular dev:vm3000 verified still listening.
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking. Implementation was subsequently authorized and completed locally; see execution ledger above.
 
 **Goal:** Make Shared Plan suggestions and results respect the whole travel intent, with separate Matching/Relevant titles and useful contextual phrase completions.
 
@@ -16,12 +35,12 @@ User requires thorough search tests before completion and month/day-only publish
 
 ### Additional Task 0: Define and verify yearless publication compatibility
 
-- [ ] Inventory all public snapshot endpoints, DTOs, preview/summarizer/read paths, copy-date flow, JSON schemas and existing published data. Determine the additive/versioned contract before implementation; do not convert LocalDate fields to month/day strings in place without consumer compatibility.
-- [ ] Specify a real month/day value and ordered offsets, never a synthetic year masquerading as the owner's year. Readers omit weekday names. includeDates=false omits month/day as well; private trip full dates are unchanged.
-- [ ] Update API/schema and UI plan for publication date options, yearless preview/readers, summaries and copy prompt. Keep original month/day only with reader-selected year or ask for new dates; preview Feb 29 and year rollover explicitly. Existing approval of retaining dates cannot silently mean retaining a hidden original year.
-- [ ] Test legacy stored publications projected to yearless public reads without revoking links or leaking structured years. Confirm old/new client/API compatibility strategy before deployment. Freely authored prose is not automatically rewritten.
-- [ ] Add red-then-green tests across publisher -> public reader/search -> copy -> private planner, with leap days, Dec/Jan, no dates, missing data, conflicting year query and malformed inputs. Verify source private dates are unmodified and transport-dependent data remains coherent.
-- [ ] Adjust temporal search fixtures: month/day/event matching only; no claim that a yearless plan confirms a typed year. State the limitation explicitly. Year-specific movable holidays require a separately reviewed public-evidence rule rather than private-year lookup.
+- [x] Inventory all public snapshot endpoints, DTOs, preview/summarizer/read paths, copy-date flow, JSON schemas and existing published data. Determine the additive/versioned contract before implementation; do not convert LocalDate fields to month/day strings in place without consumer compatibility.
+- [x] Specify a real month/day value and ordered offsets, never a synthetic year masquerading as the owner's year. Readers omit weekday names. includeDates=false omits month/day as well; private trip full dates are unchanged.
+- [x] Update API/schema and UI plan for publication date options, yearless preview/readers, summaries and copy prompt. Keep original month/day only with reader-selected year or ask for new dates; preview Feb 29 and year rollover explicitly. Existing approval of retaining dates cannot silently mean retaining a hidden original year.
+- [x] Test legacy stored publications projected to yearless public reads without revoking links or leaking structured years. Confirm old/new client/API compatibility strategy before deployment. Freely authored prose is not automatically rewritten.
+- [x] Add red-then-green tests across publisher -> public reader/search -> copy -> private planner, with leap days, Dec/Jan, no dates, missing data, conflicting year query and malformed inputs. Verify source private dates are unmodified and transport-dependent data remains coherent.
+- [x] Adjust temporal search fixtures: month/day/event matching only; no claim that a yearless plan confirms a typed year. State the limitation explicitly. Year-specific movable holidays require a separately reviewed public-evidence rule rather than private-year lookup.
 
 Task 0 expands the original search-only scope at the user's request. It crosses publication and copy contracts and must be designed/reviewed carefully before any DTO or serialization changes. Add the exact affected files after inventory; no migration is assumed. Complete thorough quality and regression checks in Task 5 before claiming completion.
 
@@ -75,43 +94,43 @@ Frontend paths relative to `client/app/feature/explore/_components/shared-plans/
 
 ## Task 1: Lock relevance examples and privacy contract
 
-- [ ] Add judged fixture cases before implementation: Thailand-only; Christmas with explicit text; public December 25; public December 5; public July; hidden December; wrong country/year; missing date; city-food; sushi vs generic food; unknown modifiers; negation; ambiguous city; exact/prefix titles. Assertions specify Matching/Relevant/excluded and rank relationships.
-- [ ] Run new service tests and record expected failures proving current country-only fallback and date ignorance. Do not rewrite prior tests simply to preserve wrong counts; explicitly update expectations against the reviewed contract.
-- [ ] Define typed concept/evidence categories and missing-evidence behavior in `PlanSearchQuery`, preserving existing aliases, city disambiguation and exact filter constraints.
-- [ ] Verify tests pass for geography/activities/unknown concepts, including negative popular-but-irrelevant examples. Commit scoped `fix(search)` on a fix branch from dev.
+- [x] Add judged fixture cases before implementation: Thailand-only; Christmas with explicit text; public December 25; public December 5; public July; hidden December; wrong country/year; missing date; city-food; sushi vs generic food; unknown modifiers; negation; ambiguous city; exact/prefix titles. Assertions specify Matching/Relevant/excluded and rank relationships.
+- [x] Run new service tests and record expected failures proving current country-only fallback and date ignorance. Do not rewrite prior tests simply to preserve wrong counts; explicitly update expectations against the reviewed contract.
+- [x] Define typed concept/evidence categories and missing-evidence behavior in `PlanSearchQuery`, preserving existing aliases, city disambiguation and exact filter constraints.
+- [x] Verify tests pass for geography/activities/unknown concepts, including negative popular-but-irrelevant examples. Commit scoped `fix(search)` on a fix branch from dev.
 
 ## Task 2: Add public temporal relevance and ranking
 
-- [ ] Write failing temporal tests for the reviewed December windows, explicit year, long date spans, contradictory text/dates, hidden/malformed/missing dates and leap-year intervals. Check both results and counts/reasons for private-date leakage.
-- [ ] Implement `PlanSearchTemporalIntent` with fixed reviewed rules and explicit evidence provenance. Movable holidays have no inferred dates without verified locale/year entries. Do not assume winter means Christmas, or Northern Hemisphere seasons apply globally.
-- [ ] Extend `Evidence` to separate title, public descriptive/owner text, place/type facts and public temporal facts. Index only deliberately included public textual fields; generic checklists or speculative owner questions must not imply an activity took place. Test event text from public introductions/notes independently from hidden notes.
-- [ ] Replace permissive related OR gates with mandatory concept compatibility. Rank exact title/phrase, coverage, evidence strength and temporal closeness before popularity; deterministic ID tie-break. Keep Matching/Relevant pools disjoint and legacy response pagination compatible.
-- [ ] Run service/controller and real PostgreSQL integration tests, including more than one page and remote titles outside initial feeds. Commit scoped backend fix.
+- [x] Write failing temporal tests for the reviewed December windows, explicit year, long date spans, contradictory text/dates, hidden/malformed/missing dates and leap-year intervals. Check both results and counts/reasons for private-date leakage.
+- [x] Implement `PlanSearchTemporalIntent` with fixed reviewed rules and explicit evidence provenance. Movable holidays have no inferred dates without verified locale/year entries. Do not assume winter means Christmas, or Northern Hemisphere seasons apply globally.
+- [x] Extend `Evidence` to separate title, public descriptive/owner text, place/type facts and public temporal facts. Index only deliberately included public textual fields; generic checklists or speculative owner questions must not imply an activity took place. Test event text from public introductions/notes independently from hidden notes.
+- [x] Replace permissive related OR gates with mandatory concept compatibility. Rank exact title/phrase, coverage, evidence strength and temporal closeness before popularity; deterministic ID tie-break. Keep Matching/Relevant pools disjoint and legacy response pagination compatible.
+- [x] Run service/controller and real PostgreSQL integration tests, including more than one page and remote titles outside initial feeds. Commit scoped backend fix.
 
 ## Task 3: Replace fixed phrase templates with contextual suggestions
 
-- [ ] Add failing frontend/backend tests for `Jap`, `Thailand Christ`, city+food prefixes, trailing spaces, completed rare phrases, unknown terms, no catalogue matches, API unavailable, duplicates and modifiers preserved during completion.
-- [ ] Implement curated destination/event/activity word completion as search-language help, explicitly separate from inventory-backed title suggestions. Remove the country+three-suffix branch entirely.
-- [ ] Implement bounded catalogue phrase candidates via `PlanSearchSuggestions`; candidates must preserve recognized constraints, have public support when claiming inventory, and return provenance/count only when verified. Avoid repeated variants and unrelated popular phrases.
-- [ ] Add an optional API field such as `querySuggestions: [{text,source,matchingCount?}]`; source is `catalogue` or `vocabulary`. Retain legacy fields internally during rolling upgrades; Zod defaults missing field to empty. No analytics/popularity claims without measured data.
-- [ ] Frontend fallback only offers defensible local completions/strong titles. It must not approximate event dates from incomplete summaries or briefly flash arbitrary Related plans before API resolution.
-- [ ] Verify suggestion tests, API schema/proxy tests and scope lint; commit focused backend/frontend fixes in their respective repos.
+- [x] Add failing frontend/backend tests for `Jap`, `Thailand Christ`, city+food prefixes, trailing spaces, completed rare phrases, unknown terms, no catalogue matches, API unavailable, duplicates and modifiers preserved during completion.
+- [x] Implement curated destination/event/activity word completion as search-language help, explicitly separate from inventory-backed title suggestions. Remove the country+three-suffix branch entirely.
+- [x] Implement bounded catalogue phrase candidates via `PlanSearchSuggestions`; candidates must preserve recognized constraints, have public support when claiming inventory, and return provenance/count only when verified. Avoid repeated variants and unrelated popular phrases.
+- [x] Add an optional API field such as `querySuggestions: [{text,source,matchingCount?}]`; source is `catalogue` or `vocabulary`. Retain legacy fields internally during rolling upgrades; Zod defaults missing field to empty. No analytics/popularity claims without measured data.
+- [x] Frontend fallback only offers defensible local completions/strong titles. It must not approximate event dates from incomplete summaries or briefly flash arbitrary Related plans before API resolution.
+- [x] Verify suggestion tests, API schema/proxy tests and scope lint; commit focused backend/frontend fixes in their respective repos.
 
 ## Task 4: Present both title groups and result groups clearly
 
-- [ ] Write grouping tests: both title groups nonempty; only one; neither; API failure vs genuine empty; no duplicated title; title activation retains normal navigation.
-- [ ] Update dropdown to render both groups under clear headings with concise evidence in Relevant rows. Keep literal Search action separate from completions. Show loading instead of prematurely claiming no matches.
-- [ ] Rename visible Related -> Relevant in results without renaming legacy wire fields unnecessarily. Show meaningful reasons such as public December dates; do not expose an owner's excluded data through reasons or counts.
-- [ ] Browser-check keyboard, focus, Escape, scrolling, mobile, live requests, cancelled/stale responses, IME, raw spacing/caret, filter changes and Back/Forward navigation. Preserve default page when criteria empty.
-- [ ] Run scoped checks and commit frontend fix.
+- [x] Write grouping tests: both title groups nonempty; only one; neither; API failure vs genuine empty; no duplicated title; title activation retains normal navigation.
+- [x] Update dropdown to render both groups under clear headings with concise evidence in Relevant rows. Keep literal Search action separate from completions. Show loading instead of prematurely claiming no matches.
+- [x] Rename visible Related -> Relevant in results without renaming legacy wire fields unnecessarily. Show meaningful reasons such as public December dates; do not expose an owner's excluded data through reasons or counts.
+- [x] Browser-check keyboard, focus, Escape, scrolling, mobile, live requests, cancelled/stale responses, IME, raw spacing/caret, filter changes and Back/Forward navigation. Preserve default page when criteria empty.
+- [x] Run scoped checks and commit frontend fix.
 
 ## Task 5: Evaluate quality, verify integration and prepare review
 
-- [ ] Run the representative judged suite: report precision@5 for eligible title suggestions/results, exact-title rank and event negative false positives. Target zero irrelevant country-only event results and zero privacy/filter violations. Publish measured values rather than an unsupported "90% accuracy" claim.
-- [ ] Compare representative live public catalogue inputs read-only. Do not modify sample dates/text to make the algorithm look better; missing evidence should yield fewer results.
-- [ ] Run client full suite/typecheck/build, backend relevant/full tests and disposable real PostgreSQL checks. Measure repeated-query latency and bounded allocations under a larger fixture catalogue. No unbounded or stale-content cache introduced to mask poor performance.
-- [ ] Get one independent code review under requesting-code-review skill; fix material findings and rerun relevant checks.
-- [ ] Update feature docs and end-session handoff/log; commit child-first with explicit files, preserving teammate changes and generated local files. Present UI/evaluation evidence for user review. VM release remains separate and must follow `docs/agents/release.md`.
+- [x] Run the representative judged suite: report precision@5 for eligible title suggestions/results, exact-title rank and event negative false positives. Target zero irrelevant country-only event results and zero privacy/filter violations. Publish measured values rather than an unsupported "90% accuracy" claim.
+- [x] Compare representative live public catalogue inputs read-only. Do not modify sample dates/text to make the algorithm look better; missing evidence should yield fewer results.
+- [x] Run client full suite/typecheck/build, backend relevant/full tests and disposable real PostgreSQL checks. Measure repeated-query latency and bounded allocations under a larger fixture catalogue. No unbounded or stale-content cache introduced to mask poor performance.
+- [x] Get one independent code review under requesting-code-review skill; fix material findings and rerun relevant checks.
+- [x] Update feature docs and end-session handoff/log; commit child-first with explicit files, preserving teammate changes and generated local files. Present UI/evaluation evidence for user review. VM release remains separate and must follow `docs/agents/release.md`.
 
 ## Open decisions for user review
 

@@ -1,6 +1,6 @@
 # Shared Plan search: intent relevance revision
 
-Status: researched proposal, detailed review requested. User added mandatory thorough search testing and month/day-only published dates. No implementation or release in this session.
+Status: User approved proceeding. Implemented and verified locally 2026-11-03; not deployed. Execution ledger and detailed implementation/test report supersede earlier proposal status wording. Month/day-only publication overrides original year-verification paragraphs below.
 
 ## 2026-11-03 amendment: published dates omit year
 
