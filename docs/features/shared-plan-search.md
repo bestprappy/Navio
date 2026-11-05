@@ -1,8 +1,8 @@
 # Shared Plan search
 
-## Smart intent revision — implemented locally 2026-11-05, not deployed
+## Smart intent revision — LIVE and verified 2026-11-05
 
-Client `bcf1d63` / Trip `66ea735`, isolated `feat/smart-plan-search-20261103` branches. This section supersedes older behavioral descriptions below only after that revision is released. Details and exact verification limits: [implementation/test report](../reports/2026-11-05-smart-shared-plan-search.md).
+Released client `bcf1d63` / Trip `66ea735`, server `35afd9c`, root `5b2a2eb`; workflow `41991110563` attempt2 successful. Actual VM API/deployed Chrome and localhost dev:vm proxy verified. This section supersedes older behavioral descriptions below. Details and exact verification limits: [implementation/test report](../reports/2026-11-05-smart-shared-plan-search.md).
 
 Typed travel intent, directional concepts and public evidence replace generic phrase suffixes. Required geography/activity/duration/temporal conditions gate both Matching and Relevant results; optional evidence cannot bypass another requirement. Natural rewrites preserve criteria. Explicit refine/broaden actions label changed criteria and require selection. No catalogue results does not suppress valid topic ideas, and actual plan titles are never fabricated.
 
@@ -10,7 +10,7 @@ Optional `searchAssist` schemaVersion1 includes conceptVersion, query, country, 
 
 Destination completion preserves the other typed interests and supplies that destination's country context. Loading/errors/conflicts have separate UI. Zero Matching with Relevant retains a compact Matching notice; both zero with useful alternatives produces one combined notice; all zero produces one larger recovery panel. Default Trending/Recent and visual-only Interests remain unchanged. Public month/day contracts from the prior release are retained.
 
-`navio.search.smart-enabled=false` retains the legacy implementation as rollback. No search migration, private-trip joins or new dependencies. Evidence cache is bounded by estimated32MiB weight with5k entry admission ceiling; visibility is rechecked each request. Known limits: bounded English vocabulary, explicit clarification for unsupported/ambiguous constraints, O(catalogue) scan, no universal Google-style personalization. See report for634 backend /689 frontend counts, realPG/browser/build evidence and5k latency limits. Separate VM release approval remains required.
+`navio.search.smart-enabled=false` retains the legacy implementation as rollback. No search migration, private-trip joins or new dependencies. Evidence cache is bounded by estimated 32 MiB weight with a 5k entry admission ceiling; visibility is rechecked each request. Known limits: bounded English vocabulary, explicit clarification for unsupported/ambiguous constraints, O(catalogue) scan, no universal Google-style personalization. See report for 634 backend / 689 frontend counts, real PG/browser/build evidence and 5k latency limits. The approved release is complete.
 
 ## Interaction
 

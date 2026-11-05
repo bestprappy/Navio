@@ -1,3 +1,13 @@
+## 2026-11-05 - Codex - Finish approved smart-search VM release
+
+**Request:** User approved Release this revision to the VM and subsequently confirmed retrying failed jobs.
+
+**Release:** root5b2a2eb/clientbcf1d63/server35afd9c/Trip66ea735/Mobilityafc6ccf published child-firstdev/main; unchangedIAM6d6c2ca/communityca13f09. Workflow41991110563 attempt2 succeeded allgates/images/VMrollout. Attempt1webimagefailed Next16.3.4 Googlefontquerybug beforedeploy. PrimaryNextissue99114 matched; connectorretry403/browserunavailable requireduserclick, then sameunchangedsource succeeded. No unrelatedfont/build/auth/security edits.
+
+**Live verified:** ActualVMpublicAPI/deployedChrome andlocalhost3000proxy passSearchAssistv1/naturalphrases/realtitles/strictintent/date/year/conflicts/revisionpagination/publicmonthdayprivacy/health200/protected401. CurrentWeekend2/natureThailand4/TokyoorKyoto2;ChristmasHoliday0eligible butsameintentphrasepresent. Browserfinalempty/edit/spacing/keyboard/mobile/noruntimeerrors pass, noAPI mocks. Noauthenticatedproductionwrites. Logs/screenshots output/smart-search-live-*.
+
+**Preservation/end:** TeammateMobility191tests0fail1skipincludingrealPG additionally verified; priorclient689/Trip634checks unchanged. Existinguserclienttsconfighash/CLAUDE/logs preserved andordinaryreleasedsourceupdated; userdev3000PID43460untouched. Ownedconfig/PG stopped; worktrees retainedclean. Report/feature/plan/handoffLIVEupdated. Postreleasenotescommit->rootdevonly; mainstaysdeployed5b2a2eb. ReadyforuserUIreview.
+
 ## 2026-11-05 - Codex - Publish approved smart-search release; CI font retry pending
 
 **Request:** User approved VM release of verified clientbcf1d63/Trip66ea735.

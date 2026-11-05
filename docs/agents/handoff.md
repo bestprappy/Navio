@@ -1,3 +1,13 @@
+## 2026-11-05 - Codex - Smart search LIVE, VM and dev:vm verified
+
+**Completed:** Explicitly approved release root `5b2a2eb`, client `bcf1d63`, server `35afd9c`, Trip `66ea735`, compatible teammate Mobility `afc6ccf` (IAM6d6c2ca/communityca13f09 unchanged). All published child-first throughdev/main; every pin matched origin/main. Workflow https://github.com/bestprappy/Navio/actions/runs/41991110563 attempt2 successful including rollout. No further release approval/deployment needed.
+
+**Recovery:** Attempt1 webimage stopped on known Next16.3.4 intermittent Googlefont extensionless-URL query parsing (officialNextissue99114). Deploy never ran on that attempt. Connector403 prevented automatic retry; user explicitly clicked Re-run failed jobs. Same commit/source built and deployed successfully on attempt2. No font/library/build/source workaround or security/access change introduced.
+
+**Live evidence:** Public read-only actualVM API and deployed Chrome pass; no API mocks. Natural ChristmasHoliday rewrite present even with zero qualifying current plans; Weekend2Matching/0Relevant; nature-focusedThailand4Matching; TokyoorKyoto2Matching; strict festival/temporal/geography/year/invaliddate/conflicts; disjoint revisionpagination; public month/day privacy; bothproduction/local3000 proxySearchAssistv1; health200/protected401. Browser actualtitles/naturalideas/finalempty/editrecovery/spacing/keyboard/dateclarification/mobile/no runtimeerrors pass. Evidence output/smart-search-live-api.json/.log, smart-search-live-browser.log and live desktop/mobile screenshots. No private production writes.
+
+**State/next:** Ordinary client/main and Trip/main now released source; root remainsdev with postrelease docs only. User's exact existing tsconfig/CLAUDE/log changes preserved; dev:vm3000 PID43460 untouched. Owned testconfig18888/PG56433 stopped. Feature worktrees retained clean for audit. Detailedreport andfeature/plan LIVE status updated. Finalnotes docsbranch->devonly, no standalone main push. User may refresh Explore and review UI.
+
 ## 2026-11-05 - Codex - Approved smart-search release published; CI font failure before deployment
 
 **Approval:** User explicitly answered Release this revision to the VM. Do not request release approval again. Published client `bcf1d63`, Trip `66ea735`, compatible teammate Mobility `afc6ccf`, server `35afd9c`, root `5b2a2eb` child-first through dev/main. All six nested pins checked equal origin/main before root push. Ordinary client/main updated, preserving exact pre-existing tsconfig hash/CLAUDE; userdev3000 PID43460 remains running. No search code changed this release turn.
