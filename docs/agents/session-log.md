@@ -1,3 +1,12 @@
+## 2026-11-05 - Codex - Remaining discovery and Saved Guides design prepared
+
+**Request/scope:** User authorized remaining features after the feedback release, then explicitly paused Custom Category. Custom Cover remains on hold. Proposed scope is Shared Plan default sections, functional filters/sorting and Saved Guides; existing feedback/search/bookmarks remain intact.
+
+**Inspection/design:** Verified root dev and nested branch/status state; pre-existing client tsconfig/CLAUDE, service logs and unrelated artifacts preserved. Read existing feed/search/library/guide APIs and database/release rules. Prepared docs/superpowers/specs/2026-11-05-shared-plan-discovery-saved-guides-design.md. Reuses current services/components; no external search engine. Proposes genuine seven-day activity trends, evidence-qualified seasonal/events, honest rating/comment sorts and guide bookmarks with independent 50-guide quota and existing seven-day trash.
+
+**Review/evidence:** Read-only builder review identified old-client GUIDE parsing incompatibility in addition to rollback concerns. Design now requires guide-inclusive request opt-in plus additive guide companion storage; legacy PLAN/PLACE responses stay compatible. Clarified Seasonal/Events OR membership, current UTC plus previous six dates, hidden-year privacy and event-calendar edge cases. Consulted linked NN/G filter and Algolia ranking references. No application code, schema, runtime process, dependency or deployment changed. No runtime test pass is claimed for this design-only work; diff/config preservation checked.
+
+**Next:** Await user design approval under the brainstorming skill's explicit design gate, then invoke writing-plans, isolate work and implement/test the approved scope. Do not repeat the already-live feedback release or interpret its old approval as authorization for a new root-main deployment. Custom categories and Custom Cover remain paused. Session/design docs committed on docs branch and merged to dev only.
 ## 2026-11-05 - Codex - Shared Plan feedback LIVE, VM and dev:vm verified
 
 **Authorization/result:** User approved release and requested continuation. Final root `0e341ac` (full `0e341ac9fb1cb3a7ae132f8b0272cd12e3c3c8a1`), client45e42e8, serverb11f808, Tripdfe950d published throughdev/main. IAM6d6c2ca/Mobilityafc6ccf/communityca13f09 unchanged. Correctiveworkflow https://github.com/bestprappy/Navio/actions/runs/42043762253 completed allgates/builds/deploy successfully. No further release approval or deployment needed.
