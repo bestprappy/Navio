@@ -1,5 +1,17 @@
 # Shared Plan search
 
+## Smart intent revision — implemented locally 2026-11-05, not deployed
+
+Client `bcf1d63` / Trip `66ea735`, isolated `feat/smart-plan-search-20261103` branches. This section supersedes older behavioral descriptions below only after that revision is released. Details and exact verification limits: [implementation/test report](../reports/2026-11-05-smart-shared-plan-search.md).
+
+Typed travel intent, directional concepts and public evidence replace generic phrase suffixes. Required geography/activity/duration/temporal conditions gate both Matching and Relevant results; optional evidence cannot bypass another requirement. Natural rewrites preserve criteria. Explicit refine/broaden actions label changed criteria and require selection. No catalogue results does not suppress valid topic ideas, and actual plan titles are never fabricated.
+
+Optional `searchAssist` schemaVersion1 includes conceptVersion, query, country, days, sort, fingerprint, catalogueRevision, maxQueryLength256, interpretation, notices, blocked, and suggestions. Suggestions have text, kind (`rewrite`, `refine`, `broaden`), changedFacets, availability (`available`, `none`, `unknown`), label, and action.query. Old fields/enums retain compatibility. Proxy/backend accept at most256 Unicode code points; the client confirms capability before exceeding100. Optional `catalogueRevision` is a64-character hex digest; later-page mismatch returns409/no-store. Client pagination takes the revision from each freshly fetched page and resets all pages on409.
+
+Destination completion preserves the other typed interests and supplies that destination's country context. Loading/errors/conflicts have separate UI. Zero Matching with Relevant retains a compact Matching notice; both zero with useful alternatives produces one combined notice; all zero produces one larger recovery panel. Default Trending/Recent and visual-only Interests remain unchanged. Public month/day contracts from the prior release are retained.
+
+`navio.search.smart-enabled=false` retains the legacy implementation as rollback. No search migration, private-trip joins or new dependencies. Evidence cache is bounded by estimated32MiB weight with5k entry admission ceiling; visibility is rechecked each request. Known limits: bounded English vocabulary, explicit clarification for unsupported/ambiguous constraints, O(catalogue) scan, no universal Google-style personalization. See report for634 backend /689 frontend counts, realPG/browser/build evidence and5k latency limits. Separate VM release approval remains required.
+
 ## Interaction
 
 The Plans search bar is reactive: after two characters, its autocomplete combines general destination completions, travel search phrases, and actual published plan cards. Countries and aliases use the existing country registry, independent of backend availability. Related phrases are query suggestions, not invented plans or claims of available results. Already-fetched public Explore cards provide immediate title matches; the catalogue endpoint augments these with matching public plans after a 250 ms debounce. Old-query responses are cancelled/ignored. IME composition does not submit unfinished input.

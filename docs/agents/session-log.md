@@ -1,3 +1,13 @@
+## 2026-11-05 - Codex - Resume and complete smart search verification
+
+**Request:** Continue approved smart Shared Plan search, audit sleep interruption, preserve completed/unrelated work and perform thorough tests.
+
+**Changes:** Finished isolated implementation/review repair, saved client `bcf1d63` and Trip `66ea735` on feat/smart-plan-search-20261103. Integrated newer teammate dev EV revisions clienteb3d858/Tripca3596a without conflict. Natural intent and evidence gates, composed phrases/explicit alternatives, progressive empty states, optional assist/capabilities and revision-safe pagination implemented. No search migrations or auth/dependency changes. Sleep caused no source loss; earlier browser first-input timeout was test hydration timing, missing isolated auth config corrected only in test process.
+
+**Verification:** frontend689pass; full backend634total/0fail/0error/3existing MyListAppendPersistence skips using explicit disposablePG datasource for everycontext, migrations/JPA/publication/copy included. Exact committed-config TypeScript, scopedlint and standard Turbopackbuild pass after teammate integration. Real search API/PG Chrome checks pass (anonymous auth/session mocked only): phrases/titlegroups/alternatives/empty/recovery/spacing/keyboard/IME/history/conflicts/mobile/default, no runtime page errors. 240 controlled surfaces/24intentfamilies/20publications;60holdout44positive, group-precision/recall/nDCG1.000,52/52 retrieval-preserving rewrites. Dataset/memory/browser-latency limits explicit in detailed report. Final1kHTTP5workers25samples:p50=179,p95=225,p99=228,cold540ms;5k:p50=877,p95=933,p99=950,cold1669ms. No VM capacity claim. Existing global CSS blocks webpack fallback; normal Turbopack passes with temporary worktree filesystem root restored afterward.
+
+**State/remaining:** Feature branches local and clean; ordinary repos/unrelated changes/userdev3000 unchanged. No app push/deployment/parentpin change. Report docs/reports/2026-11-05-smart-shared-plan-search.md, feature/plan/handoff updated. Separate VM release approval pending. Isolated frontend3109/backend18082/config18888 and identity-verified disposablePG56433 stopped; user3000 PID43460 still listening. Feature worktrees preserved. Mandatory docs commit on docs branch->rootdev only.
+
 ## 2026-11-03 - Codex - Refine empty search presentation
 
 **Request:** Progressive empty states for Matching, Relevant and Alternatives, with clearer formal copy and a larger all-empty message.
