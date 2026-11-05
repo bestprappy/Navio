@@ -4,7 +4,11 @@ User requested an inventory before implementation. Finish agreed placeholders fi
 
 **Update 2026-11-05:** User subsequently approved implementation, explicitly put Custom Cover on hold and requested component reuse. Ratings/comments/reader sharing are implemented and LIVE in root0e341ac, including corrected gateway routing. See `docs/reports/2026-11-05-shared-plan-feedback.md`. Items below preserve the original audit, not the current implementation status.
 
-## Confirmed active Shared Plan gaps
+## Latest implementation status (2026-11-05)
+
+The remaining approved scope is implemented in isolated feature branches, awaiting a new VM release: Saved Guides (traveler and publicly addressable curated guides), five discovery sections, real sorting and evidence-backed collection/theme filters. Real ratings/comments and reader sharing are already live. Custom Cover and Saved custom categories remain explicitly on hold. The original audit below is historical, not a current list of active gaps. See `docs/api/Shared Plan Discovery.md` and `docs/api/saved-content.md`.
+
+## Original Shared Plan gaps (historical audit)
 
 1. ReaderFeedback stars are React state only; no persisted plan rating, average, count, update or removal workflow. PlanEngagement always says Not rated yet. Real averages/counts must reach cards and details before rating sorting is meaningful.
 2. ReaderFeedback comments are local unposted previews only. No persisted comment listing/posting/edit/delete or conversation lifecycle in this reader. Replies, pagination, reporting/moderation and ownership rules need explicit design; do not describe these as existing controls.

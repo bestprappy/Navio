@@ -1,6 +1,6 @@
 # Shared Plan discovery and Saved Guides
 
-Status: proposed implementation design; read-only builder review completed, awaiting user design approval. No product code changed.
+Status: user-approved design implemented and verified in isolated feature branches; new VM release pending authorization. See `docs/reports/2026-11-05-discovery-saved-guides.md`. Custom Cover and custom categories remain paused.
 
 ## Authorized scope
 
