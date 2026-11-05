@@ -1,3 +1,11 @@
+## 2026-11-05 - Codex - Shared Plan placeholder inventory, no implementation
+
+**Request:** User changed priority from new default sections/filters to listing unfinished placeholders first.
+
+**Findings:** Reader ratings/comments are local previews; reader Share plan is PreviewAction although Explore-card link sharing works. ReaderPresentation owner cover override remains browser-local preview; provider covers work. Saved Guides/custom categories deferred; keyword Interests deferred to filters. Google place-review link and missing-rating fallback are not Navio review placeholders. Legacy invite/social controls have no current app import found. Inventory docs/features/shared-plan-placeholder-inventory.md separates confirmed gaps, working features and later scope.
+
+**State/next:** No application edits, runtime tests, service restart, schema change or deployment. Preserve released root5b2a2eb and user clienttsconfig/CLAUDE/service logs. Await user inventory adjustments before implementation. Mandatory notes committed on docs branch from synced dev and merged dev only.
+
 ## 2026-11-05 - Codex - Smart search LIVE, VM and dev:vm verified
 
 **Completed:** Explicitly approved release root `5b2a2eb`, client `bcf1d63`, server `35afd9c`, Trip `66ea735`, compatible teammate Mobility `afc6ccf` (IAM6d6c2ca/communityca13f09 unchanged). All published child-first throughdev/main; every pin matched origin/main. Workflow https://github.com/bestprappy/Navio/actions/runs/41991110563 attempt2 successful including rollout. No further release approval/deployment needed.
