@@ -2,6 +2,8 @@
 
 Implemented contract, 5 November 2026. Requires the Trip V27 migration and matching gateway/frontend release. This is Navio feedback on a trip plan, not Google Maps visitor reviews of a place.
 
+Live in root0e341ac (client45e42e8/serverb11f808/Tripdfe950d), verified through both the production gateway and dev:vm proxy. Public and mutation feedback paths are included in both gateway route configurations; anonymous access remains restricted by exact security rules to summary/comments GET only.
+
 All paths are under `/v1/shared-plans/{token}/feedback`. Responses are not publicly cached. Public reads require a current, active, Explore-listed publication. Unknown, unlisted, revoked and stale-sanitizer links return the existing generic 404. Private planner copies never inherit ratings/comments.
 
 | Method | Suffix | Contract |

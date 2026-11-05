@@ -25,7 +25,7 @@
 
 ## Execution ledger
 
-Implemented and published feature branches: client45e42e8/Tripdfe950d/server607ce0a. No release. Full verification/evidence in docs/reports/2026-11-05-shared-plan-feedback.md. Independent review's cached-data draft-loss and search invalidation findings corrected; browser regression confirms draft preservation after a real post-mutation failed refetch/retry. Composer success closes old editor before invalidation, avoiding a late callback closing a newly opened reply. Temporary test config restored, owned services stopped. Custom Cover remains on hold.
+Implemented feature branches: client45e42e8/Tripdfe950d/server607ce0a. User authorized VM release; final root0e341ac/serverb11f808 LIVE, workflow42043762253 successful. Initial6f9 release missed exact gateway route predicates despite correct security; real live404 identified the omission. Bundled/production routes corrected with red/green actual-path regression and3 deployment smoke tests. Live API/Chrome/dev:vm verification passes, no authenticated production writes. Full evidence in docs/reports/2026-11-05-shared-plan-feedback.md. Independent review's cached-data draft-loss and search invalidation findings corrected; browser regression confirms draft preservation after a real post-mutation failed refetch/retry. Composer success closes old editor before invalidation, avoiding a late callback closing a newly opened reply. Temporary test config restored, owned services stopped. Custom Cover remains on hold.
 
 ## Review focus
 

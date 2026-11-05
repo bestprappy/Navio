@@ -1,5 +1,11 @@
 # Shared Plan feedback implementation and verification
 
+**LIVE 2026-11-05:** User approved VM release. Final root `0e341ac`, client `45e42e8`, server `b11f808`, Trip `dfe950d`; [workflow 42043762253](https://github.com/bestprappy/Navio/actions/runs/42043762253) completed successfully. Initial root6f9b1cd built/deployed healthy but omitted feedback gateway route predicates; read-only live checks caught404. Corrected both route configs, added actual-path regression tests and a deployment smoke guard. No schema rollback or unrelated service changes.
+
+**Live checks:** Real public feed/detail rating/count projections and comments/privacy pass; reports and anonymous forged-header writes401, unknown token404, health200/protectedtrips401. Production and localhost3000 dev:vm feedback proxies200. Real deployed Chrome guest reader, share URL dialog, Explore cards and390px layout pass with no API mocks/page runtime errors. No authenticated production feedback writes were made. Evidence: output/feedback-live-api.json/.log, feedback-live-browser.log and screenshots. Deployment log explicitly confirms feedback routing/authentication verification.
+
+**Corrective checks:** Gateway18total/0fail/1existing skip; configuration-server1pass; shell syntax clean; deployment smoke3pass including reproducing missing-route failure. These supplement the implementation verification below.
+
 ## Implementation
 
 User approved implementing the placeholder inventory with Custom Cover explicitly on hold, then asked to reuse components and optimize. Completed scope is persisted plan ratings, comments/replies, author edit/delete, publisher removal/report review, and actual reader link sharing. Guides, custom Saved categories, filters and new default-page collections remain separate later work. No cover storage/upload changes.
@@ -21,4 +27,4 @@ Review corrected cached-summary error handling so failed background refreshes pr
 
 - Actual Next proxy checks (no identity bridge): anonymous summary/comments200 with no private identity; reports401; forged-header rating write401; cross-origin comment write403; unknown resource404.
 
-No VM deployment or production data writes. Dedicated frontend3111/backend18084 and identity-verified disposable PostgreSQL stopped; temporary next.config/tsconfig restored. User dev:vm3000PID43460 unchanged. Feature branches published: client45e42e8, Tripdfe950d, gateway/server607ce0a. Production/dev:vm needs the verified backend/gateway/frontend release; do not describe it as live beforehand.
+Implementation testing used only isolated data. Dedicated frontend3111/backend18084 and identity-verified disposable PostgreSQL stopped; temporary next.config/tsconfig restored. User dev:vm3000PID43460 unchanged. Initial feature branches were client45e42e8, Tripdfe950d, gateway/server607ce0a; subsequent authorized release and routing correction are live as recorded above. Custom Cover remains on hold.

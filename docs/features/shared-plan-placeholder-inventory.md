@@ -2,7 +2,7 @@
 
 User requested an inventory before implementation. Finish agreed placeholders first, then return to the new default collections and filters. No application changes are authorized by this inventory alone.
 
-**Update 2026-11-05:** User subsequently approved implementation, explicitly put Custom Cover on hold and requested component reuse. Ratings/comments/reader sharing implementation is documented in `docs/reports/2026-11-05-shared-plan-feedback.md`; it is not deployed yet. Items below preserve the original audit, not the current implementation status.
+**Update 2026-11-05:** User subsequently approved implementation, explicitly put Custom Cover on hold and requested component reuse. Ratings/comments/reader sharing are implemented and LIVE in root0e341ac, including corrected gateway routing. See `docs/reports/2026-11-05-shared-plan-feedback.md`. Items below preserve the original audit, not the current implementation status.
 
 ## Confirmed active Shared Plan gaps
 
