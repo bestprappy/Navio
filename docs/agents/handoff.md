@@ -1,3 +1,8 @@
+## 2026-11-06 - Codex - Diagnose old discovery UI on localhost (read-only product check)
+
+**Request:** User sees only Trending/Recent and preview Filters; diagnose only, no fix/restart/deploy.
+**Found:** Port3000 PID43460/parent46676 runs ordinary Navio/client at45e42e8 onmain. Its ExplorePage explicitly renders only two SharedPlansSection components and search-controls still contains the exact disabled Keyword filters preview seen in the screenshot. New client599ee7e is clean on isolated output/smart-search-work/client feature branch and is not an ancestor of ordinaryclientHEAD. Thus active frontend source is old, not a missing-results/filter bug or browser-cache diagnosis. VM backend release is also pending, but frontend checkout separation directly explains the pictured UI.
+**Actions/next:** No app/config/pin/process/server/deployment changes. Explained the integration gap; await user's next instruction. Existing feature revisions/report/tests remain valid; do not redo them. Only mandatory session notes committed ondocs branch->dev, nevermain.
 ## 2026-11-06 - Codex - Discovery and Saved Guides verified, VM release pending
 
 **Scope/result:** Completed the user-approved remaining discovery sections, filters/sorting and Saved Guides. Custom Cover and custom categories remain explicitly paused. Existing live feedback/search and unrelated teammate work preserved. Report: docs/reports/2026-11-05-discovery-saved-guides.md; API discovery/saved-content and database notes updated.
