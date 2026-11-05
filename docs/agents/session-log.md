@@ -1,3 +1,13 @@
+## 2026-11-05 - Codex - Publish approved smart-search release; CI font retry pending
+
+**Request:** User approved VM release of verified clientbcf1d63/Trip66ea735.
+
+**Published:** Preserved newer teammate devEV changes and verified compatible Mobilityafc6ccf (191tests/0fail/0error/1existing skip including realPG schema), then published children->server35afd9c->root5b2a2eb throughdev/main. All6nestedpins equal origin/main. No source edits this release turn; ordinarydev:vm source updated while exact usertsconfig/CLAUDE/logs remain intact.
+
+**Outcome so far:** Workflow41991110563 attempt1 revision/PG/allotherimages pass; web-client fails on existing PlusJakartaSans Next16.3.4 Googlefont query parsing, deploy skipped. OldVM health200/protected401. OfficialNextissue99114 documents matching intermittent extensionlessfontURL cause. Connector logs readable but retry403; browserhost/nativeactivation unavailable, Sky kernel failed. Requested user Re-run failed jobs via async input; release approval persists. Do not rerun blindly or change fonts/dependencies without investigating new evidence.
+
+**Next:** Wait for retry, monitor workflow, then actual live API/browser checks via prepared output/check-smart-search-live*.mjs; reportLIVE only after both. Finalize docs on docs/smart-search-release-20261105 ->devonly. Own config/PG stopped; user3000 PID43460 untouched. No production data writes or application rollback needed because deploy never started.
+
 ## 2026-11-05 - Codex - Resume and complete smart search verification
 
 **Request:** Continue approved smart Shared Plan search, audit sleep interruption, preserve completed/unrelated work and perform thorough tests.
