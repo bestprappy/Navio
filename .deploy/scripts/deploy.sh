@@ -577,6 +577,29 @@ verify_api_route GET '/v1/groups/search?q=ev&size=1' 200
 verify_api_route GET '/v1/groups/mine' 401
 verify_api_route POST '/v1/groups' 401
 verify_api_route GET '/v1/shared-plans?page=0&size=1' 200
+# Verify actual feedback routing as well as the independent security allowlist.
+# Only public reads and anonymous requests that must be rejected; never seed or
+# mutate production feedback as part of a deployment health check.
+compose exec -T navio-web node <<'NODE'
+const base = process.env.NAVIO_API_BASE_URL;
+async function expect(path, status, method = 'GET') {
+  const response = await fetch(new URL(path, base), { method, signal: AbortSignal.timeout(15000) });
+  if (response.status !== status) throw new Error(`Feedback route check: ${method} returned ${response.status}, expected ${status}`);
+  return response;
+}
+(async () => {
+  const feed = await (await expect('/v1/shared-plans?page=0&size=1', 200)).json();
+  const token = feed.content?.[0]?.token;
+  if (token) {
+    const path = `/v1/shared-plans/${encodeURIComponent(token)}/feedback`;
+    await expect(path, 200);
+    await expect(`${path}/comments`, 200);
+    await expect(`${path}/reports`, 401);
+    await expect(`${path}/rating`, 401, 'PUT');
+    console.log('Shared Plan feedback routing and authentication verified.');
+  } else console.log('No listed plans; feedback public-read check skipped.');
+})().catch(error => { console.error(error.message); process.exitCode = 1; });
+NODE
 verify_api_route GET '/v1/vehicle-models?page=0&size=1' 200
 verify_api_route GET '/v1/admin/audit-events' 401
 verify_api_route GET '/v1/guides?page=0&size=1' 200

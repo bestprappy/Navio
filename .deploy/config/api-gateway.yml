@@ -34,7 +34,7 @@ spring:
             - id: shared-plans
               uri: http://trip-planning-service:8082
               predicates:
-                - Path=/v1/shared-plans,/v1/shared-plans/{token},/v1/shared-plans/{token}/copies,/v1/shared-plans/{token}/summary,/v1/shared-plans/{token}/pin,/v1/shared-plans/{token}/author,/v1/shared-plans/by-author/{owner}
+                - Path=/v1/shared-plans,/v1/shared-plans/{token},/v1/shared-plans/{token}/copies,/v1/shared-plans/{token}/summary,/v1/shared-plans/{token}/pin,/v1/shared-plans/{token}/author,/v1/shared-plans/by-author/{owner},/v1/shared-plans/{token}/feedback,/v1/shared-plans/{token}/feedback/**
             - id: user-management-service
               uri: http://user-management-service:8081
               predicates:
