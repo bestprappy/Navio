@@ -15,10 +15,13 @@
 // Idempotent: a plan whose title already exists among the seed user's trips is
 // skipped, so a partial run can simply be re-run.
 
-import { plans } from "./plans.mjs";
+import { plans as originalPlans } from "./plans.mjs";
+import { seasonalEventPlans } from "./seasonal-events.mjs";
 import { completeSample } from "./complete-sample.mjs";
 
 const env = process.env;
+if(env.SEED_BATCH&&!['original','seasonal-events'].includes(env.SEED_BATCH))throw new Error('Unknown seed batch');
+const plans=env.SEED_BATCH==='seasonal-events'?seasonalEventPlans:originalPlans;
 const TRIP_URL = (env.TRIP_URL ?? "http://localhost:8082").replace(/\/$/, "");
 const GEO_URL = (env.GEO_URL ?? "http://localhost:8083").replace(/\/$/, "");
 const USER_ID = env.SEED_USER_ID ?? "";
@@ -33,6 +36,8 @@ if (!UUID_RE.test(USER_ID)) {
   console.error("SEED_USER_ID must be the seed account's Keycloak user id (a UUID).");
   process.exit(1);
 }
+if(env.SEED_BATCH==='seasonal-events'&&USER_ID!=='0ae736e4-a315-456e-bb2e-7257d419b2d9')throw new Error('This maintained batch belongs to the dedicated Navio Team account.');
+for(const base of [TRIP_URL,GEO_URL]){const url=new URL(base);if(url.protocol!=='http:'||!['localhost','127.0.0.1','trip-planning-service','mobility-and-ev-service'].includes(url.hostname))throw new Error('Use the private service network; never send internal identity headers to a public host.');}
 
 const DAY_COLORS = ["teal", "cyan", "blue", "emerald", "amber", "pine", "navy", "slate"];
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -46,6 +51,7 @@ async function call(base, method, path, body) {
       ...(body ? { "Content-Type": "application/json" } : {}),
     },
     body: body ? JSON.stringify(body) : undefined,
+    signal: AbortSignal.timeout(60000),
   });
   const text = await response.text();
   if (!response.ok) {
@@ -221,7 +227,7 @@ async function seedPlan(plan, index, skipTitles) {
   if (!destinationPlace?.location) throw new Error(`destination "${plan.destination}" not found`);
   const destination = destinationPlace.location;
 
-  const startDate = addDays(START_DATE, index * 3);
+  const startDate = plan.startDate ?? addDays(START_DATE, index * 3);
   const { blocks, placeCount } = await buildBlocks(plan, destination, startDate);
   const minPlaces = Math.max(3, plan.days.length * 2);
   if (placeCount < minPlaces) {
@@ -244,7 +250,7 @@ async function seedPlan(plan, index, skipTitles) {
   if (!planner.capabilities?.includes("publication-sections-v1") || !planner.capabilities?.includes("trip-vehicles-v1")) {
     throw new Error("Update the backend before creating complete maintained samples.");
   }
-  const complete = completeSample(plan, { ...planner, blocks });
+  const complete = completeSample(plan, { ...planner, blocks },{includeDates:plan.publishDates===true});
   const saved = await trip("PUT", `/v1/trips/${created.id}/planner`, {
     version: planner.version,
     blocks: complete.blocks,
@@ -276,6 +282,7 @@ async function seedPlan(plan, index, skipTitles) {
 }
 
 async function main() {
+  if(ONLY.some(slug=>!plans.some(plan=>plan.slug===slug)))throw new Error('Unknown plan slug for this batch');
   const selected = ONLY.length ? plans.filter((p) => ONLY.includes(p.slug)) : plans;
   console.log(`Seeding ${selected.length} plans as ${USER_ID} ("${AUTHOR}")${DRY_RUN ? " [dry run]" : ""}`);
   console.log(`trip=${TRIP_URL} geo=${GEO_URL}\n`);
