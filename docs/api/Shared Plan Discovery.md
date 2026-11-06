@@ -31,8 +31,10 @@ Released root 027fabc / Trip 044e0bd adds Halloween (October 31, seven days befo
 Chinese New Year dates are verified from the Hong Kong Observatory Gregorian/lunar tables for 2026-2030 (February 17, February 6, January 26, February 13, February 3 respectively). Loy Krathong is verified for November 24, 2026 only through Chiang Mai provincial tourism/Thai government sources. Unknown-year lunar occurrences are omitted rather than guessed. Extend official calendar coverage before those bounds expire. Source links: https://www.hko.gov.hk/en/gts/time/calendar/pdf/files/2027e.pdf and corresponding year tables; https://chiangmai.mots.go.th/news/6839 ; https://www.thailand.go.th/events . The expanded registry is live after successful workflow42181062252.
 
 
-## Ordered sorting (verified; approved release in progress, 2026-11-06)
+## Ordered sorting (LIVE, 2026-11-06)
 
 `sort` accepts an ordered comma-separated list of up to six unique explicit metrics, e.g. `rating,views,recent`. Existing single values remain supported. `relevance` (Recommended) is the exclusive default, never combined. Unknown values, duplicates, empty list elements or oversized lists are400. The server applies each metric lexicographically inside existing eligible result buckets; explicit secondary metrics precede implicit rating-count/popularity-view tie-breakers, then event proximity and stable listedAt/token fallbacks. Thus explicit Newest can outrank event proximity; Recommended retains default section behavior. Ordered criteria are part of the query fingerprint and URL/query key; mutable metrics are included in catalogue revision protection.
 
 Only the sorting disclosure expands inline inside Filters. Checking/reordering/collapsing modifies the draft; Apply activates it, Reset restores Recommended and clears existing filter groups, closing without Apply discards draft changes. Sorting does not broaden collection/theme/country/duration eligibility. No new gateway route or migration.
+
+Released root `8d61774`, client `7644ac8`, Trip `d7692ea`, server `d24ac33`. Workflow42190207640 succeeded. Live VM and dev:vm browser/API acceptance, mobile/keyboard/dark checks, actual31-plan metric ordering and existing-plan preservation passed.

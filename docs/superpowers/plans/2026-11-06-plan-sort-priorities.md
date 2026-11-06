@@ -30,3 +30,7 @@ UI: reusable SortPriorityControl with accessible expansion trigger, labeled nati
 - Deployment is not authorized for this new revision yet. Do not integrate multi-sort frontend into active dev:vm while VM rejects its new ordered parameter. Finish verification/feature commits, ask concrete release approval once.
 
 Final verified feature revisions: client7644ac8/Tripd7692ea. User approved VM deployment; release now authorized, not pending permission. Full final client701/types/lint/build and browser regression pass; Trip658 with5 existing skips.
+
+
+## Completion
+Released root8d61774/client7644ac8/Tripd7692ea/serverd24ac33; workflow42190207640 passed revision, realPG, build and deployment gates. VM and dev:vm actual browser/API checks passed ordered priorities, bad-input400, disclosure retention, reorder, cancel, Apply/Reset, keyboard, mobile/dark and no page runtime errors. Actual31-plan metric ordering verified for rating/views, views/recent, copies/views and comments/rating/views. All31existing tokens/titles/day/place/charger counts preserved; health200. Temporary test services remain stopped, original ordinaryclient tsconfig hash unchanged. Task complete, no further release needed. Minor deferred coverage remains dedicated Newest+Events regression (behavior intentional and general priority tests passed).
