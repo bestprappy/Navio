@@ -20,3 +20,15 @@ test('explicit batch uses per-plan date and publishes complete month/day section
  const result=execFileSync(process.execPath,['--input-type=module','-e',setup],{cwd:new URL('../../../',import.meta.url),env:{...process.env,SEED_USER_ID:'0ae736e4-a315-456e-bb2e-7257d419b2d9',SEED_BATCH:'seasonal-events',ONLY:'se-kyoto-spring',PAUSE_MS:'0'},encoding:'utf8'});
  assert.match(result,/"published":1/);
 });
+
+for (const scenario of ['unpublished', 'missing-charger', 'charger-error']) {
+ test(`maintained batch refuses ${scenario} instead of silently succeeding`,()=>{
+  const setup=`globalThis.fetch=async(url,options={})=>{const path=new URL(url).pathname,method=options.method??'GET';
+   if(path==='/v1/trips'&&method==='GET')return Response.json({content:${scenario==='unpublished'?"[{id:'existing',displayName:'Kyoto Spring: Blossoms, Canals and Temple Gardens'}]":"[]"},totalPages:1});
+   if(path.endsWith('/publication'))return Response.json({published:false});
+   if(path==='/v1/geo/places/search')return Response.json({items:[{providerPlaceId:'real-place',name:'Place fixture',location:{lat:13.75,lng:100.5}}]});
+   if(path==='/v1/ev/chargers/near')return ${scenario==='charger-error'?"new Response('provider unavailable',{status:503})":"Response.json({items:[]})"};
+   throw new Error('Unexpected write or call '+method+' '+path);};await import('./.deploy/scripts/seed-explore/seed.mjs');`;
+  assert.throws(()=>execFileSync(process.execPath,['--input-type=module','-e',setup],{cwd:new URL('../../../',import.meta.url),env:{...process.env,SEED_USER_ID:'0ae736e4-a315-456e-bb2e-7257d419b2d9',SEED_BATCH:'seasonal-events',ONLY:scenario==='unpublished'?'se-kyoto-spring':'ev-bangkok-new-year',PAUSE_MS:'0'},encoding:'utf8',stdio:'pipe'}),error=>{assert.match(error.stdout,/"failed":1/);assert.doesNotMatch(error.stderr,/Unexpected write/);return true;});
+ });
+}

@@ -12,8 +12,8 @@
 // gateway injects after validating a JWT. Run it only where those ports are
 // private: locally, or on the VM inside the navio-backend network (see README).
 //
-// Idempotent: a plan whose title already exists among the seed user's trips is
-// skipped, so a partial run can simply be re-run.
+// Existing completed publications are skipped. Maintained drafts fail closed
+// for explicit owner-side recovery; a partial draft is never silently called done.
 
 import { plans as originalPlans } from "./plans.mjs";
 import { seasonalEventPlans } from "./seasonal-events.mjs";
@@ -172,8 +172,10 @@ async function buildBlocks(plan, destination, startDate) {
         try {
           const charger = await resolveCharger(stop, destination);
           if (charger) items.push(charger);
+          else if (env.SEED_BATCH === "seasonal-events") throw new Error(`Required charger missing near "${stop.chargerNear}"`);
           else console.warn(`   ~ no charger near "${stop.chargerNear}", skipped`);
         } catch (error) {
+          if (env.SEED_BATCH === "seasonal-events") throw error;
           console.warn(`   ~ charger lookup failed near "${stop.chargerNear}": ${error.message}`);
         }
         continue;
@@ -204,10 +206,10 @@ async function buildBlocks(plan, destination, startDate) {
 }
 
 async function existingTitles() {
-  const titles = new Set();
+  const titles = new Map();
   for (let page = 0; page < 50; page++) {
     const result = await trip("GET", `/v1/trips?page=${page}&size=100`);
-    for (const t of result?.content ?? []) if (t.displayName) titles.add(t.displayName);
+    for (const t of result?.content ?? []) if (t.displayName) titles.set(t.displayName, t.id);
     // Spring serialises Page either flat ({ last, totalPages }) or as a PagedModel ({ page: { totalPages } }).
     const totalPages = result?.totalPages ?? result?.page?.totalPages ?? 1;
     if (page + 1 >= totalPages) break;
@@ -218,6 +220,13 @@ async function existingTitles() {
 async function seedPlan(plan, index, skipTitles) {
   const label = `[${index + 1}/${plans.length}] ${plan.title}`;
   if (skipTitles.has(plan.title)) {
+    if (env.SEED_BATCH === "seasonal-events") {
+      const existingId = skipTitles.get(plan.title);
+      const publication = await trip("GET", `/v1/trips/${existingId}/publication`);
+      if (!publication?.published || !publication.listedInExplore || publication.staleSanitizer || publication.hasUnpublishedChanges) {
+        throw new Error(`Existing maintained trip ${existingId} is incomplete or deliberately unlisted. Inspect and recover through the owner APIs; refusing to overwrite or republish it automatically.`);
+      }
+    }
     console.log(`${label}: already seeded, skipped`);
     return "skipped";
   }
