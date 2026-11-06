@@ -1,3 +1,9 @@
+## 2026-11-06 - Codex - Shared Plan multiple sorting inspection; priority semantics pending
+
+**Request:** User paused sample/provider work and asks checkboxes for multiple sorting selections plus polished UI. No implementation yet. Inspected plan-filters.tsx, search-state.ts, shared-plan-search.tsx and Trip SharedPlanSearchService. Both UI selectors/state/URL and backend currently accept one sort string; checking multiple boxes without backend ordering support would be misleading.
+**Proposed:** Ordered priorities, selected criteria numbered and reorderable; first criterion primary, following criteria break ties. Alternative blended ranking combines normalized signals but is less transparent. Need user choice before final design/implementation; do not infer checkbox-only UI satisfies actual multiple sorting. Preserve eligibility, separate Matching/Relevant/Alternatives, pagination/revision handling, Apply/Reset and existing country/duration/collections/themes. Reuse existing tokens/popover/buttons; no Google/provider work.
+**State:** No product/config/service changes. Rootdev869e4c6, ordinaryclientmain9181607 with existing usertsconfig edit/CLAUDE preserved; serverdev a20859f, Tripmain044e0bd. Latest event release027fabc remains live and successful. Fifteen sample publications remain blocked by provider403, not part of this task.
+
 ## 2026-11-06 - Codex - Event recognition release LIVE; 15 sample publications still blocked
 
 **Authorization/result:** User approved Trip044e0bd/client9181607 VM release. Released root027fabc8c9c4c7ae26ce9e77cadf8c5712f887b2, servera20859f. Workflow https://github.com/bestprappy/Navio/actions/runs/42181062252 completed SUCCESS: all six revision pins, realPostgres validation, all images and VM deployment. No migrations. Children merged feature->dev->main; rootmain fast-forwarded from dev after ancestry/pin checks, leaving unrelated dirty rootmain worktree alone.
