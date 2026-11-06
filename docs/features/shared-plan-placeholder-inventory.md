@@ -6,7 +6,7 @@ User requested an inventory before implementation. Finish agreed placeholders fi
 
 ## Latest implementation status (2026-11-05)
 
-The remaining approved scope is implemented in isolated feature branches, awaiting a new VM release: Saved Guides (traveler and publicly addressable curated guides), five discovery sections, real sorting and evidence-backed collection/theme filters. Real ratings/comments and reader sharing are already live. Custom Cover and Saved custom categories remain explicitly on hold. The original audit below is historical, not a current list of active gaps. See `docs/api/Shared Plan Discovery.md` and `docs/api/saved-content.md`.
+The remaining approved scope is implemented and LIVE after root e1aea7d (2026-11-06): Saved Guides (traveler and publicly addressable curated guides), five discovery sections, real sorting and evidence-backed collection/theme filters. Real ratings/comments and reader sharing are already live. Custom Cover and Saved custom categories remain explicitly on hold. The original audit below is historical, not a current list of active gaps. See `docs/api/Shared Plan Discovery.md` and `docs/api/saved-content.md`.
 
 ## Original Shared Plan gaps (historical audit)
 

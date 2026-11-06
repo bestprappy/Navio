@@ -1,4 +1,4 @@
-# Saved content library (implemented, VM release pending)
+# Saved content library (LIVE)
 
 IAM owns `/v1/users/me/saved`. Every operation requires the resolved current account, including administrators. Next exposes the matching authenticated, same-origin proxy at `/api/users/me/saved`. Responses are no-store.
 
@@ -21,7 +21,7 @@ Saved coordinate/Mapbox/EV locations reuse the existing atomic POST /v1/trips/{t
 
 Recents shows Recently saved then Recently opened. Search from Recents covers the full active library. Places have no library cap and are paged; legacy personal Home/Work/favorite picker remains bounded and separate in role. Shared-plan ratings/comments and reader sharing are live in root0e341ac. Custom categories and Custom Cover remain paused.
 
-## Saved Guides extension (2026-11-05; VM release pending)
+## Saved Guides extension (LIVE after root e1aea7d, 2026-11-06)
 
 `POST /guides` accepts `{id: UUID, source: "TRAVELER" | "CURATED"}`. Existing published-guide services resolve visibility and metadata; callers cannot supply arbitrary titles or bookmark private drafts. Canonical identities are `guide:traveler:<UUID>` and `guide:curated:<UUID>`. Public reader paths retain source identity, never redirect to an editor.
 

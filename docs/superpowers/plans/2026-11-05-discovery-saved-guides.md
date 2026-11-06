@@ -67,3 +67,5 @@ Files: client saved library API/model/page/save-button, guide card/reader and cu
 - Fresh whole-branch review found stale409 pagination recovery and minor event ordering/unavailable-state issues; repaired with focused regressions and actual browser rerun. No Critical/Important findings remain.
 - Decisions: expose only evidence-supported themes (no City); Seasonal uses calendar month fallback without weather claims; event proximity means shared travel date alignment. Guide-inclusive reads remain explicit opt-in and use separate storage.
 - User checkout/config preserved, test-only Next root config restored. Owned services stopped; worktrees kept. New release approval still required.
+
+- RELEASED 2026-11-06 after user approval: root e1aea7d/serverdeeb17b and verified child revisions now ondev/main; workflow42169426376 allgates/builds/deploypass. ActualVM+localhost acceptance pass. Earlier pending-release entries above are historical. No further release approval required for this revision.

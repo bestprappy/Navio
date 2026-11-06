@@ -1,6 +1,6 @@
 # Discovery and Saved Guides implementation
 
-Status: implemented in isolated feature branches; new VM release pending. Custom Cover and custom categories remain on hold. Existing user checkout, uncommitted configuration and running dev:vm server were preserved.
+Status: LIVE after the approved 2026-11-06 release, root e1aea7d. Custom Cover and custom categories remain on hold. Existing user checkout, uncommitted configuration and running dev:vm server were preserved.
 
 ## Implementation
 
@@ -27,6 +27,14 @@ One final run started before its new disposable database was created; the report
 
 ## Release boundary
 
-Code is not yet installed into the user's running dev:vm checkout or VM. Release requires changed child branches through dev/main, child-first pins and the root-main deployment after explicit approval. User configuration hash and unrelated work remain preserved. API details are in `docs/api/Shared Plan Discovery.md` and `docs/api/saved-content.md`.
+User approved integration and release after the checkout diagnosis. Client599ee7e, Tripb0f6c24, IAMce72041 and serverdeeb17b reached dev/main child-first; root e1aea7d deployed successfully in workflow42169426376. The ordinary localhost client now runs the released frontend. User configuration hash and unrelated work remain preserved. API details are in `docs/api/Shared Plan Discovery.md` and `docs/api/saved-content.md`.
 
-Verified/pushed feature revisions: client `599ee7e` on `feat/discovery-saved-guides-20261105`, Trip `b0f6c24` on `feat/discovery-collections-20261105`, IAM `ce72041` on `feat/saved-guides-20261105`. No parent pins or main branches changed. Temporary test services were stopped; worktrees remain available for release/review. User node PID43460 remains present and its configuration hash is unchanged.
+Verified/pushed feature revisions: client `599ee7e` on `feat/discovery-saved-guides-20261105`, Trip `b0f6c24` on `feat/discovery-collections-20261105`, IAM `ce72041` on `feat/saved-guides-20261105`. These feature revisions are now on dev/main and pinned in the deployed root. Temporary test services were stopped; worktrees remain available for release/review. User node PID43460 remains present and its configuration hash is unchanged.
+
+## Live release acceptance (2026-11-06)
+
+Workflow https://github.com/bestprappy/Navio/actions/runs/42169426376 passed revision checks, PostgreSQL migration/ORM gate, every container build and VM rollout. All six pins equal their repositories origin/main. The unrelated dirty old rootmain worktree was preserved; remote main fast-forwarded from verified dev after an ancestry check.
+
+Actual VM and localhost API/browser acceptance passed: five section headings, real sorts and filter validation, collection Apply/Reset, fully settled Recent cards with no collection errors, mobile390px/no horizontal overflow, no page runtime errors, protected Saved Guides401 and health200. No API mocks or authenticated production writes. Initial acceptance script waited on collections instead of the existing planCollections URL key; corrected test only and reran successfully. Evidence: output/check-discovery-guides-live.mjs, discovery-guides-live.log/.json, discovery-guides-live-vm.png and discovery-guides-live-local.png.
+
+At acceptance Trending had no new activity, and Seasonal/Events had no qualifying public records. Their honest empty states are expected; Recent and All-time popular each returned six cards. Trending will grow from actual new views/copies, without fabricated historical activity. User tsconfig hash remained unchanged; PID43460 was not restarted.

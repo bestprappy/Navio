@@ -1,6 +1,6 @@
 # Shared Plan discovery
 
-Implementation: 2026-11-05; VM release pending. Extends the existing public shared-plan search endpoint and frontend proxy; no new gateway route or external search provider.
+Implementation: 2026-11-05; LIVE on VM and verified in dev:vm after root e1aea7d (2026-11-06). Extends the existing public shared-plan search endpoint and frontend proxy; no new gateway route or external search provider.
 
 ## Request and membership
 

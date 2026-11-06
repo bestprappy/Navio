@@ -1,6 +1,6 @@
 # Shared Plan discovery and Saved Guides
 
-Status: user-approved design implemented and verified in isolated feature branches; new VM release pending authorization. See `docs/reports/2026-11-05-discovery-saved-guides.md`. Custom Cover and custom categories remain paused.
+Status: user-approved design implemented, verified and LIVE after root e1aea7d (2026-11-06), including ordinary dev:vm frontend integration. See `docs/reports/2026-11-05-discovery-saved-guides.md`. Custom Cover and custom categories remain paused.
 
 ## Authorized scope
 
