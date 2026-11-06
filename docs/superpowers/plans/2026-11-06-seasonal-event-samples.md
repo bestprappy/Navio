@@ -17,9 +17,9 @@
 
 ## Tasks
 
-- [ ] RED/GREEN: Trip tests for Halloween windows, Lunar-vs-Gregorian separation, official varying dates, unknown-year omission and Loy eligibility. Extend calendar and update its accurate UI description.
-- [ ] RED/GREEN: maintenance runner tests for explicit batch selection/per-plan dates/date publication/full sections/idempotence. Add 15 researched definitions and reuse completeSample with optional original introduction.
-- [ ] Verify focused/full regressions; real PostgreSQL startup if service source changes require release. Fresh whole-branch review.
+- [x] RED/GREEN: Trip tests for Halloween windows, Lunar-vs-Gregorian separation, official varying dates, unknown-year omission and Loy eligibility. Extend calendar and update its accurate UI description.
+- [x] RED/GREEN: maintenance runner tests for explicit batch selection/per-plan dates/date publication/full sections/idempotence. Add 15 researched definitions and reuse completeSample with optional original introduction.
+- [x] Verify focused/full regressions; real PostgreSQL startup if service source changes require release. Fresh whole-branch review.
 - [ ] VM dry-run validates provider locations; publish canary and remaining records using existing private service APIs. Compare baseline public titles/tokens and verify15 additions only, no artificial metrics.
 - [ ] Document result, source links and calendar limitations. Request release approval only for the concrete verified event-recognition code update; sample creation itself is authorized.
 
@@ -40,3 +40,6 @@
 - Live provider identity/locations and publication/copy review remain pending, not inferred from mock tests. Independent source research documented above. Existing live schema unchanged; fullPostgres-backed regression check passed, releaseCI still required before deployment.
 - VM dry run reached Google Places but all15 lookups failed: upstream403 PERMISSION_DENIED (caller lacks permission), Mobility503. Tally published0/dry-run0/failed15. No canary or apply run attempted. Application services/configuration unchanged. Temporary container file-permission issue corrected by running only that disposable maintenance container asroot.
 - Original31 public records preservation check recorded in output/seasonal-preservation.json. Do not re-create definitions or re-run code implementation; next resolve provider access, repeat dryrun, canary, remainder, full15snapshot checks, and calendar deployment approval.
+
+
+Calendar code release approved and deployed: root027fabc, client9181607, servera20859f, Trip044e0bd; workflow42181062252 successful. Actual VM/dev:vm discovery API, filters, five headings, mobile and runtime-error checks passed; existing31 plans preserved and health200. No sample records created; Google Places access is still a separate blocker. Release is complete; do not repeat it.
