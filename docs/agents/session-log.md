@@ -1,3 +1,7 @@
+## 2026-11-06 - Codex - Pinpoint discovery integration gap
+
+**Request/check:** Further diagnose only. Confirmed dev:vm script launches local next dev and changes backend environment only; it does not use a VM-hosted frontend. Active client45e42e8 ExplorePage lines68-95 passes exactly two old sections; search-controls line82 still hardcodes disabled preview. Feature599ee7e replaces these with DiscoverySections and PlanFilters; commits remain in isolated clean worktree, not activecheckout. LocalExplore HTTP200, new All-time/Seasonal headings absent. No evidence of data-driven hiding; activecode cannot render those sections at all.
+**Cause/next:** Integration gap from our isolated implementation, not missing source or failed deployment/cache. Fix path is integrate verified client branch into usercheckout preserving tsconfig, and release matching Tripb0f6c24/IAMce72041 for backend support. Backend-only deployment cannot replace localhostfrontend. No fix/restart/deploy performed; only required notes ondev. Existing release still pending approval.
 ## 2026-11-06 - Codex - Diagnose old discovery UI on localhost (read-only product check)
 
 **Request:** User sees only Trending/Recent and preview Filters; diagnose only, no fix/restart/deploy.
