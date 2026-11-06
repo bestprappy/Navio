@@ -1,3 +1,10 @@
+## 2026-11-06 - Codex - Approved event calendar release in progress
+
+**Authorization:** User explicitly approved releasing Trip044e0bd/client9181607. Do not ask again for this revision.
+**Published:** Child feature branches merged through dev/main. Servera20859f pins Trip044e0bd. Root027fabc8c9c4c7ae26ce9e77cadf8c5712f887b2 pushed dev then dev:main after six pins matched origin/main and ancestry check. Old dirty rootmain tempworktree untouched. Workflow https://github.com/bestprappy/Navio/actions/runs/42181062252 underway; revision gate passed, realPostgres gate running. No schema changes.
+**Checks/preservation:** Prior verified maintenance15pass, Trip655 nofailure/error (5 existing skips) with realPG, frontend698pass/types/lint retained; source unchanged after tests. Ordinary clientmain now9181607 preserving usertsconfig hash1D992BD1B931C3E8265212BF7868BC5BCD9E96AA7CE899345EA36C963E6DEB9C. Userdev3000 and other containers/config untouched. No sample creation attempted during release.
+**Next:** Monitor workflow through build/deploy; inspect exact failure if any, never blind retry. Then run output/check-discovery-guides-live.mjs and output/check-seasonal-preservation.mjs using Node24 with read-only VM access. Verify expanded Events description on live page. Calendar registry adds Halloween, official2026-2030CNY and verified2026Loy; CNY does not mean GregorianJanuary1. Sample creation STILL blocked by Google Places403 PERMISSION_DENIED via Mobility503; all15 prepared,0created. Do not claim samples published or rerun failed provider calls until access restored. After successful release update API/plan/session status, docsbranch->devonly; no standalone mainpush.
+
 ## 2026-11-06 - Codex - Fifteen seasonal/event samples prepared; provider access blocks publication
 
 **Request/authorization:** User requested around 15 additional real Seasonal/Event plans and explicitly approved extending recognition to Halloween and Chinese New Year. No preview-only records. Sample creation is authorized; a new application release is awaiting explicit approval under release.md. Custom Cover/categories remain paused.
