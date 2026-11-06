@@ -1,3 +1,8 @@
+## 2026-11-06 - Claude - Google free-tier limit released
+
+**State:** Mobility counts every Google Places, photo and Routes call in `ev.provider_monthly_usage` and refuses calls past about 95% of each free cap (`GoogleUsageMeter`, override `navio.google.free-tier.monthly-limits.<METER>`). Places discovery is off on the backend (`navio.discovery.enabled: false`, 404) and the client (`NEXT_PUBLIC_PLACES_ENABLED` must be `true`). Released as mobility `37f9d86`, server `4f6fe99`, client `eb48b4b`.
+**Next:** Confirm the deploy. When a meter is used up, the matching feature degrades until the 1st (Pacific time); raise the limit only if the user accepts the cost. Re-enabling discovery needs a cache first.
+
 ## 2026-11-06 - Codex - Shared Plan multiple sorting LIVE and verified
 
 **Completed:** Approved feature released as root `8d61774c80b74f89f54777669316606ae73b4636`, client `7644ac8`, Trip `d7692ea`, server `d24ac33`. Workflow https://github.com/bestprappy/Navio/actions/runs/42190207640 completed SUCCESS for revision, real-Postgres, all builds and VM rollout. User approved this release; no repeat deployment/approval needed.

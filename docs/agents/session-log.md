@@ -1,3 +1,11 @@
+## 2026-11-06 - Claude - Google free-tier limit and Places discovery off switch released
+
+**Request:** Explain the October Google bill (฿2,759.05), switch Places discovery off, and stop Google calls once the free tier is used up.
+**Cause:** Billing CSV: only Place Details Photos (9,179, ฿1,923.27) and Place Details Enterprise (2,244, ฿835.78) were charged; every other SKU stayed inside its free cap. Photos come mostly from Places discovery (uncached `withPhoto` per card, reader up to 3 per place); Details Enterprise is the planner `GET /v1/geo/places/{id}` lookup (rating/phone/hours fields), which also loads one photo.
+**Done:** Mobility `df989d7`: `navio.discovery.enabled` (default false) refused in `DiscoveryRequestLimiter.acquire()`, mapped to 404. Mobility `37f9d86`: `GoogleFreeTierBudget` consumes a unit per Places/photo/Routes call before sending it; counter `ev.provider_monthly_usage` (V2) per Pacific billing month; a used-up photo meter returns no photo, other meters refuse the call (stale cache or 503); an unreachable counter refuses. Client `eb48b4b`: Places is opt-in in `next dev` too. Server `4f6fe99` pins mobility.
+**Verified:** Mobility `./mvnw -o test` 207 tests, 0 failures (Postgres tests skipped locally: Docker not running, ~340 MB free RAM). Counter SQL tests were added to `PostgresSchemaTests`, so the release pipeline's `verify-database-schema` runs them before building. Client tsc and eslint pass.
+**Next:** Watch the deploy run. Planner card details plus photos still use about 2,000 calls a month, so after about 950 of each, cards show without photos or fail for the rest of the month. EV corridor searches use `PLACES_NEARBY_SEARCH` (950/month). Next steps: caching, or dropping the photo from the planner detail lookup. Before re-enabling Places discovery, add a result/photo cache.
+
 ## 2026-11-06 - Codex - Shared Plan multiple sorting LIVE and verified
 
 **Completed:** Approved feature released as root `8d61774c80b74f89f54777669316606ae73b4636`, client `7644ac8`, Trip `d7692ea`, server `d24ac33`. Workflow https://github.com/bestprappy/Navio/actions/runs/42190207640 completed SUCCESS for revision, real-Postgres, all builds and VM rollout. User approved this release; no repeat deployment/approval needed.

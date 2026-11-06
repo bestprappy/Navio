@@ -316,6 +316,7 @@ erDiagram
 | `ev`     | `charger_reports`          | Reports for incorrect charger data                                                                                      |
 | `ev`     | `charger_suggestions`      | Missing charger submissions and suggested edits                                                                         |
 | `ev`     | `provider_request_logs`    | Provider API usage, errors, and quota observability                                                                     |
+| `ev`     | `provider_monthly_usage`   | Google Maps Platform requests per billing month; calls stop at the free-tier limit (V2, applied)                      |
 | `ev`     | `outbox`                   | Transactional event outbox for EV events                                                                                |
 | `social` | `groups`                   | Community groups such as Thailand Restaurants or EV road-trip groups                                                    |
 | `social` | `group_profiles`           | Group banner, summary, and display metadata                                                                             |
@@ -1388,6 +1389,21 @@ Tracks external provider usage and failures for cost control.
 | `cost_units`    | `NUMERIC(10,4)` |       No | Estimated billable units                              |
 | `error_message` |          `TEXT` |       No | Error summary                                         |
 | `created_at`    |   `TIMESTAMPTZ` |      Yes | Request time                                          |
+
+## 10.8 `ev.provider_monthly_usage`
+
+### Purpose
+
+Applied in mobility-and-ev-service `V2__provider_monthly_usage.sql`. Counts Google Maps Platform requests per billing month so `GoogleFreeTierBudget` can refuse a call before it is sent once a meter reaches its limit. One atomic `INSERT ... ON CONFLICT DO UPDATE ... WHERE request_count < limit RETURNING` per call keeps every instance under the shared limit. If the counter cannot be reached, the call is refused rather than sent.
+
+| Column          |          Type | Required | Description                                                                 |
+| --------------- | ------------: | -------: | --------------------------------------------------------------------------- |
+| `usage_month`   |        `DATE` |      Yes | First day of the month in Google's billing zone (`America/Los_Angeles`); PK |
+| `meter`         | `VARCHAR(40)` |      Yes | `GoogleUsageMeter` name, e.g. `PLACE_PHOTOS`, `PLACE_DETAILS`, `ROUTES`; PK |
+| `request_count` |     `INTEGER` |      Yes | Requests counted this month, default 0, never negative                      |
+| `updated_at`    | `TIMESTAMPTZ` |      Yes | Last counted request                                                        |
+
+Default monthly limits sit about 5% under each free cap: `PLACES_AUTOCOMPLETE` 9,500; `PLACE_DETAILS`, `PLACE_PHOTOS`, `PLACES_TEXT_SEARCH` and `PLACES_NEARBY_SEARCH` 950 each; `ROUTES` 4,750. Override with `navio.google.free-tier.monthly-limits.<METER>`; turn off with `navio.google.free-tier.enabled=false`.
 
 ---
 
