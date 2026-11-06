@@ -30,3 +30,13 @@
 - Chiang Mai tourism November24-25,2026: https://chiangmai.mots.go.th/news/6839
 - Thai government Loy Krathong calendar: https://www.thailand.go.th/events
 - Official destination material consulted: japan.travel Kyoto; iamsterdam.com spring; bled.si Lake Bled; luzern.com winter; visitscotland.com Halloween; wien.info Christmas; noel.strasbourg.eu; visitsingapore.com Chinese New Year; sydneynewyearseve.com guide.
+
+
+## Execution record
+
+- Root maintenance revisionsd762bc0/0ff9c15 pushed on feature branch; Trip044e0bd and client9181607 pushed on their feature branches. No deployment/main push.
+- Final checks: maintenance15pass; Trip655 tests,0failure/0error,5existing skips with disposable realPostgres; frontend698pass, TypeScript and scopedESLint exit0.
+- Fresh read-only whole-branch review found two Important issues. Both repaired RED?GREEN: incomplete existing maintained publications now fail closed instead of falsely counting as skipped; required EV charger lookup failure prevents creation. Full maintenance suite15/15. Recovery intentionally requires owner-side inspection rather than automatically publishing potentially revoked content. Cost: manual recovery for an interrupted draft; benefit: no unintended overwrites/republication.
+- Live provider identity/locations and publication/copy review remain pending, not inferred from mock tests. Independent source research documented above. Existing live schema unchanged; fullPostgres-backed regression check passed, releaseCI still required before deployment.
+- VM dry run reached Google Places but all15 lookups failed: upstream403 PERMISSION_DENIED (caller lacks permission), Mobility503. Tally published0/dry-run0/failed15. No canary or apply run attempted. Application services/configuration unchanged. Temporary container file-permission issue corrected by running only that disposable maintenance container asroot.
+- Original31 public records preservation check recorded in output/seasonal-preservation.json. Do not re-create definitions or re-run code implementation; next resolve provider access, repeat dryrun, canary, remainder, full15snapshot checks, and calendar deployment approval.

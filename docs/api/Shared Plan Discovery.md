@@ -22,3 +22,10 @@ Changing mutable ranking statistics or relevant calendar/filter state changes th
 ## Storage
 
 Trip V28 adds publication daily activity aggregates. View recording participates in existing listed-publication reads. Copy recording occurs only after a newly inserted successful copy event; idempotent replay does not increment activity again. Existing lifetime counters and smart-search intent rules remain in place.
+
+
+## Prepared calendar extension (not yet deployed, 2026-11-06)
+
+Trip feature 044e0bd adds Halloween (October 31, seven days before/two after), Chinese/Lunar New Year (seven before/fourteen after), and Loy/Loi Krathong (three before/two after). Existing 45-day discovery lead-in and affirmative owner-text/date evidence remain. Chinese/Lunar New Year is excluded from Gregorian New Year recognition, including search intent parsing.
+
+Chinese New Year dates are verified from the Hong Kong Observatory Gregorian/lunar tables for 2026-2030 (February 17, February 6, January 26, February 13, February 3 respectively). Loy Krathong is verified for November 24, 2026 only through Chiang Mai provincial tourism/Thai government sources. Unknown-year lunar occurrences are omitted rather than guessed. Extend official calendar coverage before those bounds expire. Source links: https://www.hko.gov.hk/en/gts/time/calendar/pdf/files/2027e.pdf and corresponding year tables; https://chiangmai.mots.go.th/news/6839 ; https://www.thailand.go.th/events . The live registry remains unchanged until the approved code release.

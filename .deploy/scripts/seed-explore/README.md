@@ -47,7 +47,7 @@ SEED_USER_ID=<uuid> node seed.mjs   # defaults to localhost:8082 / :8083
 | `DRY_RUN` | off | `1` resolves places only |
 | `PAUSE_MS` | `150` | delay between provider lookups |
 
-Re-running is safe: plans whose title already exists for the seed user are skipped.
+The original batch skips existing titles. The maintained seasonal/events batch only skips an active, up-to-date Explore publication; an incomplete, unlisted, revoked or changed record stops that item for explicit owner-side inspection. Never automatically republish a revoked plan.
 A plan with too few resolved places is not published and the run exits non-zero.
 
 ## Cost
@@ -92,3 +92,14 @@ docker run --rm --network navio-backend \
 There are 30 definitions in this original manifest; any unrelated 31st feed record must remain untouched. Missing/ambiguous/unlisted records are reported and skipped. Backups contain private owned trip data and stay on the VM; do not commit or publish them. If a save succeeds but publication fails, the prior public snapshot stays intact; use the retained backup and rerun after resolving the reported error. Never bypass an ownership/revision check.
 
 Verification: `node --test .deploy/scripts/seed-explore/*.test.mjs` from the repository root covers preservation/idempotence, all definitions, real pinned catalogue identity, non-EV/EV future seed publication, dry-run, same-link updates and unrelated/revoked account guards.
+
+
+## Seasonal/events batch (2026-11-06)
+
+`SEED_BATCH=seasonal-events` selects 15 additional definitions in `seasonal-events.mjs`; it does not alter the original 30 definitions. The owner must be the existing dedicated Navio Team account. Use `DRY_RUN=1` first, then `ONLY=se-kyoto-autumn` as a canary, then the entire batch. Explicit dates are published as month/day only by the normal sanitizer. All samples contain an original introduction, official planning references, mixed My List, itinerary and illustrative budget; the Bangkok EV example also contains the catalogue Garage vehicle and a mandatory provider-resolved charger. A missing/failed required charger prevents creation.
+
+If using the existing web image for its Node runtime, its default non-root user cannot read a `umask077` maintenance directory. Run the one-shot maintenance container with `--user 0`, mount the exact maintenance directory read-only, and keep the same private `navio-backend` network. This does not change the user or permissions of running application containers.
+
+Recovery: if a request fails after trip creation, retain the reported trip ID. Inspect its owner planner and publication endpoints before retrying. A draft is deliberately **not** counted as a completed sample, silently overwritten, deleted, or automatically republished. Repair the specific owned draft through normal APIs only after distinguishing it from deliberate unlisting/revocation; re-run after its active publication is complete. Compare the public baseline and all 15 new snapshots independently of the runner tally.
+
+Current attempt: dry run blocked by Mobility's Google Places text-search 403 PERMISSION_DENIED, surfaced as 503. No samples were created. Restore the backend Google Places project/key permissions before retrying; do not publish unlocated substitutes or weaken access restrictions. Code deployment is separately pending approval.
