@@ -1,4 +1,14 @@
 openapi: 3.1.0
+x-navio-community-library:
+  status: Implemented 2026-11-08; VM release pending.
+  contract: docs/api/community-library.md
+  authentication: All /v1/social/me/library endpoints use the caller JWT subject.
+  list: GET /v1/social/me/library with view saved|voted|history|comments, q, vote all|up|down, sort recent|oldest|top, page and size.
+  mutations: PUT or DELETE /v1/social/me/library/saved/{postId}; PUT /v1/social/me/library/history/{postId}; DELETE /v1/social/me/library/history.
+  response: Spring Page of post, activityAt, nullable commentId and commentBody. PostResponse adds saved boolean.
+  retention: Thirty-day actual thread visits; immediate bookmark deletion with client Undo, separate from Explore recovery.
+  publicGuides: GET /v1/traveler-guides optional author UUID resolves authentication subject to IAM owner; only PUBLISHED guides.
+
 x-navio-implemented-color-palette:
   status: Implemented 2026-10-14, merged to dev 2026-10-17; needs the user-management V9 release before the client relies on it. See docs/api/color-palette.md.
   colorId: "Pattern ^[a-z][a-z0-9-]{0,39}$; the 24 built-in ids are seeded by user-management V9."
