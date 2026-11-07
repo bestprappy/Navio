@@ -1,3 +1,15 @@
+## 2026-11-08 - Codex - Saved Community and profile revision LIVE
+
+**Approved release:** Root main `5ebfa3a25358f471b86c590142919b31025eb81b`; client `bc40495`, server `4bdbe86`, Community `753a7a2`, IAM `2851594`. Trip `15720d8` and Mobility `37f9d86` unchanged. All six pins matched remote main before release. Child revisions published through dev; root main fast-forwarded from dev because a historical separate worktree holds the local main branch. No unrelated files committed.
+
+**Outcome:** https://github.com/bestprappy/Navio/actions/runs/42399073886 completed SUCCESS: revision gate, real PostgreSQL schema gate, every image build and VM rollout/smoke tests. Community additive V10 is live. No repeat deployment needed.
+
+**Fresh release verification:** Community full184 tests passed without skips; IAM full318 tests had zero failures/errors and two existing skips. Clean git-archive frontend type-check passed, complementing the710 frontend tests, lint, offline production build and23 local browser checks recorded below. Live read-only checks passed for health200, protected trips401, all four private collection views401 anonymously, public post saved:boolean backed by migrated storage, empty unknown-author Guide page and invalid-author400. All31 public plan identities/titles/day/place/charger counts unchanged. Active localhost3000 dev:vm proxy also passed unknown-author/invalid-author/private-collection checks. Evidence: output/saved-community-live-results.json, check-saved-devvm.mjs and release test logs in isolated worktrees. No Google/provider requests, account test writes or sample mutations were made.
+
+**Available now:** Before you go editor box; Community menu/icon polish; account dropdown; public-profile Guides; Saved Explore/Community groups with separate search/sort, bookmark buttons and inline Undo, active-vote lists, thirty-day actual thread history and own-comment history. History begins from feature activation, without backfill. Explore seven-day recovery and billing safeguards unchanged. Custom Cover/categories remain paused.
+
+**Cleanup/state:** Root/client/server/changed services returned to dev. Disposable test PostgreSQL stopped; no user dev server restart. User client tsconfig SHA256 remains1D992BD1B931C3E8265212BF7868BC5BCD9E96AA7CE899345EA36C963E6DEB9C. Unrelated CLAUDE, logs and artifacts preserved. Final session/contract status notes go docs branch to dev only, with no documentation-only main push. Next: user can refresh dev:vm and review the UI; signed-in production bookmark/history actions were verified locally against real PostgreSQL plus browser fixtures, not exercised against the user's production collection.
+
 ## 2026-11-08 - Codex - Profile navigation and private Saved Community implemented on dev
 
 **Request/decisions:** Complete the seven-part editor/sidebar/profile/Saved batch. User confirmed current active votes, one entry per own comment newest first, immediate Community unsave with an inline horizontal Undo row in the removed card's position. Explore seven-day trash stays separate; Custom Cover/categories remain paused.

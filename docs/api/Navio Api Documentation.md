@@ -3281,6 +3281,6 @@ Every authenticated traveler can manage their own guides through `/v1/users/me/g
 Private account bookmarks, canonical Place saves and verified Shared Plan references, paged search/Recents and seven-day recovery are implemented. See [Saved content API](saved-content.md) for endpoints, quotas, source validation, legacy personal-anchor integration and the compatible saved-location append contract. Guide saving and social engagement remain separate backlog.
 
 
-## Private Community collections and authored public Guides (2026-11-08; VM release pending)
+## Private Community collections and authored public Guides (2026-11-08; released root5ebfa3a)
 
 Community bookmarks, current active-vote feeds, thirty-day thread history, and one-entry-per-own-comment history use authenticated `/v1/social/me/library`. Normal post responses include the viewer's saved state. Explore recovery remains separate. Public guide discovery supports an optional account-subject `author` filter for the new public-profile Guides tab. See [Community library API](community-library.md) for validation, visibility, retention and frontend integration.

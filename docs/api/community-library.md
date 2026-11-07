@@ -1,6 +1,6 @@
 # Private Community collections and public profile Guides
 
-Implemented 2026-11-08; backend VM release pending. Community owns these records. Existing Explore PLAN/GUIDE/PLACE quotas and seven-day recovery are unchanged.
+Implemented and released to the VM on 2026-11-08 (root5ebfa3a; workflow42399073886 succeeded). Community owns these records. Existing Explore PLAN/GUIDE/PLACE quotas and seven-day recovery are unchanged.
 
 ## Community collection API
 

@@ -20,3 +20,7 @@ Ruling: mobile Saved navigation stays in document flow, desktop sticky below mea
 Ruling: Communityhistory can clear its own records with confirmation; retention excludes expired rows immediately and physically prunes daily. No invented past visits.
 
 VM release approval requested after concrete verified commits; pending. No customcover/categories/provider or productionchanges. API/storage contracts: docs/api/community-library.md.
+
+## Approved release outcome
+
+User approved this revision including CommunityV10. Rootmain5ebfa3a / workflow42399073886 succeeded completely; Community184tests and IAM318tests(2existing skips) passed fresh release verification. Clean committed frontend archive types pass. Ten read-only live checks plus active dev:vm proxy checks pass;31existing public plans preserved. No Google/provider requests or production account test writes. Notes updated on dev only after deployment; no additional production rollout required.
