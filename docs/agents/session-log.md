@@ -1,3 +1,8 @@
+## 2026-11-07 - Codex - Empty Trending section diagnosed, no product changes
+
+**Request:** Explain why Trending is empty.
+**Evidence:** Active localhost3000 JSON search returned HTTP200,total0 with collections=trending; identical unfiltered trending sort returned HTTP200,total31 with lifetime views10-39 among the first six. Frontend empty state accurately reflects backend response. SmartPlanSearchEngine excludes every trending-collection entry with zero daily-activity score; PublicationActivityRepository sums views+3*copies for today and six prior UTC dates. V28 intentionally creates an empty activity ledger with no historical backfill. Listed detail reads record daily views, copies record daily copies; list-card rendering is not a view event.
+**Conclusion/limits:** Strict recent-activity eligibility is the immediate reason for empty Trending, not feed failure or Google billing. Lifetime counts do not establish activity within the new window. Cannot distinguish absent ledger events from a deployed event-recording defect without database/log evidence or a controlled view test; no production write/detail read performed. Direct VM HTTPS read failed local certificate trust; localhost dev:vm JSON checks succeeded. No code/config/data changes, no Google calls, no deployment. A clearly labeled popular/recent fallback could avoid a blank section but changes product behavior and has not been implemented.
 ## 2026-11-07 - Codex - Shared Plan controls and offline search audit completed
 
 **Request:** Automatic nonselectable Recommended default, one-line Filters count, themed duration dropdown, and at least 80 varied search/filter tests without paid APIs.
