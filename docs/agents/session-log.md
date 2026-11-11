@@ -1,3 +1,10 @@
+## 2026-11-11 - Codex - Main synchronization audit
+
+**Request:** Push latest work to main and check whether unrelated work was pushed.
+**Verified:** Fresh fetch of all seven repositories confirms all completed product revisions already equal origin/main: root 5ebfa3a, client bc40495, server 4bdbe86, Community 753a7a2, IAM 2851594, Trip 15720d8, Mobility 37f9d86. No new product commit or deployment required. Root dev differs only in post-release documentation. Latest release file lists contain requested features and supporting tests/migration/docs; no unrelated files found in that release. This is not a claim that every historical release was exhaustively audited.
+**Preserved:** Existing local client tsconfig generated-build-path edits, other-session Nov09 notes, untracked CLAUDE/logs/poster/report/output artifacts left uncommitted. No API/provider calls or data changes. Required audit notes committed alone on docs branch and merged/pushed dev only, in accordance with the no-docs-only-main rule.
+**Next:** User can pull main for all completed feature code. Custom Cover/categories remain paused; no outstanding authorized release.
+
 ## 2026-11-08 - Codex - Saved Community and profile revision LIVE
 
 **Approved release:** Root main `5ebfa3a25358f471b86c590142919b31025eb81b`; client `bc40495`, server `4bdbe86`, Community `753a7a2`, IAM `2851594`. Trip `15720d8` and Mobility `37f9d86` unchanged. All six pins matched remote main before release. Child revisions published through dev; root main fast-forwarded from dev because a historical separate worktree holds the local main branch. No unrelated files committed.
