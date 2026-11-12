@@ -18,10 +18,14 @@
 import { plans as originalPlans } from "./plans.mjs";
 import { seasonalEventPlans } from "./seasonal-events.mjs";
 import { completeSample } from "./complete-sample.mjs";
+import { ddayPlans } from "./dday-plans.mjs";
+import { resolutionCache } from "./resolution-cache.mjs";
 
 const env = process.env;
-if(env.SEED_BATCH&&!['original','seasonal-events'].includes(env.SEED_BATCH))throw new Error('Unknown seed batch');
-const plans=env.SEED_BATCH==='seasonal-events'?seasonalEventPlans:originalPlans;
+if(env.SEED_BATCH&&!['original','seasonal-events','dday'].includes(env.SEED_BATCH))throw new Error('Unknown seed batch');
+const maintained=['seasonal-events','dday'].includes(env.SEED_BATCH);
+const plans=env.SEED_BATCH==='dday'?ddayPlans:env.SEED_BATCH==='seasonal-events'?seasonalEventPlans:originalPlans;
+const providerCache=env.RESOLUTION_CACHE_DIR?resolutionCache({directory:env.RESOLUTION_CACHE_DIR,requireCached:env.REQUIRE_CACHED==='1'}):null;
 const TRIP_URL = (env.TRIP_URL ?? "http://localhost:8082").replace(/\/$/, "");
 const GEO_URL = (env.GEO_URL ?? "http://localhost:8083").replace(/\/$/, "");
 const USER_ID = env.SEED_USER_ID ?? "";
@@ -36,14 +40,14 @@ if (!UUID_RE.test(USER_ID)) {
   console.error("SEED_USER_ID must be the seed account's Keycloak user id (a UUID).");
   process.exit(1);
 }
-if(env.SEED_BATCH==='seasonal-events'&&USER_ID!=='0ae736e4-a315-456e-bb2e-7257d419b2d9')throw new Error('This maintained batch belongs to the dedicated Navio Team account.');
+if(maintained&&USER_ID!=='0ae736e4-a315-456e-bb2e-7257d419b2d9')throw new Error('This maintained batch belongs to the dedicated Navio Team account.');
 for(const base of [TRIP_URL,GEO_URL]){const url=new URL(base);if(url.protocol!=='http:'||!['localhost','127.0.0.1','trip-planning-service','mobility-and-ev-service'].includes(url.hostname))throw new Error('Use the private service network; never send internal identity headers to a public host.');}
 
 const DAY_COLORS = ["teal", "cyan", "blue", "emerald", "amber", "pine", "navy", "slate"];
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function call(base, method, path, body) {
-  const response = await fetch(`${base}${path}`, {
+  const response = await (base===GEO_URL&&providerCache?providerCache.fetch:fetch)(`${base}${path}`, {
     method,
     headers: {
       "X-User-Id": USER_ID,
@@ -129,6 +133,7 @@ async function resolveCharger(stop, destination) {
   await sleep(PAUSE_MS);
   const charger = [...(result?.items ?? [])]
     .filter((c) => c.status !== "OFFLINE" && c.location)
+    .filter((c) => env.SEED_BATCH!=='dday'||c.connectorTypes?.some(type=>['TYPE2','CCS2'].includes(type)))
     .sort((a, b) => b.maxKw - a.maxKw)[0];
   if (!charger) return null;
   return {
@@ -172,10 +177,10 @@ async function buildBlocks(plan, destination, startDate) {
         try {
           const charger = await resolveCharger(stop, destination);
           if (charger) items.push(charger);
-          else if (env.SEED_BATCH === "seasonal-events") throw new Error(`Required charger missing near "${stop.chargerNear}"`);
+          else if (maintained) throw new Error(`Required charger missing near "${stop.chargerNear}"`);
           else console.warn(`   ~ no charger near "${stop.chargerNear}", skipped`);
         } catch (error) {
-          if (env.SEED_BATCH === "seasonal-events") throw error;
+          if (maintained) throw error;
           console.warn(`   ~ charger lookup failed near "${stop.chargerNear}": ${error.message}`);
         }
         continue;
@@ -220,7 +225,7 @@ async function existingTitles() {
 async function seedPlan(plan, index, skipTitles) {
   const label = `[${index + 1}/${plans.length}] ${plan.title}`;
   if (skipTitles.has(plan.title)) {
-    if (env.SEED_BATCH === "seasonal-events") {
+    if (maintained) {
       const existingId = skipTitles.get(plan.title);
       const publication = await trip("GET", `/v1/trips/${existingId}/publication`);
       if (!publication?.published || !publication.listedInExplore || publication.staleSanitizer || publication.hasUnpublishedChanges) {
@@ -238,6 +243,7 @@ async function seedPlan(plan, index, skipTitles) {
 
   const startDate = plan.startDate ?? addDays(START_DATE, index * 3);
   const { blocks, placeCount } = await buildBlocks(plan, destination, startDate);
+  if(env.SEED_BATCH==='dday'&&blocks.some((b,i)=>b.items.length!==plan.days[i].length))throw new Error('A required exhibition stop is unresolved; not creating a partial trip.');
   const minPlaces = Math.max(3, plan.days.length * 2);
   if (placeCount < minPlaces) {
     throw new Error(`only ${placeCount} places resolved (need ${minPlaces}); not publishing a thin plan`);
@@ -309,6 +315,7 @@ async function main() {
   }
 
   console.log(`\nDone: ${JSON.stringify(tally)}`);
+  if(providerCache)console.log('Provider resolution cache: '+JSON.stringify(providerCache.stats));
   process.exit(tally.failed ? 1 : 0);
 }
 
