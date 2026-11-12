@@ -24,7 +24,7 @@ Only published records enter discovery. Curated and traveler rows share server s
 
 ## Search evidence
 
-Title matches rank ahead of incidental body mentions. Synonyms and bounded prefix/typo matching use internal vocabulary and the published catalogue. Recognized country/destination, season and named-event constraints remain enforced for Relevant results. Dessert and desert are distinct. Suggested searches use eligible published titles or grounded destination/topic phrases; they are search actions, not fabricated publication titles. Plans and Guides search independently and use separate URL keys. Places search is unchanged.
+Title matches rank ahead of incidental body mentions. Synonyms and bounded prefix/typo matching use internal vocabulary and the published catalogue. Recognized country/destination, season and named-event constraints remain enforced for Relevant results. Dessert and desert are distinct. Suggested searches use eligible published titles with title-wording resemblance (including supported synonyms), or grounded destination/topic phrases. A body-only relevant title such as Shanghai is not promoted as a query completion for foo; they are search actions, not fabricated publication titles. Plans and Guides search independently and use separate URL keys. Places search is unchanged.
 
 Evidence comes from authored title/description/document and places actually referenced by that document. Unused embedded place records are not indexed. A venue name alone does not establish a holiday/event guide. Collection focus uses authored heading/title/description or a significant share of referenced places; a lone incidental restaurant in a broad city guide does not automatically establish food focus.
 
