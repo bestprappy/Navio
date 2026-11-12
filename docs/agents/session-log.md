@@ -1,3 +1,11 @@
+## 2026-11-12 - Codex - Guides discovery revision LIVE
+
+**Approval/release:** User explicitly approved this revision. Published IAM 848a1c9, Trip 9a442a6, client 00cb5dd and server 08e34e1 from dev to main, then root main 2d9db5c. All six child pins equalled origin/main before the root push. Community 753a7a2 and Mobility 37f9d86 unchanged. No new product changes or unrelated local edits included.
+
+**Outcome:** https://github.com/bestprappy/Navio/actions/runs/43186986279 completed SUCCESS: revision gate, real PostgreSQL schema gate, every image build, VM rollout and automatic smoke checks. IAM additive V14 is live. Twelve additional read-only production checks passed: health200, protected trips401, Guide discovery/default/search/country-season/food-sort contract and dedup/page bounds, invalid size400, three Plans searches and both frontend catalogue proxies. No Google/provider requests or test view writes. Evidence: output/check-guides-release.mjs and output/guides-release-live-results.json. Known VM self-signed TLS certificate required a process-local verification bypass; no persistent configuration changed.
+
+**Local status:** localhost3000 was unreachable, so active dev:vm integration could not be verified in this release turn; no local server was started or restarted. The deployed backend is ready when the user runs npm run dev:vm. Root/client/server/changed service worktrees remain on dev; unrelated notes, tsconfig, CLAUDE and artifacts preserved. Release result documentation goes to dev only, never a documentation-only main push. Next: user reviews Guides discovery and simplified independent Plans/Guides suggestions. Existing content without authored seasonal evidence is not automatically labelled seasonal; sparse trending uses honest fallbacks. Custom Cover/categories and deferred editorial report scope unchanged.
+
 ## 2026-11-12 - Codex - Guides discovery and catalogue search implemented on dev
 
 **Approved scope:** Separate Guides and Plans searches with catalogue-grounded suggestions and Matching/Relevant titles. Guides visual cards based on Shared Plans, no copies or itinerary dates; no Desert escapes. Places and the Guide editor remain unchanged.

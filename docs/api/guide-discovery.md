@@ -1,6 +1,6 @@
 # Guide discovery and catalogue search
 
-Implemented on development branches; VM release is a separate step. The existing Guide editor, reader document format, author feeds and saving contracts remain compatible.
+Live on the VM from root release 2d9db5c (2026-11-12), verified by deployment run 43186986279. The existing Guide editor, reader document format, author feeds and saving contracts remain compatible.
 
 ## Published catalogue
 

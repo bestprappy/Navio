@@ -1,6 +1,6 @@
 # Guides discovery and catalogue-led search implementation
 
-Implemented and verified on dev 2026-11-12; VM release pending explicit approval.
+Implemented, verified and released with explicit approval on 2026-11-12. Root main 2d9db5c; deployment 43186986279 succeeded, with twelve read-only live checks passing.
 
 Approved 2026-11-12. Plans and Guides remain separate; Places unchanged. Remove Desert escapes. Guide cards follow Shared Plan card surfaces/alignment with larger cover prominence, no copies or itinerary dates. Reuse Plan priority sorting control adapted to supported Guide metrics. Existing editor/reader behavior retained.
 
