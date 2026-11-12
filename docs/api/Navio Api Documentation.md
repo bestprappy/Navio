@@ -3284,3 +3284,8 @@ Private account bookmarks, canonical Place saves and verified Shared Plan refere
 ## Private Community collections and authored public Guides (2026-11-08; released root5ebfa3a)
 
 Community bookmarks, current active-vote feeds, thirty-day thread history, and one-entry-per-own-comment history use authenticated `/v1/social/me/library`. Normal post responses include the viewer's saved state. Explore recovery remains separate. Public guide discovery supports an optional account-subject `author` filter for the new public-profile Guides tab. See [Community library API](community-library.md) for validation, visibility, retention and frontend integration.
+
+
+### Guide discovery and simplified catalogue search
+
+Development contract: [Guide discovery](guide-discovery.md). Adds unified published curated/traveler discovery, collection/time/interest filters, ordered sorting and deduplicated reading events. Plans and Guides keep separate catalogues and URL state while sharing autocomplete presentation; Places remains unchanged.

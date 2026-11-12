@@ -3213,3 +3213,8 @@ Trip migration V27 adds `trip.plan_rating` (publication/account unique 1–5 sco
 ## Implemented Community collection extension (2026-11-08; V10 released root5ebfa3a)
 
 Community migration V10 adds `social.saved_posts(user_id uuid, post_id uuid, saved_at timestamptz)` and `social.post_visits(user_id uuid, post_id uuid, opened_at timestamptz)`, each with composite account/post primary key and cascading post foreign key. User/timestamp indexes support paged private collections; a visit expiry index supports daily30dayretention cleanup. Existing votes and comments are queried directly rather than duplicated. The migration only adds tables/indexes and preserves existing rows/schema for rollback. Author-filtered public Guides reuse IAM's existing user/auth-subject and published-guide model, without an IAM migration.
+
+
+## Guide discovery engagement (IAM V14)
+
+Development implementation adds `iam.guide_daily_views` (source/guide/date aggregates), `iam.guide_view_dedup` (stable hashed viewer/source/guide/date uniqueness), and `iam.guide_view_budgets` (viewer/network daily counters). CURATED/TRAVELER is part of every guide identity. No Guide document/entity columns are changed; migration is additive and rollback compatible. See [Guide discovery contract](../api/guide-discovery.md) for counting, retention and limits.
