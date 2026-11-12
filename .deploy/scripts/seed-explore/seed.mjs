@@ -22,6 +22,7 @@ import { ddayPlans } from "./dday-plans.mjs";
 import { resolutionCache } from "./resolution-cache.mjs";
 
 const env = process.env;
+if(env.REQUIRE_CACHED==='1'&&!env.RESOLUTION_CACHE_DIR)throw new Error('REQUIRE_CACHED needs RESOLUTION_CACHE_DIR');
 if(env.SEED_BATCH&&!['original','seasonal-events','dday'].includes(env.SEED_BATCH))throw new Error('Unknown seed batch');
 const maintained=['seasonal-events','dday'].includes(env.SEED_BATCH);
 const plans=env.SEED_BATCH==='dday'?ddayPlans:env.SEED_BATCH==='seasonal-events'?seasonalEventPlans:originalPlans;
