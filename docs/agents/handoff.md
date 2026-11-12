@@ -1,3 +1,11 @@
+## 2026-11-12 - Codex - Guide polish fixes LIVE
+
+**Approved release:** User approved releasing these fixes. IAM cfd208c, client b821f24 and server eae1324 published dev to main; root main dd9b388. All six pins matched origin/main before root push. Trip9a442a6, Community753a7a2 and Mobility37f9d86 unchanged. No migrations, data edits or unrelated code included.
+
+**Outcome:** https://github.com/bestprappy/Navio/actions/runs/43207740866 completed SUCCESS: revision check, PostgreSQL compatibility gate, every image build, VM rollout and automatic smoke checks. Fourteen additional read-only live checks passed, including foo query completion regression and frontend proxy equality, discovery/filter contract, invalid parameters, Plans queries, health200 and protected trips401. No Google/provider calls or view/event writes. Evidence output/check-discovery-polish-release.mjs and output/discovery-polish-release-live-results.json. Verification used only a process-local bypass for the known VM self-signed certificate, restoring the environment afterward.
+
+**Available:** Empty published Guide headings and jump links omitted while prose-only sections remain; Guide month/season menu is downward and readable; compact Plans/Guides filters open downward with internal scrolling and visible footer; body-only relevant city titles no longer become unrelated suggested queries for foo. Existing editor, saved content, Places behavior and local user tsconfig preserved. Local ordinary checkouts remain dev, no user server restart. Documentation-only result commit goes to dev, not main. Next: user refreshes and reviews the fixes. Custom Cover/categories and deferred editorial/report scope unchanged.
+
 ## 2026-11-12 - Codex - Guide reader, suggestions and downward dropdown fixes
 
 **Request:** Omit empty published Guide sections (Shanghai Hotel), polish month/season menu and force downward, stop bare city titles in Suggested searches for foo while retaining relevant publications, compact both Plans/Guides filter dropdowns and force downward.
