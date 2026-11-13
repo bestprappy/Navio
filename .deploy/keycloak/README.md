@@ -86,7 +86,9 @@ Authorization Code flow. The client starts that flow from its `/sign-in` and
 password confirmation, applies the realm's brute-force controls, and enforces
 this server-side password policy:
 
-- at least 12 characters;
+- at least 8 characters;
+- at least one lowercase letter and one number;
+- at least one uppercase letter **or** one special character (either is enough);
 - must not contain the username or email address; and
 - must not reuse any of the previous three passwords.
 

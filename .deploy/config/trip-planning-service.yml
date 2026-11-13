@@ -25,6 +25,11 @@ spring:
       auto-offset-reset: earliest
     producer:
       acks: all
+      properties:
+        # Fail a send in seconds when the broker is down; the outbox retries later.
+        max.block.ms: 10000
+        delivery.timeout.ms: 15000
+        request.timeout.ms: 5000
   cloud:
     bus:
       destination: navio-config-bus
@@ -38,6 +43,13 @@ spring:
       spec: maximumSize=32,expireAfterWrite=12h,recordStats
 
 navio:
+  outbox:
+    # trip.events.v1 transactional outbox: SharedPlanListed.v1 for follower notifications.
+    topic: trip.events.v1
+    retention: P14D
+    relay:
+      enabled: ${TRIP_OUTBOX_RELAY_ENABLED:true}
+      interval-ms: 2000
   currency-provider:
     base-url: ${CURRENCY_PROVIDER_BASE_URL:https://api.frankfurter.dev}
   mobility:

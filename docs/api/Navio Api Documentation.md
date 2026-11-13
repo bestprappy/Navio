@@ -3279,3 +3279,51 @@ Every authenticated traveler can manage their own guides through `/v1/users/me/g
 ## Saved content library (2026-10-29; VM release pending)
 
 Private account bookmarks, canonical Place saves and verified Shared Plan references, paged search/Recents and seven-day recovery are implemented. See [Saved content API](saved-content.md) for endpoints, quotas, source validation, legacy personal-anchor integration and the compatible saved-location append contract. Guide saving and social engagement remain separate backlog.
+
+
+## Private Community collections and authored public Guides (2026-11-08; released root5ebfa3a)
+
+Community bookmarks, current active-vote feeds, thirty-day thread history, and one-entry-per-own-comment history use authenticated `/v1/social/me/library`. Normal post responses include the viewer's saved state. Explore recovery remains separate. Public guide discovery supports an optional account-subject `author` filter for the new public-profile Guides tab. See [Community library API](community-library.md) for validation, visibility, retention and frontend integration.
+
+
+### Guide discovery and simplified catalogue search
+
+Development contract: [Guide discovery](guide-discovery.md). Adds unified published curated/traveler discovery, collection/time/interest filters, ordered sorting and deduplicated reading events. Plans and Guides keep separate catalogues and URL state while sharing autocomplete presentation; Places remains unchanged.
+
+
+## Guide readership and reader feedback (2026-11-13)
+
+Applies separately to published CURATED and TRAVELER Guides. Private/draft or
+missing sources are never exposed through these endpoints. `source` and UUID
+identify the Guide; account identity always comes from the validated session/JWT.
+
+* `POST /v1/traveler-guides/discovery/{source}/{id}/view`: public, body
+  `{ "readId": "<UUID>" }`. One new random UUID per visible page opening;
+  retries use the same UUID. A successful accepted opening adds one total view.
+  Guests add totals only, with no persistent guest identifier. Signed-in reads
+  also insert one lifetime-unique account/source/Guide entry. The legacy
+  `visitorId` field remains accepted for rolling-release compatibility only;
+  it is never trusted as account identity. Existing network abuse budgets remain.
+* `GET .../{source}/{id}/feedback`: public, no-store. Rating average/count,
+  comment count, optional caller rating, publisher/moderation permissions,
+  `viewCount` (all accepted reads) and `uniqueViewCount` (signed-in accounts only).
+* `PUT/DELETE .../feedback/rating`: sign-in required; score1–5; one editable
+  rating per account/Guide, removable. Publishers cannot rate their own Guides.
+* `GET/POST .../feedback/comments`: public reading, authenticated writing.
+  `parentId` supports one reply level; `page` paginates20 entries. Names come
+  from the resolved profile, never the submitted author field.
+* `PUT/DELETE .../feedback/comments/{commentId}`: author edits with expected
+  `version`; author, publisher or global moderator may soft-delete. Replies
+  remain readable. Optimistic edit conflicts return409.
+* `POST .../feedback/comments/{commentId}/reports` and `GET .../feedback/reports`:
+  authenticated reporting (one per account/comment, no self-report); reports
+  visible only to publisher/global moderators. Other ownership violations403.
+
+Discovery entries expose nullable `ratingAverage` and `ratingCount`; `rating`
+and `reviews` sorts use actual scores and rating counts, with unrated Guides
+last. Thirty-day Trending uses daily total reads, while Most popular uses
+all-time totals. Existing destination/season/interest constraints still apply.
+
+Historical total views are retained. Lifetime signed-in unique tracking starts
+with this revision because expired mixed guest/account daily dedup records
+cannot establish accurate historical lifetime uniqueness. No synthetic backfill.

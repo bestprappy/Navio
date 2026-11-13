@@ -47,7 +47,7 @@ SEED_USER_ID=<uuid> node seed.mjs   # defaults to localhost:8082 / :8083
 | `DRY_RUN` | off | `1` resolves places only |
 | `PAUSE_MS` | `150` | delay between provider lookups |
 
-Re-running is safe: plans whose title already exists for the seed user are skipped.
+The original batch skips existing titles. The maintained seasonal/events batch only skips an active, up-to-date Explore publication; an incomplete, unlisted, revoked or changed record stops that item for explicit owner-side inspection. Never automatically republish a revoked plan.
 A plan with too few resolved places is not published and the run exits non-zero.
 
 ## Cost
@@ -92,3 +92,24 @@ docker run --rm --network navio-backend \
 There are 30 definitions in this original manifest; any unrelated 31st feed record must remain untouched. Missing/ambiguous/unlisted records are reported and skipped. Backups contain private owned trip data and stay on the VM; do not commit or publish them. If a save succeeds but publication fails, the prior public snapshot stays intact; use the retained backup and rerun after resolving the reported error. Never bypass an ownership/revision check.
 
 Verification: `node --test .deploy/scripts/seed-explore/*.test.mjs` from the repository root covers preservation/idempotence, all definitions, real pinned catalogue identity, non-EV/EV future seed publication, dry-run, same-link updates and unrelated/revoked account guards.
+
+
+## Seasonal/events batch (2026-11-06)
+
+`SEED_BATCH=seasonal-events` selects 15 additional definitions in `seasonal-events.mjs`; it does not alter the original 30 definitions. The owner must be the existing dedicated Navio Team account. Use `DRY_RUN=1` first, then `ONLY=se-kyoto-autumn` as a canary, then the entire batch. Explicit dates are published as month/day only by the normal sanitizer. All samples contain an original introduction, official planning references, mixed My List, itinerary and illustrative budget; the Bangkok EV example also contains the catalogue Garage vehicle and a mandatory provider-resolved charger. A missing/failed required charger prevents creation.
+
+If using the existing web image for its Node runtime, its default non-root user cannot read a `umask077` maintenance directory. Run the one-shot maintenance container with `--user 0`, mount the exact maintenance directory read-only, and keep the same private `navio-backend` network. This does not change the user or permissions of running application containers.
+
+Recovery: if a request fails after trip creation, retain the reported trip ID. Inspect its owner planner and publication endpoints before retrying. A draft is deliberately **not** counted as a completed sample, silently overwritten, deleted, or automatically republished. Repair the specific owned draft through normal APIs only after distinguishing it from deliberate unlisting/revocation; re-run after its active publication is complete. Compare the public baseline and all 15 new snapshots independently of the runner tally.
+
+Completed on 2026-11-13 after the user confirmed a replacement provider key was operational. All15 original destinations are now actual listed Navio Team publications (46 total public plans), with92 ordinary stops and one required Bangkok charger/catalogue Garage. Dry-run15/15, one canary, remaining14, then unchanged rerun skipped15/15. Full private trip backups and calendar-repair snapshots remain in the VM maintenance directory backups-20261113. Existing31 public snapshots were unchanged. Official-calendar review moved Changdeokgung and Palais Rohan to suitable days and explicitly marked the closed Alsatian Museum as an exterior heritage stop; both corrected publications retained their links. Source definitions include those corrections. Public dates contain month/day only. No application release was required.
+
+Known existing search limitation found during content verification: a query containing spring, even a complete published title, can be rejected by the current unsupported-season evidence policy. Destination searches and the current seasonal/events collection filters passed. Search behavior was left unchanged in this content-only maintenance task. This batch does not alter Places browsing or provider cost protections.
+
+## D-Day expansion (2026-11-13)
+
+`SEED_BATCH=dday` selects `dday-plans.mjs`:30 additional complete plans, exactly10 different Thai destinations and20 different destinations outside Thailand. The original and seasonal/events manifests remain separate. Every itinerary stop is required; a missing stop or compatible EV charger prevents creating a thin plan. The two EV examples use the existing real catalogue model and accept TYPE2/CCS2 chargers only. Published dates remain month/day. Budgets and schedules are explicitly illustrative.
+
+Use a new private maintenance directory and back up the trip schema/data first. Mount a private cache directory and set `RESOLUTION_CACHE_DIR=/cache` during `DRY_RUN=1`. This temporary maintenance helper caches only successful place-search/charger responses (no credentials or private trip responses). Place resolutions expire after24hours, charger responses after1hour. Set `REQUIRE_CACHED=1` for publication: a missing or expired resolution stops the item rather than repeating a provider lookup. Normal trip creation may still request destination details through Mobility. This helper does not change application caching, Places browsing, provider permissions or budget protections, and is not a zero-cost guarantee.
+
+After reviewing the resolved names/routes, publish two canaries using `ONLY=dd-hua-hin-ev,dd-kanazawa-crafts`, verify public sections and unchanged existing records, then run the full batch. A completed active publication is skipped; existing drafts/unlisted/revoked plans still require explicit inspection. Rerun the batch to prove it creates no duplicates. Keep backups and provider cache off Git. Reuse the Node-capable deployed web image in the private Docker network as above; no application release or new exposed service is needed.

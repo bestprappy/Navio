@@ -1,9 +1,20 @@
 openapi: 3.1.0
+x-navio-community-library:
+  status: Released 2026-11-08 in root5ebfa3a; workflow42399073886 succeeded.
+  contract: docs/api/community-library.md
+  authentication: All /v1/social/me/library endpoints use the caller JWT subject.
+  list: GET /v1/social/me/library with view saved|voted|history|comments, q, vote all|up|down, sort recent|oldest|top, page and size.
+  mutations: PUT or DELETE /v1/social/me/library/saved/{postId}; PUT /v1/social/me/library/history/{postId}; DELETE /v1/social/me/library/history.
+  response: Spring Page of post, activityAt, nullable commentId and commentBody. PostResponse adds saved boolean.
+  retention: Thirty-day actual thread visits; immediate bookmark deletion with client Undo, separate from Explore recovery.
+  publicGuides: GET /v1/traveler-guides optional author UUID resolves authentication subject to IAM owner; only PUBLISHED guides.
+
 x-navio-implemented-color-palette:
   status: Implemented 2026-10-14, merged to dev 2026-10-17; needs the user-management V9 release before the client relies on it. See docs/api/color-palette.md.
   colorId: "Pattern ^[a-z][a-z0-9-]{0,39}$; the 24 built-in ids are seeded by user-management V9."
   sharedPlanDays: PublicDayDto adds nullable colorId, copied only when it matches the palette id format. SANITIZER_VERSION unchanged.
-  guides: Category colorId must exist in the palette (retired colors accepted).
+  guides: Category colorId must exist in the palette (retired and deleted colors accepted).
+  labelTextAndDelete: "Implemented 2026-10-31 (user-management V12). Per-theme label text (textOnLight/textOnDark: auto|white|black), PATCH /v1/admin/palette-colors/{id}, DELETE /v1/admin/palette-colors/{id}. A deleted id stays reserved and is still listed by GET /v1/palette-colors with deleted true and the default color's (teal) hex, so saved references render the default."
 x-navio-implemented-day-sections:
   status: Implemented locally (2026-10-17); needs the Trip Planning V23 release before the client relies on it.
   plannerCapability: day-sections-v1
@@ -226,21 +237,24 @@ paths:
             application/json:
               schema:
                 type: array
-                maxItems: 200
+                description: Up to 200 colors followed by the reserved ids of deleted colors
                 items:
                   type: object
-                  required: [id, name, hex, retired]
+                  required: [id, name, hex, retired, deleted, textOnLight, textOnDark]
                   properties:
                     id: {type: string, pattern: '^[a-z][a-z0-9-]{0,39}$'}
-                    name: {type: string, maxLength: 40}
-                    hex: {type: string, pattern: '^#[0-9a-f]{6}$'}
-                    retired: {type: boolean}
+                    name: {type: string, maxLength: 40, description: '"Deleted color" for a deleted id'}
+                    hex: {type: string, pattern: '^#[0-9a-f]{6}$', description: For a deleted id, the default color's hex}
+                    retired: {type: boolean, description: Always true for a deleted id}
+                    deleted: {type: boolean, description: Saved references to this id render the default color}
+                    textOnLight: {type: string, enum: [auto, white, black], description: Label text drawn on the color in the light theme; auto picks the better contrast}
+                    textOnDark: {type: string, enum: [auto, white, black]}
   /v1/admin/palette-colors:
     get:
       tags: [User Management Service]
       summary: List palette colors with admin metadata
       responses:
-        '200': {description: 'Array of {id, name, hex, sortOrder, retired, retiredAt, createdAt, updatedAt}'}
+        '200': {description: 'Array of {id, name, hex, sortOrder, retired, retiredAt, createdAt, updatedAt, textOnLight, textOnDark}; deleted colors are not listed'}
         '401': {$ref: '#/components/responses/Unauthorized'}
         '403': {$ref: '#/components/responses/Forbidden'}
     post:
@@ -256,13 +270,46 @@ paths:
               properties:
                 name: {type: string, minLength: 1, maxLength: 40}
                 hex: {type: string, pattern: '^#[0-9A-Fa-f]{6}$'}
+                textOnLight: {type: string, enum: [auto, white, black], default: auto}
+                textOnDark: {type: string, enum: [auto, white, black], default: auto}
       responses:
-        '201': {description: The new color; its id is derived from the name}
+        '201': {description: The new color; its id is derived from the name and never reuses a deleted color's id}
         '400': {description: Invalid name or hex, with validationErrors}
         '401': {$ref: '#/components/responses/Unauthorized'}
         '403': {$ref: '#/components/responses/Forbidden'}
         '409': {description: The hex or name is already in the palette}
         '422': {description: Invisible on the light or dark surface, or the palette is full}
+  /v1/admin/palette-colors/{id}:
+    parameters:
+    - {name: id, in: path, required: true, schema: {type: string, pattern: '^[a-z][a-z0-9-]{0,39}$'}}
+    patch:
+      tags: [User Management Service]
+      summary: Change the label text drawn on a color in each theme; name and hex stay fixed
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [textOnLight, textOnDark]
+              properties:
+                textOnLight: {type: string, enum: [auto, white, black]}
+                textOnDark: {type: string, enum: [auto, white, black]}
+      responses:
+        '200': {description: The updated color (unchanged values are not re-audited)}
+        '400': {description: Missing or unknown text color, with validationErrors}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {description: Color not found}
+    delete:
+      tags: [User Management Service]
+      summary: Permanently delete a removed (retired) color; its id stays reserved and saved references render the default color
+      responses:
+        '204': {description: Deleted}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {description: Color not found}
+        '422': {description: The color is still in the palette, or it is the default color (teal) that replaces deleted ones}
   /v1/admin/palette-colors/{id}/retire:
     parameters:
     - {name: id, in: path, required: true, schema: {type: string, pattern: '^[a-z][a-z0-9-]{0,39}$'}}
@@ -4207,6 +4254,96 @@ paths:
         schema:
           type: string
         description: id path parameter
+  /v1/notifications/stream:
+    get:
+      tags:
+      - Community Service
+      summary: Live inbox hints (Server-Sent Events)
+      description: >-
+        Opens a text/event-stream for the caller only; the recipient is the validated
+        token subject and no parameter can name anyone else. Frames carry no
+        notification content: `ready` on connect (reconcile the inbox through the REST
+        API), `inbox.changed` with `{"kind":"created"|"removed"}`, `read-state.changed`
+        with `{"kind":"read_state"}`, and a `:hb` comment every 25 s. The stream ends
+        when the access token expires (at most 30 minutes) and nothing is replayed;
+        clients reconcile on every `ready`. Browsers use the same-origin proxy
+        `/api/notifications/stream` because EventSource cannot send a bearer token.
+      operationId: getNotificationsStream
+      responses:
+        '200':
+          description: Event stream; `Cache-Control: no-store`, `X-Accel-Buffering: no`.
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '503':
+          description: This instance holds its maximum number of streams. Empty body, `Retry-After` header.
+  /v1/admin/notification-events:
+    get:
+      tags:
+      - Community Service
+      summary: List quarantined notification events
+      description: >-
+        trip.events.v1 records the notification consumer could not handle after
+        retries (malformed, or a dependency down past the retry window). Platform
+        ADMIN or OWNER token roles only; moderators receive 403.
+      operationId: getAdminNotificationEvents
+      parameters:
+      - name: open
+        in: query
+        schema:
+          type: boolean
+          default: true
+        description: Only events not yet replayed
+      - name: page
+        in: query
+        schema:
+          type: integer
+          default: 0
+      - name: size
+        in: query
+        schema:
+          type: integer
+          default: 20
+      responses:
+        '200':
+          description: Page of quarantined events (id, topic, partition, offset, eventId, eventType, payload, error, quarantinedAt, replayedAt, replayOutcome)
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+  /v1/admin/notification-events/{id}/replay:
+    post:
+      tags:
+      - Community Service
+      summary: Replay a quarantined notification event
+      description: >-
+        Runs the stored record through the live consumer. Safe to repeat: an event
+        already processed returns outcome DUPLICATE and notifies nobody again.
+        Outcomes NOTIFIED, NOT_LISTED, STALE, DUPLICATE, IGNORED.
+      operationId: postAdminNotificationEventReplay
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: '{"id": "...", "outcome": "NOTIFIED"}'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: The record is still malformed and cannot be replayed (ErrorResponse).
+        '503':
+          description: Trip planning is unavailable; retry the replay later (ErrorResponse).
   /v1/ai/plan/suggest:
     post:
       tags:

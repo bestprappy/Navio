@@ -1,271 +1,232 @@
-# Navio tutorial landing page implementation plan
+# Navio first-time highlight tours: implementation plan
 
-Date: 2026-11-02  
-Status: Proposed implementation; no tutorial feature implemented by this document.
+Date: 2026-11-13 (supersedes the 2026-11-02 `/learn` landing-page plan)
+Status: **Implemented 2026-11-13** in client commit `17993b2` (`feat/onboarding-tours`, merged to client `dev`; root `dev` pin bumped). Feature tours and two fixes followed in client `017327d` (see §13). Not on `main` or production yet. The user asked to build it now, superseding the earlier "build last" decision. See §12 for what shipped and where it differs from this plan.
 
 ## 1. Objective
 
-Build a beautiful, practical learning experience that shows travelers how to use Navio. A new visitor should understand the planning workflow, try a small demonstration, find help for a specific task, and continue into the real app.
+Show first-time users short tips and tricks inside the real app by highlighting actual controls with spotlight tours: one tour each for the **Dashboard**, the **Trip planner**, and **Community**.
 
-Use **Motion for React** as the animation library. Motion for React is the current name of the library previously called Framer Motion. New implementation should use the `motion` package and `motion/react` imports.
+User decisions, 2026-11-13:
 
-The visual centerpiece is one sample trip that develops from an idea into an itinerary as visitors choose tutorial steps. Beauty should come from the actual product, clear typography, cohesive colors, meaningful movement, and generous spacing.
+| Decision | Choice |
+| --- | --- |
+| Scope | Highlight tours only. The public `/learn` landing page, Motion walkthrough, tutorial cards and FAQ are **dropped**. |
+| Trigger | Each tour **auto-starts once**, the first time a user opens that area. A **Help button** replays it any time. |
+| Areas | Dashboard, Trip planner, Community. (Explore and a separate EV/Garage tour are out of scope; the planner tour includes a Garage stop when that section is shown.) |
+| "Seen" memory | **Browser only** (`localStorage`). No backend, migration or release risk. A new device or browser shows each tour once more, which is accepted. |
 
-## 2. Scope and defaults
+Out of scope: backend endpoints, migrations, account-level progress, Motion, MDX, recordings, Explore tour, deferred Places editorial content, and any change to Navio Team sample plans.
 
-### First release
+## 2. Technology
 
-- Public `/learn` landing page, accessible without signing in.
-- A prominent Learn Navio link from the existing public navigation, plus a discoverable help entry inside the app using the existing navigation pattern.
-- Five-step interactive product walkthrough.
-- Task-based tutorials and tips for Planner, Explore, Budget, EV, and Sharing.
-- Small local practice interaction with reset and a clear transition into real trip creation.
-- Responsive desktop and mobile layouts, light/dark themes, keyboard operation, and reduced motion.
-- Existing `/` homepage remains the entry page; add a contextual link to `/learn` instead of replacing the homepage as part of this scope.
-
-### Later, independent enhancements
-
-- Optional Driver.js tours inside the real planner, only after the landing experience is complete.
-- Separate tutorial detail routes or MDX when the amount of content warrants them.
-- Short captioned recordings for actions that are difficult to teach with the interactive preview.
-- Cross-device learning progress only if a product need justifies backend work.
-
-This work does not require backend endpoints, migrations, a CMS, a new mapping provider, or changes to production sample plans. Public sample records must not be modified to create the tutorial. Do not introduce deferred Places editorial functionality into this experience.
-
-## 3. Repository baseline and implementation preflight
-
-Observed in the working tree on 2026-11-02:
-
-- `client/app/page.tsx` contains an existing public landing page and a Bangkok-to-Khao-Yai planner mockup. Its displayed figures are not evidence of live functionality or current routing/charging data.
-- Existing routes include `/planner`, `/planner/new`, `/planner/[planId]`, `/explore`, `/explore/shared/[token]`, and `/share/plans/[token]`.
-- The client already has shadcn, Tailwind, Lucide, Jotai, TanStack Query, and Embla installed. Motion was absent from the inspected dependency manifest.
-- `client/app/globals.css` defines semantic theme tokens and Plus Jakarta Sans as the sans-serif family.
-- The root and child repositories contain unrelated unfinished work. Preserve it and inspect current state before implementation.
-
-Before writing code:
-
-1. Read `AGENTS.md`, the current handoff/session log, and `client/AGENTS.md`.
-2. Read relevant Next.js guides under `client/node_modules/next/dist/docs/`; do not assume older App Router behavior.
-3. Apply the repository frontend-design skill and review the actual existing components, theme tokens, navigation, and authentication boundary.
-4. Check each proposed teaching action against the current app. Record the real control label, actual interaction, route, signed-in requirement, and any limitations.
-5. Distinguish shipped behavior from local unfinished features. Exclude demonstrations that depend on unverified functionality.
-6. Confirm `/learn` can be served publicly through existing auth/proxy rules and that real-app CTAs preserve the intended destination through sign-in.
-
-## 4. Technology decisions
-
-| Need | Choice | Implementation guidance |
+| Need | Choice | Notes |
 | --- | --- | --- |
-| Layout and controls | Existing Tailwind + shadcn components | Reuse semantic tokens and accessible primitives; customize composition to Navio |
-| React animation | Motion for React | Add `motion` in the client during implementation; keep animated code in small client components |
-| Icons | Existing Lucide | Use consistent size/stroke; pair unfamiliar icons with text |
-| Content | Typed local data in `data.ts` | Keep tutorial text, steps, tips, and illustrative records separate from rendering |
-| State | Local React state initially | Use Jotai only if state genuinely needs to cross independent app areas |
-| Server data | Existing TanStack Query if needed later | The initial tutorial should not require authenticated API calls |
-| In-app spotlight tours | Driver.js, optional later phase | Load on request, theme locally, and verify focus behavior and route cleanup |
-| Long-form tutorial authoring | MDX, optional later phase | Adopt when several maintained guides justify a content pipeline |
-| Recordings | Native video | Poster image, explicit playback controls, captions/transcript, no autoplay audio |
+| Spotlight and popover | **Driver.js** (MIT, small, no dependencies) | Not installed yet. Check the current version and API at build time. **Load it with dynamic `import()` only when a tour starts**, so pages don't pay for it otherwise. |
+| Theming | Navio tokens from `client/app/globals.css` | Style the popover through `popoverClass` with existing semantic tokens (card, foreground, muted-foreground, primary, border, focus ring). Must work in light and dark themes. No default Tailwind palette. |
+| Shared state | Jotai | One `activeTourAtom` so only one tour runs at a time and the Help button knows the current state. |
+| Content | Typed `data.ts` per feature | Step text lives apart from rendering. Strong types, no `any`. |
+| Element targets | `data-tour="<tour>.<step>"` attributes | Never CSS classes or visible text, which change with styling and copy edits. |
 
-Do not add GSAP in the first release. Reconsider GSAP with ScrollTrigger only if a specific approved scene requires complex pinned and scrubbed animation timelines. Basic scroll progress, reveals, and step transitions are within Motion's scope. Avoid having two libraries control the same element.
+## 3. The three tours
 
-## 5. Information architecture and page design
+Rules for every tour: at most 7 steps, one short title plus one or two sentences each, ending with a "Replay this from Help any time" step. The control names below were read from `origin/dev` on 2026-11-13. **Check them again at build time**, since the UI will have changed by then.
 
-### Page order
+### 3.1 Dashboard: `/dashboard` (`app/feature/planner/planner-home.tsx`, `_components/dashboard/*`)
 
-1. Existing Navio navigation with a clear Learn entry.
-2. Hero: **Your first trip, from idea to itinerary.** A short explanation, **Try the walkthrough**, and **Create a trip**.
-3. Interactive five-step walkthrough with a large product preview.
-4. Quick tutorials grouped by user task.
-5. Practical tips with concise examples and contextual links.
-6. Short FAQ for verified common questions and a final **Create a trip** action.
-7. Existing footer.
+Starts only for a signed-in user, after the trip query has settled (not on the skeleton or the error state).
 
-### Desktop composition
-
-```text
-Navio navigation                                       Learn / Sign in
-
-Your first trip, from idea to itinerary.   [Large sample planner preview]
-One clear explanatory sentence.           [Same trip throughout the page]
-[Try the walkthrough] [Create a trip]
-
-[Step selector + explanation]              [Preview of selected action]
-[Previous] [Next]                          [Try it / Reset demo]
-
-Quick tutorials: Planner / Explore / Budget / EV / Sharing
-[Task and outcome] [Task and outcome] [Task and outcome]
-
-Useful tips + focused screenshot examples
-FAQ                                      [Create a trip]
-```
-
-Use a sticky preview only where viewport height allows it. Explicit step selection is the primary navigation. Scrolling must remain native and must never trap visitors in an animation.
-
-### Mobile composition
-
-- Place the active step explanation directly above its preview.
-- Use a compact step selector with accessible labels and Previous/Next controls.
-- Adapt the preview to a readable narrow composition; do not shrink a desktop screenshot until labels become illegible.
-- Avoid long pinned scenes, horizontal page overflow, and controls that overlap the preview.
-- Tutorial topics wrap or use a properly labeled scrollable control; content remains reachable without dragging.
-
-### Visual contract
-
-- Preserve the existing type family and semantic background, surface, foreground, primary, muted, border, and focus tokens. Resolve exact current values in the implementation design pass; do not invent a separate brand palette.
-- Use a clear headline/body/caption hierarchy and readable text lines, normally below 80 characters.
-- Give the product preview the strongest visual emphasis. Avoid turning every paragraph into an identical bordered card.
-- Use destination imagery sparingly and keep one consistent sample-trip identity throughout.
-- Every decorative animation must have a purpose; there should be no continual floating, flashing, or looping emphasis around tutorial text.
-- Demonstration figures and synthetic maps must be labeled as illustrative where they could otherwise look live.
-
-## 6. Walkthrough content
-
-Use a local illustrative Bangkok-to-Khao-Yai weekend trip as the starting content direction, subject to verification of recognizable places and app terminology. It is a tutorial fixture, not a new published Navio Team plan.
-
-| Step | User outcome | Demonstration | Teaching note |
+| # | Target (`data-tour`) | Real control | Tip |
 | --- | --- | --- | --- |
-| Start your trip | Understand the starting details | Choose destination and dates in a simplified preview | Match the real creation flow and labels |
-| Collect places | Understand My List | Add a place to the sample list | Explain how the list relates to the itinerary without implying unsupported automation |
-| Build your days | Understand itinerary organization | Place a saved stop into a day and change its order | Provide click/keyboard controls even if drag is supported |
-| Plan the details | Understand budget and EV options | Show an editable example budget; an optional EV view explains Garage and charging stops | EV guidance is optional; never present sample charge times or availability as live |
-| Share your plan | Understand sharing choices | Show a demonstration of the verified sharing controls | Explain private draft, share link, and Explore listing only as supported by current behavior |
+| 1 | `dashboard.overview` | "Your travel dashboard" region | Your upcoming and past trips live here. |
+| 2 | `dashboard.new-trip` | **Start planning** / sidebar **New trip** | Start a trip with a destination and dates. |
+| 3 | `dashboard.trips` | "Upcoming trips" list (skip when empty) | Open a trip to keep planning; its menu has options. |
+| 4 | `dashboard.preparation` | "Before you head out" planning companion | A checklist of what to prepare: dates, places, charging stops, packing. |
+| 5 | `dashboard.explore` | **Explore plans** / **Browse guides** | Borrow ideas from shared plans and guides. |
+| 6 | `dashboard.notifications` | Notifications bell | Replies, reactions and plan activity show up here. |
+| 7 | `dashboard.help` | Help button | Replay this tour any time. |
 
-Each step contains a short title, one goal, one action, a visible result, and one useful tip. Visitors can jump directly to a step and return to earlier steps without losing navigation control.
+A brand-new user usually has no trips, so the tour must look right on the empty dashboard. Step 3 is skipped when its target isn't there.
 
-The demo should use deterministic state: selecting a later step produces a complete valid preview even if earlier steps were skipped. Reset restores the initial local fixture. No demo action calls a real create, update, publish, or share API.
+### 3.2 Trip planner: `/planner/[planId]` (`app/feature/planner/planId/planner-detail.tsx`)
 
-## 7. Tutorials and tips
+Starts only for the **trip owner** on an editable trip, after trip metadata has loaded. It **never** starts on read-only or shared views (`/share/plans/[token]`, `/explore/shared/[token]`, `/preview/shared-plan`, `readOnly` planner rendering).
 
-Initial topics should be short enough to read inline, with stable section anchors. Add separate detail pages only when they improve readability.
+| # | Target | Real control | Tip |
+| --- | --- | --- | --- |
+| 1 | `planner.trip-info` | Trip info card: name editor and dates | Rename the trip and change dates here. |
+| 2 | `planner.my-list` | **My List** section, including **Add to** day menu | Collect places first, then add them to a day. |
+| 3 | `planner.itinerary` | Itinerary days, expand/collapse, **Day to show** | Each day holds its stops in order. |
+| 4 | `planner.auto-plan` | **Auto plan** entry | Let Navio suggest a day order. Nothing changes until you choose **Apply plan**. |
+| 5 | `planner.garage` | **My garage** (only when shown) | Pick your EV so routes and charging estimates fit your car. |
+| 6 | `planner.budget` | **Budgeting**, then **Add expense** | Track estimated costs per trip. |
+| 7 | `planner.trip-options` | **Trip options** menu (contains **Publish plan as a link**) | Share or manage your trip from here. |
+| (end) | `planner.help` | Help button | Replay any time. |
 
-| Topic | Initial tutorial candidates | Tip direction |
-| --- | --- | --- |
-| Planner | Create a trip; add a stop; arrange a day | Leave room between stops; put useful context in notes |
-| Explore | Find a place; inspect a shared plan | Explain which actions save, open, or reuse content after verifying their actual semantics |
-| Budget | Add and edit an example cost | Clearly distinguish an illustrative estimate from an actual booking price |
-| EV | Choose a vehicle in trip Garage; inspect charging stops | Explain the information the app actually provides and its freshness |
-| Sharing | Open sharing settings; understand visibility | Show the difference between an accessible link and a public listing where supported |
+Planner-specific handling:
 
-For every tutorial, keep typed metadata for stable ID, topic, title, summary, steps, relevant app destination, media if any, and last review date. Use strong types with no `any`.
+- **Mobile view switch.** `plannerMobileViewAtom` stores `"itinerary" | "map"`. If the map view is showing, either switch to itinerary for the length of the tour and restore it afterwards, or skip steps whose targets aren't visible. Pick one approach in Phase 1 and test it.
+- **Nested scrolling.** The itinerary sits in a scrollable drawer. Check that scrolling to each step reaches the target inside that container.
+- **The tour only highlights, it never acts.** It must not open the publish dialog, run Auto plan, add places or change privacy.
+- If "Plan inspiration" ships in its current form, it can replace step 5 when no Garage is shown. Keep the total at 7 or fewer.
 
-Initially, topic filtering and anchor navigation are sufficient. Add search only when the content inventory makes it useful. Filtered empty states must explain how to see all topics again.
+### 3.3 Community: `/community` (`app/feature/community/community-page.tsx`, `_components/community-navbar.tsx`)
 
-## 8. Motion and interaction specification
+Starts once the feed and sidebar have finished loading. Guests may see it too, but any step whose target needs sign-in is skipped.
 
-- Use Motion for state-driven preview transitions, active-step emphasis, and continuity when a sample item changes position.
-- Prefer opacity and transform for ordinary movement. Use layout animation selectively where it helps explain an itinerary change.
-- Use shared layout identifiers only inside the isolated demo so unrelated app elements cannot animate together.
-- Starting timing direction: approximately 150-220 ms for small feedback and 250-400 ms for preview transitions, refined through visual review.
-- Keep visible controls responsive during transitions. Rapid step changes must resolve to the last selected step without stale content or queued animations.
-- Do not autoplay through the tutorial. Do not animate entire paragraphs one letter at a time.
-- Use CSS sticky positioning for the desktop preview when appropriate; a complex scroll timeline is unnecessary.
-- Respect system reduced-motion preference through Motion's configuration/hooks and CSS. Substitute immediate state changes or restrained fades for spatial movement, while preserving all information.
-- Use concise polite announcements for user-triggered demo outcomes when needed; avoid announcing every animated frame.
+| # | Target | Real control | Tip |
+| --- | --- | --- | --- |
+| 1 | `community.sections` | **Home** / **Popular** | Home is your communities; Popular is everyone. |
+| 2 | `community.search` | "Search Navio community" | Find posts and communities. |
+| 3 | `community.create-post` | **Create post** | Ask a question or share a plan. You can attach a trip. |
+| 4 | `community.create-group` | **Create a community** | Start a group around a route or interest. |
+| 5 | `community.my-groups` | "Your communities" sidebar | Jump back into groups you joined. |
+| 6 | `community.popular` | "Popular communities" | Good places to start. |
+| (end) | `community.help` | Help button | Replay any time. |
 
-## 9. Proposed client structure
+## 4. Auto-start and Help behavior
 
-Adapt names to established repository conventions during implementation:
+**Auto-start a tour only when every one of these is true:**
+
+1. The user is on that tour's route, and for the planner and dashboard, is signed in. The planner also requires the owner on an editable trip.
+2. The page has finished loading: the query has settled, no skeleton is showing, no error boundary has tripped.
+3. No dialog, menu, sheet or other tour is open.
+4. Storage shows no `completed` or `dismissed` record for this tour at its current version.
+5. At least 3 of the tour's targets exist and are visible.
+
+Wait one frame after the page is ready before starting, so layout has settled. Never start a tour on a delay timer and never queue one up. If a condition fails, just don't start; when it fails, **don't** mark the tour as seen.
+
+**Recording "seen":** finishing the tour stores `completed`. Skip, Close or Escape stores `dismissed`. Either one stops auto-start for that tour version. A tour cut off because the user navigated away stores nothing, so it is offered again on the next visit.
+
+**Help button:** a reusable icon button with the visible tooltip and accessible name "Show tips for this page". It appears only on routes that have a tour.
+
+- Placement: the app sidebar (dashboard and planner) and `community-navbar`. Final spots are decided in Phase 1 against the real layout.
+- Clicking it always replays the tour, whatever storage says. It is disabled while a tour is running.
+- **Known issue:** the public `components/navbar.tsx` has a **Help** link to `/help`, and no `/help` route exists on `origin/dev`. Decide in Phase 1: remove the link, point it at the in-app tours, or build a small help page. Don't leave a link that goes nowhere.
+
+## 5. Storage contract
+
+- Key: `navio:tours:v1:<userId>`, or `navio:tours:v1:guest` when signed out. Keying by user stops one account's progress from hiding tours from another account on a shared browser.
+- Value: `Record<TourId, { status: "completed" | "dismissed"; version: number; at: string }>`.
+- Every tour definition has a `version`. Bump it **only** when the tour changes in a way that matters, so users see it again. Wording fixes don't count.
+- Wrap every read and write in `try/catch`. If storage is unavailable or holds corrupt JSON, treat it as "not seen" and continue without errors. Validate the parsed shape with Zod.
+- Store no trip content, names or tokens. Only tour IDs, statuses and timestamps.
+
+## 6. Accessibility
+
+- **Keyboard:** Next / Back / Skip buttons, arrow keys, and Escape to close. Check what Driver.js does out of the box (`allowKeyboardControl`) and fill any gaps.
+- **Focus:** move focus into the popover when a step opens. When the tour ends, return focus to the Help button if it started the tour, otherwise to the page's main heading or landmark.
+- **Popover semantics:** add `role="dialog"`, `aria-labelledby` (title) and `aria-describedby` (description) in `onPopoverRender` if Driver.js doesn't set them. Show a step counter as text ("2 of 6"), not only as dots.
+- **Visuals:** visible focus rings on every popover button, contrast at WCAG AA in both themes, and the highlighted state shown by more than color alone (the overlay cut-out plus the popover arrow is enough).
+- **Reduced motion:** when `prefers-reduced-motion: reduce` is set, use `animate: false` and instant (non-smooth) scrolling.
+- **Small screens:** popovers stay inside a 375px viewport and a short-height viewport, and buttons never sit under the overlay.
+
+## 7. Proposed client structure
 
 ```text
-client/app/learn/page.tsx                 Public server-rendered page and metadata
-client/app/feature/learn/data.ts          Typed tutorial content and local sample fixture
-client/app/feature/learn/types.ts         Content and demo-state contracts
-client/app/feature/learn/learn-page.tsx    Page composition
-client/app/feature/learn/walkthrough/     Compound walkthrough components and local state
-client/app/feature/learn/tutorials/       Topic controls and tutorial content
-client/app/feature/learn/tips/            Reusable tip presentation
-client/public/tutorials/                 Optimized media used by this experience
+client/components/tour/                        global, reusable
+  tour.types.ts             TourId, TourStep, TourDefinition, TourRecord
+  tour-storage.ts           versioned, user-keyed, try/catch + Zod
+  tour.atoms.ts             activeTourAtom
+  use-tour.ts               start/stop, dynamic import("driver.js"), visible-step filter, focus restore
+  tour-auto-start.tsx       "use client"; props: tourId, ready, eligible
+  tour-help-button.tsx      "use client"; replays the current route's tour
+  tour.css                  popover theme using globals.css tokens
+
+client/app/feature/planner/_components/dashboard/tour/data.ts   dashboard tour steps
+client/app/feature/planner/planId/_components/tour/data.ts      planner tour steps
+client/app/feature/community/_components/tour/data.ts           community tour steps
 ```
 
-Suggested compound API: `Walkthrough.Root`, `Walkthrough.Steps`, `Walkthrough.Preview`, and `Walkthrough.Controls`. Separate presentational preview components from authenticated planner hooks. Reuse safe existing UI pieces where practical, but do not mount the full live planner just to render a demonstration.
+Each feature drops one `<TourAutoStart tourId=… ready={…} eligible={…} />` into its page and adds `data-tour` attributes to existing elements. The feature already knows its own `ready` (query settled) and `eligible` (owner, signed in) flags. The tour module never reaches into feature internals.
 
-Keep page headings, explanatory text, tutorial links, and a usable initial preview in server-rendered output. Load interaction code only for the walkthrough and filters. A JavaScript failure must not leave a blank learning page.
+## 8. Delivery phases
 
-## 10. Optional in-app tour phase
+1. **Audit (when building starts).** Fetch `origin/dev`. Re-check every target and label in §3 against the current UI. Choose the planner mobile-view approach, the Help button placements, and what to do with the `/help` link. Read the Next.js docs under `client/node_modules/next/dist/docs/` and the current Driver.js docs.
+   Exit: every step maps to a control that exists.
+2. **Tour core.** Add `driver.js` and build `components/tour/*` with storage, the atom, dynamic loading, the themed popover, focus handling and reduced motion.
+   Exit: a sample definition runs, replays, persists, and survives broken storage.
+3. **The three tours.** Add the `data-tour` attributes, the step data and the auto-start wiring for the Dashboard, Planner and Community, plus the Help buttons.
+   Exit: each tour auto-starts once, can be replayed, and skips missing targets.
+4. **Verification.** Check light and dark themes at about 375px, tablet and desktop widths, plus a short viewport and 200% zoom. Check keyboard-only use, reduced motion, an empty dashboard, a planner that is in map view on mobile, a read-only shared plan (no tour should start), sign-out and sign-in as a different user, and navigating away mid-tour.
+   Exit: the checklist in §9 passes.
 
-After the landing page is delivered, evaluate a small user-started tour from Help or a **Show me in the planner** action.
+## 9. Acceptance checklist
 
-- Use stable `data-tour` targets rather than CSS classes or translated text selectors.
-- Only start when the correct route, authorized trip, and required controls exist.
-- Wait for real loading states to resolve. If a target is unavailable, provide an explanation or exit cleanly rather than highlighting an unrelated element.
-- Offer Skip, Back, Next, Close, and Replay; support Escape and restore focus to the initiating control.
-- Handle dialogs, scrolling containers, viewport changes, and route transitions explicitly.
-- Tours explain actions; they must not silently modify a trip, create a public listing, or change privacy settings.
-- Persist dismissal locally only if useful. Any storage failure must be harmless. Keep storage versioned and free of private trip content.
-- Do not automatically show tours every time users enter the app.
+- [ ] Each tour auto-starts exactly once per user per browser, only once its page has loaded, and never on read-only or shared plan views.
+- [ ] Skip, Close, Escape and finishing all stop future auto-starts. Leaving mid-tour does not.
+- [ ] The Help button replays the current page's tour and is hidden on routes without a tour.
+- [ ] Missing or hidden targets are skipped. A tour with fewer than 3 usable targets doesn't start.
+- [ ] No tour step changes data, opens a publish or share dialog, or changes privacy.
+- [ ] Driver.js is loaded only when a tour runs. No layout shift or console or hydration errors.
+- [ ] Keyboard, focus restore, dialog semantics, contrast and reduced motion pass in both themes.
+- [ ] Popovers fit at 375px and in short viewports. No horizontal overflow.
+- [ ] Blocked or corrupt `localStorage` causes no errors.
+- [ ] The `/help` navbar link is fixed, either removed or pointed somewhere that works.
+- [ ] `npx tsc --noEmit`, lint on changed files, and `next build` pass.
 
-## 11. Accessibility, assets, and performance
+**Tests:** the client has no test runner yet (`package.json` has only `build` and `lint`). Either add a minimal Vitest setup to unit-test `tour-storage.ts` (corrupt JSON, storage that throws, version bump, per-user keys) and the auto-start eligibility and visible-step filter logic, or keep that logic as pure functions and record the manual verification. Decide at the start of Phase 2. Don't write tests that only repeat copy or styling.
 
-- All interactive controls work by keyboard with visible focus and clear accessible names.
-- Use correct tab semantics only if the step selector behaves as a tab interface; otherwise use ordinary buttons with an announced current state.
-- Text contrast should meet WCAG AA; status is never communicated by color alone.
-- Provide useful image descriptions, captions/transcripts for instructional recordings, and controls to pause media.
-- Respect reduced motion from initial render, and ensure text remains available when animation is disabled.
-- Use approved assets or captures with synthetic/example data. Do not expose real travelers' names, private itineraries, tokens, or account details.
-- Reserve media dimensions to avoid layout shifts; optimize images and lazy-load below-fold recordings.
-- Avoid loading live map SDKs, tour code, or authenticated service requests on the initial learning page. Use a clearly illustrative lightweight map graphic where needed.
-- Use browser measurements to catch animation jank and layout shifts; library choice alone does not guarantee smooth performance.
+## 10. Git and release
 
-## 12. Delivery phases
+Build on `feat/onboarding-tours` in `client`, cut from an up-to-date `dev`, with unrelated work left out. Push `client` before updating the root pin. Root `main` pushes deploy production; read `docs/agents/release.md` first.
 
-### Phase 1: Content and visual contract
+## 11. References
 
-Audit supported actions and navigation. Create the typed content inventory, one consistent sample trip, and desktop/mobile compositions. Review light/dark theme choices and reduced-motion behavior. Deliver a design specification grounded in the current Navio UI before implementation.
+- [Driver.js configuration](https://driverjs.com/docs/configuration)
+- [Driver.js API](https://driverjs.com/docs/api)
+- [Driver.js theming](https://driverjs.com/docs/theming)
 
-Exit: Each teaching claim maps to a verified app action; the layout and preview content are defined.
+## 12. Implementation notes (2026-11-13, client 17993b2)
 
-### Phase 2: Public learning page
+**Shipped (client only, no backend):**
 
-Add `/learn`, static tutorial content, topic navigation, FAQ, metadata, and working app links. Integrate existing navigation/footer. Establish accessible responsive behavior before adding motion.
+- `components/tour/`: types, Zod-validated per-user storage (`navio:tours:v1:<userId|guest>`), pure policy (`resolveTourSteps`, `canAutoStartTour`, `statusForEndReason`), DOM helpers, a Driver.js controller (dynamic `import("driver.js")`), `PageTour` (registers the page's tour and auto-starts it once), `TourHelpButton` (row and icon variants), and `tour.css` (Navio tokens, route-line progress, a one-time target pulse, popover entrance, reduced-motion overrides).
+- Tour content in `data.ts` beside each feature: dashboard (7 steps), planner (8), community (7). Driver.js is pinned to **1.10.2** (1.11 and 1.12 were under two weeks old).
+- Targets are `data-tour` attributes. `SidebarItem`, `SidebarMenu` and `TripActionsMenu` gained an optional `tourTarget` prop.
+- **Show tips** sits in the app sidebar's account actions (dashboard and planner) and as an icon in the community navbar. It renders only when the page has a tour.
+- The planner tour starts only for a signed-in user with metadata loaded, blocks hydrated, not read-only, not in table view, and with the itinerary on screen (split view, or phone itinerary tab). On replay, `prepare()` switches a phone back to the itinerary and closes the table view.
 
-Exit: Signed-out visitors can read and navigate the complete page; real-app links follow the existing sign-in flow.
+**Differences from the plan:**
 
-### Phase 3: Interactive walkthrough and Motion
+- The dashboard's "Before you head out" (`TripPreparation`) is not rendered on `origin/dev`, so the dashboard tour uses New trip, Upcoming trips, Explore plans, the sidebar Trips list, Notifications and Help instead.
+- **The `/help` links were left untouched.** The sidebar Discover "Help" link was user-approved in an earlier session, and the navbar and footer link there too. `/help` still has no page.
+- Driver.js skips `onDestroyed` when a tour is closed during its first transition. The controller captures the reason in `onDestroyStarted` and ends the tour through one idempotent `finish()`.
+- Focus moves to **Next** on each step (Driver.js would focus the close button), and returns to the opener or the page `h1` afterwards.
 
-Add the `motion` dependency, isolated deterministic demo state, five-step navigation, practice controls, reset, and focused animation. Add the reduced-motion alternative and keyboard announcements where required.
+**Verified:** `tests/tour/tour-policy.test.mjs` and `tour-data.test.mjs` 14/14. Full client suite 726/727; the one failure is the known `canonical.test.mjs` golden-fixture check that reads `server/...` beside the main checkout. `tsc`, changed-file ESLint and `next build` pass. `tests/tour/tour-browser-check.mjs` passed 10/10 against an isolated `next dev` (port 3121, test `AUTH_SECRET`, placeholder Keycloak env, all APIs mocked, system Chrome): auto-start once, completion recorded, Show tips replay, Escape mid-animation dismisses, focus restore, navigation away records nothing, planner every target, no auto-start in table view or phone map view, phone replay switches to itinerary, community guest at 375px with no overflow, dark theme, reduced motion. **Not verified:** a real signed-in account against live services, and Safari/Firefox.
 
-Exit: All steps work in any order, and no practice action mutates real data.
+## 13. Planner feature tours and fixes (2026-11-13, client 017327d)
 
-### Phase 4: Verification and visual refinement
+**Why:** The user wanted every planner feature taught. One tour would have run past 30 steps, so the planner tutorial is split.
 
-Review screenshots in desktop/mobile and light/dark themes; inspect readability, clipping, layout shifts, loading behavior, rapid interactions, and reduced motion. Refine spacing, copy, assets, and transitions based on the rendered result.
+**What shipped:**
 
-Exit: Acceptance checklist passes and any limitations are documented.
+- The automatic 8-step planner overview is unchanged except for its last step, which now points to the other tips.
+- **Seven feature tours run only on request:** Days and timing, Auto plan, Notes and checklists, Your EV, Charging stops, Budget, and Share and export. Content is in `planId/_components/tour/data.ts`.
+- **Ways in:**
+  - **Show tips** (sidebar) is a shadcn `DropdownMenu` listing the page's tours, with a tick on finished ones. Pages with one tour still start it directly.
+  - A **?** beside the Itinerary heading offers Days, Auto plan, Notes and Share.
+  - A **?** beside My garage offers Your EV and Charging stops.
+  - A **?** beside Budgeting starts Budget.
+  - A **?** in the EV charging panel header starts Charging stops.
+  - These buttons are hidden on read-only plans. A green dot appears once every tour in a section is finished.
+- **Step model** (`components/tour/tour.types.ts`):
+  - `opens`: press this trigger first, because the target sits inside its menu. The tour closes it again afterwards.
+  - `unless`: skip this step while that control is on screen. This pairs a "set it up" step with the steps for the feature once it is set up.
+  - `fallback`: centred text shown when the control is missing.
+- **Rule:** tours may open and close menus, but never press anything that changes a trip. Modal dialogs are never opened, because their focus trap would conflict with Driver.js.
+- **Navigation:** buttons and arrow keys both go through one `go()` in the controller. It prepares each step: opens or closes the menu, then waits up to 700 ms for the target. A step that is still missing is skipped, unless it has a fallback.
 
-### Phase 5: Optional expansion
+**Fixes in the same release:**
 
-Implement in-app tours, longer tutorials, MDX, or recordings only where the completed experience demonstrates a specific need. These are not prerequisites for releasing the learning page.
+- **Spotlight drifting:** the spotlight now follows its control when content above grows (late garage charts) or a nested panel scrolls (`tour-layout-tracker.ts`). Driver.js only listens to window scroll and resize.
+- **Close button:** the × works again. `all: unset` had dropped its z-index, so the title covered it.
 
-## 13. Acceptance checklist and verification
+**Verified:**
 
-- [ ] `/learn` is publicly accessible and linked from appropriate public/app navigation.
-- [ ] Existing homepage and unrelated navigation flows still work.
-- [ ] Tutorial actions and labels match the current app; illustrative values are clearly presented.
-- [ ] Five steps are reachable directly and sequentially, including when visited out of order.
-- [ ] The practice interaction and reset work without network writes or access to private trips.
-- [ ] Real-app CTAs reach valid routes and preserve the intended destination through authentication.
-- [ ] Topic controls, anchors, FAQ, and help links work with keyboard and pointer input.
-- [ ] Mobile preview text is readable, controls are reachable, and no horizontal page overflow occurs.
-- [ ] Light and dark themes use Navio tokens consistently.
-- [ ] Reduced motion preserves content and functionality; no forced autoplay or scroll trapping occurs.
-- [ ] A failed/delayed media load does not hide tutorial instructions or shift controls unexpectedly.
-- [ ] No live map SDK, optional tour bundle, or authenticated API call is required for the initial page.
-- [ ] No browser hydration errors or console errors occur during the walkthrough.
-
-Run repository-standard type checking, changed-file lint, and a production build. Add focused behavior tests for demo transitions, jumping between steps, reset, and any destination/auth logic introduced. Do not add tests that only mirror static copy or styling. If the optional tour phase is implemented, test missing targets, cancellation, route cleanup, and focus restoration.
-
-Use browser verification around 375 px, tablet, and desktop widths, plus a short-height viewport and 200% zoom. Check keyboard operation and reduced motion explicitly. Verify actual CTA/auth behavior in an appropriate environment; do not treat a screenshot as proof of integration.
-
-## 14. Git and release boundaries
-
-Implementation belongs on an appropriate client feature branch from `dev`, with unrelated work excluded. Follow nested repository commit order and push the child before updating its parent pin. Root `main` pushes deploy production; read `docs/agents/release.md` before any release. Documentation-only session work goes to a docs branch and local `dev`, never to root `main` on its own.
-
-## 15. Reference documentation
-
-- [Motion for React](https://motion.dev/docs/react)
-- [Motion scroll animations](https://motion.dev/docs/react-scroll-animations)
-- [Motion accessibility](https://motion.dev/docs/react-accessibility)
-- [GSAP ScrollTrigger](https://gsap.com/docs/v3/Plugins/ScrollTrigger/) — alternative only if the interaction requirements change
-- [Driver.js configuration](https://driverjs.com/docs/configuration) — optional tour phase
-- [Next.js MDX guide](https://nextjs.org/docs/app/guides/mdx) — optional content expansion
-
-Recheck current documentation and installed package APIs during implementation.
+- **Unit tests:** 23 tour tests. They include a check that every target and every `opens` trigger exists in app code, and that check excludes the tour data files.
+- **Full suite:** 748/749 after rebasing onto `fa1fea5`. The one failure is the known `canonical.test.mjs` worktree path.
+- **Build and lint:** `tsc`, ESLint and `next build` pass.
+- **Browser:** `tests/tour/tour-browser-check.mjs` 16/16 against a mocked isolated dev server, covering the tips menu and ticks, the day menu opened and closed by a tour, the Itinerary and garage menus, real add-button targets, Escape closing the day menu, and spotlight drift.
+- **Not run:** a real login with live data. The charger panel steps are checked by the target test and code reading, not walked in a browser.

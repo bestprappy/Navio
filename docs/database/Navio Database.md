@@ -2,6 +2,10 @@
 
 Trip migration V21__shared_plan_copy_events.sql adds trip.shared_plan_copy for transactional successful-copy events and aggregate total/distinct counts. It retains events after private-copy deletion and cascades on publication deletion. Backfill recovers only identifiable existing imports. Fresh and historical-upgrade checks passed against disposable real PostgreSQL; the configured VM was not migrated/deployed by this task. See [contract and persistence notes](../api/Shared%20Plan%20Card%20Metrics.md).
 
+# Palette label text and permanent deletion (2026-11-02)
+
+User-management migration `V12__palette_text_color_and_deletion.sql` adds `text_on_light` and `text_on_dark` (`varchar(5) NOT NULL DEFAULT 'auto'`, checked `auto|white|black`) to `iam.palette_colors` and sets both to `white` for the 24 seeded ids (what the client always drew). It creates `iam.deleted_palette_colors` (`id varchar(40)` primary key with the palette id check, `name`, `hex`, `deleted_by` referencing `iam.users`, `deleted_at`). Deleting a retired color removes its `palette_colors` row and inserts its id here; ids in this table are never reused by new colors, guides may keep them, and readers render them as the default color `teal` (which cannot be deleted). Additive; the previous release ignores both columns and the table. Verified on disposable PostgreSQL 16/PostGIS with `PostgresSchemaTests` and `PaletteColorPostgresTests` (Flyway V1–V12, `ddl-auto=validate`).
+
 # Implemented admin color palette (2026-10-14)
 
 User-management migration `V9__palette_colors.sql` adds `iam.palette_colors`: `id varchar(40)` primary key (checked `^[a-z][a-z0-9-]{0,39}$`), `name varchar(40)`, `hex varchar(7)` (checked lowercase `#rrggbb`), `sort_order integer`, nullable `retired_at timestamptz`, `created_by`/`updated_by` referencing `iam.users`, and `created_at`/`updated_at`. Unique indexes on `hex` and `lower(btrim(name))`. It seeds the 24 built-in colors with the ids the client always used, so existing `trip.list_block.block_color` values and guide category colors stay valid without a backfill. Rows are never deleted and `hex` is not updatable: retiring sets `retired_at`. Additive; the previous release ignores the table. Verified on disposable PostgreSQL 16/PostGIS with `PostgresSchemaTests` (Flyway V1–V9, `ddl-auto=validate`) and `PaletteColorPostgresTests`. Trip-planning has no schema change: shared-plan snapshots gain a nullable `colorId` inside the existing JSON.
@@ -312,6 +316,7 @@ erDiagram
 | `ev`     | `charger_reports`          | Reports for incorrect charger data                                                                                      |
 | `ev`     | `charger_suggestions`      | Missing charger submissions and suggested edits                                                                         |
 | `ev`     | `provider_request_logs`    | Provider API usage, errors, and quota observability                                                                     |
+| `ev`     | `provider_monthly_usage`   | Google Maps Platform requests per billing month; calls stop at the free-tier limit (V2, applied)                      |
 | `ev`     | `outbox`                   | Transactional event outbox for EV events                                                                                |
 | `social` | `groups`                   | Community groups such as Thailand Restaurants or EV road-trip groups                                                    |
 | `social` | `group_profiles`           | Group banner, summary, and display metadata                                                                             |
@@ -947,6 +952,10 @@ Transactional outbox for trip events.
 | `last_error`       |         `TEXT` |       No | Last publishing error                     |
 | `created_at`       |  `TIMESTAMPTZ` |      Yes | Creation time                             |
 
+### As implemented (trip V25, 2026-10-31)
+
+`V25__trip_events_outbox.sql` differs from the target above: `id` is the event id (no separate `event_id`), `attempt_count` and `next_attempt_at` replace `published`/`publish_attempts` (unpublished means `published_at IS NULL`), and there is no `headers_jsonb` (the trace id travels in the payload). Indexes: pending scan `(next_attempt_at, created_at) WHERE published_at IS NULL`; retention sweep `(published_at) WHERE published_at IS NOT NULL`. Published rows are kept 14 days so an operator can replay with the original id by setting `published_at = NULL`. Only `SharedPlanListed.v1` is produced today.
+
 ---
 
 # 8. `iam` Schema Design
@@ -1381,6 +1390,21 @@ Tracks external provider usage and failures for cost control.
 | `error_message` |          `TEXT` |       No | Error summary                                         |
 | `created_at`    |   `TIMESTAMPTZ` |      Yes | Request time                                          |
 
+## 10.8 `ev.provider_monthly_usage`
+
+### Purpose
+
+Applied in mobility-and-ev-service `V2__provider_monthly_usage.sql`. Counts Google Maps Platform requests per billing month so `GoogleFreeTierBudget` can refuse a call before it is sent once a meter reaches its limit. One atomic `INSERT ... ON CONFLICT DO UPDATE ... WHERE request_count < limit RETURNING` per call keeps every instance under the shared limit. If the counter cannot be reached, the call is refused rather than sent.
+
+| Column          |          Type | Required | Description                                                                 |
+| --------------- | ------------: | -------: | --------------------------------------------------------------------------- |
+| `usage_month`   |        `DATE` |      Yes | First day of the month in Google's billing zone (`America/Los_Angeles`); PK |
+| `meter`         | `VARCHAR(40)` |      Yes | `GoogleUsageMeter` name, e.g. `PLACE_PHOTOS`, `PLACE_DETAILS`, `ROUTES`; PK |
+| `request_count` |     `INTEGER` |      Yes | Requests counted this month, default 0, never negative                      |
+| `updated_at`    | `TIMESTAMPTZ` |      Yes | Last counted request                                                        |
+
+Default monthly limits sit about 5% under each free cap: `PLACES_AUTOCOMPLETE` 9,500; `PLACE_DETAILS`, `PLACE_PHOTOS`, `PLACES_TEXT_SEARCH` and `PLACES_NEARBY_SEARCH` 950 each; `ROUTES` 4,750. Override with `navio.google.free-tier.monthly-limits.<METER>`; turn off with `navio.google.free-tier.enabled=false`.
+
 ---
 
 # 11. `social` Schema Design
@@ -1688,6 +1712,10 @@ Deduplicates Kafka events consumed by notification workers.
 | `processed_at`  |  `TIMESTAMPTZ` |      Yes | Processing time   |
 
 Primary key: `(event_id, consumer_name)`
+
+### As implemented (community V8 and V9)
+
+Implemented tables differ from 12.1-12.4: `notif.preferences` (per-type booleans) and `notif.notifications` (type, actor, post or plan subject, `dedupe_key` unique per recipient) come from V8. V9 adds `notif.processed_events` (primary key `(consumer, event_id)` with `event_type`, `outcome`, `processed_at`; the consumer is `community-notifications`) in place of `consumed_events`, and `notif.quarantined_events` (raw record, topic/partition/offset unique, error, replay time and outcome) for events that failed after retries. There is no `delivery_log`: only in-app delivery exists.
 
 ---
 
@@ -3170,4 +3198,47 @@ Trip Planning V22__shared_plan_sections_and_trip_vehicles.sql adds nullable JSON
 
 # Saved library membership (2026-10-29; VM release pending)
 
+## Additive discovery and guide storage (LIVE after root e1aea7d, 2026-11-06)
+
+Trip V28__publication_daily_activity.sql adds daily per-publication view/copy aggregates with a publication FK and date index. Recording uses the existing view/copy transaction, including copy-event idempotence. It does not backfill invented activity or store visitor identifiers.
+
+IAM V13__saved_guide_bookmarks.sql adds the GUIDE-only saved_guide_items companion table. Guide-inclusive reads opt into a UNION with existing membership; legacy reads and place-sync triggers remain unchanged. Separate guide quota50 uses the existing account lock and seven-day trash lifecycle. Both migrations were tested on real PostgreSQL, including validating the previous released ORM against the migrated schema. The authorized release passed actual PostgreSQL migration/entity validation and VM rollout. New discovery API behavior was verified against the deployed services.
+
 IAM V10__saved_content_library.sql adds saved_library_items and saved_library_sources with account/canonical-identity uniqueness, owned paged indexes and pg_trgm search index. The pg_trgm extension is explicitly installed in public; calls/operators are qualified. SQL normalize_library_search matches accent/case/whitespace normalization on every favorite import/bridge write. Existing active personal favorites are imported without changing their roles/defaults or old capped picker API. A trigger bridges subsequent favorite saves/edits; travel bookmarks never write personal anchors. Canonical existing-provider updates synchronize coordinates. Moving a personal favorite to a different canonical location keeps the independent old bookmark and adds the new location. Library rows/sources hard-expire after7days in trash (hourly cleanup; expired rows cannot restore or appear). Active Plan limit50 is enforced under account row lock; Places unbounded but all new library reads paged. No old migration/table/column is renamed/dropped. [API/lifecycle](../api/saved-content.md).
+# Shared Plan feedback — implemented additive schema (2026-11-05)
+
+Trip migration V27 adds `trip.plan_rating` (publication/account unique 1–5 score), `trip.plan_comment` (plain text, same-publication parent FK, tombstones and optimistic edit version), and `trip.plan_comment_report` (comment/reporter unique). All reference the publication and cascade on trip/publication deletion. No cross-service tables are read. `trip.trip_publication` gains default-zero `rating_count`, `rating_sum`, `comment_count`; rating average is derived, never fabricated. Publication-row locks serialize feedback writes and SQL maintains counts; Hibernate maps these counters as non-updatable. The existing released schema/model remains valid after this additive migration. See `docs/api/Shared Plan Feedback.md` for visibility and ownership rules. This additive schema is live after the authorized root0e341ac release (2026-11-05); production startup and actual feedback reads were verified.
+
+
+## Implemented Community collection extension (2026-11-08; V10 released root5ebfa3a)
+
+Community migration V10 adds `social.saved_posts(user_id uuid, post_id uuid, saved_at timestamptz)` and `social.post_visits(user_id uuid, post_id uuid, opened_at timestamptz)`, each with composite account/post primary key and cascading post foreign key. User/timestamp indexes support paged private collections; a visit expiry index supports daily30dayretention cleanup. Existing votes and comments are queried directly rather than duplicated. The migration only adds tables/indexes and preserves existing rows/schema for rollback. Author-filtered public Guides reuse IAM's existing user/auth-subject and published-guide model, without an IAM migration.
+
+
+## Guide discovery engagement (IAM V14)
+
+Development implementation adds `iam.guide_daily_views` (source/guide/date aggregates), `iam.guide_view_dedup` (stable hashed viewer/source/guide/date uniqueness), and `iam.guide_view_budgets` (viewer/network daily counters). CURATED/TRAVELER is part of every guide identity. No Guide document/entity columns are changed; migration is additive and rollback compatible. See [Guide discovery contract](../api/guide-discovery.md) for counting, retention and limits.
+
+
+## Applied extension: Guide readership and feedback (IAM V15–V16)
+
+Additive tables in the `iam` schema; existing daily view totals are preserved.
+
+| Table | Identity and purpose |
+| --- | --- |
+| guide_read_requests | PK(source,guide_id,read_id): retry idempotency for each visible opening; expires after two days |
+| guide_unique_account_views | PK(source,guide_id,account_hash): permanent signed-in uniqueness, first_view_at; no guest rows |
+| guide_feedback_subjects | Stable UUID per source/Guide; unique(source,guide_id), PUBLISHED status checked before access |
+| guide_rating | PK(publication_id,user_id), score1–5, updated_at |
+| guide_comment | Per-subject comments, optional same-subject parent FK, optimistic version, soft deletion |
+| guide_comment_report | PK(comment_id,reporter_id), validated reason, created_at |
+
+Guide rows are locked for feedback writes, making concurrent rating updates
+and expected-version comment edits consistent. A composite parent/subject FK
+prevents cross-Guide reply threads. Account identity is the internal resolved
+IAM user ID for feedback and a SHA-256 authenticated subject hash for unique
+readership. No email, raw network address or browser identifier is stored in
+the new read ledgers. Existing daily network budgets protect read writes.
+
+Old view aggregates and legacy tables remain rollback compatible; no migration
+edits, drops or destructive backfill. Unique counts begin with this revision.

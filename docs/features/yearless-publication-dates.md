@@ -1,0 +1,13 @@
+# Published travel dates: month and day only
+
+Released 2026-11-03 as root `65a4105`, workflow `41617858398` successful. Real VM search/year-limitation and legacy public read checks passed. The selected live sample hides dates, so visible-date and copy round-trip assertions rely on the earlier real-PostgreSQL/HTTP integration suite; no authenticated production writes were tested.
+
+Private planner dates remain full `LocalDate` values. Public snapshot start/end/day dates are `MonthDay` values serialized as `MM-dd`, with no original year or fabricated replacement year. Existing reference endpoints may use ISO MonthDay `--MM-dd`; the reader accepts both formats and legacy full ISO dates without displaying their year. Publication timestamps and freely authored prose are separate from structured travel dates.
+
+`PublicDayDto.dayOffset` and `PublicPlanSnapshot.daySpan` preserve the relative day spacing and trip span, including sparse itineraries and trips crossing New Year. The sanitizer derives these from the source before discarding the year. Hidden dates also omit these optional date offsets; default day order still copies normally. Automatically generated ISO date titles follow date visibility and never bypass the owner's choice to hide dates.
+
+`PublicPlanDates` projects existing frozen snapshots at read time. It computes relative spacing from legacy ISO dates, accepts old records without revoking links, and returns yearless DTOs. It does not rewrite stored publications or re-read the private trip. Main public read, summary/reference, feed and search paths use this reader. A malformed snapshot remains a handled unavailable publication, not a runtime cast failure. No database migration or entity changes were required.
+
+Copying requires a full explicit destination start date. The UI offers a starting month/day with a chosen year, or entirely new dates; it does not guess the original or current year. Invalid leap-day choices are rejected. Subsequent dates follow the preserved day offsets, so calendar labels can shift in a different year; the UI explains this. The frontend sends the explicit chosen start with `dateMode: change`, so an older backend cannot silently reuse its original year during rolling releases. The new backend also validates direct `retain` requests with an explicit start and matching starting month/day. A missing request/start is rejected before any trip is created.
+
+Search may use deliberately published month/day or affirmative public event/month text. It cannot verify an original travel year, and a year-specific query receives an explicit limitation notice instead of a false year match. Hidden dates are never fetched from the private planner to improve search results.

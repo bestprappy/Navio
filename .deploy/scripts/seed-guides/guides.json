@@ -1,0 +1,2059 @@
+[
+  {
+    "id": "aed0ceea-d61b-5023-89a5-e46ea3076215",
+    "slug": "kyoto",
+    "source": "CURATED",
+    "guide": {
+      "name": "Kyoto in Autumn: Gardens, Temple Paths and Quiet Moments",
+      "country": "Japan",
+      "countryCode": "JP",
+      "destination": {
+        "provider": "GOOGLE",
+        "providerPlaceId": "ChIJ8cM8zdaoAWARPR27azYdlsA",
+        "name": "Kyoto",
+        "lat": 35.011564,
+        "lng": 135.7681489
+      },
+      "description": "A thoughtful Kyoto guide for garden lovers, with autumn colour, temple etiquette and room to slow down.",
+      "coverPlaceId": "GOOGLE:ChIJk54PuAGqAWARwEgz_9o-nM0",
+      "content": {
+        "categories": [
+          {
+            "id": "section-1",
+            "name": "Garden perspectives",
+            "iconId": "trees",
+            "colorId": "teal"
+          },
+          {
+            "id": "section-2",
+            "name": "Temple approaches and city flavours",
+            "iconId": "landmark",
+            "colorId": "amber"
+          }
+        ],
+        "lists": {
+          "section-1": {
+            "id": "section-1",
+            "categoryId": "section-1"
+          },
+          "section-2": {
+            "id": "section-2",
+            "categoryId": "section-2"
+          }
+        },
+        "places": {
+          "ChIJk54PuAGqAWARwEgz_9o-nM0": {
+            "id": "GOOGLE:ChIJk54PuAGqAWARwEgz_9o-nM0",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJk54PuAGqAWARwEgz_9o-nM0",
+            "name": "Tenryu-ji",
+            "address": "Japan, 〒616-8385 京都府京都市右京区嵯峨天龍寺芒ノ馬場町６８",
+            "lat": 35.0158379,
+            "lng": 135.6737654,
+            "tags": [],
+            "category": "Buddhist Temple"
+          },
+          "ChIJp7ocMCqoAWARQoXXRj4Xq-E": {
+            "id": "GOOGLE:ChIJp7ocMCqoAWARQoXXRj4Xq-E",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJp7ocMCqoAWARQoXXRj4Xq-E",
+            "name": "Ryōan-ji",
+            "address": "13 Ryōanji Goryōnoshitachō, Ukyo Ward, Kyoto, 616-8001, Japan",
+            "lat": 35.0344943,
+            "lng": 135.71826339999998,
+            "tags": [],
+            "category": "Buddhist Temple"
+          },
+          "ChIJB_vchdMIAWARujTEUIZlr2I": {
+            "id": "GOOGLE:ChIJB_vchdMIAWARujTEUIZlr2I",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJB_vchdMIAWARujTEUIZlr2I",
+            "name": "Kiyomizu-dera",
+            "address": "1-chōme-294 Kiyomizu, Higashiyama Ward, Kyoto, 605-0862, Japan",
+            "lat": 34.9946662,
+            "lng": 135.784661,
+            "tags": [],
+            "category": "Buddhist Temple"
+          },
+          "ChIJIW0uPRUPAWAR6eI6dRzKGns": {
+            "id": "GOOGLE:ChIJIW0uPRUPAWAR6eI6dRzKGns",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJIW0uPRUPAWAR6eI6dRzKGns",
+            "name": "Fushimi Inari Taisha",
+            "address": "68 Fukakusa Yabunouchichō, Fushimi Ward, Kyoto, 612-0882, Japan",
+            "lat": 34.9676945,
+            "lng": 135.7791876,
+            "tags": [],
+            "category": "Shinto Shrine"
+          },
+          "ChIJT8uMzZwIAWARnGzsARCjnrY": {
+            "id": "GOOGLE:ChIJT8uMzZwIAWARnGzsARCjnrY",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJT8uMzZwIAWARnGzsARCjnrY",
+            "name": "Nishiki Market",
+            "address": "Higashiuoyacho, Nakagyo Ward, Kyoto, 604-8055, Japan",
+            "lat": 35.0050258,
+            "lng": 135.764723,
+            "tags": [],
+            "category": "Market"
+          }
+        },
+        "body": "Kyoto rewards a little patience. A garden becomes more interesting when you notice its framing, a temple approach when you leave time to look at the buildings along it. This collection brings together landscape, architecture and an everyday food stop. Use it to choose a few places that suit your mood. Autumn foliage is a reason to visit, though its timing and intensity vary each year. The same gardens are worth considering outside the leaf season, when a different texture or a quieter afternoon may become the memory you take home.\n\n## Before you go\n\n- Choose one part of the city for a half-day, then check transport before crossing to another district.\n- Keep voices low at religious sites, follow photography signs and stay out of private lanes. Leave bamboo and garden plants untouched.\n- For autumn visits, check the city’s current foliage information. Special evening openings and admission arrangements need separate confirmation.\n\n<div data-embed=\"placeList\" data-list-id=\"section-1\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJk54PuAGqAWARwEgz_9o-nM0\"></div>\n\nGive the garden a proper pause. Look at how water, planting and the surrounding landscape sit together before moving on. A slower visit here can be the centre of an Arashiyama outing, with the bamboo area as a separate addition.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJp7ocMCqoAWARQoXXRj4Xq-E\"></div>\n\nApproach the rock garden as an exercise in looking. Sit where permitted and notice the spaces between the elements. It makes a rewarding contrast with the more wooded and colourful places in this guide.\n\n<div data-embed=\"placeList\" data-list-id=\"section-2\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJB_vchdMIAWARujTEUIZlr2I\"></div>\n\nThe approach is part of the experience. Give yourself time for the streets as well as the temple, and keep entrances clear when stopping. Busy periods call for extra flexibility, especially if you are hoping to linger for photographs.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJIW0uPRUPAWAR6eI6dRzKGns\"></div>\n\nFollow the permitted paths through the shrine’s torii-lined setting and turn back when the distance suits you. The wider route involves climbing, so choose footwear and an ambition level that match your energy.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJT8uMzZwIAWARnGzsARCjnrY\"></div>\n\nFinish with browsing and a small taste of Kyoto’s food culture. Look at what stalls specialise in, ask about unfamiliar ingredients and eat only where the shop permits. A market visit works best with curiosity and a little appetite.\n\n## Official references\n\n- [Kyoto City responsible travel](https://kyoto.travel/en/responsible-travel/)\n- [Kyoto seasonal information](https://kyoto.travel/en/seasonal-info/)\n\nPrepared by Navio Team. Information reviewed 2026-11-12. Check official sources for current access, reservations and local conditions."
+      }
+    }
+  },
+  {
+    "id": "bfc53b27-61a4-559f-baf7-fbfdfede1311",
+    "slug": "osaka",
+    "source": "CURATED",
+    "guide": {
+      "name": "Osaka by Appetite: Markets, Neon and a Nara Breather",
+      "country": "Japan",
+      "countryCode": "JP",
+      "destination": {
+        "provider": "GOOGLE",
+        "providerPlaceId": "ChIJ4eIGNFXmAGAR5y9q5G7BW8U",
+        "name": "Osaka",
+        "lat": 34.6952474,
+        "lng": 135.5012079
+      },
+      "description": "Street-food browsing, evening neighbourhoods and an optional cultural escape beyond Osaka.",
+      "coverPlaceId": "GOOGLE:ChIJXSJB5UHnAGARQcEjvngsHaw",
+      "content": {
+        "categories": [
+          {
+            "id": "section-1",
+            "name": "Eat and explore",
+            "iconId": "utensils",
+            "colorId": "rose"
+          },
+          {
+            "id": "section-2",
+            "name": "A different rhythm in Nara",
+            "iconId": "trees",
+            "colorId": "teal"
+          }
+        ],
+        "lists": {
+          "section-1": {
+            "id": "section-1",
+            "categoryId": "section-1"
+          },
+          "section-2": {
+            "id": "section-2",
+            "categoryId": "section-2"
+          }
+        },
+        "places": {
+          "ChIJXSJB5UHnAGARQcEjvngsHaw": {
+            "id": "GOOGLE:ChIJXSJB5UHnAGARQcEjvngsHaw",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJXSJB5UHnAGARQcEjvngsHaw",
+            "name": "Kuromon Market",
+            "address": "2-chōme-4-1 Nipponbashi, Chuo Ward, Osaka, 542-0073, Japan",
+            "lat": 34.665351099999995,
+            "lng": 135.5062417,
+            "tags": [],
+            "category": "Tourist Attraction"
+          },
+          "ChIJg2DcJhXnAGARCbeAHoZrPeQ": {
+            "id": "GOOGLE:ChIJg2DcJhXnAGARCbeAHoZrPeQ",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJg2DcJhXnAGARCbeAHoZrPeQ",
+            "name": "Dotonbori",
+            "address": "Dotonbori, Chuo Ward, Osaka, 542-0071, Japan",
+            "lat": 34.6686471,
+            "lng": 135.5030983,
+            "tags": []
+          },
+          "ChIJV6JXdmDnAGAR-9a4atjXsTY": {
+            "id": "GOOGLE:ChIJV6JXdmDnAGAR-9a4atjXsTY",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJV6JXdmDnAGAR-9a4atjXsTY",
+            "name": "Shinsekai",
+            "address": "2 Chome-5 Ebisuhigashi, Naniwa Ward, Osaka, 556-0002, Japan",
+            "lat": 34.651601299999996,
+            "lng": 135.50595619999999,
+            "tags": []
+          },
+          "ChIJYWCMvZY5AWARVnREV_OsbPk": {
+            "id": "GOOGLE:ChIJYWCMvZY5AWARVnREV_OsbPk",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJYWCMvZY5AWARVnREV_OsbPk",
+            "name": "Nara Park",
+            "address": "Nara, Japan",
+            "lat": 34.685047,
+            "lng": 135.843012,
+            "tags": [],
+            "category": "Park"
+          },
+          "ChIJ3XYIepA5AWARjzzVnT-skPg": {
+            "id": "GOOGLE:ChIJ3XYIepA5AWARjzzVnT-skPg",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJ3XYIepA5AWARjzzVnT-skPg",
+            "name": "Tōdai-ji",
+            "address": "406-1 Zōshichō, Nara, 630-8587, Japan",
+            "lat": 34.6889851,
+            "lng": 135.8398158,
+            "tags": [],
+            "category": "Buddhist Temple"
+          }
+        },
+        "body": "Build an Osaka visit around the way you like to eat. You might prefer a market browse with a few small tastes, an unhurried sit-down meal, or the spectacle of bright restaurant signs after dark. This guide offers several moods, then adds a Nara option for a change of pace. The places are choices to combine across a stay. An evening in Dotonbori and a separate Nara outing need very different amounts of time, so decide what kind of day you want before filling a map with stops.\n\n## Before you go\n\n- At food stalls, check ingredients and portion sizes before ordering. Sharing small portions can leave space for a wider range of flavours.\n- Choose Namba and Shinsekai as neighbourhood visits. Build in travel time for Nara and check the return train before settling into dinner.\n- In Nara, follow the local rules around deer and keep food, bags and paper secure. Treat temple grounds as places of worship.\n\n<div data-embed=\"placeList\" data-list-id=\"section-1\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJXSJB5UHnAGARQcEjvngsHaw\"></div>\n\nUse the market to discover what catches your appetite. Compare stalls before choosing, leave room for another taste and ask where you may eat. Focus on the food itself and the people running the shops.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJg2DcJhXnAGARCbeAHoZrPeQ\"></div>\n\nCome for the theatre of the signs and the concentration of dining choices. Browse before committing to a restaurant and check its menu and queue. The area is enjoyable even when your main activity is simply looking around.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJV6JXdmDnAGAR-9a4atjXsTY\"></div>\n\nSpend time with the district’s more nostalgic streets and casual dining atmosphere. It offers a different visual character from Dotonbori. Plan a meal here if the menus appeal, and let the neighbourhood provide the evening’s setting.\n\n<div data-embed=\"placeList\" data-list-id=\"section-2\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJYWCMvZY5AWARVnREV_OsbPk\"></div>\n\nChoose an optional outing with open space and a gentler rhythm. Keep an eye on deer and on the paths you are using. A park stop is an opportunity to breathe between larger cultural visits.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJ3XYIepA5AWARjzzVnT-skPg\"></div>\n\nMake the temple the focus of your Nara visit if monumental architecture interests you. Allow time to look closely at the scale and details. Check current access arrangements before treating it as a guaranteed addition to the day.\n\n## Official references\n\n- [Osaka Convention & Tourism Bureau neighbourhood guide](https://osaka-info.jp/en/special/universal/course03/)\n- [Nara official visitor information](https://www.visitnara.jp/)\n\nPrepared by Navio Team. Information reviewed 2026-11-12. Check official sources for current access, reservations and local conditions."
+      }
+    }
+  },
+  {
+    "id": "ca68a205-06e6-51a0-a08d-84406420f912",
+    "slug": "sapporo",
+    "source": "CURATED",
+    "guide": {
+      "name": "Sapporo Summer: Green Spaces, Market Mornings and Otaru",
+      "country": "Japan",
+      "countryCode": "JP",
+      "destination": {
+        "provider": "GOOGLE",
+        "providerPlaceId": "ChIJMzaXWnXUCl8R1bqHRp1-kzM",
+        "name": "Sapporo",
+        "lat": 43.0617713,
+        "lng": 141.3544506
+      },
+      "description": "A summer-minded city guide with park time, mountain views and a separate harbour-town excursion.",
+      "coverPlaceId": "GOOGLE:ChIJKdPFSFEpC18RnuAg7TaybA4",
+      "content": {
+        "categories": [
+          {
+            "id": "section-1",
+            "name": "Sapporo at an easy pace",
+            "iconId": "trees",
+            "colorId": "teal"
+          },
+          {
+            "id": "section-2",
+            "name": "Otaru as a separate outing",
+            "iconId": "waves",
+            "colorId": "blue"
+          }
+        ],
+        "lists": {
+          "section-1": {
+            "id": "section-1",
+            "categoryId": "section-1"
+          },
+          "section-2": {
+            "id": "section-2",
+            "categoryId": "section-2"
+          }
+        },
+        "places": {
+          "ChIJKdPFSFEpC18RnuAg7TaybA4": {
+            "id": "GOOGLE:ChIJKdPFSFEpC18RnuAg7TaybA4",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJKdPFSFEpC18RnuAg7TaybA4",
+            "name": "Odori Park",
+            "address": "Japan, 〒060-0042 北海道札幌市中央区大通西１〜１２丁目",
+            "lat": 43.060752099999995,
+            "lng": 141.3544308,
+            "tags": [],
+            "category": "Park"
+          },
+          "ChIJCb2qW4IpC18R93EsGNFraJI": {
+            "id": "GOOGLE:ChIJCb2qW4IpC18R93EsGNFraJI",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJCb2qW4IpC18R93EsGNFraJI",
+            "name": "Nijo Market",
+            "address": "Japan, 〒060-0052 Hokkaido, Sapporo, Chuo Ward, Minami 2 Jōhigashi, 1-chōme, 南３条東１丁目〜２丁目",
+            "lat": 43.058299,
+            "lng": 141.358446,
+            "tags": [],
+            "category": "Market"
+          },
+          "ChIJG4fqNwYqC18Rd5EvgpNdRQ8": {
+            "id": "GOOGLE:ChIJG4fqNwYqC18Rd5EvgpNdRQ8",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJG4fqNwYqC18Rd5EvgpNdRQ8",
+            "name": "Mount Moiwa Ropeway Entrance",
+            "address": "5-chōme-3-7 Fushimi, Chuo Ward, Sapporo, Hokkaido 064-0942, Japan",
+            "lat": 43.0316221,
+            "lng": 141.33309789999998,
+            "tags": [],
+            "category": "Tourist Attraction"
+          },
+          "ChIJ0UxVV2ThCl8RIZdpda0H7gQ": {
+            "id": "GOOGLE:ChIJ0UxVV2ThCl8RIZdpda0H7gQ",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJ0UxVV2ThCl8RIZdpda0H7gQ",
+            "name": "Otaru Canal",
+            "address": "5 Minatomachi, Otaru, Hokkaido 047-0007, Japan",
+            "lat": 43.199041,
+            "lng": 141.0021176,
+            "tags": [],
+            "category": "Tourist Attraction"
+          },
+          "ChIJB2IMXFrgCl8Rx-WS9YJOmbQ": {
+            "id": "GOOGLE:ChIJB2IMXFrgCl8Rx-WS9YJOmbQ",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJB2IMXFrgCl8Rx-WS9YJOmbQ",
+            "name": "Otaru Music Box Museum",
+            "address": "4-1 Sumiyoshichō, Otaru, Hokkaido 047-0015, Japan",
+            "lat": 43.190528799999996,
+            "lng": 141.00797319999998,
+            "tags": [],
+            "category": "Store"
+          }
+        },
+        "body": "Summer gives Sapporo a different personality from its snow-season image. The city’s official visitor guide highlights green landscapes and outdoor activities during the warmer months. This collection keeps the idea manageable with central places, one elevated viewpoint and an optional Otaru visit. There is space for a market morning, a long lunch and a pause outside. Use the selection for a city-based stay, and keep more distant Hokkaido countryside ambitions for another guide or a carefully planned extension.\n\n## Before you go\n\n- Treat Otaru as a separate excursion and check rail connections rather than assuming it is another Sapporo neighbourhood.\n- Check the current forecast and ropeway operating information before travelling to Mount Moiwa. Visibility can change the experience.\n- If you want to attend a summer event in Odori Park, use the official calendar for that year. A seasonal guide cannot guarantee an event on your dates.\n\n<div data-embed=\"placeList\" data-list-id=\"section-1\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJKdPFSFEpC18RnuAg7TaybA4\"></div>\n\nUse the park as a breathing space between city visits. Choose a stretch to walk, find somewhere permitted to sit and let the day slow down. Check the event calendar if you want to build a visit around a festival.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJCb2qW4IpC18R93EsGNFraJI\"></div>\n\nMake a market morning about looking and choosing thoughtfully. Check menus, ingredients and prices before ordering. It is a useful food stop to pair with a central-city wander, with the rest of the day left flexible.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJG4fqNwYqC18Rd5EvgpNdRQ8\"></div>\n\nConsider the ropeway when you want a broader sense of the city’s setting. This map pin marks the entrance, so allow for the full visit beyond it. Check the operator’s latest service and visibility information first.\n\n<div data-embed=\"placeList\" data-list-id=\"section-2\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJ0UxVV2ThCl8RIZdpda0H7gQ\"></div>\n\nGive the canal a relaxed walk with time to notice its waterside setting. It provides a different scale and atmosphere from central Sapporo. Choose your onward stops according to the weather and how much browsing you enjoy.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJB2IMXFrgCl8Rx-WS9YJOmbQ\"></div>\n\nThis is a good counterpoint to the outdoor canal walk if small objects, music and browsing appeal to you. Check what is open and take care around displays. Leave time afterwards for the surrounding shopping streets.\n\n## Official references\n\n- [Visit Sapporo summer guide](https://visit.sapporo.travel/seasons/summer/)\n- [Otaru official tourism information](https://www.visit-otaru-en.info/)\n\nPrepared by Navio Team. Information reviewed 2026-11-12. Check official sources for current access, reservations and local conditions."
+      }
+    }
+  },
+  {
+    "id": "d265d8d2-fe17-50e9-be8e-2dcdebc13c0d",
+    "slug": "seoul",
+    "source": "CURATED",
+    "guide": {
+      "name": "Seoul in Spring: Palace Courtyards and Neighbourhood Walks",
+      "country": "South Korea",
+      "countryCode": "KR",
+      "destination": {
+        "provider": "GOOGLE",
+        "providerPlaceId": "ChIJzzlcLQGifDURm_JbQKHsEX4",
+        "name": "Seoul",
+        "lat": 37.550263,
+        "lng": 126.9970831
+      },
+      "description": "Palaces, living hanok streets, market food and riverside space for a spring-minded Seoul visit.",
+      "coverPlaceId": "GOOGLE:ChIJod7tSseifDUR9hXHLFNGMIs",
+      "content": {
+        "categories": [
+          {
+            "id": "section-1",
+            "name": "Palaces and lived-in streets",
+            "iconId": "landmark",
+            "colorId": "amber"
+          },
+          {
+            "id": "section-2",
+            "name": "Food and open space",
+            "iconId": "utensils",
+            "colorId": "rose"
+          }
+        ],
+        "lists": {
+          "section-1": {
+            "id": "section-1",
+            "categoryId": "section-1"
+          },
+          "section-2": {
+            "id": "section-2",
+            "categoryId": "section-2"
+          }
+        },
+        "places": {
+          "ChIJod7tSseifDUR9hXHLFNGMIs": {
+            "id": "GOOGLE:ChIJod7tSseifDUR9hXHLFNGMIs",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJod7tSseifDUR9hXHLFNGMIs",
+            "name": "Gyeongbokgung Palace",
+            "address": "161 Sajik-ro, Jongno District, Seoul, South Korea",
+            "lat": 37.579617,
+            "lng": 126.977041,
+            "tags": [],
+            "category": "Cultural landmark"
+          },
+          "ChIJT8H4r9qifDURmuXJ_6m6vM0": {
+            "id": "GOOGLE:ChIJT8H4r9qifDURmuXJ_6m6vM0",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJT8H4r9qifDURmuXJ_6m6vM0",
+            "name": "Bukchon Hanok Village",
+            "address": "Gyedong-gil, Jongno District, Seoul, South Korea",
+            "lat": 37.5814696,
+            "lng": 126.9849519,
+            "tags": [],
+            "category": "Landmark"
+          },
+          "ChIJoUzwDuiifDURpGVi0ArwvU0": {
+            "id": "GOOGLE:ChIJoUzwDuiifDURpGVi0ArwvU0",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJoUzwDuiifDURpGVi0ArwvU0",
+            "name": "Insa-dong",
+            "address": "Insa-dong, Jongno District, Seoul, South Korea",
+            "lat": 37.5717174,
+            "lng": 126.9860732,
+            "tags": []
+          },
+          "ChIJm3V0fu2ifDURRJ8IMUijVtY": {
+            "id": "GOOGLE:ChIJm3V0fu2ifDURRJ8IMUijVtY",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJm3V0fu2ifDURRJ8IMUijVtY",
+            "name": "Gwangjang Market",
+            "address": "88 Cheonggyecheon-ro, Jongno District, Seoul, South Korea",
+            "lat": 37.570038499999995,
+            "lng": 126.99960379999997,
+            "tags": [],
+            "category": "Market"
+          },
+          "ChIJ77fEAzuffDURLEWNv56G2KQ": {
+            "id": "GOOGLE:ChIJ77fEAzuffDURLEWNv56G2KQ",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJ77fEAzuffDURLEWNv56G2KQ",
+            "name": "Yeouido Hangang Park",
+            "address": "330 Yeouidong-ro, Yeongdeungpo District, Seoul, South Korea",
+            "lat": 37.5267106,
+            "lng": 126.9347112,
+            "tags": [],
+            "category": "Park"
+          }
+        },
+        "body": "Let Seoul unfold at two scales. Palace courtyards invite you to look at a larger composition, while neighbourhood lanes reward attention to doorways, workshops and everyday routines. This guide connects those experiences with a market and a riverside pause. Spring is a useful inspiration for walking, although blossom timing and weather vary. Keep your day flexible and choose a few anchors. A quiet visit depends as much on considerate behaviour and sensible timing as on finding a particular street.\n\n## Before you go\n\n- Bukchon is a residential area with regulated visitor access in some zones. Check current restrictions and keep conversations and photography considerate.\n- Verify palace opening days and any reservation requirements. Leave enough time for the site you choose.\n- For spring blossoms, use current local information. Keep a market or museum option in mind when rain changes an outdoor afternoon.\n\n<div data-embed=\"placeList\" data-list-id=\"section-1\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJod7tSseifDUR9hXHLFNGMIs\"></div>\n\nChoose a few architectural details to follow through the grounds, such as rooflines, gates or the relationship between buildings and open space. This makes a palace visit more rewarding than rushing between the most photographed views.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJT8H4r9qifDURmuXJ_6m6vM0\"></div>\n\nWalk only where visitor access is permitted and remember that people live here. Keep entrances clear and avoid photographing private interiors. The appeal is in the neighbourhood’s form and details, which deserve a respectful pace.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJoUzwDuiifDURpGVi0ArwvU0\"></div>\n\nBrowse according to your interests, with time for craft, art or a tea break. It can provide a softer transition from a palace visit to an ordinary city afternoon. Check individual businesses before travelling for something specific.\n\n<div data-embed=\"placeList\" data-list-id=\"section-2\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJm3V0fu2ifDURRJ8IMUijVtY\"></div>\n\nTake a first lap to understand the food options before sitting down. Ask about ingredients and order at a pace that leaves room to try something else. A focused market meal can become its own part of the visit.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJ77fEAzuffDURLEWNv56G2KQ\"></div>\n\nLeave a gap in the schedule for the river. Choose a manageable walk or a place to rest, and check conditions before committing to a long outdoor visit. Seasonal events and crowds can change the mood considerably.\n\n## Official references\n\n- [Seoul official palace guide](https://english.visitseoul.net/attractions/Gyeongbokgung%C2%ADPalace/ENP000072)\n- [Seoul municipal Bukchon visitor map](https://english.seoul.go.kr/wp-content/themes/seoul-e/assets/images/hanok/img/hanok-map-2-eng.pdf)\n\nPrepared by Navio Team. Information reviewed 2026-11-12. Check official sources for current access, reservations and local conditions."
+      }
+    }
+  },
+  {
+    "id": "17d23a74-c2c5-55d4-84ab-660493cba93a",
+    "slug": "busan",
+    "source": "CURATED",
+    "guide": {
+      "name": "Busan After the Beach: Coastal Views and Evening Lights",
+      "country": "South Korea",
+      "countryCode": "KR",
+      "destination": {
+        "provider": "GOOGLE",
+        "providerPlaceId": "ChIJNc0j6G3raDURpwhxJHTL2DU",
+        "name": "Busan",
+        "lat": 35.1731121,
+        "lng": 129.0714122
+      },
+      "description": "A sea-facing Busan collection balancing beach time, colourful streets, seafood browsing and the evening waterfront.",
+      "coverPlaceId": "GOOGLE:ChIJXwf-DlyNaDURmKxjwdWxY5k",
+      "content": {
+        "categories": [
+          {
+            "id": "section-1",
+            "name": "Coast and changing light",
+            "iconId": "waves",
+            "colorId": "blue"
+          },
+          {
+            "id": "section-2",
+            "name": "Neighbourhood colour and food",
+            "iconId": "camera",
+            "colorId": "rose"
+          }
+        ],
+        "lists": {
+          "section-1": {
+            "id": "section-1",
+            "categoryId": "section-1"
+          },
+          "section-2": {
+            "id": "section-2",
+            "categoryId": "section-2"
+          }
+        },
+        "places": {
+          "ChIJXwf-DlyNaDURmKxjwdWxY5k": {
+            "id": "GOOGLE:ChIJXwf-DlyNaDURmKxjwdWxY5k",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJXwf-DlyNaDURmKxjwdWxY5k",
+            "name": "Haeundae Beach",
+            "address": "Haeundae Beach, South Korea",
+            "lat": 35.158697499999995,
+            "lng": 129.16038419999998,
+            "tags": [],
+            "category": "Beach"
+          },
+          "ChIJfdIYWwuNaDURDx-eqtUjCkg": {
+            "id": "GOOGLE:ChIJfdIYWwuNaDURDx-eqtUjCkg",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJfdIYWwuNaDURDx-eqtUjCkg",
+            "name": "Haeundae Blueline Park - Mipo Station",
+            "address": "13 Dalmaji-gil 62beon-gil, Haeundae, Busan, South Korea",
+            "lat": 35.158284,
+            "lng": 129.17276719999998,
+            "tags": [],
+            "category": "Tourist Attraction"
+          },
+          "ChIJxw7HJy_taDUR-xaSTeHwbf8": {
+            "id": "GOOGLE:ChIJxw7HJy_taDUR-xaSTeHwbf8",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJxw7HJy_taDUR-xaSTeHwbf8",
+            "name": "Gwangalli Beach",
+            "address": "Gwangalli Beach, Busan, South Korea",
+            "lat": 35.1531696,
+            "lng": 129.118666,
+            "tags": [],
+            "category": "Beach"
+          },
+          "ChIJUToRo7fpaDURo_ZMItcBfpc": {
+            "id": "GOOGLE:ChIJUToRo7fpaDURo_ZMItcBfpc",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJUToRo7fpaDURo_ZMItcBfpc",
+            "name": "Gamcheon Culture Village",
+            "address": "203 Gamnae 2-ro, Saha-gu, Busan, South Korea",
+            "lat": 35.097393499999995,
+            "lng": 129.0105921,
+            "tags": [],
+            "category": "Tourist Attraction"
+          },
+          "ChIJudkrFArpaDURbbCzajeQs0c": {
+            "id": "GOOGLE:ChIJudkrFArpaDURbbCzajeQs0c",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJudkrFArpaDURbbCzajeQs0c",
+            "name": "Jagalchi Market",
+            "address": "52 Jagalchihaean-ro, Jung-gu, Busan, South Korea",
+            "lat": 35.0966339,
+            "lng": 129.0307965,
+            "tags": [],
+            "category": "Market"
+          }
+        },
+        "body": "Busan is a good place to make the coastline part of the experience. A beach walk, a view from the shore and a market visit can each carry a different mood. This guide gives the evening waterfront a central role, with cultural and food stops to balance it. The city is spread out, so use the map to group places geographically. You can spend a satisfying half-day in one coastal area without trying to fit every beach into the same outing.\n\n## Before you go\n\n- Group Haeundae-area visits together and plan separate travel for Gamcheon and Jagalchi.\n- Use current operator information for the Blueline Park. A map pin at Mipo is an access point, not a confirmed ride reservation.\n- Check sea and weather conditions before water activities. For an evening walk, confirm your route back before public transport becomes less frequent.\n\n<div data-embed=\"placeList\" data-list-id=\"section-1\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJXwf-DlyNaDURmKxjwdWxY5k\"></div>\n\nChoose your own pace along the waterfront. A short walk and a place to sit may be enough, especially after a busy journey. Notice how the atmosphere changes between daytime activity and the quieter moments around a meal.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJfdIYWwuNaDURDx-eqtUjCkg\"></div>\n\nConsider this access point if a coastal ride fits your interests. Check the current choices and booking requirements with the operator. Leave enough time to enjoy the setting without turning the ride into another rushed transfer.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJxw7HJy_taDUR-xaSTeHwbf8\"></div>\n\nGive the evening some open time here. The waterfront and bridge views are the attraction, so a simple walk can be enough. Select a café or meal by its menu and comfort as well as its view.\n\n<div data-embed=\"placeList\" data-list-id=\"section-2\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJUToRo7fpaDURo_ZMItcBfpc\"></div>\n\nFollow signed public routes and take the slopes at a comfortable pace. The neighbourhood has homes as well as visitor attractions. Keep doorways clear, respect photography notices and let the streets offer smaller details between viewpoints.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJudkrFArpaDURbbCzajeQs0c\"></div>\n\nBrowse before ordering, ask clearly about preparation and price, and check ingredients if you have dietary needs. A seafood market visit can be about observing the trade as much as arranging a large meal.\n\n## Official references\n\n- [Visit Busan Gwangalli guide](https://www.visitbusan.net/en/index.do?lang_cd=en&menuCd=DOM_000000303011001000&uc_seq=377)\n- [Busan official visitor information](https://www.visitbusan.net/en/)\n\nPrepared by Navio Team. Information reviewed 2026-11-12. Check official sources for current access, reservations and local conditions."
+      }
+    }
+  },
+  {
+    "id": "5f66524a-943b-5cbc-95d9-b0fcf880df2a",
+    "slug": "taipei",
+    "source": "CURATED",
+    "guide": {
+      "name": "Taipei Small Bites: Night Markets, Sweet Breaks and Beitou",
+      "country": "Taiwan",
+      "countryCode": "TW",
+      "destination": {
+        "provider": "GOOGLE",
+        "providerPlaceId": "ChIJmQrivHKsQjQR4MIK3c41aj8",
+        "name": "Taipei",
+        "lat": 25.0329694,
+        "lng": 121.5654177
+      },
+      "description": "A food-first Taipei guide with night-market browsing, room for dessert and a slower Beitou interlude.",
+      "coverPlaceId": "GOOGLE:ChIJg6W0DZyrQjQR9vZdgYMRoj0",
+      "content": {
+        "categories": [
+          {
+            "id": "section-1",
+            "name": "Browse with an appetite",
+            "iconId": "utensils",
+            "colorId": "rose"
+          },
+          {
+            "id": "section-2",
+            "name": "A gentler afternoon",
+            "iconId": "heart",
+            "colorId": "teal"
+          }
+        ],
+        "lists": {
+          "section-1": {
+            "id": "section-1",
+            "categoryId": "section-1"
+          },
+          "section-2": {
+            "id": "section-2",
+            "categoryId": "section-2"
+          }
+        },
+        "places": {
+          "ChIJg6W0DZyrQjQR9vZdgYMRoj0": {
+            "id": "GOOGLE:ChIJg6W0DZyrQjQR9vZdgYMRoj0",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJg6W0DZyrQjQR9vZdgYMRoj0",
+            "name": "Songshan Raohe Night Market",
+            "address": "Raohe St, Ciyou Village, Songshan District, Taipei City, Taiwan 105",
+            "lat": 25.0508854,
+            "lng": 121.5774891,
+            "tags": [],
+            "category": "Market"
+          },
+          "ChIJBa_9xLGuQjQRKfnnhr5twuc": {
+            "id": "GOOGLE:ChIJBa_9xLGuQjQRKfnnhr5twuc",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJBa_9xLGuQjQRKfnnhr5twuc",
+            "name": "Shilin Night Market",
+            "address": "No. 101, Jihe Rd, Yixin Village, Shilin District, Taipei City, Taiwan 111",
+            "lat": 25.0884972,
+            "lng": 121.52435039999999,
+            "tags": [],
+            "category": "Market"
+          },
+          "ChIJQXcl6LarQjQRGUMnQ18F0lE": {
+            "id": "GOOGLE:ChIJQXcl6LarQjQRGUMnQ18F0lE",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJQXcl6LarQjQRGUMnQ18F0lE",
+            "name": "Din Tai Fung 101",
+            "address": "110, Taiwan, Taipei City, Xinyi District, Xicun Village, City Hall Rd, 45號B1",
+            "lat": 25.033337099999997,
+            "lng": 121.56465960000001,
+            "tags": [],
+            "category": "Taiwanese Restaurant"
+          },
+          "ChIJ6fE69FCuQjQRPAp8aSmP8a0": {
+            "id": "GOOGLE:ChIJ6fE69FCuQjQRPAp8aSmP8a0",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJ6fE69FCuQjQRPAp8aSmP8a0",
+            "name": "Beitou Hot Spring Museum",
+            "address": "No. 2, Zhongshan Rd, Linquan Village, Beitou District, Taipei City, Taiwan 112",
+            "lat": 25.136569400000003,
+            "lng": 121.50715,
+            "tags": [],
+            "category": "Museum"
+          },
+          "ChIJTamiuZ2pQjQRsmnfkkID6UM": {
+            "id": "GOOGLE:ChIJTamiuZ2pQjQRsmnfkkID6UM",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJTamiuZ2pQjQRsmnfkkID6UM",
+            "name": "Chiang Kai-shek Memorial Hall",
+            "address": "Zhongzheng District, Taipei City, Taiwan 100",
+            "lat": 25.035501999999997,
+            "lng": 121.5201832,
+            "tags": [],
+            "category": "Cultural landmark"
+          }
+        },
+        "body": "An enjoyable food trip leaves some appetite for the next discovery. In Taipei, use night markets for small tastes, a sit-down meal when you want a pause, and a quieter cultural stop to reset. This guide also leaves room for sweet treats you discover along the way. Ask vendors what is in a dish and choose what genuinely appeals. Beitou offers a different afternoon mood, while a city viewpoint can add a visual contrast if you feel like going beyond the food stops.\n\n## Before you go\n\n- Pick one night market for an evening so you have time to browse. Check opening arrangements for the stalls you particularly want.\n- For sweet treats, ask about dairy, nuts, peanuts and other ingredients. Keep room for a small portion instead of committing to every stall at once.\n- Beitou Hot Spring Museum is a cultural visit. If you also want to bathe, research and book a suitable bathing facility separately.\n\n<div data-embed=\"placeList\" data-list-id=\"section-1\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJg6W0DZyrQjQR9vZdgYMRoj0\"></div>\n\nWalk through once before choosing your first snack. Compare what stalls specialise in and give yourself time to eat where permitted. The market is a useful place to build an evening around several modest tastes.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJBa_9xLGuQjQRKfnnhr5twuc\"></div>\n\nChoose this as an alternative market evening when its location fits your stay. Let queues guide curiosity without making them your only measure of a dish. Leave a little room for a drink or dessert that catches your eye.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJQXcl6LarQjQRGUMnQ18F0lE\"></div>\n\nA seated meal can be a welcome change from market browsing. Check current booking or queue arrangements, examine the menu and ask about ingredients. Plan other nearby activities flexibly around the wait.\n\n<div data-embed=\"placeList\" data-list-id=\"section-2\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJ6fE69FCuQjQRPAp8aSmP8a0\"></div>\n\nUse the museum to give a hot-spring-area visit some context. Check access and entry guidance before travelling. It suits an afternoon when you want to read and look at a place at a slower pace.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJTamiuZ2pQjQRsmnfkkID6UM\"></div>\n\nAllow time for the setting and the public spaces as well as the main building. Decide how much walking you want and use the visit as a pause between food-focused neighbourhoods. Check current exhibitions if you want more context.\n\n## Official references\n\n- [Taipei Travel Raohe market](https://www.travel.taipei/en/attraction/details/1691)\n- [Taipei City market administration](https://english.tcma.gov.taipei/News_Content.aspx?n=8D1486E0B9D99902&s=F040CB446A14DF94&sms=EA204939C1676EF8)\n- [Taipei Travel official visitor information](https://www.travel.taipei/en)\n\nPrepared by Navio Team. Information reviewed 2026-11-12. Check official sources for current access, reservations and local conditions."
+      }
+    }
+  },
+  {
+    "id": "1a8aee6e-66d4-522b-9e11-9776ad5b0ffe",
+    "slug": "hong-kong",
+    "source": "CURATED",
+    "guide": {
+      "name": "Hong Kong in Layers: Ferry Views, Design and Night Markets",
+      "country": "Hong Kong",
+      "countryCode": "HK",
+      "destination": {
+        "provider": "GOOGLE",
+        "providerPlaceId": "ChIJD5gyo-3iAzQRfMnq27qzivA",
+        "name": "Hong Kong",
+        "lat": 22.3193039,
+        "lng": 114.1693611
+      },
+      "description": "Harbour crossings, a design stop and street-level exploring across Hong Kong Island and Kowloon.",
+      "coverPlaceId": "GOOGLE:ChIJkR_N-HsABDQR49-CU5m1ShU",
+      "content": {
+        "categories": [
+          {
+            "id": "section-1",
+            "name": "Island details",
+            "iconId": "camera",
+            "colorId": "violet"
+          },
+          {
+            "id": "section-2",
+            "name": "Across the harbour",
+            "iconId": "waves",
+            "colorId": "blue"
+          }
+        ],
+        "lists": {
+          "section-1": {
+            "id": "section-1",
+            "categoryId": "section-1"
+          },
+          "section-2": {
+            "id": "section-2",
+            "categoryId": "section-2"
+          }
+        },
+        "places": {
+          "ChIJkR_N-HsABDQR49-CU5m1ShU": {
+            "id": "GOOGLE:ChIJkR_N-HsABDQR49-CU5m1ShU",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJkR_N-HsABDQR49-CU5m1ShU",
+            "name": "Man Mo Temple",
+            "address": "Man Mo Temple, 124-130 Hollywood Rd, Sheung Wan, Hong Kong Island, Hong Kong",
+            "lat": 22.283972900000002,
+            "lng": 114.15019989999999,
+            "tags": [],
+            "category": "Place of Worship"
+          },
+          "ChIJn7jpjXsABDQRBt_E3gFvqVw": {
+            "id": "GOOGLE:ChIJn7jpjXsABDQRBt_E3gFvqVw",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJn7jpjXsABDQRBt_E3gFvqVw",
+            "name": "PMQ - Staunton",
+            "address": "PMQ - Staunton, Aberdeen St, Central, Hong Kong Island, Hong Kong",
+            "lat": 22.283327999999997,
+            "lng": 114.15156689999999,
+            "tags": [],
+            "category": "Building"
+          },
+          "ChIJx_WyiXMABDQRJnFIJdc19Kw": {
+            "id": "GOOGLE:ChIJx_WyiXMABDQRJnFIJdc19Kw",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJx_WyiXMABDQRJnFIJdc19Kw",
+            "name": "The Peak Tram",
+            "address": "St. John's Building, 33 Garden Rd, Central, Hong Kong Island, Hong Kong",
+            "lat": 22.2776827,
+            "lng": 114.1591909,
+            "tags": [],
+            "category": "Transit station"
+          },
+          "ChIJt6hfR_MABDQRksRMRk3NNeM": {
+            "id": "GOOGLE:ChIJt6hfR_MABDQRksRMRk3NNeM",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJt6hfR_MABDQRksRMRk3NNeM",
+            "name": "Tsim Sha Tsui Star Ferry Pier",
+            "address": "Tsim Sha Tsui, Kowloon, Hong Kong",
+            "lat": 22.293763,
+            "lng": 114.168748,
+            "tags": [],
+            "category": "Ferry Terminal"
+          },
+          "ChIJC2iWnfEABDQRt4UDHkwdLTg": {
+            "id": "GOOGLE:ChIJC2iWnfEABDQRt4UDHkwdLTg",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJC2iWnfEABDQRt4UDHkwdLTg",
+            "name": "Avenue of Stars",
+            "address": "Ave of Stars, Hong Kong",
+            "lat": 22.2959261,
+            "lng": 114.1768374,
+            "tags": []
+          },
+          "ChIJzcAL8-oABDQRpDOEry9D3bc": {
+            "id": "GOOGLE:ChIJzcAL8-oABDQRpDOEry9D3bc",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJzcAL8-oABDQRpDOEry9D3bc",
+            "name": "Temple Street Night Market",
+            "address": "Temple St, Jordan, Kowloon, Hong Kong",
+            "lat": 22.3065185,
+            "lng": 114.1699805,
+            "tags": [],
+            "category": "Market"
+          }
+        },
+        "body": "Hong Kong becomes especially engaging when you alternate between its skyline and its smaller street details. A ferry crossing gives you the wider view, while a temple, a design stop and a market invite closer attention. This collection is built around that contrast. Choose a few places on each side of the harbour and leave time for the crossing itself. The transit is part of the experience, so there is no need to turn every move into the fastest possible connection.\n\n## Before you go\n\n- Check which Star Ferry route and pier you need. The Tsim Sha Tsui pin is on the Kowloon side.\n- For Peak Tram visits, check queues, operating arrangements and visibility before making the journey the centre of an afternoon.\n- Keep a flexible evening plan for Temple Street. Individual stalls, dining options and opening patterns can change.\n\n<div data-embed=\"placeList\" data-list-id=\"section-1\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJkR_N-HsABDQR49-CU5m1ShU\"></div>\n\nPause at the temple with attention to the people using it. Follow photography and access signs, and keep the visit quiet. It provides a more intimate contrast with the skyline views elsewhere in this collection.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJn7jpjXsABDQRBt_E3gFvqVw\"></div>\n\nBrowse for design, creative work and independent shops according to what is currently open. The pleasure is in discovering something you would choose for yourself. Check the programme if exhibitions or workshops are important to your visit.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJx_WyiXMABDQRJnFIJdc19Kw\"></div>\n\nConsider the tram as an experience as well as a way to reach a view. Build in time for the full journey and for any wait. Have a street-level alternative ready if conditions make the viewpoint less appealing.\n\n<div data-embed=\"placeList\" data-list-id=\"section-2\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJt6hfR_MABDQRksRMRk3NNeM\"></div>\n\nGive the crossing your attention. Choose the correct service, settle into the journey and look at how the city changes across the water. Pair the arrival with a manageable waterfront walk.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJC2iWnfEABDQRt4UDHkwdLTg\"></div>\n\nUse the promenade for a relaxed look back across the harbour. You can keep this visit simple with a walk and a pause. Check conditions and crowd levels before deciding how long to stay.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJzcAL8-oABDQRpDOEry9D3bc\"></div>\n\nEnd with browsing if you still have energy. Look at the goods and food options before choosing, agree prices clearly and keep the visit flexible. The market adds street-level texture after a day of wider views.\n\n## Official references\n\n- [Hong Kong Tourism Board Star Ferry guide](https://www.discoverhongkong.com/eng/place-to-go/travel.guide-star-ferry-pier.html)\n- [Hong Kong Tourism Board transport guide](https://www.discoverhongkong.com/eng/travel-guide/traveller-essentials/getting-around.html)\n\nPrepared by Navio Team. Information reviewed 2026-11-12. Check official sources for current access, reservations and local conditions."
+      }
+    }
+  },
+  {
+    "id": "d1913081-16fa-5544-aa7f-fb25c8c1399d",
+    "slug": "singapore",
+    "source": "CURATED",
+    "guide": {
+      "name": "Singapore on the Table: Hawker Food, Gardens and Heritage",
+      "country": "Singapore",
+      "countryCode": "SG",
+      "destination": {
+        "provider": "GOOGLE",
+        "providerPlaceId": "ChIJdZOLiiMR2jERxPWrUs9peIg",
+        "name": "Singapore",
+        "lat": 1.352083,
+        "lng": 103.819836
+      },
+      "description": "A Singapore guide for curious eaters, with heritage districts and green spaces between meals.",
+      "coverPlaceId": "GOOGLE:ChIJAenlH3MZ2jERqjoWXlxEH6w",
+      "content": {
+        "categories": [
+          {
+            "id": "section-1",
+            "name": "Food with a neighbourhood",
+            "iconId": "utensils",
+            "colorId": "rose"
+          },
+          {
+            "id": "section-2",
+            "name": "Green space and another heritage quarter",
+            "iconId": "trees",
+            "colorId": "teal"
+          }
+        ],
+        "lists": {
+          "section-1": {
+            "id": "section-1",
+            "categoryId": "section-1"
+          },
+          "section-2": {
+            "id": "section-2",
+            "categoryId": "section-2"
+          }
+        },
+        "places": {
+          "ChIJAenlH3MZ2jERqjoWXlxEH6w": {
+            "id": "GOOGLE:ChIJAenlH3MZ2jERqjoWXlxEH6w",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJAenlH3MZ2jERqjoWXlxEH6w",
+            "name": "Chinatown Complex",
+            "address": "335 Smith St, Singapore 050335",
+            "lat": 1.2825735,
+            "lng": 103.8431104,
+            "tags": [],
+            "category": "Restaurant"
+          },
+          "ChIJ5Y6l4Q0Z2jERYL0KDIjT6v0": {
+            "id": "GOOGLE:ChIJ5Y6l4Q0Z2jERYL0KDIjT6v0",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJ5Y6l4Q0Z2jERYL0KDIjT6v0",
+            "name": "Lau Pa Sat",
+            "address": "18 Raffles Quay, Singapore 048582",
+            "lat": 1.2805121,
+            "lng": 103.8503809,
+            "tags": [],
+            "category": "Restaurant"
+          },
+          "ChIJ0bwmznIZ2jEREOCMNggtIBk": {
+            "id": "GOOGLE:ChIJ0bwmznIZ2jEREOCMNggtIBk",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJ0bwmznIZ2jEREOCMNggtIBk",
+            "name": "Buddha Tooth Relic Temple",
+            "address": "288 S Bridge Rd, Singapore 058840",
+            "lat": 1.2815155,
+            "lng": 103.84423969999999,
+            "tags": [],
+            "category": "Buddhist Temple"
+          },
+          "ChIJMxZ-kwQZ2jERdsqftXeWCWI": {
+            "id": "GOOGLE:ChIJMxZ-kwQZ2jERdsqftXeWCWI",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJMxZ-kwQZ2jERdsqftXeWCWI",
+            "name": "Gardens by the Bay",
+            "address": "18 Marina Gardens Dr, Singapore 018953",
+            "lat": 1.2815683,
+            "lng": 103.8636132,
+            "tags": [],
+            "category": "Garden"
+          },
+          "ChIJyQfG_rAZ2jER6Yr2-WKP3mc": {
+            "id": "GOOGLE:ChIJyQfG_rAZ2jER6Yr2-WKP3mc",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJyQfG_rAZ2jER6Yr2-WKP3mc",
+            "name": "Haji Lane",
+            "address": "Haji Ln, Singapore",
+            "lat": 1.3007065,
+            "lng": 103.8591356,
+            "tags": []
+          },
+          "ChIJb6xq2bAZ2jERE1P6sVKtofw": {
+            "id": "GOOGLE:ChIJb6xq2bAZ2jERE1P6sVKtofw",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJb6xq2bAZ2jERE1P6sVKtofw",
+            "name": "Sultan Mosque",
+            "address": "3 Muscat St, Singapore 198833",
+            "lat": 1.3022854,
+            "lng": 103.8589636,
+            "tags": [],
+            "category": "Mosque"
+          }
+        },
+        "body": "Singapore makes it easy to connect a meal with a neighbourhood. This guide gives food a central role, then uses gardens, heritage streets and places of worship to make space between tastes. Choose a hawker stop according to what you want to eat and how it fits your day. A useful food guide should help you make choices, so keep your appetite, dietary needs and preferred pace in charge. The garden and heritage options can turn a meal outing into a fuller visit.\n\n## Before you go\n\n- At hawker centres, check the stall’s own opening pattern, payment options and menu. A centre being open does not mean every stall is trading.\n- Religious sites may have visitor dress and photography requirements. Follow the guidance at the entrance.\n- Plan garden walks around current weather and check ticketing for individual attractions within Gardens by the Bay.\n\n<div data-embed=\"placeList\" data-list-id=\"section-1\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJAenlH3MZ2jERqjoWXlxEH6w\"></div>\n\nStart by looking at the different stalls and their specialities. Pick a dish you are curious about, ask about ingredients and leave room to explore the surrounding area afterwards. Shared seating calls for a little patience and consideration.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJ5Y6l4Q0Z2jERYL0KDIjT6v0\"></div>\n\nChoose a meal here when its setting and location fit your plans. Browse the current options before ordering and check prices clearly. A food-centre visit can be relaxed even when the surrounding city feels busy.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJ0bwmznIZ2jEREOCMNggtIBk\"></div>\n\nMake time for a respectful cultural visit while exploring Chinatown. Check visitor access and dress guidance, and treat active worship with care. It gives the district more depth than a food stop alone.\n\n<div data-embed=\"placeList\" data-list-id=\"section-2\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJMxZ-kwQZ2jERdsqftXeWCWI\"></div>\n\nDecide which parts of the gardens you most want to see before buying tickets. Leave space for outdoor areas as well as any enclosed attraction you choose. A garden afternoon can be a welcome counterpoint to a busy food district.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJyQfG_rAZ2jER6Yr2-WKP3mc\"></div>\n\nBrowse small shops and notice the visual character of the street. Check opening times for a particular business and keep pedestrian space clear when taking photographs. Let the visit develop according to what catches your interest.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJb6xq2bAZ2jERE1P6sVKtofw\"></div>\n\nLook at the mosque in the context of its neighbourhood, and check the current visitor arrangements before entering. Respect prayer activity and any dress requirements. A careful visit fits naturally with a wider Kampong Gelam walk.\n\n## Official references\n\n- [Visit Singapore Chinatown](https://www.visitsingapore.com/neighbourhood/featured-neighbourhood/chinatown/)\n- [Visit Singapore food guide](https://www.visitsingapore.com/travel-tips/travelling-to-singapore/itineraries/singapore-food-guide/)\n- [Gardens by the Bay visitor information](https://www.gardensbythebay.com.sg/)\n\nPrepared by Navio Team. Information reviewed 2026-11-12. Check official sources for current access, reservations and local conditions."
+      }
+    }
+  },
+  {
+    "id": "f68fed91-94a0-5f5c-acef-7b809d848a35",
+    "slug": "ubud",
+    "source": "CURATED",
+    "guide": {
+      "name": "Ubud Beyond the Checklist: Rice Landscapes and Temple Culture",
+      "country": "Indonesia",
+      "countryCode": "ID",
+      "destination": {
+        "provider": "GOOGLE",
+        "providerPlaceId": "ChIJw8kin3M90i0RHD13a_2Ko1Q",
+        "name": "Ubud",
+        "lat": -8.5068536,
+        "lng": 115.2624778
+      },
+      "description": "Walking, rice terraces, a sacred water temple and time for Ubud’s everyday creative life.",
+      "coverPlaceId": "GOOGLE:ChIJ9XP0yms90i0Rn8QbqnT9E3w",
+      "content": {
+        "categories": [
+          {
+            "id": "section-1",
+            "name": "Landscape at walking pace",
+            "iconId": "trees",
+            "colorId": "teal"
+          },
+          {
+            "id": "section-2",
+            "name": "Culture and a town interlude",
+            "iconId": "landmark",
+            "colorId": "amber"
+          }
+        ],
+        "lists": {
+          "section-1": {
+            "id": "section-1",
+            "categoryId": "section-1"
+          },
+          "section-2": {
+            "id": "section-2",
+            "categoryId": "section-2"
+          }
+        },
+        "places": {
+          "ChIJ9XP0yms90i0Rn8QbqnT9E3w": {
+            "id": "GOOGLE:ChIJ9XP0yms90i0Rn8QbqnT9E3w",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJ9XP0yms90i0Rn8QbqnT9E3w",
+            "name": "Campuhan Ridge Walk",
+            "address": "Jl. Raya Ubud, Kelusa, Kec. Payangan, Kabupaten Gianyar, Bali, Indonesia",
+            "lat": -8.5035806,
+            "lng": 115.25475789999999,
+            "tags": [],
+            "category": "Hiking Area"
+          },
+          "ChIJ4wD5Iwsi0i0R7QRsOGmJGo0": {
+            "id": "GOOGLE:ChIJ4wD5Iwsi0i0R7QRsOGmJGo0",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJ4wD5Iwsi0i0R7QRsOGmJGo0",
+            "name": "Tegallalang Rice Terrace",
+            "address": "Jl. Raya Tegallalang, Tegallalang, Kec. Tegallalang, Kabupaten Gianyar, Bali 80561, Indonesia",
+            "lat": -8.431711199999999,
+            "lng": 115.279303,
+            "tags": [],
+            "category": "Scenic Spot"
+          },
+          "ChIJtTFh4PQY0i0RwewUdwFaolM": {
+            "id": "GOOGLE:ChIJtTFh4PQY0i0RwewUdwFaolM",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJtTFh4PQY0i0RwewUdwFaolM",
+            "name": "Pura Tirta Empul",
+            "address": "Tampaksiring, Gianyar Regency, Bali 80552, Indonesia",
+            "lat": -8.4156589,
+            "lng": 115.3153284,
+            "tags": [],
+            "category": "Hindu Temple"
+          },
+          "ChIJoQpF2-I90i0R7Q2a3ncHnUA": {
+            "id": "GOOGLE:ChIJoQpF2-I90i0R7Q2a3ncHnUA",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJoQpF2-I90i0R7Q2a3ncHnUA",
+            "name": "Ubud Art Market",
+            "address": "Jl. Raya Ubud No.35, Ubud, Kecamatan Ubud, Kabupaten Gianyar, Bali 80571, Indonesia",
+            "lat": -8.507223999999999,
+            "lng": 115.26278889999999,
+            "tags": [],
+            "category": "Market"
+          },
+          "ChIJZ5sY9kM90i0RVsPvSxZD7LY": {
+            "id": "GOOGLE:ChIJZ5sY9kM90i0RVsPvSxZD7LY",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJZ5sY9kM90i0RVsPvSxZD7LY",
+            "name": "Sacred Monkey Forest Sanctuary",
+            "address": "Jl. Monkey Forest, Ubud, Kecamatan Ubud, Kabupaten Gianyar, Bali 80571, Indonesia",
+            "lat": -8.5193727,
+            "lng": 115.26062990000001,
+            "tags": [],
+            "category": "Nature Preserve"
+          }
+        },
+        "body": "Ubud is a useful base for a slower conversation between landscape and culture. This guide gathers a ridge walk, rice scenery, a temple and places closer to town. Choose fewer stops and spend longer with the setting. The wider area needs travel planning, and map proximity does not tell the whole story of traffic or terrain. Leave room for a meal and a rest between outings. A satisfying visit can come from looking carefully at one landscape and understanding one cultural place.\n\n## Before you go\n\n- Tirta Empul is sacred to the Balinese Hindu community. Follow local guidance on dress, access and any ritual participation.\n- Use marked paths around terraces and walking areas, and check current conditions after rain. Ask before entering working or private land.\n- At the monkey sanctuary, follow the operator’s rules and secure loose belongings. Avoid feeding or approaching animals outside the guidance provided.\n\n<div data-embed=\"placeList\" data-list-id=\"section-1\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJ9XP0yms90i0Rn8QbqnT9E3w\"></div>\n\nChoose the length of your walk according to the heat, footing and your energy. Pause to look at the landscape instead of treating the path as a photo stop. Carry water and allow yourself to turn back comfortably.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJ4wD5Iwsi0i0R7QRsOGmJGo0\"></div>\n\nLook at the terraces as an agricultural landscape as well as a view. Check permitted paths and entry arrangements, and respect working areas. Choose an experience that lets you appreciate the setting without rushing between staged photographs.\n\n<div data-embed=\"placeList\" data-list-id=\"section-2\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJtTFh4PQY0i0RwewUdwFaolM\"></div>\n\nGive the temple a visit grounded in respect. Observe first and ask local staff about the right way to proceed. Seeing how a sacred place is used can be more meaningful than assuming every activity is intended for visitors.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJoQpF2-I90i0R7Q2a3ncHnUA\"></div>\n\nBrowse with attention to materials, workmanship and what you actually want to take home. Ask questions and agree prices politely. Leave time to look beyond the first shopfront instead of shopping under a tight departure deadline.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJZ5sY9kM90i0RVsPvSxZD7LY\"></div>\n\nRead the entry guidance and move through the sanctuary at a calm pace. Give animals space and keep belongings secure. The visit offers another kind of wooded setting, with rules that are important to both people and wildlife.\n\n## Official references\n\n- [Indonesia Tourism Tirta Empul guide](https://www.indonesia.travel/id/id/destination/bali-nusa-tenggara/bali/bali---the-holy-springs-of-tirta-empul)\n- [Ubud Monkey Forest official information](https://monkeyforestubud.com/)\n\nPrepared by Navio Team. Information reviewed 2026-11-12. Check official sources for current access, reservations and local conditions."
+      }
+    }
+  },
+  {
+    "id": "6e93de94-89fe-5643-a5f9-52a74be89fe5",
+    "slug": "hanoi",
+    "source": "CURATED",
+    "guide": {
+      "name": "Hanoi Between Meals: Lakeside Walks and Old Quarter Stories",
+      "country": "Vietnam",
+      "countryCode": "VN",
+      "destination": {
+        "provider": "GOOGLE",
+        "providerPlaceId": "ChIJoRyG2ZurNTERqRfKcnt_iOc",
+        "name": "Hanoi",
+        "lat": 21.0277644,
+        "lng": 105.8341598
+      },
+      "description": "A compact city guide mixing food, educational heritage and a closer look at Hanoi’s streets.",
+      "coverPlaceId": "GOOGLE:ChIJlclXM5WrNTERDqL5tGu_ugE",
+      "content": {
+        "categories": [
+          {
+            "id": "section-1",
+            "name": "Read the city through its spaces",
+            "iconId": "landmark",
+            "colorId": "amber"
+          },
+          {
+            "id": "section-2",
+            "name": "A meal and a deeper history",
+            "iconId": "utensils",
+            "colorId": "rose"
+          }
+        ],
+        "lists": {
+          "section-1": {
+            "id": "section-1",
+            "categoryId": "section-1"
+          },
+          "section-2": {
+            "id": "section-2",
+            "categoryId": "section-2"
+          }
+        },
+        "places": {
+          "ChIJlclXM5WrNTERDqL5tGu_ugE": {
+            "id": "GOOGLE:ChIJlclXM5WrNTERDqL5tGu_ugE",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJlclXM5WrNTERDqL5tGu_ugE",
+            "name": "Hoàn Kiếm Lake",
+            "address": "Hoàn Kiếm Lake, Hoan Kiem, Ha Noi, Vietnam",
+            "lat": 21.028666899999997,
+            "lng": 105.85214839999999,
+            "tags": [],
+            "category": "Lake"
+          },
+          "ChIJZ73nJpmrNTERHt_VdIgHDlg": {
+            "id": "GOOGLE:ChIJZ73nJpmrNTERHt_VdIgHDlg",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJZ73nJpmrNTERHt_VdIgHDlg",
+            "name": "Temple Of Literature",
+            "address": "58 Quốc Tử Giám, Văn Miếu, Đống Đa, Hà Nội, Vietnam",
+            "lat": 21.0281175,
+            "lng": 105.8356692,
+            "tags": [],
+            "category": "Place of Worship"
+          },
+          "ChIJ95W4Ib-rNTERpMcyh8TGG2Q": {
+            "id": "GOOGLE:ChIJ95W4Ib-rNTERpMcyh8TGG2Q",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJ95W4Ib-rNTERpMcyh8TGG2Q",
+            "name": "Old Quarter",
+            "address": "Old Quarter, Hoàn Kiếm, Ha Noi, Vietnam",
+            "lat": 21.035266399999998,
+            "lng": 105.8500124,
+            "tags": []
+          },
+          "ChIJXWi6pPKrNTER55D6MD-WZ34": {
+            "id": "GOOGLE:ChIJXWi6pPKrNTER55D6MD-WZ34",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJXWi6pPKrNTER55D6MD-WZ34",
+            "name": "Bún chả Hương Liên",
+            "address": "24 P. Lê Văn Hưu, Cửa Nam, Hà Nội, Vietnam",
+            "lat": 21.0181373,
+            "lng": 105.8538926,
+            "tags": [],
+            "category": "Vietnamese Restaurant"
+          },
+          "ChIJF13BXqGrNTERTE3hz8KFDmI": {
+            "id": "GOOGLE:ChIJF13BXqGrNTERTE3hz8KFDmI",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJF13BXqGrNTERTE3hz8KFDmI",
+            "name": "Ho Chi Minh's Mausoleum",
+            "address": "1 Hùng Vương, Điện Biên, Ba Đình, Hà Nội, Vietnam",
+            "lat": 21.0368973,
+            "lng": 105.83466670000001,
+            "tags": [],
+            "category": "Historical Landmark"
+          }
+        },
+        "body": "Hanoi can be explored through a sequence of small observations. A lakeside pause, a courtyard and a market-like street each show a different part of the city’s life. This collection keeps the focus within Hanoi and leaves enough space for a proper meal. Walk with attention to traffic and allow time for crossing streets and finding your bearings. The aim is to understand a little more of a neighbourhood, with the next food stop giving you a reason to sit and take stock.\n\n## Before you go\n\n- Check current opening and entry arrangements for heritage sites. Some visits involve dress requirements or restricted areas.\n- Choose a manageable part of the Old Quarter to explore and keep your onward route handy. Streets and pavements can be busy.\n- Ask about ingredients and portion sizes when trying a dish. Keep longer excursions such as Ha Long Bay as separately planned trips.\n\n<div data-embed=\"placeList\" data-list-id=\"section-1\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJlclXM5WrNTERDqL5tGu_ugE\"></div>\n\nUse the lakeside as a place to orient yourself and slow down. Choose a comfortable stretch to walk and pay attention to how people use the public space. It can be a useful start or a gentle finish to an outing.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJZ73nJpmrNTERHt_VdIgHDlg\"></div>\n\nMake room for a more reflective visit. The site’s connection with education gives it a different character from the city’s religious monuments. Look closely at the courtyards and details, and use official interpretation to give them context.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJ95W4Ib-rNTERpMcyh8TGG2Q\"></div>\n\nChoose a few streets and notice their shopfronts, signs and everyday activity. Pause clear of traffic and entrances when looking at the map. A short, attentive walk can be more rewarding than trying to cover the entire area.\n\n<div data-embed=\"placeList\" data-list-id=\"section-2\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJXWi6pPKrNTER55D6MD-WZ34\"></div>\n\nConsider a seated food stop when you want a break from walking. Check the current menu, ask about ingredients and choose a portion that suits you. Give the meal time to be part of the visit instead of a hurried refuelling stop.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJF13BXqGrNTERTE3hz8KFDmI\"></div>\n\nResearch the current visitor arrangements before setting out, including any closures and entry rules. Treat the site with the formality it asks of visitors. It offers a different historical perspective to the older streets and educational heritage nearby.\n\n## Official references\n\n- [Vietnam Tourism Hanoi heritage guide](https://vietnam.travel/things-to-do/hanoi-six-heritage-sites/)\n- [Vietnam Tourism Hanoi destination information](https://vietnam.travel/places-to-go/northern-vietnam/ha-noi)\n\nPrepared by Navio Team. Information reviewed 2026-11-12. Check official sources for current access, reservations and local conditions."
+      }
+    }
+  },
+  {
+    "id": "205fea89-f540-5b33-a510-4c49400f7723",
+    "slug": "luang-prabang",
+    "source": "CURATED",
+    "guide": {
+      "name": "Luang Prabang, Slowly: Temple Details and Waterfall Time",
+      "country": "Laos",
+      "countryCode": "LA",
+      "destination": {
+        "provider": "GOOGLE",
+        "providerPlaceId": "ChIJoxs9QT8qLzERVmqOYKlJl6w",
+        "name": "Luang Prabang",
+        "lat": 19.883285,
+        "lng": 102.1387166
+      },
+      "description": "A gentle heritage-town guide with thoughtful temple visits, a museum, an evening market and a nature excursion.",
+      "coverPlaceId": "GOOGLE:ChIJaxzF_xIqLzERA8XHuqU1WBw",
+      "content": {
+        "categories": [
+          {
+            "id": "section-1",
+            "name": "The town in detail",
+            "iconId": "landmark",
+            "colorId": "amber"
+          },
+          {
+            "id": "section-2",
+            "name": "A nature outing and an easy evening",
+            "iconId": "trees",
+            "colorId": "teal"
+          }
+        ],
+        "lists": {
+          "section-1": {
+            "id": "section-1",
+            "categoryId": "section-1"
+          },
+          "section-2": {
+            "id": "section-2",
+            "categoryId": "section-2"
+          }
+        },
+        "places": {
+          "ChIJaxzF_xIqLzERA8XHuqU1WBw": {
+            "id": "GOOGLE:ChIJaxzF_xIqLzERA8XHuqU1WBw",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJaxzF_xIqLzERA8XHuqU1WBw",
+            "name": "Wat Xiengthong",
+            "address": "V4WV+WC8, Khem Khong, Luang Prabang, Laos",
+            "lat": 19.897292,
+            "lng": 102.1435649,
+            "tags": [],
+            "category": "Buddhist Temple"
+          },
+          "ChIJmWyMMmoqLzERZpN_gPRpYjM": {
+            "id": "GOOGLE:ChIJmWyMMmoqLzERZpN_gPRpYjM",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJmWyMMmoqLzERZpN_gPRpYjM",
+            "name": "Royal Palace & National Museum",
+            "address": "27 Ounheun Rd, Luang Prabang, Laos",
+            "lat": 19.8922222,
+            "lng": 102.13555559999999,
+            "tags": [],
+            "category": "Museum"
+          },
+          "ChIJC-9_ZmoqLzER_HZ6XRLymv0": {
+            "id": "GOOGLE:ChIJC-9_ZmoqLzER_HZ6XRLymv0",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJC-9_ZmoqLzER_HZ6XRLymv0",
+            "name": "Phousi Hill",
+            "address": "Ban Pakham, Sisavangvong Road, Luang Prabang, Laos",
+            "lat": 19.890321999999998,
+            "lng": 102.13700620000002,
+            "tags": [],
+            "category": "Buddhist Temple"
+          },
+          "ChIJE6osyBbSKDERHyF_m5cx8-E": {
+            "id": "GOOGLE:ChIJE6osyBbSKDERHyF_m5cx8-E",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJE6osyBbSKDERHyF_m5cx8-E",
+            "name": "Kuang Si Waterfall",
+            "address": "Laos",
+            "lat": 19.749572999999998,
+            "lng": 101.99318389999999,
+            "tags": [],
+            "category": "Tourist Attraction"
+          },
+          "ChIJQVUKAWsqLzEREM3TCkajFGg": {
+            "id": "GOOGLE:ChIJQVUKAWsqLzEREM3TCkajFGg",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJQVUKAWsqLzEREM3TCkajFGg",
+            "name": "Luang Prabang Night Market",
+            "address": "Ban Pakham, V4QM+QM9 district & province, Sisavangvong Road, Luang Prabang, Laos",
+            "lat": 19.8892734,
+            "lng": 102.1340698,
+            "tags": [],
+            "category": "Market"
+          }
+        },
+        "body": "Luang Prabang suits a visit with space between the main sights. Give a temple time for its details, read a little at the museum and leave an evening open for browsing. Kuang Si provides a separate nature outing when you want to leave the town for a while. This guide is built around that slower rhythm. Religious practices and daily routines continue around visitors, so the most valuable preparation is understanding how to observe with consideration and when to step back.\n\n## Before you go\n\n- Dress respectfully at temples and follow photography rules. Ask before photographing people or religious activity.\n- If you observe morning alms, read the official local guidance first and keep a respectful distance.\n- Plan transport for Kuang Si separately. Follow posted swimming restrictions and path guidance, which may change with local conditions.\n\n<div data-embed=\"placeList\" data-list-id=\"section-1\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJaxzF_xIqLzERA8XHuqU1WBw\"></div>\n\nAllow a quiet visit with time for the building’s decorative details. Follow the local guidance on where to enter and photograph. A temple visit becomes richer when you give the setting your full attention.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJmWyMMmoqLzERZpN_gPRpYjM\"></div>\n\nUse the museum to add context to the streets and temples around you. Check current opening and photography arrangements. Choose a few exhibits or themes to remember rather than trying to absorb everything in one hurried circuit.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJC-9_ZmoqLzER_HZ6XRLymv0\"></div>\n\nConsider the climb according to your energy and the conditions. Use the permitted paths and give others space on the steps. A viewpoint is most enjoyable when you allow enough time for the walk up and the return.\n\n<div data-embed=\"placeList\" data-list-id=\"section-2\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJE6osyBbSKDERHyF_m5cx8-E\"></div>\n\nMake the waterfall an outing with its own travel time. Walk only where permitted and check the current rules around the pools. You can appreciate the landscape without assuming every pool or path will be open.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJQVUKAWsqLzEREM3TCkajFGg\"></div>\n\nBrowse slowly for something you genuinely like. Ask about materials and makers where possible, agree prices politely and leave clear passage for others. The market can be a relaxed evening after a more active daytime excursion.\n\n## Official references\n\n- [Luang Prabang official tourism website](https://tourismluangprabang.org/)\n- [Official Kuang Si visitor information](https://tourismluangprabang.org/things-to-do/nature/kuang-si-waterfall/)\n\nPrepared by Navio Team. Information reviewed 2026-11-12. Check official sources for current access, reservations and local conditions."
+      }
+    }
+  },
+  {
+    "id": "e0b53db9-f0e2-5800-b5d3-903276d3b307",
+    "slug": "siem-reap",
+    "source": "CURATED",
+    "guide": {
+      "name": "Reading Angkor: Architecture, Forest Settings and Siem Reap Evenings",
+      "country": "Cambodia",
+      "countryCode": "KH",
+      "destination": {
+        "provider": "GOOGLE",
+        "providerPlaceId": "ChIJeaiRjJoWEDER-rvlPvmqQKk",
+        "name": "Krong Siem Reap",
+        "lat": 13.3632533,
+        "lng": 103.856403
+      },
+      "description": "A cultural guide to looking more closely at Angkor, balanced with time in Siem Reap.",
+      "coverPlaceId": "GOOGLE:ChIJLSea6ooWEDERjUGwVxGoqz4",
+      "content": {
+        "categories": [
+          {
+            "id": "section-1",
+            "name": "Contrasting temple experiences",
+            "iconId": "landmark",
+            "colorId": "amber"
+          },
+          {
+            "id": "section-2",
+            "name": "An evening in Siem Reap",
+            "iconId": "music",
+            "colorId": "violet"
+          }
+        ],
+        "lists": {
+          "section-1": {
+            "id": "section-1",
+            "categoryId": "section-1"
+          },
+          "section-2": {
+            "id": "section-2",
+            "categoryId": "section-2"
+          }
+        },
+        "places": {
+          "ChIJLSea6ooWEDERjUGwVxGoqz4": {
+            "id": "GOOGLE:ChIJLSea6ooWEDERjUGwVxGoqz4",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJLSea6ooWEDERjUGwVxGoqz4",
+            "name": "Angkor Wat",
+            "address": "Krong Siem Reap, Cambodia",
+            "lat": 13.4124693,
+            "lng": 103.8669857,
+            "tags": [],
+            "category": "Buddhist Temple"
+          },
+          "ChIJlTryri4UEDERY52x4bXHVqk": {
+            "id": "GOOGLE:ChIJlTryri4UEDERY52x4bXHVqk",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJlTryri4UEDERY52x4bXHVqk",
+            "name": "Bayon Temple",
+            "address": "Krong Siem Reap, Cambodia",
+            "lat": 13.4412831,
+            "lng": 103.85890359999999,
+            "tags": [],
+            "category": "Buddhist Temple"
+          },
+          "ChIJ36Upst8VEDERHgViL55Fuc8": {
+            "id": "GOOGLE:ChIJ36Upst8VEDERHgViL55Fuc8",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJ36Upst8VEDERHgViL55Fuc8",
+            "name": "Ta Prohm Temple",
+            "address": "Krong Siem Reap, Cambodia",
+            "lat": 13.4347941,
+            "lng": 103.88930409999999,
+            "tags": [],
+            "category": "Buddhist Temple"
+          },
+          "ChIJrwT1qNlDEDERRGwI6TLK7EI": {
+            "id": "GOOGLE:ChIJrwT1qNlDEDERRGwI6TLK7EI",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJrwT1qNlDEDERRGwI6TLK7EI",
+            "name": "Banteay Srei",
+            "address": "Banteay Srei, Cambodia",
+            "lat": 13.6031005,
+            "lng": 103.96661150000001,
+            "tags": []
+          },
+          "ChIJ3-8kVnIXEDERspUIeSGCNmo": {
+            "id": "GOOGLE:ChIJ3-8kVnIXEDERspUIeSGCNmo",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJ3-8kVnIXEDERspUIeSGCNmo",
+            "name": "Phare, The Cambodian Circus",
+            "address": "Ring Road, south of the, Intersection, Sok San Rd, Krong Siem Reap, Cambodia",
+            "lat": 13.353881099999999,
+            "lng": 103.8392442,
+            "tags": [],
+            "category": "Performing Arts Theater"
+          }
+        },
+        "body": "Angkor deserves time to read its spaces. Look at how a gateway frames an approach, how carved details differ between places and how the setting changes the experience of a temple. This guide introduces several contrasting visits and an evening option in Siem Reap. It is a collection for choosing and learning. A licensed local guide can help turn unfamiliar details into a more coherent story. Build the number of temples around your interest, the conditions and your energy.\n\n## Before you go\n\n- Use the official Angkor ticket service and check current access arrangements before travelling.\n- Follow APSARA’s visitor code, dress respectfully and stay within open areas. Avoid touching carvings or climbing on fragile structures.\n- Plan breaks, water and transport between temples. Check performance schedules and book directly with the operator for an evening show.\n\n<div data-embed=\"placeList\" data-list-id=\"section-1\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJLSea6ooWEDERjUGwVxGoqz4\"></div>\n\nStart with the larger composition, then give attention to a small area of detail. A guide or official interpretation can help you understand what you are seeing. Allow time to walk between spaces without rushing the experience.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJlTryri4UEDERY52x4bXHVqk\"></div>\n\nNotice the changes in scale and the way views unfold as you move through permitted areas. It is a useful contrast with Angkor Wat. Keep to open routes and give other visitors room to stop and look.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJ36Upst8VEDERHgViL55Fuc8\"></div>\n\nLook at the relationship between the temple and its forest setting while staying on designated paths. Respect barriers and conservation work. The atmosphere is a reason to pause, while the rules protect what makes the place distinctive.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJrwT1qNlDEDERRGwI6TLK7EI\"></div>\n\nConsider this as a separate outing if closer attention to carving and architectural detail interests you. Check the travel involved before adding it. Fewer temples with more time at each can make the visit easier to absorb.\n\n<div data-embed=\"placeList\" data-list-id=\"section-2\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJ3-8kVnIXEDERspUIeSGCNmo\"></div>\n\nChoose a performance as a change from temple visits. Read the current programme and booking arrangements with the operator. A live show brings a different kind of storytelling to a stay focused on architecture and history.\n\n## Official references\n\n- [APSARA visitor information and code](https://apsaraauthority.gov.kh/our-work/tourism-info/)\n- [Angkor Enterprise official tickets](https://www.angkorenterprise.gov.kh/)\n- [Phare official performance information](https://pharecircus.org/)\n\nPrepared by Navio Team. Information reviewed 2026-11-12. Check official sources for current access, reservations and local conditions."
+      }
+    }
+  },
+  {
+    "id": "ba46d4a0-9c86-5a71-bc2e-078e782ce35a",
+    "slug": "chiang-mai",
+    "source": "CURATED",
+    "guide": {
+      "name": "Chiang Mai at Ease: Forest Temples, Khao Soi and Creative Streets",
+      "country": "Thailand",
+      "countryCode": "TH",
+      "destination": {
+        "provider": "GOOGLE",
+        "providerPlaceId": "ChIJXW-7kH462jARZ0ObpXBi1Jg",
+        "name": "Chiang Mai",
+        "lat": 18.7883439,
+        "lng": 98.9853008
+      },
+      "description": "Northern food, old-city temple visits and wooded places for travellers who prefer a gentler pace.",
+      "coverPlaceId": "GOOGLE:ChIJFRQRM5k62jARuqhLBJpw91w",
+      "content": {
+        "categories": [
+          {
+            "id": "section-1",
+            "name": "Temple visits with different moods",
+            "iconId": "landmark",
+            "colorId": "teal"
+          },
+          {
+            "id": "section-2",
+            "name": "Food and a creative-city afternoon",
+            "iconId": "utensils",
+            "colorId": "rose"
+          }
+        ],
+        "lists": {
+          "section-1": {
+            "id": "section-1",
+            "categoryId": "section-1"
+          },
+          "section-2": {
+            "id": "section-2",
+            "categoryId": "section-2"
+          }
+        },
+        "places": {
+          "ChIJFRQRM5k62jARuqhLBJpw91w": {
+            "id": "GOOGLE:ChIJFRQRM5k62jARuqhLBJpw91w",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJFRQRM5k62jARuqhLBJpw91w",
+            "name": "Wat Chedi Luang",
+            "address": "QXPP+QCQ, 103 Prapokklao Road Old City Tambon Si Phum, Amphoe Mueang Chiang Mai, Chang Wat Chiang Mai 50200, Thailand",
+            "lat": 18.7869693,
+            "lng": 98.9865804,
+            "tags": [],
+            "category": "Buddhist Temple"
+          },
+          "ChIJnWhAb3A62jARWVBZnaOa7-0": {
+            "id": "GOOGLE:ChIJnWhAb3A62jARWVBZnaOa7-0",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJnWhAb3A62jARWVBZnaOa7-0",
+            "name": "Wat Umong Suan Putthatham",
+            "address": "135, Tambon Su Thep, Amphoe Mueang Chiang Mai, Chang Wat Chiang Mai 50200, Thailand",
+            "lat": 18.7827263,
+            "lng": 98.9521099,
+            "tags": [],
+            "category": "Buddhist Temple"
+          },
+          "ChIJtd3x37U52jARIX7FrlxMhp0": {
+            "id": "GOOGLE:ChIJtd3x37U52jARIX7FrlxMhp0",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJtd3x37U52jARIX7FrlxMhp0",
+            "name": "Wat Phra That Doi Suthep",
+            "address": "Suthep, Mueang Chiang Mai District, Chiang Mai 50200, Thailand",
+            "lat": 18.804988899999998,
+            "lng": 98.92163370000002,
+            "tags": [],
+            "category": "Buddhist Temple"
+          },
+          "ChIJqcysHow62jAR6ElsdYpG8EU": {
+            "id": "GOOGLE:ChIJqcysHow62jAR6ElsdYpG8EU",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJqcysHow62jAR6ElsdYpG8EU",
+            "name": "Khao Soi Maesai",
+            "address": "29, 1 Soi Ratchaphuek, Tambon Chang Phueak, Amphoe Mueang Chiang Mai, Chang Wat Chiang Mai 50300, Thailand",
+            "lat": 18.7995989,
+            "lng": 98.9752135,
+            "tags": [],
+            "category": "Noodle Shop"
+          },
+          "ChIJSeLRHWM62jARNbDigb8iLEo": {
+            "id": "GOOGLE:ChIJSeLRHWM62jARNbDigb8iLEo",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJSeLRHWM62jARNbDigb8iLEo",
+            "name": "Nimmanahaeminda Road",
+            "address": "Nimmanahaeminda Road, Tambon Su Thep, Amphoe Mueang Chiang Mai, Chang Wat Chiang Mai, Thailand",
+            "lat": 18.7958248,
+            "lng": 98.9658116,
+            "tags": []
+          }
+        },
+        "body": "Chiang Mai offers several ways to slow a visit down. You can spend time with an old-city temple, choose a northern food stop or head towards a wooded setting when you want a change of atmosphere. This guide keeps those moods distinct so you can build a day around your energy. The mountain and forest visits need their own transport choices, while the city gives you room for a meal and a browse. Leave some space to follow a smaller detail that catches your attention.\n\n## Before you go\n\n- Treat temples as active religious places. Cover appropriately, follow entry signs and keep photography considerate.\n- Check current transport and conditions before a mountain outing. City air quality and weather may affect how appealing an outdoor day feels.\n- At food stops, ask about ingredients and the current menu. Café districts and markets are best explored with flexible expectations.\n\n<div data-embed=\"placeList\" data-list-id=\"section-1\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJFRQRM5k62jARuqhLBJpw91w\"></div>\n\nGive the temple a visit with attention to its scale and the smaller details around it. Move quietly through permitted areas and leave room for people who are there to worship. It is a useful anchor for an old-city outing.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJnWhAb3A62jARWVBZnaOa7-0\"></div>\n\nChoose this wooded temple setting when you want a change from the city streets. Follow the site’s guidance and keep the visit quiet. Allow enough time to look without making the stop another quick photograph.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJtd3x37U52jARIX7FrlxMhp0\"></div>\n\nPlan the mountain visit with transport, access and your energy in mind. Check conditions and the current arrangements before setting out. The approach and temple setting deserve time beyond a short stop at the map pin.\n\n<div data-embed=\"placeList\" data-list-id=\"section-2\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJqcysHow62jAR6ElsdYpG8EU\"></div>\n\nUse this as a focused northern-food stop if the menu suits you. Ask about ingredients and check current opening arrangements. Give yourself time for the meal and keep the next activity flexible if there is a wait.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJSeLRHWM62jARNbDigb8iLEo\"></div>\n\nBrowse side streets and businesses according to what is currently open. Choose a café by the menu and comfort, or look for a design shop that interests you. It works well as an afternoon with fewer fixed commitments.\n\n## Official references\n\n- [Tourism Authority of Thailand Chiang Mai](https://www.tourismthailand.org/Destinations/Provinces/Chiang-Mai/101)\n- [Chiang Mai official heritage management information](https://chiangmaipao.go.th/ChiangMaiWorldHeritage/en/wp-content/uploads/sites/2/2025/12/ManagementPlan_EN.pdf)\n\nPrepared by Navio Team. Information reviewed 2026-11-12. Check official sources for current access, reservations and local conditions."
+      }
+    }
+  },
+  {
+    "id": "9c5ba03e-ef9a-5054-a451-d8337a7b6739",
+    "slug": "chiang-rai",
+    "source": "CURATED",
+    "guide": {
+      "name": "Chiang Rai in Colour: Contemporary Art and Temple Design",
+      "country": "Thailand",
+      "countryCode": "TH",
+      "destination": {
+        "provider": "GOOGLE",
+        "providerPlaceId": "ChIJZYPDE2cG1zARNwa2sbtUFXE",
+        "name": "Mueang Chiang Rai",
+        "lat": 19.9104798,
+        "lng": 99.840576
+      },
+      "description": "A visual culture guide exploring contrasting creative spaces, temple architecture and a park interlude.",
+      "coverPlaceId": "GOOGLE:ChIJD5RZzt-31zARo7esjg3V_Co",
+      "content": {
+        "categories": [
+          {
+            "id": "section-1",
+            "name": "Three different visual languages",
+            "iconId": "camera",
+            "colorId": "violet"
+          },
+          {
+            "id": "section-2",
+            "name": "A pause between larger visits",
+            "iconId": "trees",
+            "colorId": "teal"
+          }
+        ],
+        "lists": {
+          "section-1": {
+            "id": "section-1",
+            "categoryId": "section-1"
+          },
+          "section-2": {
+            "id": "section-2",
+            "categoryId": "section-2"
+          }
+        },
+        "places": {
+          "ChIJD5RZzt-31zARo7esjg3V_Co": {
+            "id": "GOOGLE:ChIJD5RZzt-31zARo7esjg3V_Co",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJD5RZzt-31zARo7esjg3V_Co",
+            "name": "Wat Rong Khun",
+            "address": "Pa O Don Chai, Mueang Chiang Rai District, Chiang Rai 57000, Thailand",
+            "lat": 19.8232669,
+            "lng": 99.7627085,
+            "tags": [],
+            "category": "Buddhist Temple"
+          },
+          "ChIJERD0pfEG1zARLAVNEwcKLOc": {
+            "id": "GOOGLE:ChIJERD0pfEG1zARLAVNEwcKLOc",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJERD0pfEG1zARLAVNEwcKLOc",
+            "name": "Wat Rong Suea Ten",
+            "address": "306 หมู่ที่ 2 Maekok Rd, Tambon Rim Kok, Amphoe Mueang Chiang Rai, Chang Wat Chiang Rai 57100, Thailand",
+            "lat": 19.923395199999998,
+            "lng": 99.84187349999999,
+            "tags": [],
+            "category": "Buddhist Temple"
+          },
+          "ChIJAQAAAFAA1zARlrvp9yTMeoE": {
+            "id": "GOOGLE:ChIJAQAAAFAA1zARlrvp9yTMeoE",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJAQAAAFAA1zARlrvp9yTMeoE",
+            "name": "Baan Dam Museum",
+            "address": "333 Tambon Nang Lae, อำเภอเมือง Chang Wat Chiang Rai 57100, Thailand",
+            "lat": 19.992037,
+            "lng": 99.8607523,
+            "tags": [],
+            "category": "Art museum"
+          },
+          "ChIJU05GDusP1zARDhNO9epTtu4": {
+            "id": "GOOGLE:ChIJU05GDusP1zARDhNO9epTtu4",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJU05GDusP1zARDhNO9epTtu4",
+            "name": "Singha Park Chiang Rai",
+            "address": "99, Tambon Mae Kon, Amphoe Mueang Chiang Rai, Chang Wat Chiang Rai 57000, Thailand",
+            "lat": 19.8530809,
+            "lng": 99.74302139999999,
+            "tags": [],
+            "category": "Tourist Attraction"
+          },
+          "ChIJMWn662YG1zARY4ZUtHVhxu4": {
+            "id": "GOOGLE:ChIJMWn662YG1zARY4ZUtHVhxu4",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJMWn662YG1zARY4ZUtHVhxu4",
+            "name": "Chiang Rai Clock Tower",
+            "address": "WR4J+V94 สุขสถิต Tambon Wiang, Amphoe Mueang Chiang Rai, Chang Wat Chiang Rai 57000, Thailand",
+            "lat": 19.9071489,
+            "lng": 99.8309632,
+            "tags": [],
+            "category": "Scenic Spot"
+          }
+        },
+        "body": "Chiang Rai is an engaging place to look at different expressions of art and religious architecture. The white forms of Wat Rong Khun, the Blue Temple and the collection at Baan Dam each invite a different kind of attention. This guide gives those visits room, then adds a park and a city landmark for a change of scale. The places are spread out, so arrange transport before deciding how many to combine. A visual theme becomes more interesting when you leave time to understand the differences.\n\n## Before you go\n\n- Check each site’s current visitor arrangements and photography restrictions. Religious settings deserve appropriate dress and behaviour.\n- Plan transport between the separate sites. A map of highlights should not be read as a single walkable neighbourhood.\n- Look for official interpretation or a knowledgeable guide when symbolism interests you. Avoid treating every building as having the same purpose.\n\n<div data-embed=\"placeList\" data-list-id=\"section-1\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJD5RZzt-31zARo7esjg3V_Co\"></div>\n\nLook at the overall forms first, then the details that reveal a more contemporary artistic vocabulary. Follow the visitor route and photography signs. Give the visit time to be more than a photograph of the exterior.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJERD0pfEG1zARLAVNEwcKLOc\"></div>\n\nNotice the colour, decorative choices and the way the space feels in use. Approach the visit with the same consideration you would give any active temple. Comparing details with other sites can make each one more memorable.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJAQAAAFAA1zARlrvp9yTMeoE\"></div>\n\nTreat the collection as a distinct artistic visit. Read available interpretation and take time with a few objects or structures that interest you. Its character provides a different perspective from the temple settings in this guide.\n\n<div data-embed=\"placeList\" data-list-id=\"section-2\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJU05GDusP1zARDhNO9epTtu4\"></div>\n\nChoose a manageable part of the park according to current access, weather and your energy. Check separately for activities you want to join. Open space can be a useful pause after several detailed cultural visits.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJMWn662YG1zARY4ZUtHVhxu4\"></div>\n\nUse the city landmark as a point of orientation during an evening wander. Check the surroundings before stopping for photographs and keep clear of traffic. Let a nearby meal or a short walk complete the outing.\n\n## Official references\n\n- [Tourism Authority of Thailand Chiang Rai](https://www.tourismthailand.org/Destinations/Provinces/chiang-rai/102)\n- [Thailand tourism directory Wat Rong Khun](https://www.thailandtourismdirectory.go.th/en/attraction/3601)\n\nPrepared by Navio Team. Information reviewed 2026-11-12. Check official sources for current access, reservations and local conditions."
+      }
+    }
+  },
+  {
+    "id": "64a007b0-5e8d-5438-a6a7-265a55cc9baf",
+    "slug": "hua-hin",
+    "source": "CURATED",
+    "guide": {
+      "name": "Hua Hin and Pranburi: A Slower Coast, Markets and Open Landscapes",
+      "country": "Thailand",
+      "countryCode": "TH",
+      "destination": {
+        "provider": "GOOGLE",
+        "providerPlaceId": "ChIJEXKZAPSq_TARYBI4LLwjAgQ",
+        "name": "Hua Hin",
+        "lat": 12.5683747,
+        "lng": 99.9576888
+      },
+      "description": "A relaxed Gulf-coast guide with a heritage stop, market browsing and a separately planned national-park outing.",
+      "coverPlaceId": "GOOGLE:ChIJl1PqzM8D_TARM2T7rQHienU",
+      "content": {
+        "categories": [
+          {
+            "id": "section-1",
+            "name": "Heritage and an unhurried evening",
+            "iconId": "landmark",
+            "colorId": "amber"
+          },
+          {
+            "id": "section-2",
+            "name": "Space for the coast and nature",
+            "iconId": "waves",
+            "colorId": "teal"
+          }
+        ],
+        "lists": {
+          "section-1": {
+            "id": "section-1",
+            "categoryId": "section-1"
+          },
+          "section-2": {
+            "id": "section-2",
+            "categoryId": "section-2"
+          }
+        },
+        "places": {
+          "ChIJl1PqzM8D_TARM2T7rQHienU": {
+            "id": "GOOGLE:ChIJl1PqzM8D_TARM2T7rQHienU",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJl1PqzM8D_TARM2T7rQHienU",
+            "name": "Mrigadayavan Palace",
+            "address": "1281 เพชรเกษม Thanon Phet Kasem, Tambon Cha-am, Amphoe Cha-am, Chang Wat Phetchaburi 76120, Thailand",
+            "lat": 12.6985578,
+            "lng": 99.9632297,
+            "tags": [],
+            "category": "Tourist Attraction"
+          },
+          "ChIJy0xwZIyr_TARhN-8TbWDEN8": {
+            "id": "GOOGLE:ChIJy0xwZIyr_TARhN-8TbWDEN8",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJy0xwZIyr_TARhN-8TbWDEN8",
+            "name": "Cicada Market",
+            "address": "83 159 ซอย หัวถนน 21 Tambon Nong Kae, Amphoe Hua Hin, Chang Wat Prachuap Khiri Khan 77110, Thailand",
+            "lat": 12.534659399999999,
+            "lng": 99.9659588,
+            "tags": [],
+            "category": "Market"
+          },
+          "ChIJOwoWVa62_TARFzeECNErglg": {
+            "id": "GOOGLE:ChIJOwoWVa62_TARFzeECNErglg",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJOwoWVa62_TARFzeECNErglg",
+            "name": "Khao Kalok",
+            "address": "Khao Kalok, Pak Nam Pran, Pran Buri District, Prachuap Khiri Khan 77120, Thailand",
+            "lat": 12.3369444,
+            "lng": 99.9997222,
+            "tags": [],
+            "category": "Mountain Peak"
+          },
+          "ChIJxcOqF1HM_TARAM3YPyzgbio": {
+            "id": "GOOGLE:ChIJxcOqF1HM_TARAM3YPyzgbio",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJxcOqF1HM_TARAM3YPyzgbio",
+            "name": "Khao Sam Roi Yot National Park",
+            "address": "4XH3+CFX, Khao Daeng, Kui Buri District, Prachuap Khiri Khan, Thailand",
+            "lat": 12.128617,
+            "lng": 99.9537428,
+            "tags": [],
+            "category": "National Park"
+          }
+        },
+        "body": "A coast break can have more than one rhythm. In Hua Hin and the wider Pranburi area, combine a small heritage visit with market browsing, then leave another day open for a broader landscape. This guide is for travellers who want breathing room between activities. The national park is an outing of its own, and the places should be grouped with travel time in mind. Choose the amount of walking and driving that leaves the day feeling restful.\n\n## Before you go\n\n- Check current access for Mrigadayavan Palace and market opening days before building a visit around them.\n- Research the exact national-park area and trail you want. Conditions, closures, tides and your fitness can affect what is suitable.\n- Keep coastal visits flexible around local weather and sea conditions. Arrange a return journey before settling into a remote stop.\n\n<div data-embed=\"placeList\" data-list-id=\"section-1\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJl1PqzM8D_TARM2T7rQHienU\"></div>\n\nResearch the current public access before travelling. If a visit is available, give attention to the architecture and setting, with appropriate clothing and conduct. Keep a nearby alternative in mind when restoration or other arrangements limit entry.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJy0xwZIyr_TARhN-8TbWDEN8\"></div>\n\nChoose an evening when the market is scheduled to open. Browse crafts and food options before committing to a meal. It can be a relaxed way to explore after a quieter daytime visit, with room to follow your own interests.\n\n<div data-embed=\"placeList\" data-list-id=\"section-2\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJOwoWVa62_TARFzeECNErglg\"></div>\n\nConsider a coastal pause with the amount of walking that suits the conditions. Check local guidance before taking a path or approaching the water. A simple look at the scenery can be enough for a slower day.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJxcOqF1HM_TARAM3YPyzgbio\"></div>\n\nChoose a specific part of the park and prepare for that visit. The broad park pin is a starting point for research. Check official access and local conditions before selecting a trail, cave or other activity.\n\n## Official references\n\n- [Thailand official Khao Sam Roi Yot information](https://www.thailandtourismdirectory.go.th/en/attraction/1405)\n- [Tourism Authority of Thailand Hua Hin and Cha-am guide](https://tourismthailand.my/ematerials/pdf/Hua%20Hin.pdf)\n\nPrepared by Navio Team. Information reviewed 2026-11-12. Check official sources for current access, reservations and local conditions."
+      }
+    }
+  },
+  {
+    "id": "21a4408f-4211-57a3-9c04-626c5319d9b0",
+    "slug": "paris",
+    "source": "CURATED",
+    "guide": {
+      "name": "Paris Between Paintings: Art, Garden Chairs and the Seine",
+      "country": "France",
+      "countryCode": "FR",
+      "destination": {
+        "provider": "GOOGLE",
+        "providerPlaceId": "ChIJD7fiBh9u5kcRYJSMaMOCCwQ",
+        "name": "Paris",
+        "lat": 48.8575475,
+        "lng": 2.3513765
+      },
+      "description": "An art-minded Paris collection with room for museum reading, a garden pause and neighbourhood wandering.",
+      "coverPlaceId": "GOOGLE:ChIJD3uTd9hx5kcR1IQvGfr8dbk",
+      "content": {
+        "categories": [
+          {
+            "id": "section-1",
+            "name": "Art with time to look",
+            "iconId": "camera",
+            "colorId": "violet"
+          },
+          {
+            "id": "section-2",
+            "name": "After the galleries",
+            "iconId": "trees",
+            "colorId": "teal"
+          }
+        ],
+        "lists": {
+          "section-1": {
+            "id": "section-1",
+            "categoryId": "section-1"
+          },
+          "section-2": {
+            "id": "section-2",
+            "categoryId": "section-2"
+          }
+        },
+        "places": {
+          "ChIJD3uTd9hx5kcR1IQvGfr8dbk": {
+            "id": "GOOGLE:ChIJD3uTd9hx5kcR1IQvGfr8dbk",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJD3uTd9hx5kcR1IQvGfr8dbk",
+            "name": "Louvre Museum",
+            "address": "75001 Paris, France",
+            "lat": 48.8606111,
+            "lng": 2.337644,
+            "tags": [],
+            "category": "Art museum"
+          },
+          "ChIJG5Qwtitu5kcR2CNEsYy9cdA": {
+            "id": "GOOGLE:ChIJG5Qwtitu5kcR2CNEsYy9cdA",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJG5Qwtitu5kcR2CNEsYy9cdA",
+            "name": "Musée d'Orsay",
+            "address": "Esplanade Valéry Giscard d'Estaing, 75007 Paris, France",
+            "lat": 48.859961399999996,
+            "lng": 2.3265614,
+            "tags": [],
+            "category": "Art museum"
+          },
+          "ChIJAQAAMCxu5kcRx--_4QnbGcI": {
+            "id": "GOOGLE:ChIJAQAAMCxu5kcRx--_4QnbGcI",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJAQAAMCxu5kcRx--_4QnbGcI",
+            "name": "Tuileries Garden",
+            "address": "75001 Paris, France",
+            "lat": 48.863491599999996,
+            "lng": 2.3274942999999997,
+            "tags": [],
+            "category": "Garden"
+          },
+          "ChIJiwXbjSBu5kcRG_Vjyw1gadQ": {
+            "id": "GOOGLE:ChIJiwXbjSBu5kcRG_Vjyw1gadQ",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJiwXbjSBu5kcRG_Vjyw1gadQ",
+            "name": "Pont Neuf",
+            "address": "75001 Paris, France",
+            "lat": 48.856696899999996,
+            "lng": 2.3408412000000003,
+            "tags": [],
+            "category": "Bridge"
+          },
+          "ChIJ6UrOzQNu5kcRRp5vRIClzzg": {
+            "id": "GOOGLE:ChIJ6UrOzQNu5kcRRp5vRIClzzg",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJ6UrOzQNu5kcRRp5vRIClzzg",
+            "name": "Le Marais",
+            "address": "Le Marais, Paris, France",
+            "lat": 48.861232699999995,
+            "lng": 2.3581892,
+            "tags": []
+          }
+        },
+        "body": "A museum visit is easier to enjoy when it has room around it. This Paris guide pairs major art collections with a garden and a neighbourhood where you can change pace. Choose the art you most want to see, then let the rest of the outing stay light. You can read labels, return to a favourite room or simply sit after a long visit. The collection works for a first visit and for a return trip built around one artistic interest.\n\n## Before you go\n\n- Reserve through official museum channels when required and check the current entrance arrangements. Special exhibitions may have separate conditions.\n- Leave space between large museums. A garden or neighbourhood walk can be a more comfortable follow-up than another long queue.\n- Keep outdoor plans flexible in rain, heat or other poor conditions. Check access at religious sites before entering.\n\n<div data-embed=\"placeList\" data-list-id=\"section-1\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJD3uTd9hx5kcR1IQvGfr8dbk\"></div>\n\nChoose a small set of galleries or a theme before arriving. Give yourself permission to spend longer with fewer works and to take a break. Check the museum’s current map so your interests guide the visit.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJG5Qwtitu5kcR2CNEsYy9cdA\"></div>\n\nUse the collection as an opportunity for closer looking. Pick an artist, subject or period to follow, and leave time to appreciate the building too. Check the current programme if you are travelling for a particular exhibition.\n\n<div data-embed=\"placeList\" data-list-id=\"section-2\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJAQAAMCxu5kcRx--_4QnbGcI\"></div>\n\nMake the garden a place to rest and observe. Choose a permitted seat or a comfortable walk, and notice how the paths and planting frame the surroundings. It gives a museum-focused day a welcome stretch of open space.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJiwXbjSBu5kcRG_Vjyw1gadQ\"></div>\n\nPause safely for a wider sense of the Seine and the city around it. A bridge visit needs little scheduling, which makes it useful between more structured attractions. Keep pedestrian space clear when taking photographs.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJ6UrOzQNu5kcRRp5vRIClzzg\"></div>\n\nBrowse the neighbourhood according to your interests in art, shops and streets. Choose one small area and let a café or an unexpected shop become part of the afternoon. Check a particular museum or business before making a special journey.\n\n## Official references\n\n- [Paris tourism Tuileries guide](https://parisjetaime.com/culture/jardin-des-tuileries-p3545)\n- [Paris tourism Marais guide](https://parisjetaime.com/eng/article/exploring-the-marais-a1070)\n- [Louvre official visitor information](https://www.louvre.fr/en)\n- [Musée d’Orsay official information](https://www.musee-orsay.fr/en)\n\nPrepared by Navio Team. Information reviewed 2026-11-12. Check official sources for current access, reservations and local conditions."
+      }
+    }
+  },
+  {
+    "id": "6b51a6fc-ec0c-5a7c-b0fc-a49bd1c2c1ad",
+    "slug": "rome",
+    "source": "CURATED",
+    "guide": {
+      "name": "Rome in Layers: Ancient Spaces, Piazzas and Trastevere",
+      "country": "Italy",
+      "countryCode": "IT",
+      "destination": {
+        "provider": "GOOGLE",
+        "providerPlaceId": "ChIJu46S-ZZhLxMROG5lkwZ3D7k",
+        "name": "Rome",
+        "lat": 41.8967068,
+        "lng": 12.4822025
+      },
+      "description": "History at several scales, from major ancient sites to public squares and neighbourhood streets.",
+      "coverPlaceId": "GOOGLE:ChIJrRMgU7ZhLxMRxAOFkC7I8Sg",
+      "content": {
+        "categories": [
+          {
+            "id": "section-1",
+            "name": "Give ancient Rome some context",
+            "iconId": "landmark",
+            "colorId": "amber"
+          },
+          {
+            "id": "section-2",
+            "name": "The city at a human scale",
+            "iconId": "heart",
+            "colorId": "rose"
+          }
+        ],
+        "lists": {
+          "section-1": {
+            "id": "section-1",
+            "categoryId": "section-1"
+          },
+          "section-2": {
+            "id": "section-2",
+            "categoryId": "section-2"
+          }
+        },
+        "places": {
+          "ChIJrRMgU7ZhLxMRxAOFkC7I8Sg": {
+            "id": "GOOGLE:ChIJrRMgU7ZhLxMRxAOFkC7I8Sg",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJrRMgU7ZhLxMRxAOFkC7I8Sg",
+            "name": "Colosseum",
+            "address": "P.za del Colosseo, 1, 00184 Roma RM, Italy",
+            "lat": 41.8902102,
+            "lng": 12.4922309,
+            "tags": [],
+            "category": "Historical Landmark"
+          },
+          "ChIJ782pg7NhLxMR5n3swAdAkfo": {
+            "id": "GOOGLE:ChIJ782pg7NhLxMR5n3swAdAkfo",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJ782pg7NhLxMR5n3swAdAkfo",
+            "name": "Roman Forum",
+            "address": "00186 Rome, Metropolitan City of Rome Capital, Italy",
+            "lat": 41.892090599999996,
+            "lng": 12.4864378,
+            "tags": [],
+            "category": "Museum"
+          },
+          "ChIJqUCGZ09gLxMRLM42IPpl0co": {
+            "id": "GOOGLE:ChIJqUCGZ09gLxMRLM42IPpl0co",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJqUCGZ09gLxMRLM42IPpl0co",
+            "name": "Pantheon",
+            "address": "Piazza della Rotonda, 00186 Roma RM, Italy",
+            "lat": 41.8986108,
+            "lng": 12.4768729,
+            "tags": [],
+            "category": "Historical Landmark"
+          },
+          "ChIJkyhW-09gLxMR-17gjM4lxAU": {
+            "id": "GOOGLE:ChIJkyhW-09gLxMR-17gjM4lxAU",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJkyhW-09gLxMR-17gjM4lxAU",
+            "name": "Piazza Navona",
+            "address": "Piazza Navona, 00186 Roma RM, Italy",
+            "lat": 41.8991328,
+            "lng": 12.4732921,
+            "tags": []
+          },
+          "ChIJ921caWhgLxMRM_bfeCcgn6M": {
+            "id": "GOOGLE:ChIJ921caWhgLxMRM_bfeCcgn6M",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJ921caWhgLxMRM_bfeCcgn6M",
+            "name": "Trastevere",
+            "address": "Trastevere, Rome, Metropolitan City of Rome Capital, Italy",
+            "lat": 41.8848294,
+            "lng": 12.4704017,
+            "tags": []
+          }
+        },
+        "body": "Rome is especially rewarding when you alternate the monumental and the ordinary. An ancient site can lead to a public square, then a neighbourhood meal gives you time to think about what you have seen. This guide gathers places that invite that change of scale. Choose a few historical anchors and leave space between them. A visit to the Forum demands a different kind of attention from an evening in Trastevere, and both benefit from an unhurried approach.\n\n## Before you go\n\n- Use official ticket channels for major sites and check current timed-entry rules before fixing the day’s order.\n- Plan walking around heat, uneven surfaces and your own mobility. Build in seated breaks and carry water.\n- At churches and religious sites, follow dress and visitor guidance. Check restaurant menus and prices before sitting down.\n\n<div data-embed=\"placeList\" data-list-id=\"section-1\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJrRMgU7ZhLxMRxAOFkC7I8Sg\"></div>\n\nCheck which visit your ticket includes and allow for security and entry time. Look at the structure as well as its famous outline. Official interpretation or a suitable guide can help you connect the building with its history.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJ782pg7NhLxMR5n3swAdAkfo\"></div>\n\nUse a map or interpretation to make sense of the spaces. Choose a few structures to understand rather than trying to identify everything at once. Uneven ground and outdoor conditions are part of planning a comfortable visit.\n\n<div data-embed=\"placeList\" data-list-id=\"section-2\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJqUCGZ09gLxMRLM42IPpl0co\"></div>\n\nGive the interior your full attention and follow the current access and conduct rules. Looking at light, proportion and materials offers a focused way to experience the building. Leave time afterwards to take in the surrounding square.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJkyhW-09gLxMR-17gjM4lxAU\"></div>\n\nSlow down to notice how the fountains and buildings shape the square. Choose a place to pause without blocking pedestrian routes. This kind of open-ended stop can be a useful balance to a timed museum or monument visit.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJ921caWhgLxMRM_bfeCcgn6M\"></div>\n\nChoose a manageable area to wander and let dinner be part of the experience. Browse menus before deciding and respect the neighbourhood’s residents. An evening walk can be satisfying without a long checklist of individual sights.\n\n## Official references\n\n- [Rome tourism historic-centre neighbourhood guide](https://www.turismoroma.it/quartieri/navona-campodefiori-pantheon-viagiulia)\n- [Rome tourism Piazza Navona](https://www.turismoroma.it/it/luoghi/piazza-navona)\n- [Colosseum Archaeological Park official information](https://colosseo.it/en/)\n\nPrepared by Navio Team. Information reviewed 2026-11-12. Check official sources for current access, reservations and local conditions."
+      }
+    }
+  },
+  {
+    "id": "7569f201-245d-51dd-8a2e-80323b1a60c2",
+    "slug": "barcelona",
+    "source": "CURATED",
+    "guide": {
+      "name": "Barcelona by Design: Gaudí, Street Details and Market Colour",
+      "country": "Spain",
+      "countryCode": "ES",
+      "destination": {
+        "provider": "GOOGLE",
+        "providerPlaceId": "ChIJ5TCOcRaYpBIRCmZHTz37sEQ",
+        "name": "Barcelona",
+        "lat": 41.3874374,
+        "lng": 2.1686496
+      },
+      "description": "An architecture-focused guide balancing major modernista visits with street-level discovery.",
+      "coverPlaceId": "GOOGLE:ChIJk_s92NyipBIRUMnDG8Kq2Js",
+      "content": {
+        "categories": [
+          {
+            "id": "section-1",
+            "name": "Three ways to look at Gaudí",
+            "iconId": "camera",
+            "colorId": "violet"
+          },
+          {
+            "id": "section-2",
+            "name": "Street life between reservations",
+            "iconId": "utensils",
+            "colorId": "rose"
+          }
+        ],
+        "lists": {
+          "section-1": {
+            "id": "section-1",
+            "categoryId": "section-1"
+          },
+          "section-2": {
+            "id": "section-2",
+            "categoryId": "section-2"
+          }
+        },
+        "places": {
+          "ChIJk_s92NyipBIRUMnDG8Kq2Js": {
+            "id": "GOOGLE:ChIJk_s92NyipBIRUMnDG8Kq2Js",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJk_s92NyipBIRUMnDG8Kq2Js",
+            "name": "Basilica of the Sagrada Familia",
+            "address": "Carrer de Mallorca, 401, Eixample, 08013 Barcelona, Spain",
+            "lat": 41.4036299,
+            "lng": 2.1743558,
+            "tags": [],
+            "category": "Church"
+          },
+          "ChIJYUFLSe2ipBIRD04uni940kA": {
+            "id": "GOOGLE:ChIJYUFLSe2ipBIRD04uni940kA",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJYUFLSe2ipBIRD04uni940kA",
+            "name": "Casa Batlló",
+            "address": "Pg. de Gràcia, 43, Eixample, 08007 Barcelona, Spain",
+            "lat": 41.3917,
+            "lng": 2.164918,
+            "tags": [],
+            "category": "Historical Landmark"
+          },
+          "ChIJq0HUUq6ipBIRWM6qGqALmok": {
+            "id": "GOOGLE:ChIJq0HUUq6ipBIRWM6qGqALmok",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJq0HUUq6ipBIRWM6qGqALmok",
+            "name": "Park Güell",
+            "address": "Gràcia, 08024 Barcelona, Spain",
+            "lat": 41.4144948,
+            "lng": 2.1526945,
+            "tags": [],
+            "category": "Park"
+          },
+          "ChIJAVoetfeipBIR1a1z3FTGCoY": {
+            "id": "GOOGLE:ChIJAVoetfeipBIR1a1z3FTGCoY",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJAVoetfeipBIR1a1z3FTGCoY",
+            "name": "Mercat de la Boqueria",
+            "address": "La Rambla, 91, Ciutat Vella, 08001 Barcelona, Spain",
+            "lat": 41.3817399,
+            "lng": 2.1715853,
+            "tags": [],
+            "category": "Market"
+          },
+          "ChIJc0WMe_GipBIR_EfbMXL48cY": {
+            "id": "GOOGLE:ChIJc0WMe_GipBIR_EfbMXL48cY",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJc0WMe_GipBIR_EfbMXL48cY",
+            "name": "El Born Centre de Cultura i Memòria",
+            "address": "Mercat del Born, Plaça Comercial, 12, Ciutat Vella, 08003 Barcelona, Spain",
+            "lat": 41.385686899999996,
+            "lng": 2.1836862,
+            "tags": [],
+            "category": "Cultural Center"
+          }
+        },
+        "body": "Barcelona is a good city for looking at how buildings change a street. This guide gives you several distinct architectural experiences, then adds market browsing and an older neighbourhood setting. Choose an interior visit that genuinely interests you and leave time to notice façades and public spaces between reservations. The aim is to make the design readable, with enough breathing room to enjoy the city around it. Photography can be part of the visit, while closer looking gives you more to take home.\n\n## Before you go\n\n- Book major attractions through their official channels and check the entrance, time slot and access conditions.\n- Plan for slopes and outdoor walking at Park Güell. Check current access information before choosing your route.\n- At markets and busy pavements, keep circulation clear and respect working shops. Check ingredients and prices before ordering food.\n\n<div data-embed=\"placeList\" data-list-id=\"section-1\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJk_s92NyipBIRUMnDG8Kq2Js\"></div>\n\nGive attention to light, structure and the relationship between the exterior and interior. Check what your ticket includes before arriving. A focused visit here is a better anchor than several overlapping reservations.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJYUFLSe2ipBIRD04uni940kA\"></div>\n\nLook at how the façade and interior choices work together, using the interpretation available with your visit. Allow enough time to notice details instead of moving straight between photo points. Check the current ticket options carefully.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJq0HUUq6ipBIRWM6qGqALmok\"></div>\n\nChoose a route that suits your mobility and the conditions. Notice the relationship between designed elements and the hillside setting. Check the official ticket and entry arrangements, then leave time to enjoy a view without rushing.\n\n<div data-embed=\"placeList\" data-list-id=\"section-2\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJAVoetfeipBIR1a1z3FTGCoY\"></div>\n\nBrowse for colour, ingredients and something you would actually like to eat. Look before ordering, keep entrances clear and treat the market as a working place. A small meal can provide a welcome break from architectural visits.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJc0WMe_GipBIR_EfbMXL48cY\"></div>\n\nCheck the current programme and visitor access if you want a deeper cultural stop. The surrounding neighbourhood also invites a slower look at streets and buildings. Choose the amount of reading and walking that suits your afternoon.\n\n## Official references\n\n- [Barcelona official modernisme route](https://guia.barcelona.cat/en/detall/ruta-del-modernisme-a-barcelona-organitzada-per-l-institut-municipal-del-paisatge-urba-i-la-qualitat-de-vida_99400100435.html)\n- [Barcelona tourism Park Güell information](https://bid.barcelonaturisme.com/wv3/en/page/1076/park-guell.html)\n- [Sagrada Família official visitor information](https://sagradafamilia.org/en/)\n\nPrepared by Navio Team. Information reviewed 2026-11-12. Check official sources for current access, reservations and local conditions."
+      }
+    }
+  },
+  {
+    "id": "83662d49-f803-5cf1-b9a2-70412af4a228",
+    "slug": "amsterdam",
+    "source": "CURATED",
+    "guide": {
+      "name": "Amsterdam in Spring: Canal Details, Museums and Park Time",
+      "country": "Netherlands",
+      "countryCode": "NL",
+      "destination": {
+        "provider": "GOOGLE",
+        "providerPlaceId": "ChIJVXealLU_xkcRja_At0z9AGY",
+        "name": "Amsterdam",
+        "lat": 52.3675734,
+        "lng": 4.9041389
+      },
+      "description": "A spring-minded Amsterdam guide for art, canal-side wandering and a gentler city afternoon.",
+      "coverPlaceId": "GOOGLE:ChIJ5Ra7we4JxkcRhYVAaq5zQ9U",
+      "content": {
+        "categories": [
+          {
+            "id": "section-1",
+            "name": "Choose an art focus",
+            "iconId": "camera",
+            "colorId": "violet"
+          },
+          {
+            "id": "section-2",
+            "name": "Outside the galleries",
+            "iconId": "trees",
+            "colorId": "teal"
+          }
+        ],
+        "lists": {
+          "section-1": {
+            "id": "section-1",
+            "categoryId": "section-1"
+          },
+          "section-2": {
+            "id": "section-2",
+            "categoryId": "section-2"
+          }
+        },
+        "places": {
+          "ChIJ5Ra7we4JxkcRhYVAaq5zQ9U": {
+            "id": "GOOGLE:ChIJ5Ra7we4JxkcRhYVAaq5zQ9U",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJ5Ra7we4JxkcRhYVAaq5zQ9U",
+            "name": "Rijksmuseum",
+            "address": "Museumstraat 1, 1071 XX Amsterdam, Netherlands",
+            "lat": 52.3599976,
+            "lng": 4.8852188,
+            "tags": [],
+            "category": "Art museum"
+          },
+          "ChIJX1rTlu8JxkcRGsV8-a4oKMI": {
+            "id": "GOOGLE:ChIJX1rTlu8JxkcRGsV8-a4oKMI",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJX1rTlu8JxkcRGsV8-a4oKMI",
+            "name": "Van Gogh Museum",
+            "address": "Museumplein 6, 1071 DJ Amsterdam, Netherlands",
+            "lat": 52.3580757,
+            "lng": 4.8812052999999995,
+            "tags": [],
+            "category": "Art museum"
+          },
+          "ChIJz3y0xeIJxkcRNcogBVV41Gw": {
+            "id": "GOOGLE:ChIJz3y0xeIJxkcRNcogBVV41Gw",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJz3y0xeIJxkcRNcogBVV41Gw",
+            "name": "Vondelpark",
+            "address": "1071 AA Amsterdam, Netherlands",
+            "lat": 52.3579946,
+            "lng": 4.8686484,
+            "tags": [],
+            "category": "Park"
+          },
+          "ChIJf-GU6NoJxkcRHOqk5aT6MoY": {
+            "id": "GOOGLE:ChIJf-GU6NoJxkcRHOqk5aT6MoY",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJf-GU6NoJxkcRHOqk5aT6MoY",
+            "name": "Jordaan",
+            "address": "Jordaan, Amsterdam, Netherlands",
+            "lat": 52.3732456,
+            "lng": 4.8802411999999995,
+            "tags": []
+          },
+          "ChIJZapZuvIJxkcRmAvJTwrtnNE": {
+            "id": "GOOGLE:ChIJZapZuvIJxkcRmAvJTwrtnNE",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJZapZuvIJxkcRmAvJTwrtnNE",
+            "name": "Albert Cuyp Markt",
+            "address": "Albert Cuypstraat 101, 1072 VV Amsterdam, Netherlands",
+            "lat": 52.3553059,
+            "lng": 4.8915504,
+            "tags": [],
+            "category": "Market"
+          }
+        },
+        "body": "Amsterdam invites close looking. A canal edge, a museum room and a park path each offer a different pace. This collection uses that variety to make a city stay feel less rushed, with spring as a reason to leave room for outdoor time. Flowers and weather follow their own schedules, so build the visit around interests that remain worthwhile in changing conditions. One thoughtful museum visit and a good neighbourhood walk can make a satisfying day.\n\n## Before you go\n\n- Check museum reservations and timed-entry requirements directly. Build the rest of the day around the visit you most want.\n- Watch for cycle lanes and keep out of them when checking the map or taking photographs.\n- Treat spring flowers as a possibility, with current local reports guiding any special journey. Choose an indoor alternative when the weather calls for it.\n\n<div data-embed=\"placeList\" data-list-id=\"section-1\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJ5Ra7we4JxkcRhYVAaq5zQ9U\"></div>\n\nPick a theme or a few rooms before arriving, then allow time to look carefully. The museum’s own map and interpretation can help you make choices. Leave a little space for something unexpected to catch your attention.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJX1rTlu8JxkcRGsV8-a4oKMI\"></div>\n\nResearch the current ticket and exhibition arrangements before travelling. Follow a small number of ideas through the collection and take breaks when needed. It can be a separate visit from the Rijksmuseum if you prefer more time for each.\n\n<div data-embed=\"placeList\" data-list-id=\"section-2\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJz3y0xeIJxkcRNcogBVV41Gw\"></div>\n\nChoose a walk or a quiet pause according to the weather. The park gives a museum-focused outing a different rhythm. Stay aware of other people using the paths and leave space for a longer rest if that is what the day needs.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJf-GU6NoJxkcRHOqk5aT6MoY\"></div>\n\nExplore a small area slowly, noticing canal views, shopfronts and the everyday neighbourhood. Keep private entrances clear and respect residents when taking photographs. A café stop can give the walk an easy centre.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJZapZuvIJxkcRmAvJTwrtnNE\"></div>\n\nBrowse the market when its current opening pattern fits your stay. Look at food and other stalls before choosing what to buy. It offers another kind of street-level visit after the quieter concentration of a museum.\n\n## Official references\n\n- [I amsterdam Museum Quarter guide](https://www.iamsterdam.com/en/explore/neighbourhoods/centrum/things-to-do-in-the-museum-quarter)\n- [I amsterdam Jordaan guide](https://www.iamsterdam.com/en/explore/neighbourhoods/centrum/things-to-do-in-the-jordaan)\n- [Rijksmuseum official visitor information](https://www.rijksmuseum.nl/en)\n\nPrepared by Navio Team. Information reviewed 2026-11-12. Check official sources for current access, reservations and local conditions."
+      }
+    }
+  },
+  {
+    "id": "acf791aa-25c3-5434-a529-e11cd6f51289",
+    "slug": "london",
+    "source": "CURATED",
+    "guide": {
+      "name": "London on a Rainy Day: Art, Objects and Market Lunches",
+      "country": "United Kingdom",
+      "countryCode": "GB",
+      "destination": {
+        "provider": "GOOGLE",
+        "providerPlaceId": "ChIJdd4hrwug2EcRmSrV3Vo6llI",
+        "name": "London",
+        "lat": 51.5072178,
+        "lng": -0.1275862
+      },
+      "description": "An indoor-friendly London guide with museums, food markets and neighbourhood time between visits.",
+      "coverPlaceId": "GOOGLE:ChIJB9OTMDIbdkgRp0JWbQGZsS8",
+      "content": {
+        "categories": [
+          {
+            "id": "section-1",
+            "name": "Two very different collections",
+            "iconId": "camera",
+            "colorId": "violet"
+          },
+          {
+            "id": "section-2",
+            "name": "Lunch and a change of scene",
+            "iconId": "utensils",
+            "colorId": "rose"
+          }
+        ],
+        "lists": {
+          "section-1": {
+            "id": "section-1",
+            "categoryId": "section-1"
+          },
+          "section-2": {
+            "id": "section-2",
+            "categoryId": "section-2"
+          }
+        },
+        "places": {
+          "ChIJB9OTMDIbdkgRp0JWbQGZsS8": {
+            "id": "GOOGLE:ChIJB9OTMDIbdkgRp0JWbQGZsS8",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJB9OTMDIbdkgRp0JWbQGZsS8",
+            "name": "The British Museum",
+            "address": "Great Russell St, London WC1B 3DG, UK",
+            "lat": 51.5194133,
+            "lng": -0.1269566,
+            "tags": [],
+            "category": "Museum"
+          },
+          "ChIJlRl2MakEdkgR55tr4CNv_B8": {
+            "id": "GOOGLE:ChIJlRl2MakEdkgR55tr4CNv_B8",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJlRl2MakEdkgR55tr4CNv_B8",
+            "name": "Tate Modern",
+            "address": "Bankside, London SE1 9TG, UK",
+            "lat": 51.507595300000006,
+            "lng": -0.0993564,
+            "tags": [],
+            "category": "Art Gallery"
+          },
+          "ChIJD2bPdVcDdkgRuUSgnOXnKDE": {
+            "id": "GOOGLE:ChIJD2bPdVcDdkgRuUSgnOXnKDE",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJD2bPdVcDdkgRuUSgnOXnKDE",
+            "name": "Borough Market",
+            "address": "London SE1 9AH, UK",
+            "lat": 51.505582600000004,
+            "lng": -0.09048080000000001,
+            "tags": [],
+            "category": "Market"
+          },
+          "ChIJs4GOh8sEdkgRRiBFZKMP8ZE": {
+            "id": "GOOGLE:ChIJs4GOh8sEdkgRRiBFZKMP8ZE",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJs4GOh8sEdkgRRiBFZKMP8ZE",
+            "name": "Covent Garden",
+            "address": "Covent Garden, London, UK",
+            "lat": 51.5116571,
+            "lng": -0.12404359999999999,
+            "tags": []
+          },
+          "ChIJKZQaXxwbdkgRWLo89tC-_V8": {
+            "id": "GOOGLE:ChIJKZQaXxwbdkgRWLo89tC-_V8",
+            "provider": "GOOGLE",
+            "providerPlaceId": "ChIJKZQaXxwbdkgRWLo89tC-_V8",
+            "name": "Camden Town",
+            "address": "Camden Town, London, UK",
+            "lat": 51.5390261,
+            "lng": -0.1425516,
+            "tags": []
+          }
+        },
+        "body": "A wet or wintry London day can still be a good day to explore. Give a museum a clear focus, choose a market lunch and leave room for a neighbourhood browse when conditions improve. This guide keeps several different cultural moods available so you can choose by interest and location. The places span different parts of the city, so group them sensibly. A well-paced visit should leave you with something you remember reading or seeing, as well as time to enjoy a meal.\n\n## Before you go\n\n- Check official museum information for current entry, security and exhibition arrangements. Some exhibitions need separate tickets.\n- Markets and their individual traders have their own opening patterns. Check a particular stall before making a special journey.\n- Use public transport to connect areas and keep walking distances realistic in poor weather. A covered attraction may still involve an outdoor queue.\n\n<div data-embed=\"placeList\" data-list-id=\"section-1\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJB9OTMDIbdkgRp0JWbQGZsS8\"></div>\n\nChoose a collection or question to follow through the museum. Read a few labels carefully and leave time to consider the objects’ contexts. A focused visit is easier to absorb than trying to see every gallery.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJlRl2MakEdkgR55tr4CNv_B8\"></div>\n\nGive yourself permission to be curious about work you do not immediately understand. Look first, then use the interpretation for another perspective. Check the current displays and any separate exhibition arrangements before visiting.\n\n<div data-embed=\"placeList\" data-list-id=\"section-2\"></div>\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJD2bPdVcDdkgRuUSgnOXnKDE\"></div>\n\nBrowse the current traders and menus before choosing lunch. Ask about ingredients and find an appropriate place to eat. The market can be busy, so keep the meal flexible and leave clear passage through the stalls.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJs4GOh8sEdkgRRiBFZKMP8ZE\"></div>\n\nChoose a manageable browse with breaks for shops, food or the public spaces that interest you. Check a specific venue in advance if it is the reason for your visit. It works as a lighter stop between more demanding cultural visits.\n\n<div data-embed=\"guidePlace\" data-place-id=\"ChIJKZQaXxwbdkgRWLo89tC-_V8\"></div>\n\nConsider Camden when a different neighbourhood mood appeals. Explore according to what is currently open and choose food by the menu as well as the display. Keep your onward transport in mind if the afternoon turns into an evening.\n\n## Official references\n\n- [Visit London markets guide](https://www.visitlondon.com/things-to-do/shopping/market/londons-top-markets)\n- [Visit London attraction map](https://www.visitlondon.com/things-to-do/london-attractions-map)\n- [British Museum official visitor information](https://www.britishmuseum.org/visit)\n- [Tate Modern official visitor information](https://www.tate.org.uk/visit/tate-modern)\n\nPrepared by Navio Team. Information reviewed 2026-11-12. Check official sources for current access, reservations and local conditions."
+      }
+    }
+  }
+]
