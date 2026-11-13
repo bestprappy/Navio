@@ -3218,3 +3218,27 @@ Community migration V10 adds `social.saved_posts(user_id uuid, post_id uuid, sav
 ## Guide discovery engagement (IAM V14)
 
 Development implementation adds `iam.guide_daily_views` (source/guide/date aggregates), `iam.guide_view_dedup` (stable hashed viewer/source/guide/date uniqueness), and `iam.guide_view_budgets` (viewer/network daily counters). CURATED/TRAVELER is part of every guide identity. No Guide document/entity columns are changed; migration is additive and rollback compatible. See [Guide discovery contract](../api/guide-discovery.md) for counting, retention and limits.
+
+
+## Applied extension: Guide readership and feedback (IAM V15–V16)
+
+Additive tables in the `iam` schema; existing daily view totals are preserved.
+
+| Table | Identity and purpose |
+| --- | --- |
+| guide_read_requests | PK(source,guide_id,read_id): retry idempotency for each visible opening; expires after two days |
+| guide_unique_account_views | PK(source,guide_id,account_hash): permanent signed-in uniqueness, first_view_at; no guest rows |
+| guide_feedback_subjects | Stable UUID per source/Guide; unique(source,guide_id), PUBLISHED status checked before access |
+| guide_rating | PK(publication_id,user_id), score1–5, updated_at |
+| guide_comment | Per-subject comments, optional same-subject parent FK, optimistic version, soft deletion |
+| guide_comment_report | PK(comment_id,reporter_id), validated reason, created_at |
+
+Guide rows are locked for feedback writes, making concurrent rating updates
+and expected-version comment edits consistent. A composite parent/subject FK
+prevents cross-Guide reply threads. Account identity is the internal resolved
+IAM user ID for feedback and a SHA-256 authenticated subject hash for unique
+readership. No email, raw network address or browser identifier is stored in
+the new read ledgers. Existing daily network budgets protect read writes.
+
+Old view aggregates and legacy tables remain rollback compatible; no migration
+edits, drops or destructive backfill. Unique counts begin with this revision.
