@@ -1,0 +1,4 @@
+# Preserve document bytes and suppress text diffs for binary reference files.
+*.pdf binary
+*.docx binary
+*.dotx binary

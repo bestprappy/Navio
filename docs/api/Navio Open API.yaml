@@ -123,6 +123,127 @@ tags:
 - name: Geo Provider
 - name: Budgeting
 paths:
+  /v1/trips/{tripId}/cover:
+    parameters:
+      - name: tripId
+        in: path
+        required: true
+        schema: {type: string, format: uuid}
+    post:
+      tags: [Trip Planning Service]
+      summary: Upload or replace the owner's trip banner photo
+      description: Owner-only. Accepts JPEG or PNG up to 5 MB. Replaces the previous cover without changing the itinerary version. Trip responses expose nullable coverMediaId for versioned image URLs.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: {type: string, format: binary}
+      responses:
+        '201':
+          description: The current cover identity
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [tripId, coverMediaId]
+                properties:
+                  tripId: {type: string, format: uuid}
+                  coverMediaId: {type: string, format: uuid}
+        '400': {description: Invalid image}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {description: Trip absent or not owned by the caller}
+        '413': {description: Image exceeds the upload limit}
+    get:
+      tags: [Trip Planning Service]
+      summary: Read the owner's uploaded trip banner
+      description: Owner-only, including for listed trips. Returns the validated image type with Cache-Control no-store and X-Content-Type-Options nosniff.
+      responses:
+        '200':
+          description: Uploaded image bytes
+          content:
+            image/jpeg:
+              schema: {type: string, format: binary}
+            image/png:
+              schema: {type: string, format: binary}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {description: Trip or cover absent, or trip not owned by the caller}
+    delete:
+      tags: [Trip Planning Service]
+      summary: Remove the owner's uploaded trip banner
+      responses:
+        '204': {description: Cover removed; the client returns to its destination-photo fallback}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {description: Trip absent or not owned by the caller}
+  /v1/trips/{tripId}/place-recommendations:
+    get:
+      tags: [Trip Planning Service]
+      summary: Recommend nearby places using anonymous distinct-traveler counts
+      description: Owner-only. Within 50 km of the requested coordinates, count each eligible account once per canonical public place currently retained in an itinerary, including private trips. My List, personal saved locations, inherited copied stops, the maintained Team owner and opted-out accounts do not contribute. At least five contributors are required. Names and coordinates in the optional place object come only from active Explore-listed public snapshots, never private planner content. The client can match count-only entries to published Guide candidates and use uncounted Guide picks as fallback. No provider API calls or new provider-content cache. No-store response. See place-recommendations.md.
+      parameters:
+        - {name: tripId, in: path, required: true, schema: {type: string, format: uuid}}
+        - {name: lat, in: query, required: true, schema: {type: number, minimum: -90, maximum: 90}}
+        - {name: lng, in: query, required: true, schema: {type: number, minimum: -180, maximum: 180}}
+      responses:
+        '200':
+          description: Up to 48 candidates ordered by distinct traveler count, then canonical ID
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, minimumTravelers]
+                properties:
+                  minimumTravelers: {type: integer, minimum: 5}
+                  items:
+                    type: array
+                    maxItems: 48
+                    items:
+                      type: object
+                      required: [placeId, travelerCount, place]
+                      properties:
+                        placeId: {type: string, pattern: '^(GOOGLE|MAPBOX):\S+$'}
+                        travelerCount: {type: integer, minimum: 5}
+                        place:
+                          type: object
+                          nullable: true
+                          properties:
+                            name: {type: string}
+                            address: {type: string}
+                            lat: {type: number}
+                            lng: {type: number}
+                            primaryType: {type: string, nullable: true}
+                            imageUrl: {type: string, nullable: true, description: Currently null; the shelf does not request provider photos}
+        '400': {description: Invalid coordinates or malformed identity}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {description: Trip absent or owned by someone else}
+  /v1/trips/place-popularity/preferences:
+    get:
+      tags: [Trip Planning Service]
+      summary: Read the authenticated traveler's popularity contribution preference
+      description: Defaults to contributes=true when no row exists. Account identity is resolved by the authenticated gateway, never a body or query parameter. No-store response.
+      responses:
+        '200': {description: 'Object with boolean contributes'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+    put:
+      tags: [Trip Planning Service]
+      summary: Enable or disable anonymous popularity contribution
+      description: Updates only the authenticated account. Disabling removes existing as well as future itinerary contributions from subsequent aggregate reads; it does not change or publish any trip. No-store response.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [contributes]
+              properties:
+                contributes: {type: boolean}
+      responses:
+        '200': {description: 'Saved object with boolean contributes'}
+        '400': {description: Missing or invalid contributes value}
+        '401': {$ref: '#/components/responses/Unauthorized'}
   /v1/users/me/guides:
     get:
       tags: [User Management Service]
@@ -249,6 +370,42 @@ paths:
                     deleted: {type: boolean, description: Saved references to this id render the default color}
                     textOnLight: {type: string, enum: [auto, white, black], description: Label text drawn on the color in the light theme; auto picks the better contrast}
                     textOnDark: {type: string, enum: [auto, white, black]}
+  /v1/admin/ev/google-usage:
+    get:
+      tags: [Geo Provider]
+      summary: This billing month's counted Google requests against Navio's limits
+      description: >-
+        Administrators and owners only; moderators get 403. Reads Navio's own counters and never calls Google.
+        Counts cover calls made by this server only, not maps loaded in the browser or other uses of the key.
+        Months follow Google's Pacific billing calendar. Sent with Cache-Control no-store.
+      responses:
+        '200':
+          description: The report
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [monthStart, resetsAt, asOf, limitsEnforced, placesDiscoveryEnabled, meters]
+                properties:
+                  monthStart: {type: string, format: date-time}
+                  resetsAt: {type: string, format: date-time}
+                  asOf: {type: string, format: date-time}
+                  limitsEnforced: {type: boolean, description: 'When false, calls are neither counted nor stopped'}
+                  placesDiscoveryEnabled: {type: boolean}
+                  meters:
+                    type: array
+                    description: Every meter, including those with no calls yet
+                    items:
+                      type: object
+                      required: [meter, used, limit]
+                      properties:
+                        meter: {type: string, description: 'For example PLACE_PHOTOS, PLACE_DETAILS or ROUTES'}
+                        used: {type: integer, minimum: 0}
+                        limit: {type: integer, minimum: 0}
+                        lastCountedAt: {type: string, format: date-time, nullable: true}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '503': {description: The counters could not be read. Never reported as zero.}
   /v1/admin/palette-colors:
     get:
       tags: [User Management Service]
@@ -4271,7 +4428,7 @@ paths:
       operationId: getNotificationsStream
       responses:
         '200':
-          description: Event stream; `Cache-Control: no-store`, `X-Accel-Buffering: no`.
+          description: 'Event stream; Cache-Control: no-store, X-Accel-Buffering: no.'
           content:
             text/event-stream:
               schema:
@@ -4910,6 +5067,13 @@ paths:
         schema:
           type: string
         description: providerPlaceId path parameter
+      - name: includePhoto
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: true
+        description: Pass false to skip the separately billed photo request; photoUrl may then be null.
       - name: provider
         in: query
         required: false

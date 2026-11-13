@@ -1,3 +1,19 @@
+## 2026-11-13 - Codex - Production release verified
+
+**Goal:** Complete the authorized feature consolidation and production deployment.
+**Done:** Released root main 643cf26f6459697d087a15abe625d7cf828b0580 through dev; workflow 43407351162: https://github.com/bestprappy/Navio/actions/runs/43407351162 ended success. Child main revisions: client dc6028c, server f596297, trip 81e5d43, mobility 0477c36, iam 7ce3e90, community 753a7a2. Root and server gitlink revisions exactly match every child origin/main. Feature commits and conflict decisions are detailed in the preceding consolidation entry.
+**Verified:** Client785/785, TypeScript, scoped ESLint and production build; Trip1040/0 errors (5 skipped), Mobility239/0 errors (1 skipped), IAM442/0 errors (2 skipped), Community184/0 errors (32 skipped), gateway20/0 errors (1 skipped). Real PostgreSQL schema checks passed for all four services; Trip includes V31 and the historical upgrade. IAM required cleaning stale target output from older checkouts; no schema source changed. Deployment revision gate, CI PostgreSQL checks, all ten image builds and VM deployment completed successfully. Live health/protected-route checks are recorded in the release artifact directory.
+**Not done / left uncommitted:** Only local CLAUDE.md, existing runtime/crash logs and historical scratch worktrees/stashes are excluded. No feature source remains pending in the active feature worktrees. Release backups and logs are retained under C:/Users/User/.codex/tmp/navio-release-20261113. No signed-in real-account end-to-end browser session was performed in this release session.
+**Follow-ups:** These final result notes are committed on a docs branch from dev and merged/pushed to dev only; they will reach main with the next release. Do not push main just for these notes. The existing /help route gap and external provider billing/quotas remain separate follow-ups. Deferred Places editorial/report exclusions remain in effect.
+
+## 2026-11-13 - Codex - Consolidate feature branches for main release
+
+**Goal:** Commit all pending feature work, preserve features across branches, resolve conflicts, and deploy through dev to main. The user explicitly authorized commits, pushes, conflict resolution and production deployment.
+**Done:** Committed compact planner recommendations and private-trip contribution controls (client 87447be, trip d4d6838/V31), Google usage reporting (client 7862e07, mobility 0477c36), photo opt-out (client fc7c0d5, mobility c473270), recommendation wording f21fa6b and sidebar alignment a1ad11f. Existing covers, feature tours, Guide feedback, discovery repairs, notifications and EV fixes from remote dev are preserved. Stale EV working copies were reconciled against the newer already-integrated implementations. Root divergent documentation histories were merged; current gateway routes, SSE configuration, tutorial decisions and V12 palette numbering retained. Existing project documents/templates and the moved notification plan were committed without editing report contents. Binary attributes preserve document bytes; all 22 report files match the original backups. Added missing cover and usage API contracts and fixed a pre-existing YAML quoting error.
+**Verified:** Client TypeScript, changed-source ESLint, production build and all785 tests pass. Cover fixtures now use an uncatalogued destination instead of Malaysia (which now has a photo). Trip full suite1040 with5 skipped, Mobility239 with1 skipped, Community184 with32 skipped, gateway20 with1 skipped; zero failures/errors. Real disposable PostGIS16 at127.0.0.1:55437, separate service databases, including Trip V1-V31 schema validation/historical upgrade and cover/popularity integration tests. The new popularity test now uses the same configuration-server loading as the existing schema suite. IAM clean verification is still running after stale generated migration files were detected; no source migration was renamed/edited.
+**Git/state:** Current child revisions: client dc6028c, server f596297, trip 81e5d43, mobility 0477c36, iam 7ce3e90, community 753a7a2. Changed child dev/main branches and server pins are pushed. Root release pin commit and main deployment remain pending. Never force-pushed; no direct commits on main. Local secrets/tooling, crash logs and historical backup stashes remain outside new commits. Reversible release backups/scripts/logs: C:/Users/User/.codex/tmp/navio-release-20261113. Archived checkpoints were not used to overwrite newer features or revive deferred Places articles.
+**Follow-ups:** Finish IAM verification, commit root pins, confirm every nested pin equals its remote main, push the root main merge, monitor the workflow and check public/protected health. Record the actual result in a new dev-only session note. Existing /help route gap and provider billing/quotas are outside this release; no live traveler content or sample plans were changed by maintenance tooling.
+
 ## 2026-11-13 - Claude - Planner feature tours and tour fixes (client 017327d, on dev)
 
 **Request:** Fix the spotlight drifting when an EV is selected and the X not closing tips. Then split the planner tutorial into per-section tours, with a ? per section and a Show tips menu (/frontend-design, shadcn). Merge to dev only.
@@ -21,7 +37,6 @@
 **Concrete findings:** SelectContent combines Popup native overflow with separate Base UI scroll arrows; Guide controls place Any time directly at padded Popup start outside SelectGroup, while filters use an edge-aligned native scrollbar. PlanCover has a limited locally hosted destination-cover map, otherwise depends on live readPlace/photo responses; new destinations missing local coverage may remain placeholders when provider photos fail. Kyoto spring/autumn have mostly different source itineraries but use the same city fallback photo; preserve identities/links/engagement during changes. Twenty maintained Guide manifest entries have4-6 referenced places each (101 total); expand only maintained Team content, no unrelated traveler edits. Guide reader POST is fire-and-forget, ignores non-OK responses and does not invalidate guide-discovery query cache. IAM GuideDiscoveryController permits anonymous view requests and derives identity from authenticated account or visitor UUID, but GatewaySecurityConfig lacks POST /v1/traveler-guides/discovery/{source}/{id}/view permit rule, causing anonymous rejection. GuideEngagementRepository currently deduplicates per source/id/viewer/day and deletes dedup after2 days; daily totals and30-day recent views drive rankings. Historical lifetime uniqueness cannot be reconstructed from expired dedup; preserve prior totals, apply accurate new uniqueness going forward, explain limitation. Security changes need exact-route authorization tests. New additive unique-view migration requires real PostgreSQL and concurrent dedup tests, plus discovery ordering/filter/time tests.
 
 **Proposed execution after choice:** Scoped client dropdown/scroll primitive options so unrelated selects/Places search stay unchanged; local attributed destination/season-specific cover assets rather than increasing browse-time Google calls; inspect live photo errors before claiming exact cause; research and expand maintained sample Guides with9-20 unique real mapped locations and richer destination-specific explanations, dry-run/backups/canary/in-place update workflow. Backend unique ledger with source+guide+viewer identity, first-seen dates for30-day trending, first-party guest handling per answer, cache invalidation after acknowledged view. Check all shelves including country/time/interests/sort combinations and labels/fallbacks. Need present concise design for approval under brainstorming before implementing new view semantics; literal UI bug fixes have clear user scope. Use existing components, preserve unrelated edits. Existing .git local exclusions /output/, __pycache__, *.pyc remain. Product source/pins unchanged, local tsconfig and other-session notes preserved. No Google/provider requests made in this audit. Next: receive guest-view choice, finalize design and implementation plan, then implement/test across client/IAM/gateway and sample maintenance.
-
 
 ## 2026-11-13 - Claude - First-time highlight tours (client 17993b2, on dev)
 
@@ -66,6 +81,65 @@
 **Verification:** All15 existing seed tests pass after content corrections. Live verification checks15 complete snapshots, expected93 located stops, per-stop notes/times, valid coordinates, month/day-only schedule, My List ordering/checklist labels, budget sum, Garage only for EV and real charger. All31 original plan snapshots remain exactly equal to baseline. All15 new public links unchanged after calendar repairs. Fifteen destination searches plus current Seasonal/Events collection checks pass. Evidence output/verify-seasonal-batch.py, output/seasonal-batch-live-results.json, output/seasonal-batch-before-calendar.json; VM dry-run/publication/idempotence logs retained privately. Initial verifier assumed obsolete checklist/cover/search response fields and unsupported search size100; corrected to actual checklistLabels/place-reference-cover/result-group contract and size24. Public detail verification uses normal GET behavior, which increments ordinary view counters; no copy/rating/comment writes or fabricated engagement. No production copy test was performed.
 
 **Separate finding/next:** Existing search rejects spring terms, including a full published spring title, as unsupported seasonal evidence. Confirmed Kyoto destination search returns the new samples; current Seasonal/Events filters work. Search code deliberately unchanged in this content-only task. Report this limitation to user for later search work. Seasonal/events rows follow the current month/upcoming calendar; Christmas and Halloween samples need not appear in November event rows yet. User plans to discuss Places/API cost countermeasures later: do not start that rework here. Twenty recently added Guides remain live. Product production revision stays dd9b388; sample content is already live without a deployment. User tsconfig and other-session Nov09 working notes/artifacts preserved. Only this session notes plus maintenance README staged in docs branch and merged to dev; main untouched.
+
+## 2026-11-13 - Codex - Planner popularity engine and compact shadcn recommendations
+
+**Goal:** Implement the council recommendation and reference layout using frontend-design/shadcn. User chose contributions from private itineraries as well as public ones, with an opt-out.
+**Done:** Built client/Trip feature worktrees under `Capstone/Navio-worktrees/place-recommendations`, branches `feat/place-recommendations`. Small Accordion/Carousel shelf between Add a stop and actions, six candidates, two readable desktop cards/mobile swipe, category or already-loaded photo thumbnail, preview, add and canonical-ID duplicate state. Popular counts precede mixed curated fallback; each distinguishes traveler evidence from Navio picks. Added account-scoped Privacy setting with server-acknowledged updates and error recovery. Trip engine aggregates distinct users from current itinerary state within50km, including private plans, with min5/max48 and no duplicate/publication/view increments. Excludes personal/residential/inherited-copy/Team data and opted-out accounts. Private names never feed display metadata: only already-public Guide/Explore sources do. Counts and public-source lookup normalize legacy Google identities. V31 adds preference table/index after banner V30; preferences default enabled and withdraw retained votes on opt-out. Updated root OpenAPI, API details and database documentation.
+**Integration:** Synchronized owned feature checkouts to latest client dev017327d and Trip dev07bbbf5. Resolved an action-area overlap while keeping all newly merged tour selectors. No application changes in the shared main checkouts; no feature commits, parent-pin changes, push or deployment.
+**Verified:** Client TypeScript, scoped ESLint, production build; recommendation10, cover11, tour-target8 and tour-policy15 tests (last uses existing TS loader; native transform-only runner has its known extensionless import failure). Trip service/controller11, real PostgreSQL popularity5/schema8, and combined full-context cover3 pass. Disposable PostgreSQL16.4 fresh V1-V31 startup/validation and V13 upgrade expect18 later migrations. Edge browser synthetic checks cover position/add/dedup/preview/keyboard/collapse/ranking labels/carousel/privacy opt-out/failed save/themes/375px/no overflow/no new provider calls. Screenshots reviewed; temporary fixture route and local build-root changes removed, test dev server/database stopped. No live account/provider requests, production database changes, sample changes or deployment.
+**Not done / left uncommitted:** All feature edits, root API/database docs and this session's notes. Required root pull failed with Not possible to fast-forward, aborting; did not reconcile unrelated divergent history or commit previous sessions' work.
+**Follow-ups:** Review feature worktrees and screenshot artifacts, commit/push client and Trip before parent pins, integrate dev and ship both together when authorized. Data coverage remains dependent on actual eligible use; sparse destinations get honest Guide picks. Provider closure status is not freshly verified by this provider-free shelf. Account minimum is a provisional product threshold, not an anonymity guarantee.
+
+## 2026-11-13 - Claude - Planner banner photo upload with destination default (merged to dev)
+
+**Request:** The planner banner's edit button did nothing. Let travelers upload their own photo, and otherwise show a photo of the destination country.
+**Done:** Trip service (`Capstone/Navio-worktrees/trip-cover/trip`, `feat/trip-cover-upload` from `origin/dev` 9a442a6): `V29__trip_cover_pictures.sql` adds `trip.trip_cover_picture` (one row per trip, re-encoded PNG/JPEG bytea up to 5 MiB, `ON DELETE CASCADE`; the `trip` row and its version are untouched). `POST/GET/DELETE /v1/trips/{tripId}/cover`, owner-only (others get 404), re-encoded through a copy of IAM's `PictureValidator`. `TripResponse.coverMediaId` is added (the list endpoint fetches it in one batched query). Multipart limit 5MB/6MB in `application.yml`; picture errors, 413 and missing file part are mapped in `GlobalExceptionHandler`. Client (`Capstone/Navio-worktrees/trip-cover/client`, `feat/trip-cover-upload` from `origin/dev` 17993b2): `trip-hero.tsx` shows the uploaded cover, else a credited bundled photo via new `destinationCountryCover` (city match, then any photo from the same country, so "Taiwan" gets Taipei), else the brand gradient. The removed external stock placeholder was a Thailand photo shown for every trip. The pencil opens a menu (Upload/Replace, "Use destination photo") and reuses the profile banner's `AvatarCropper` + `renderBanner` (3:1, 1500x500 JPEG).
+**Verified:** Trip suite 1017 run: 2 errors (`contextLoads`, `VerificationTests`, which need a live Postgres; Docker was not running), 33 skipped (Postgres-gated, including the new `TripCoverPostgresTests` and `PostgresSchemaTests`, whose upgrade count is now 16). New `TripCoverControllerTests` 10, `TripCoverServiceTests` 9 and `TripServiceTests` 8 pass. Client: tsc and scoped ESLint clean; new `tests/planner/trip-cover.test.mjs` 11/11; full suite 726/728. The 2 failures are pre-existing: `tour-policy` has an extensionless import in the tour code on dev, and the energy golden-fixture test needs a `../server` beside the worktree. Browser (Edge, temporary route, since deleted; cover API mocked): 18/18, covering menu by keyboard, upload multipart, banner swap, toast, remove -> DELETE -> destination photo, dark mode, 375px with no overflow, and no page errors. Screenshots reviewed. Next dev must be opened on `localhost`, not `127.0.0.1`, or it never hydrates.
+**Git (user: merge to dev, don't deploy):** trip `42cd199` + merge `07bbbf5` (dev had gained its own V29, so the cover migration became **V30**, and the upgrade test now expects 17; suite re-run after the merge: 1024 run, the same 2 Postgres-only context errors). Server pin `3d16874`, client `4f40c44` + merge `fa1fea5` (tsc clean, new tests 11/11 after merge), root `65a13b6`. All are fast-forwards of `dev`; `main` untouched (`3d2601f`).
+**Not done / left uncommitted:** Real Postgres run of V30 not done. `docs/api/Navio Open API.yaml` not updated (the root copy holds other sessions' uncommitted edits). Shared-plan readers and dashboard cards still don't show the uploaded cover (owner-only read).
+**Next:** Run `PostgresSchemaTests` and `TripCoverPostgresTests` with `NAVIO_TEST_DB_URL` (see `docs/agents/database-changes.md`). On approval, commit trip -> server pin -> client -> root, merge to `dev` only, and add the three cover routes to the OpenAPI file.
+
+## 2026-11-13 - Codex - Sidebar account action alignment
+
+**Goal:** Make Notifications and Settings match Log out and Show tips in the sidebar.
+**Done:** Added an optional `action` variant to `client/components/sidebar/sidebar.item.tsx` and selected it for Notifications, Settings and Sign in in `sidebar-account-actions.tsx` (client `dev`). It uses a 20px icon container instead of 32px, a 12px expanded gap, matching collapsed padding, rounded corners and hover treatment. Existing navigation styling, active states, unread badges and navigation handlers are retained.
+**Verified:** Scoped ESLint passed; existing sidebar navigation and notification badge tests passed 10/10; client `git diff --check` passed. Read local Next.js Link documentation and applied frontend-design guidance. No browser or production build run for this styling-only change.
+**Not done / left uncommitted:** The two sidebar files and these notes; the earlier recommendation wording change is also still uncommitted. Root local/remote dev history remains divergent after the earlier required fast-forward pull failed. No push, merge, deployment or unrelated edits.
+**Follow-ups:** Review sidebar visually; resolve root dev history separately before committing session notes on a docs branch and merging to dev only.
+
+## 2026-11-13 - Codex - Place popularity engine council
+
+**Goal:** Evaluate the user's distinct-traveler place-count proposal, whether Explore/Guide appearances should count, and a compact recommendation row below Add a stop.
+**Done:** Applied llm-council: five independent advisors, five anonymized independent peer reviews and chairman synthesis. Recommend one eligible account per canonical public place deliberately retained in an itinerary; no extra votes for repeated plans/days, publication or guide presence. Actual additions from Explore/Guides qualify normally; My List saves remain a separate interest signal. Exclude Team/test samples, private custom locations and automatic copy inheritance initially. Define private-plan eligibility explicitly. Prefer a bounded destination-specific aggregation of saved state with curated fallback over building a broad recommendation platform. Recommend 4-6 compact thumbnail/name/+ suggestions between input and action buttons, with honest labeling and added state.
+**Verified:** Inspected repository/branch state, local planner/append/publication code and relevant origin/dev planner/Mobility configuration. Confirmed guide-derived existing shelf and remote discovery-disabled/monthly-protection defaults. Consulted official Google Places storage/attribution guidance and primary research on presentation bias. No live coverage audit, provider requests, feature edits, migrations or runtime tests.
+**Not done / left uncommitted:** Only this session's additions to handoff/session log; existing application and note edits preserved. Required git pull --ff-only origin dev failed: Not possible to fast-forward, aborting. No history reconciliation, push or deployment.
+**Follow-ups:** If implementation is requested, audit distinct eligible real travelers/place identities per destination and copied-stop provenance first. Set explicit source/privacy/retention/launch rules; any proposed minimum contributor count is provisional. Assess names/thumbnails independently of ranking cost and respect provider storage rules. No implementation approved by this consultation.
+
+## 2026-11-13 - Codex - Planner recommendation heading
+
+**Goal:** Replace the screenshot's `Popular places in Bangkok` with wording that communicates recommendations from Navio.
+**Done:** In client `dev`, changed `app/feature/planner/planId/_components/guide/popular-places.tsx` to display `Places we recommend in {guide.name}`, with matching carousel accessible name and a `Browse all recommended places in {guide.name}` button label. Updated the existing browser-check locators in `tests/admin/guides-planner-check.mjs`.
+**Verified:** Scoped ESLint, `node --check tests/admin/guides-planner-check.mjs` and client `git diff --check` pass. Reviewed repository instructions and root/client/server/changed-service state. Browser execution and production build were not run for this copy-only change.
+**Not done / left uncommitted:** Both client files and this session's additions to handoff/session log. The required pre-commit `git pull --ff-only origin dev` failed with `Not possible to fast-forward, aborting` because root dev histories diverge. Existing unfinished work preserved; no push or deployment.
+**Follow-ups:** Review wording in the planner; reconcile root dev separately before saving the required notes on a docs branch and merging to dev only.
+
+## 2026-11-13 - Claude - First-time highlight tours built (client worktree, uncommitted)
+
+**Request:** Implement the highlight-tour plan with /frontend-design and shadcn where needed.
+**Done:** Built Driver.js tours for Dashboard, Trip planner and Community in `Capstone/Navio-worktrees/onboarding-tours/client` on `feat/onboarding-tours` (from `origin/dev` b821f24). Details in `docs/agents/tutorial-plan.md` §12. Fixed a Driver.js gap where Escape during the first animation skipped `onDestroyed`.
+**Verified:** Unit tests 14/14, full client suite 726/727 (the known `canonical.test.mjs` worktree-path failure), `tsc`, scoped ESLint and `next build` pass. Browser check 10/10 on an isolated dev server with mocked APIs; screenshots reviewed in light, dark and 375px. Not run against live services or a real login.
+**Also:** The user's :3000 dev server showed a Turbopack `next/font/google` "queries have exactly one entry" error. Cause: its `client/.next` cache holds Google's `fonts.gstatic.com/l/font?kit=` URL form. Fix: stop the server, delete `client/.next`, restart; self-host the font with `next/font/local` if it recurs. Not done, because the server is the user's.
+**Not done / left uncommitted:** No commit or push; the user has not asked. `/help` links unchanged (still 404).
+**Next:** User reviews, then commit `feat(tour): ...` on `feat/onboarding-tours` -> client `dev`, then bump the root pin. Optionally decide what `/help` should be.
+
+## 2026-11-13 - Claude - Onboarding rescoped to highlight tours only (docs only)
+
+**Request:** Recall the tutorial plan, then keep only the highlighting part: in-app tips and tricks for first-time users.
+**Done:** Rewrote `docs/agents/tutorial-plan.md`. The `/learn` landing page and Motion walkthrough are dropped. It is now Driver.js spotlight tours for Dashboard, Trip planner and Community: each auto-starts once per user per browser, with a Help button to replay; "seen" is stored in localStorage only (no backend). Steps point at real controls read from `origin/dev` (local client is 29 commits behind).
+**Verified:** Code reading on `origin/dev` only. Found that the public navbar's Help link goes to `/help`, which has no route (404); the plan says to settle it at build time. The client has no test runner (only `build` and `lint`).
+**Not done / left uncommitted:** No app code changed. These notes and the plan are uncommitted because this file and handoff.md hold other sessions' uncommitted entries.
+**Next:** Build last, after every other feature (user reconfirmed). Start with Phase 1 in the plan: re-check targets against `origin/dev`.
 
 ## 2026-11-12 - Codex - Pending sample recovery audited; destination choice pending
 
@@ -145,6 +219,23 @@
 **Preserved:** Existing local client tsconfig generated-build-path edits, other-session Nov09 notes, untracked CLAUDE/logs/poster/report/output artifacts left uncommitted. No API/provider calls or data changes. Required audit notes committed alone on docs branch and merged/pushed dev only, in accordance with the no-docs-only-main rule.
 **Next:** User can pull main for all completed feature code. Custom Cover/categories remain paused; no outstanding authorized release.
 
+## 2026-11-09 - Claude - Google Places bill investigation (no code changed)
+
+**Request:** User pasted Google support's email about THB 2,759.05 on project navio-495916 (Oct 14-31: 10,262 Place Details Photos, 2,468 Place Details Enterprise, about 80% duplicate Details, key ending BlPk, billing now disabled). Support needs two confirmations before a goodwill adjustment review.
+**Done:** Traced the causes in code and drafted the reply in chat. `GooglePlacesAdapter.withPhoto`/`loadPhotoResource` make one billed media call per photo. Explore (`PlaceExploreService:78`) and discovery (`PlaceDiscoveryService:43`) resolve a photo for every result with no server cache; the client uses staleTime 0/gcTime 0. Reader (`PlaceDiscoveryService:49`, adapter `reader`) is uncached: 1 Enterprise Details plus up to 3 photos per open. `getDetail` always adds a photo, is cached only 15 minutes in process, and a session token bypasses the fresh cache; `usePlaceDetails` runs on every trip place card and guide card, so reopening a trip repeats the lookups. The key ending BlPk is in `client/.env.local`, `client/.env.local.prod` (browser variable) and `server/mobility-and-ev-service/.env.local` (server variable); it is not in git history.
+**Verified:** Code reading only, plus Google's pricing page (Photos and Enterprise each 1,000 free per month, $7 and $20 per 1,000). The bill reconciles to about $94 after the free caps. Not seen: Google metrics, production secrets, real traffic. The split between local and production usage is unknown; no loop was found by reading, and none was ruled out at runtime.
+**Not done / left uncommitted:** No fix implemented, no console change. These notes are uncommitted because both files hold other sessions' uncommitted entries.
+**Next:** User sets the photo quota, decides on billing and sends the reply. Then reduce photo calls; check Google's Service Specific Terms before caching any place content (existing code deliberately avoids it). Split browser and server keys.
+**Correction:** The code reading above used the local checkout, which is behind `origin/dev`. The 2026-11-06 release had already turned discovery off (Explore and reader return 404) and added a monthly limit per meter. Those causes describe October, not what is live now.
+
+## 2026-11-09 - Claude - Google usage panel and photo opt-out (uncommitted)
+
+**Request:** Reduce the Google calls and build an admin panel showing usage against limits with links to Cloud Console, using /frontend-design and shadcn.
+**Done (worktrees `Navio-worktrees/google-usage/*`, branch `feat/google-usage-panel`, from `origin/dev`):** Mobility: `GET /v1/admin/ev/google-usage` reads `ev.provider_monthly_usage`, never calls Google, refuses non-admins with 403; `includePhoto=false` on place details uses `getDetailWithoutPhoto`, cached apart, and reuses a fresh with-photo entry. Client: `/admin/google-usage` (`UsageLedger` compound, shadcn Progress added, sidebar entry), one shared "today" line through every bar, run-out estimate, and Google Cloud links. Trip cards with a saved photo and Auto plan no longer request a photo. Gateway: anonymous 401 test. OpenAPI updated.
+**Verified:** Mobility full suite 239 run, 0 failed, 5 skipped (including 4 `PostgresSchemaTests`, because Docker is off; the new `usageFor` SQL has not run on Postgres locally). Gateway `GroupPublicRoutesTest` 11/11. Client 734 run, 733 pass; the 1 failure is `canonical.test.mjs` reading `server/mobility-and-ev-service` beside the worktree, which this layout names `mobility`. tsc, scoped ESLint and `next build` pass. Browser check 9/9 against the real page with mocked API and a test session cookie. Not run: live gateway, real Postgres, a real admin login, real Google traffic; the size of the saving is unmeasured.
+**Not done / left uncommitted:** Everything. User approves commit and release. These notes share files with other sessions' uncommitted entries.
+**Next:** See handoff.
+
 ## 2026-11-08 - Codex - Saved Community and profile revision LIVE
 
 **Approved release:** Root main `5ebfa3a25358f471b86c590142919b31025eb81b`; client `bc40495`, server `4bdbe86`, Community `753a7a2`, IAM `2851594`. Trip `15720d8` and Mobility `37f9d86` unchanged. All six pins matched remote main before release. Child revisions published through dev; root main fast-forwarded from dev because a historical separate worktree holds the local main branch. No unrelated files committed.
@@ -177,12 +268,14 @@
 **Inspection:** Existing AuthActions avatar links settings/profile, sidebar ProfileMenu already links own public /u/username. PublicProfileContentTabs has posts/plans. TravelerGuide publishing/discovery already exists and should be reused for public-only authored guide feed. Saved library currently PLAN/PLACE/GUIDE with7daytrash and quota50plans/50guides; account-scoped Community savedpost/browsing/commenthistory endpoints not found. Existing vote records and comments can be reused for private voted/comment feeds; viewinghistory requires new account-scoped30daytracking from feature activation, no invented backfill. Reuse communitypostcard, savedlayout/search controls, dropdown/accordion and richtext editor.
 **Pending decisions:** Ask whether Voted is currentactivevotes or pastvoteevents; commenthistory oneentrypercomment or groupedbypost; unsavedposts immediateUndo vs existing7daytrash (and mixedtrashscope). User explicitly says wait after questions. No product edits/implementation until answers. Proposed defaults: currentactivevotes, oneentrypercommentnewestfirst, immediateunsavewithUndo leaving Exploretrashscope unchanged. Profiledropdown apply consistently to main/community nav and sidebar; AccountSettings keeps currentsettingsdestination. Existing public visibility and account ownership must remain enforced. No API/provider requests, schemachanges, deployment or datawrites made during inspection.
 **State:** Latest UI8aeae55 on clientdev; rootdev5e30968 notes, rootmain liveTrending d1d4bc0/clientmain6b5aab1. Existing usertsconfig/CLAUDE/backendlogs/artifacts untouched. Places staysdisabled/free-tierguardpreserved, CustomCover/categories paused. Required notes saved docsbranch->devonly. Resume after useranswers, then detailed implementation plan and backend database rules before migrations.
+
 ## 2026-11-07 - Codex - Community Navio menu and planner note alignment completed
 
 **Request:** Align Before you go Add note to the right; add a collapsible labelled normal Navio menu above Community navigation, retain bottom Back to Navio, distinguish Community Explore icon.
 **Done:** Client8aeae55 on fix/community-navigation-alignment-20261107 merged/pushed to clientdev and integrated active checkout. Removed only Add note's mr-6 and made action nonshrinking. New reusable CommunityNavioMenu uses existing Accordion, starts collapsed, contains Home/Dashboard/Explore/Community/Help; Community highlighted throughout community subpaths. Community menu heading added; Community Explore uses UsersRound, Navio Explore keeps Compass. Existing feeds/group links, create/auth behavior and bottom history-aware Back to Navio handler unchanged. No backend/API/data/provider changes or production release; rootmain/clientmain remain previous live release.
 **Verified:** Frontend707pass, tsc and scoped ESLint pass, production build passes with verification-only cached-font substitution and layout/config restored. Nine local browser checks passed with synthetic account/API data: collapsed labels/order,5destinations+activeCommunity, Space/Enter toggle, distinct icon/route, bottomfooter, final panelbounds after animation, shortviewportscroll, Addnote exactrightedge/zero margin, zero page runtime errors. External browser traffic blocked; server guard also blocked attempted remote hero artwork fetch, so no external/provider calls completed. Fresh read-only code review no actionable findings. Screenshots/results output/community-nav-desktop.png, community-nav-dark.png, before-you-go-aligned.png, community-nav-browser-results.json.
 **Preserved/cleanup:** Ordinary usertsconfig SHA2561D992BD1B931C3E8265212BF7868BC5BCD9E96AA7CE899345EA36C963E6DEB9C unchanged. Unrelated CLAUDE, backend logs, output/doc artifacts preserved. Owned temporary servers3111/18890 stopped; userdev3000 not restarted. Required notes/plan committed docsbranch->rootdevonly, rootclientpin remains released6b5aab1 until a future approved release. Main is not updated for these UI changes. Local dev refresh sees changes without backend deployment.
+
 ## 2026-11-07 - Codex - Monthly Trending fallback LIVE and verified
 
 **Completed:** Approved release root d1d4bc0f6da75e51f10a923ed47187d9881fb54e, client6b5aab1, Trip15720d8, serverbd5c3dc. Workflow https://github.com/bestprappy/Navio/actions/runs/42368784466 completed SUCCESS for revision gate, real-Postgres gate, all builds and VM rollout. No repeat deployment needed.
@@ -190,16 +283,19 @@
 **Verified live:** output/check-trending-live.mjs passed on VM and active localhost3000 dev:vm:14 filter combinations, eligibility-equivalent fallback membership, labels, firstsixcards, unique pagination, original31tokens/titles/day/place/charger counts preserved, health200, protectedtrips401. Read-only JSON only; no Google images/maps/provider calls or production data writes. output/trending-live-results.json and trending-live-before.json hold evidence.
 **Local verification:** Trip983tests/0fail/0error/5existing skips with disposable realPG, plus final5-test Trending regression pass (includes mixed-tier conflicting multi-sort). Client705tests/types/lint/offlinecachedfontbuild pass; independent committed-tree tsc pass. Six browser checks with exported actual-engine fixtures/localtransport pass, zero runtime/externalrequests. Fresh review no actionable findings; optional mixed-sort coverage added before release. No live browser/image calls needed. Owned test3111/18890 and named disposablePG stopped; user app3000 not restarted. Usertsconfig hash unchanged1D992BD1B931C3E8265212BF7868BC5BCD9E96AA7CE899345EA36C963E6DEB9C.
 **State/next:** Root/client/server on dev; Tripordinarymain15720d8, isolatedfixbranches preserved. Unrelated usertsconfig/CLAUDE/community+Mobilitylogs/output/docs artifacts untouched. Places discovery remains off and free-tier limits unchanged. Search NLP capability gaps from the preceding audit remain separate pending work. Custom Cover/categories paused; fifteen sample publications remain blocked. Final session notes merged/pushed docs->dev only; no documentation-only main deployment.
+
 ## 2026-11-07 - Codex - Monthly Trending fallback verified; VM release approved
 
 **Done:** Client6b5aab1 and Trip15720d8 merged/pushed fix->dev->main with explicit user release approval. Thirty rolling UTC dates, daily views+3*copies weighted30..1; recent-activity tier first, popular lifetime copies/views next, then newly shared zero-engagement plans. Honest per-token discoveryLabels and visible card labels. All country/duration/theme/query eligibility remains enforced, pagination/revision protected. No schema/migration change, no provider calls, no sample/publication mutations. Earlier UI polish dd76a97 and audit c2c0337 included. Teammate clienteb48b4b and Mobility37f9d86 safeguards preserved.
 **Verified:** Full Trip983/0fail/0error/5existing skips with disposable realPG, plus final5-test Trending rerun after adding conflicting multi-sort regression. Client705 pass/types/lint/offline cached-font production build pass. Six browser acceptance checks passed (sparse6cards, pagination9unique, noactivityfallback, mobilelabels, genuineempty, zeroruntime/externalrequests), using actual Java engine exported fixtures and localtransport, not live catalogue. Fresh code review no actionable findings. Temporary layout/config changes restored; usertsconfighash unchanged1D992BD1B931C3E8265212BF7868BC5BCD9E96AA7CE899345EA36C963E6DEB9C.
 **Next:** Complete server/root release pins; verify all six pins equal origin/main, push rootmain through dev, monitor workflow, verify health and read-only actual Trending/dev:vm JSON labels/counts without loading Google images/maps. No repeat approval needed. Isolated test3111/18890 and disposablePG still owned until cleanup. API note documents new contract; mark live only after successful rollout.
+
 ## 2026-11-07 - Codex - Empty Trending section diagnosed, no product changes
 
 **Request:** Explain why Trending is empty.
 **Evidence:** Active localhost3000 JSON search returned HTTP200,total0 with collections=trending; identical unfiltered trending sort returned HTTP200,total31 with lifetime views10-39 among the first six. Frontend empty state accurately reflects backend response. SmartPlanSearchEngine excludes every trending-collection entry with zero daily-activity score; PublicationActivityRepository sums views+3*copies for today and six prior UTC dates. V28 intentionally creates an empty activity ledger with no historical backfill. Listed detail reads record daily views, copies record daily copies; list-card rendering is not a view event.
 **Conclusion/limits:** Strict recent-activity eligibility is the immediate reason for empty Trending, not feed failure or Google billing. Lifetime counts do not establish activity within the new window. Cannot distinguish absent ledger events from a deployed event-recording defect without database/log evidence or a controlled view test; no production write/detail read performed. Direct VM HTTPS read failed local certificate trust; localhost dev:vm JSON checks succeeded. No code/config/data changes, no Google calls, no deployment. A clearly labeled popular/recent fallback could avoid a blank section but changes product behavior and has not been implemented.
+
 ## 2026-11-07 - Codex - Shared Plan controls and offline search audit completed
 
 **Request:** Automatic nonselectable Recommended default, one-line Filters count, themed duration dropdown, and at least 80 varied search/filter tests without paid APIs.
@@ -208,6 +304,7 @@
 **Findings:** Existing seasonal-word block prevents Winter/Summer/Spring examples, Europe/Western country groups lack semantics, transposed musuem and Okonawa lack reliable corrections. These are recorded capability gaps; this UI revision does not claim those searches are solved. Supported controlled queries retrieve expected fixtures. Existing signed-out navbar overflow at 768px recorded, not edited.
 **Safety/cleanup:** No Google/provider requests, published samples, production writes, billing/key changes or limit increases. Places remains disabled. Owned test servers 3111/18890 ended and named disposable PG stopped; user app not restarted. Ordinary client user tsconfig SHA256 remains 1D992BD1B931C3E8265212BF7868BC5BCD9E96AA7CE899345EA36C963E6DEB9C; unrelated CLAUDE/logs/artifacts preserved. Root pins remain released teammate pins; local submodule dirtiness is not committed with docs.
 **Next:** User can review controls in their dev checkout. Address recorded NLP gaps only as a separate agreed search revision; live provider behavior remains unverified due billing restriction. Required notes/report committed on docs branch from root dev, merged/pushed dev only. Custom Cover/categories remain paused.
+
 ## 2026-11-06 - Claude - Google free-tier limit and Places discovery off switch released
 
 **Request:** Explain the October Google bill (฿2,759.05), switch Places discovery off, and stop Google calls once the free tier is used up.
@@ -280,20 +377,24 @@
 **Verified:** RealVM+localhost directAPI and actualChrome test passed five headings, active sorting/collection/theme controls, Apply/Reset, fullyloadedRecentcards/no collectionerrors, mobile390px/nooverflow, no page runtimeerrors, invalidfilter400, protectedSavedGuides401 andhealth200. No API mocks/authenticatedproductionwrites. Testscript initially expected collections instead of actualplanCollections URLkey; corrected testonly, reranpass. output/discovery-guides-live.log/.json and screenshots; report/API/spec/inventory/plan/database markedLIVE. Priorfullsuites698frontend/Trip650/IAM317 andschema/rollback checks unchanged; CI additionallyproved migratedstartup.
 **Expected data state:** FreshTrendingactivity0; Seasonal/Events0eligible; Recent/Popular6returned. Empty states are evidence-gated, not omittedsections. Trending accumulates new realviews/copies afterrelease. Calendar fallbackseasonal/publicmonthday and initial Christmas/NewYear/WesternEaster registry unchanged.
 **Preserved/next:** Ordinaryclient/main nowreleasedsource and userdev3000PID43460 neverrestarted. UsertsconfigSHA2561D992BD1B931C3E8265212BF7868BC5BCD9E96AA7CE899345EA36C963E6DEB9C unchanged; CLAUDE/logs/unrelatedartifacts preserved. Isolated featureworktreeskeptclean, tempservicesalready stopped. Rootpostrelease docsbranch->devonly, no standalone mainpush. Releasecomplete; usercanrefreshandreview. Do not repeat implementation/deployment or ask approval again for this revision.
+
 ## 2026-11-06 - Codex - Approved discovery release in progress
 
 **Authorization:** After diagnosis pinpointed the isolated-checkout gap, user said proceed. This authorizes integrating ordinaryfrontend and releasing the matching backend; do not ask again for this release.
 **Published:** ordinary clientmain now599ee7e, Tripmainb0f6c24, IAMmaince72041; each feature->dev->main pushed. Serverdeeb17b pins both services and is ondev/main. Root e1aea7da3d595cc346d19c14d60acc78ce0478f1 pushed dev->main; workflow42169426376 revisiongate passed, PGgate in progress. Existing unrelated dirty old rootmain worktree was not touched; remote main fast-forwarded from dev after ancestry check. Root working checkout remainsdev. Existing usertsconfighash1D992BD1B931C3E8265212BF7868BC5BCD9E96AA7CE899345EA36C963E6DEB9C preserved.
 **Next:** Monitor https://github.com/bestprappy/Navio/actions/runs/42169426376 throughbuild/deploy. If fails inspect exactlogs, no blindretry. After success run output/check-discovery-guides-live.mjs using Node24; it checks realVM+localhost APIs, five sections/filterapply/reset/mobile,401protection; no mocks/authenticatedproductionwrites. Verify script selectors/actualcontract if testharness failure. Then markreport/API/spec/plan/database LIVE and finalnotescommit->devonly. No customcover/categories. Userdev3000PID43460 not restarted.
+
 ## 2026-11-06 - Codex - Pinpoint discovery integration gap
 
 **Request/check:** Further diagnose only. Confirmed dev:vm script launches local next dev and changes backend environment only; it does not use a VM-hosted frontend. Active client45e42e8 ExplorePage lines68-95 passes exactly two old sections; search-controls line82 still hardcodes disabled preview. Feature599ee7e replaces these with DiscoverySections and PlanFilters; commits remain in isolated clean worktree, not activecheckout. LocalExplore HTTP200, new All-time/Seasonal headings absent. No evidence of data-driven hiding; activecode cannot render those sections at all.
 **Cause/next:** Integration gap from our isolated implementation, not missing source or failed deployment/cache. Fix path is integrate verified client branch into usercheckout preserving tsconfig, and release matching Tripb0f6c24/IAMce72041 for backend support. Backend-only deployment cannot replace localhostfrontend. No fix/restart/deploy performed; only required notes ondev. Existing release still pending approval.
+
 ## 2026-11-06 - Codex - Diagnose old discovery UI on localhost (read-only product check)
 
 **Request:** User sees only Trending/Recent and preview Filters; diagnose only, no fix/restart/deploy.
 **Found:** Port3000 PID43460/parent46676 runs ordinary Navio/client at45e42e8 onmain. Its ExplorePage explicitly renders only two SharedPlansSection components and search-controls still contains the exact disabled Keyword filters preview seen in the screenshot. New client599ee7e is clean on isolated output/smart-search-work/client feature branch and is not an ancestor of ordinaryclientHEAD. Thus active frontend source is old, not a missing-results/filter bug or browser-cache diagnosis. VM backend release is also pending, but frontend checkout separation directly explains the pictured UI.
 **Actions/next:** No app/config/pin/process/server/deployment changes. Explained the integration gap; await user's next instruction. Existing feature revisions/report/tests remain valid; do not redo them. Only mandatory session notes committed ondocs branch->dev, nevermain.
+
 ## 2026-11-06 - Codex - Discovery and Saved Guides verified, VM release pending
 
 **Scope/result:** Completed the user-approved remaining discovery sections, filters/sorting and Saved Guides. Custom Cover and custom categories remain explicitly paused. Existing live feedback/search and unrelated teammate work preserved. Report: docs/reports/2026-11-05-discovery-saved-guides.md; API discovery/saved-content and database notes updated.
@@ -307,6 +408,7 @@
 **Cleanup/preservation:** verified temporary3111/18084/18085 and synthetic18890 stopped; exact disposable navio-discovery-verify-pg-20261105 stopped, not deleted. User node43460 still present; ordinary client tsconfig SHA2561D992BD1B931C3E8265212BF7868BC5BCD9E96AA7CE899345EA36C963E6DEB9C unchanged. Existing CLAUDE/logs/untracked artifacts preserved. Do not commit output test tokens/configs or restart userdev3000. Worktrees kept for release.
 
 **Next:** Ask once for concrete VM release of these revisions. On approval, feature->dev->main child-first, server IAM/Trip pins on chore branch then root client/server pins, each pin equals origin/main; follow docs/agents/release.md, monitor CI and read-only deployed/dev:vm acceptance. Trending starts collecting after release; Seasonal uses shared month/day fallback, Events registry Christmas/New Year/Western Easter. Docs-only log commit merges dev only; never push notes alone to rootmain.
+
 ## 2026-11-05 - Codex - Remaining discovery and Saved Guides design prepared
 
 **Request/scope:** User authorized remaining features after the feedback release, then explicitly paused Custom Category. Custom Cover remains on hold. Proposed scope is Shared Plan default sections, functional filters/sorting and Saved Guides; existing feedback/search/bookmarks remain intact.
@@ -316,6 +418,7 @@
 **Review/evidence:** Read-only builder review identified old-client GUIDE parsing incompatibility in addition to rollback concerns. Design now requires guide-inclusive request opt-in plus additive guide companion storage; legacy PLAN/PLACE responses stay compatible. Clarified Seasonal/Events OR membership, current UTC plus previous six dates, hidden-year privacy and event-calendar edge cases. Consulted linked NN/G filter and Algolia ranking references. No application code, schema, runtime process, dependency or deployment changed. No runtime test pass is claimed for this design-only work; diff/config preservation checked.
 
 **Next:** Await user design approval under the brainstorming skill's explicit design gate, then invoke writing-plans, isolate work and implement/test the approved scope. Do not repeat the already-live feedback release or interpret its old approval as authorization for a new root-main deployment. Custom categories and Custom Cover remain paused. Session/design docs committed on docs branch and merged to dev only.
+
 ## 2026-11-05 - Codex - Shared Plan feedback LIVE, VM and dev:vm verified
 
 **Authorization/result:** User approved release and requested continuation. Final root `0e341ac` (full `0e341ac9fb1cb3a7ae132f8b0272cd12e3c3c8a1`), client45e42e8, serverb11f808, Tripdfe950d published throughdev/main. IAM6d6c2ca/Mobilityafc6ccf/communityca13f09 unchanged. Correctiveworkflow https://github.com/bestprappy/Navio/actions/runs/42043762253 completed allgates/builds/deploy successfully. No further release approval or deployment needed.
@@ -383,6 +486,30 @@
 **Verification:** frontend689pass; full backend634total/0fail/0error/3existing MyListAppendPersistence skips using explicit disposablePG datasource for everycontext, migrations/JPA/publication/copy included. Exact committed-config TypeScript, scopedlint and standard Turbopackbuild pass after teammate integration. Real search API/PG Chrome checks pass (anonymous auth/session mocked only): phrases/titlegroups/alternatives/empty/recovery/spacing/keyboard/IME/history/conflicts/mobile/default, no runtime page errors. 240 controlled surfaces/24intentfamilies/20publications;60holdout44positive, group-precision/recall/nDCG1.000,52/52 retrieval-preserving rewrites. Dataset/memory/browser-latency limits explicit in detailed report. Final1kHTTP5workers25samples:p50=179,p95=225,p99=228,cold540ms;5k:p50=877,p95=933,p99=950,cold1669ms. No VM capacity claim. Existing global CSS blocks webpack fallback; normal Turbopack passes with temporary worktree filesystem root restored afterward.
 
 **State/remaining:** Feature branches local and clean; ordinary repos/unrelated changes/userdev3000 unchanged. No app push/deployment/parentpin change. Report docs/reports/2026-11-05-smart-shared-plan-search.md, feature/plan/handoff updated. Separate VM release approval pending. Isolated frontend3109/backend18082/config18888 and identity-verified disposablePG56433 stopped; user3000 PID43460 still listening. Feature worktrees preserved. Mandatory docs commit on docs branch->rootdev only.
+
+## 2026-11-04 - Codex - EV range policy council
+
+**Request:** Run llm-council to determine how to correct the lab-to-road gap; user has no idea whether 20% is the right reduction.
+**Done:** Five independent advisor analyses, five anonymous peer reviews and chairman synthesis (batches limited by three available subagent slots). Recommended NEDC x 0.75 as a provisional planning assumption for the current catalogue, not an established average or safe lower bound; rejected a universal 20% cut and endorsement of the full factor table. Scoped fallback: unsupported non-NEDC range-only inputs cannot receive numerical battery predictions until reviewed; unclassified inputs need provenance. Keep genuine observed consumption, the separate 12% arrival reserve and auto-charger preview-only restriction. Card should distinguish estimated planning range from lab-rated range. Prioritize a reviewable baseline of the 27 fixes, then two-day baseline, focused correction and repeated verification. Charging may be implemented separately but needs a release gate: fix duration-to-battery optimism or suppress affected onward battery predictions.
+**Verified:** Read handoff/newest logs/audit, checked root/client/server/all changed service branches and status, and inspected live TS/Java models, simulation policy, vehicle schema/card, trip profile validation and catalogue seeds. Browsed original AAA Seal results and BYD specifications: 488 vs 650 NEDC or 570 WLTP is one road sample, not two. InsideEVs' 445 km Atto result used different conditions (90 km/h, 25 C, Thailand). Five viewpoints do not validate coefficients. No application changes, runtime tests or production verification.
+**Git:** Only this session's additions are being saved on an isolated docs branch from local dev and merged locally to dev only. Preserve every preexisting application and note edit. Remote dev synchronization attempted with --ff-only and refused because histories diverged; remote integration is outside this consultation. No push or deployment.
+**Next:** Implementation remains a recommendation, not an authorization. Recheck owned fixes before committing them; verify full standard propagation, shared fixtures, policy/stale-preview handling, saved snapshots and schema needs. Calibrate against representative observed trips before expanding policies or claiming accuracy. Connector power, saved station status and EV-30 remain open.
+
+## 2026-11-04 - Claude - EV lab range versus real-world range (investigation only)
+
+**Request:** Does the battery estimate discount the lab-tested range (480 km test, about 20% less on the road), and should the UI show actual versus tested?
+**Done:** Traced the live energy path. It does not discount: `energy-model.ts:62` and `CanonicalEnergy.java:49` use `distance / ratedRangeKm`. All three seeded catalogue cars are NEDC with no consumption figure, so all use this path. The 12% `planningMarginFraction`, charge efficiency and DC taper exist only in `EvSimulationModel` and `energy-simulation.ts`, which nothing live calls. The only buffer is the 12% arrival reserve. Recommended a per-standard factor in the calculation plus a two-line vehicle display; factor values are assumptions from a small sample.
+**Verified:** Code reading and arithmetic plus web sources (AAA Australia real-world program). No code changed and nothing was run.
+**Not done / left uncommitted:** These notes, because both files hold other sessions' uncommitted entries.
+**Next:** User decides whether to build it and accepts or changes the factors.
+
+## 2026-11-04 - Claude - EV next-steps council (consultation only)
+
+**Request:** Run llm-council on what to do after the EV audit and produce a plan to give another agent.
+**Done:** Five advisors and five peer reviews. Verdict: secure the 27 fixes, run a real two-day trip, then settle preview/apply, EV-14, EV-13 and EV-30. All advisors recommend turning the disconnected-later-day block into a warning; the user has not decided yet. The plan was given in chat.
+**Verified:** Read the audit and handoff and checked repo status. No code changed and nothing was run.
+**Not done / left uncommitted:** These notes, because both files hold other sessions' uncommitted entries.
+**Next:** The user passes the plan to another agent.
 
 ## 2026-11-03 - Codex - Refine empty search presentation
 
@@ -503,6 +630,7 @@
 **Not verified:** A signed-in admin using /admin/colors (picker, label edit, delete) against the real backend has never been run; earlier browser checks mocked the API. Rollback note still applies: the previous IAM ignores `iam.deleted_palette_colors`, so a rollback could let a new color reuse a deleted id.
 **Checkouts left as they are:** A Codex session was actively editing the main client checkout (notification badge, sidebar, globals.css, tmp-badge-preview), so it was not touched. That checkout (`feat/profile-page-rework`) still holds uncommitted copies of the palette files, now identical to b06e814 and safe to drop once its owner has finished. Main root checkout: local `dev` has diverged from origin/dev (12 ahead, 32 behind) and holds uncommitted copies of the released .deploy and docs hunks; its docs/agents edits, plan.md deletion and docs/report were left alone. Main IAM checkout was cleaned and moved to `dev` at 6d6c2ca; its old files are backed up in this session's scratchpad.
 **Next:** Sign in as an admin and try /admin/colors on production. Reconcile local root `dev` with origin/dev. Delete the empty leftover folder `C:\c` (see the session's final message). Local databases that ran the drafted palette V11 would need resetting; the earlier verification used disposable databases only.
+
 ## 2026-11-02 - Codex - Sleep recovery and Shared Plan search implementation (not released)
 
 **Request:** Check laptop sleep/disconnection damage and resume approved Shared Plan live search; preserve existing default feed and friend work.
@@ -532,6 +660,72 @@
 **Boundaries:** Friend reports unpublished local social/follow/block/report/pin/notification, profile/security and publication author/pin work; reserve relevant shared-plan publication APIs/publication-api.ts, author links, navbar/sidebar, profile/proxy/shared path proxy and gateway configs. Reserve listed other-session place-notes.tsx, trip-place-card.tsx, community-comment-thread.tsx, palette/admin, Keycloak/nginx. Migration reservations from note: SocialV8, TripV24, IAMV11palette/V12profile; do not allocate these, confirm latest sequence before future DB work. Note explicitly mentions unresolved IAM profile rename clash; do not repair unrelated work. Several paths/words in supplied note are truncated; do not infer exact omitted scope.
 
 **Recommended order:** Shared Plan frontend search/results/cards and reader presentation using current contracts first; server-wide publication/search enhancements coordinated before edits. AutoAdd audit next: charger panel/state, mobility optimizer and separate TripEvOptimization preview/apply integration; preserve shared cards, trip entities/publication contracts, locked/manual stops and persistence. Guides listing/reader/design can proceed; new-guide-dialog listed both safe and uncommitted elsewhere, treat reserved until clarified. Community isolated visual polish only outside reserved post/reader/author/comment-thread/navbar components. Existing local checkout shows only generated clienttsconfig/CLAUDE and two service log folders, so friend's unpublished work is not available to audit here. No pull of his unpublished changes, no app edits/push/deploy. Append-only session notes on docs branch -> localdev.
+
+## 2026-11-02 - Codex - Private messaging product consultation
+
+**Request:** Advise whether Navio should add chat for each user; assumed user-to-user private messages rather than AI assistance.
+**Done:** Applied llm-council with five independent perspectives and peer review, grounded in current project context. Advisors recommend deferring a general inbox pending demonstrated private coordination needs; scoped, consent-based plan conversations are a candidate to validate, not an approved feature. Consulted OWASP WebSocket guidance for implementation obligations.
+**Verified:** Repository state and current notes reviewed. Consultation only; no feature changes, runtime tests, or claims of user-demand metrics.
+**Git:** Only this session's notes committed on a docs branch from local dev and merged locally to dev; existing concurrent edits preserved. No remote sync, push, or deployment.
+**Next:** Identify a real traveler task that needs private communication before designing chat. Tutorial plan unchanged.
+
+## 2026-11-02 - Codex - Tutorial implementation plan
+
+**Request:** Create docs/agents/tutorial-plan.md for the proposed beautiful tutorial landing page.
+**Done:** Added the Motion-based implementation plan: public /learn route, five-step local sample-trip walkthrough, task tutorials/tips, visual and responsive contract, accessibility, proposed components, phased delivery, verification checklist, and optional Driver.js/MDX expansion. No application implementation or dependencies changed.
+**Verified:** Inspected current homepage, routes, theme/dependency baseline, repository instructions, and changed-repository status. Reviewed the plan and checked whitespace; runtime tests are not applicable to documentation-only work.
+**Git:** This plan and only this session's note additions are prepared on docs/tutorial-plan-2026-11-02 from local dev for a local dev-only merge. Existing unfinished application and note edits are preserved outside the commit. No push or deployment; remote synchronization is outside this documentation-only change.
+**Next:** Implement Phase 1 after an implementation request; recheck actual feature behavior and current working state first. The document is a proposal, not evidence of shipped functionality.
+
+## 2026-11-02 - Claude - EV audit continued after Codex's limit (client, mobility, trip; uncommitted)
+
+**Request:** Codex reached its limit; continue finding EV bugs.
+**Done:** Fixed 15 more defects, EV-15 to EV-29; details in `docs/agents/ev-audit-2026-11-02.md`. Most serious: a multi-day deadlock where a trip with two days needing charging could not be planned at all; search only tried the cheapest plan; a kept stop's saved charge was ignored, adding redundant chargers; two unlocked visits to one station were merged and one removed; the day's route estimate showed an unreachable leg as "prediction unavailable". Plus corridor gaps, provider outage reported as no safe plan, later-day train legs blocking earlier days, and display fixes.
+**Changed contract:** `followingDaysAreReplayedAndUnsafePlansHaveNoApplicableOperations` now expects the `far` case to warn instead of block. Disconnected, unknown and observed-low later days still block.
+**Verified:** Client 633/633, tsc and changed-file ESLint clean. Mobility 170 run, 0 failed, 2 skipped. Trip 307 run, 0 failed, 14 skipped, 2 errors: `TripPlanningServiceApplicationTests` and `VerificationTests`, full-application context tests needing local infrastructure that was not running. 58 other context errors cleared once the local config server (8888) was started; it was stopped afterwards. All mocked: no real provider, real routes, signed-in preview/apply, browser run, Postgres check or production build. No schema changes.
+**Cost note:** corridor sampling went from 30 km to 20 km, about 50% more Google Nearby requests on uncached routes. A failed plan can now verify up to 8 alternatives; `RouteService` caches repeated legs.
+**Not done / left uncommitted:** All application changes, and these notes, because both note files already hold other sessions' uncommitted entries. Nothing pushed or deployed.
+**Next:** EV-13 and EV-14 (need an additive migration), EV-30 (calculated times use stale charge durations), and the user's call on disconnected later days. Then a signed-in run of a two-day trip against live services.
+
+## 2026-11-02 - Codex - Motion versus GSAP consultation
+
+**Request:** Compare GSAP, Framer Motion, and Motion for React for the proposed tutorial landing page.
+**Done:** Checked official Motion and GSAP React/ScrollTrigger documentation. Recommended Motion for React for component-driven Navio tutorials; GSAP with ScrollTrigger if the design centers on intricate pinned, scrubbed scroll sequences. Clarified Motion for React is the successor naming to Framer Motion.
+**Verified:** Documentation review only; no package installation or application changes.
+**Not done / left uncommitted:** Notes remain uncommitted alongside other sessions' unfinished note edits; no permission to commit those existing edits. No deployment.
+**Next:** Select the visual interaction direction before implementation.
+
+## 2026-11-02 - Codex - Tutorial landing page recommendations
+
+**Request:** Recommend libraries and design for a beautiful Navio tutorial landing page and tips; consultation only.
+**Done:** Inspected client dependencies and frontend instructions; consulted frontend-design and official Motion, Driver.js, and Next.js MDX documentation. Recommended existing shadcn/Tailwind/Lucide foundation plus Motion, optional Driver.js for in-app tours, and MDX only if tutorial content grows. Proposed a visual sample-trip walkthrough and task-based tips.
+**Verified:** Root/client/server and changed service status checked; no application changes, package installs, or runtime tests.
+**Not done / left uncommitted:** Session notes remain uncommitted because both note files already contain other sessions' unfinished changes, which must not be committed without permission. Existing app work preserved.
+**Next:** User chooses tutorial scope before implementation; recommendations are proposals, not shipped features.
+
+## 2026-11-02 - Claude - Palette admin messages moved to toasts (client, uncommitted)
+
+**Request:** User tested a failing palette action (backend still deploying) and saw the inline "Not found" box instead of a popup.
+**Done (client, `feat/profile-page-rework`, uncommitted):** `palette-workspace.tsx` is the first page moved to `notify`: inline notice box and its state removed; errors use `notify.error` with a per-action title ("Color not removed") and the server message as description; successes use `notify.success`; Remove keeps Undo as a toast action for 10s. Mixed in with the uncommitted palette work in that file.
+**Verified:** tsc clean, ESLint clean on the file, client suite 617/617. Temporary route (deleted), Playwright/Edge with mocked API: 404 shows the error toast and no inline box; 200 shows success with Undo; Undo calls restore. Not run against a live backend.
+**Note:** the "Not found" itself is expected until IAM V11 is live, per the palette entry below. Every other page still has its own inline errors (about 119 `role="alert"` sites in 83 files, some of them field errors that should stay inline).
+**Next:** User decides whether to migrate the rest.
+
+## 2026-11-02 - Claude - Global bottom-right toasts and notification popups (client, uncommitted)
+
+**Request:** Bottom-right notification popups like the supplied reference (tinted surface, accent border, icon, dismiss); implement if missing; shadcn + /frontend-design. Must scale into a global system with different colors for errors, replacing inline error boxes later.
+**Done (client, branch `feat/profile-page-rework`, uncommitted):** shadcn `components/ui/sonner.tsx` (adds `sonner` ^2.0.8 to package.json and the lockfile). `components/toast/toast-card.tsx`: tones notification, error, warning, success, info, each one accent variable; optional media, link, action. `components/toast/notify.tsx`: the app-wide API (`notify.error({ title, description, action })`, also `.success/.warning/.info/.notification/.render/.dismiss`). `components/notifications/notification-popups.tsx` + `lib/notifications/popup-rules.ts`: watches the polled unread count; first count is only a baseline; 1 to 3 new show one popup each, more show "N new notifications"; opening one marks it read. `hooks/use-notifications.ts`: `useMarkNotificationRead` extracted. Root layout mounts `<NotificationPopups />` and `<Toaster />`.
+**Verified:** tsc clean, changed-file ESLint clean, full client suite 617/617. Temporary routes (deleted) on dev server :3000, Playwright/Edge: all layouts in light, dark and 375px, 24px from the bottom-right corner, dismiss works. Real `SidebarWrapper` with mocked session and notification APIs: no popup on load, +1 shows the popup and updates the badge, opening it POSTs read, navigates and removes it, +5 shows the summary. Not run: `next build`, live services.
+**Limits:** popups arrive with the 60s poll (paused while the tab is hidden), not instantly; there is no push channel. Inline error boxes were deliberately not migrated.
+**Next:** User review. To replace an inline error box, call `notify.error` from the mutation's `onError` and delete the box. New tone: add a line to `toastCardVariants`, `TONE_ICONS` and `DEFAULT_DURATIONS`. Commit package.json and the lockfile with this work. These notes are uncommitted for the reason given in the entry below.
+
+## 2026-11-02 - Claude - Yellow pinging unread badge (client, uncommitted)
+
+**Request:** Replace "Notifications (1 unread)" text with a pinging yellow count badge, 99+ cap; shadcn + /frontend-design.
+**Done (client, branch `feat/profile-page-rework`, uncommitted):** new `components/notifications/notification-count-badge.tsx` (shadcn Badge + ping layer, `formatNotificationCount`, `notificationsLabel`), used by the sidebar row and the navbar bell. `SidebarItem`: unused `alert` prop replaced by `badge` and `accessibleLabel`; `overflow-hidden` now only when expanded so the ping isn't clipped on the collapsed rail. `globals.css`: `--notification` tokens (both themes) and `animate-notification-ping`. Exact count stays in the link's accessible name; the badge is aria-hidden. Reduced motion drops the ping and keeps the badge.
+**Verified:** tsc clean, changed-file ESLint clean, full client suite 607/607 incl. new `tests/notifications/notification-count-badge.test.mjs`. Temporary preview route (deleted) on dev server :3000 with Playwright/Edge: counts 1 to 1500, expanded, collapsed and bell overlays, light and dark screenshots inspected, reduced motion, 375px no overflow, no page errors. Not checked: the real sidebar signed in with live unread counts.
+**Left as is:** `/notifications` page subtitle still reads "N unread".
+**Next:** User review. Commit with the profile-rework client work, not with the palette files. These notes are uncommitted too, because both files already hold other sessions' uncommitted entries.
 
 ## 2026-10-31 - Claude - Live notifications released (root main 5c29d9f)
 
@@ -639,6 +833,84 @@
 **Changes / files:** output/poster/Navio_CS_DDay_A1_v10.pdf, v10.png (300dpi), v10_Preview.png plus README-v10/source. Added purpose line, transit/guide caption details, database schema context and EV/seasonal-rule technique note. Two new transparent map-reading/camera goose assets generated with built-in imagegen from existing goose reference; placed in open margins, alongside restrained photo-corner accents. Original sticker/screenshots/QRs untouched.
 
 **Verified:** Browser screenshot dimensions/section fit/footer bounds and exact594x841mm one-page embedded-font PDF checks pass; final render inspected. EV image decoded pixels exactly match source; both QR URLs retained. Separate300dpi image generated; versioned v9 PDF confirmed present. The earlier FINAL PDF alias is absent and was not recreated. User review/physical scan/advisor approval not claimed. No app edits/pull/deploy; pending source preserved. Mandatory notes docsbranch merged localdev only.
+
+## 2026-10-31 - Codex - Full profile and live-notification implementation plan
+
+**Goal:** Write an in-depth root plan.md covering the proposed profile/settings/public-profile/social/privacy/Kafka/SSE feature; explicitly require shadcn/ui, /frontend-design, and frontend color variety. User requested planning only.
+**Done:** Created plan.md with current-working-tree reuse inventory, product defaults, visual/token contract and wireframes, account/Keycloak/media flows, privacy/block/report rules, API/service ownership, additive schema requirements, outbox/consumer/fan-out design, authenticated streaming and recovery, phased tasks, acceptance matrix, and rollout/rollback criteria. Optional EV display and explicit substantial-update announcements included as later phases; closed-app push/email excluded from the initial feature. No application implementation.
+**Verified:** Read frontend-design, client instructions, database/release rules, actual social DTOs/migration/controllers and profile/token configuration. Checked root/client/server/changed-service state; reviewed plan requirements and whitespace. Runtime tests are not applicable to this documentation-only task; no feature is claimed verified/live.
+**Not done / left uncommitted:** Existing application, deployment, palette, profile-social, planner, report and artifact changes preserved. Documentation prepared in an isolated docs/profile-social-plan-2026-10-31 worktree from local dev, then merged to local dev only. No push/deployment. Pull origin dev --ff-only was attempted before commit and refused because remote dev advanced with teammate release/history changes; remote application pin integration was deliberately left outside this planning task.
+**Follow-ups:** User reviews plan.md and explicitly requests implementation before any feature work. Re-audit concurrent profile/social code and remote branch changes at implementation start; do not treat proposed API paths/defaults or uncommitted baseline code as shipped functionality.
+
+## 2026-10-31 - Codex - Rounded community comment connectors
+
+**Goal:** Match the supplied YouTube-style rounded comment thread reference.
+**Done:** Updated community-comment-thread.tsx: rounded border elbows, sibling-owned vertical rails, replies outside the parent row so its rail ends at the branch, no background masking patches, no dangling rail for collapsed/depth-limited threads. Existing tokens, avatars and controls retained.
+**Verified:** Targeted ESLint passed; client diff whitespace check passed. Browser appearance not verified.
+**Left uncommitted:** Client UI change only; unrelated working changes preserved. Root dev sync conflicted in agent notes; the attempted merge was aborted. Notes saved locally; remote reconciliation remains required.
+**Next:** Inspect expanded/nested/collapsed threads in light/dark themes and mobile; commit the client change separately from existing profile/palette work.
+
+## 2026-10-31 - Codex - Kafka notification design consultation
+
+**Goal:** Explain how Kafka-backed follower notifications can appear while a user is planning, and refine the feature prompt before implementation.
+**Done:** Read architecture sections 4.9 and 8 and inspected the current Community notification controller/service. Recommended cross-service Trip outbox -> Kafka -> Community persisted inbox -> authenticated SSE -> app-wide toast/bell, with same-domain Community notifications created transactionally. Public publish/significant-update events only, no private draft/autosave alerts. SSE is a proposal, not an existing verified capability.
+**Verified:** Repository branches/status checked, including changed services. Local profile-social work already includes notification REST endpoints and a plan-shared announcement endpoint; no SSE/KafkaListener found in the scoped Community/Trip source scan. Consulted MDN EventSource documentation. No runtime tests or production checks for this consultation.
+**Not done / left uncommitted:** No feature implementation requested or performed. Existing profile, palette, deployment, planner, guide, and service changes preserved. Only this session's two agent-note additions committed on a docs branch and merged to local dev; no production deployment.
+**Follow-ups:** User reviews refined requirements. Implementation should inspect concurrent profile-social work, replace reliance on browser-triggered plan announcements with committed backend events, deduplicate per event/recipient, reconcile missed notifications after reconnect, enforce current visibility/block/preferences, and verify delivery through actual proxies without disturbing planner state.
+
+## 2026-10-31 - Claude - Planner stop cards show full notes when closed (client, uncommitted)
+
+**Request:** On an unselected itinerary stop card, show all of the notes instead of cutting them off with a fade.
+**Done (client, current branch `feat/profile-page-rework`, uncommitted, not mixed with that branch's other work):** `trip-place-card.tsx` passes `clamped={false}` to `PlaceNotesPreview` at both closed-card sites (place stops and charger stops), so the 6rem `max-h-24` clamp and mask fade no longer apply. `place-notes.tsx` doc comment updated. Default `clamped = true` is kept for the shared reader's collapsed disclosure preview (`reader-ui.tsx`), which has its own Show/Hide.
+**Verified:** ESLint clean on both files; tsc shows no errors for them; full client suite 591/591 (`node --experimental-transform-types --test "tests/**/*.test.mjs"`). Not checked in a browser (needs a signed-in trip with long notes).
+**Next:** User checks a long-note stop in the planner. Commit on its own `feat/` branch from dev, excluding the profile-rework files.
+
+## 2026-10-31 - Claude - New guide dialog spacing (client, uncommitted)
+
+**Request:** Fix spacing in the "Where is your guide for?" dialog (frontend-design skill).
+**Done (`client/app/feature/guides/new-guide-dialog.tsx` only, on the current client branch `feat/profile-page-rework`, uncommitted, not mixed with that branch's other work):** dialog padding 1rem -> 1.5rem with 1.5rem between header, field and footer; close button moved to 1rem from the corner so it lines up with the title; header `pr-8` so text never runs under it. The "private draft" note and the error now sit under the input in the field group (0.5rem apart, note `text-xs`) instead of floating between field and footer. Footer bleed adjusted to match (`-mx-6 -mb-6 px-6 py-4`). The shared `components/ui/dialog.tsx` primitive is untouched (about 20 other dialogs use it).
+**Verified:** tsc shows no errors for the file; ESLint clean. Temporary preview route (deleted) on the user's dev server :3000, Playwright via installed Edge: dark, light and 375px screenshots inspected, no horizontal overflow, no page errors.
+**Next:** Commit with the next client guides/UI change on its own `feat/`/`style/` branch from dev; exclude the profile-rework files.
+
+## 2026-10-31 - Claude - Simpler Keycloak password policy (root .deploy, uncommitted)
+
+**Request:** Change the Keycloak password rule to: at least 8 characters, a mix of upper/lower case, numbers and special characters, where an uppercase letter makes a special character unnecessary. Keep it simple.
+**Done (root working tree, not committed, not released):** `passwordPolicy` in `.deploy/keycloak/navio-realm.json` and the `kcadm update` in `.deploy/scripts/deploy.sh` are now `length(8) and regexPattern((?=.*[a-z])(?=.*[0-9])(?=.*[^a-z0-9]).*) and notUsername and notEmail and passwordHistory(3)` (was `length(12) ...`). Meaning: lowercase + digit + (uppercase OR special). An all-caps password fails (no lowercase). `navio` login theme `messages_en.properties` overrides `invalidPasswordMinLengthMessage` and `invalidPasswordRegexPatternMessage` with plain wording instead of Keycloak's "fails to match regex pattern(s)". Keycloak README policy list updated.
+**Verified:** `bash -n deploy.sh`; regex checked with Python fullmatch (Java `matches()` semantics): Password1, pass@word1, abcdefg1! pass; password1, PASSWORD1, Password, pass1A fail. The regex has no `$` or single quote, so it survives the `bash -euc '...'` wrapper. Not verified: a real Keycloak registration against the new policy.
+**Next:** Commit `.deploy` on a `chore/` branch from dev and release; `deploy.sh` applies the policy on every deploy (the realm JSON only matters on a fresh import). Existing passwords are unaffected; the rule applies at registration and password change.
+
+## 2026-10-31 - Claude - Palette color picker redesign, per-theme label text, permanent delete (uncommitted)
+
+**Request:** Redesign the admin palette color picker to look like a reference picker (saturation area, eyedropper + hue slider, format menu + channel fields), let admins choose the label text on a color (white in both themes, black in both, or white/black differing per theme), and add a permanent delete for removed colors that reverts everyone's saved uses to the default color. frontend-design skill.
+**Backend (IAM branch `feat/palette-text-and-delete` from dev, uncommitted):** `V11__palette_text_color_and_deletion.sql`: `palette_colors.text_on_light/text_on_dark varchar(5) NOT NULL DEFAULT 'auto'` (check auto|white|black; 24 seeded ids set to white, matching what the client always drew) and `iam.deleted_palette_colors` (reserved ids). New `DeletedPaletteColor` entity/repo. `PATCH /v1/admin/palette-colors/{id}` {textOnLight,textOnDark}; `DELETE /v1/admin/palette-colors/{id}` -> 204, only for retired colors, never `teal` (the fallback), audited `PALETTE_COLOR_DELETED`. `uniqueId` skips deleted ids; `requireKnown` accepts deleted ids so guides stay saveable. Public `GET /v1/palette-colors` adds `deleted`, `textOnLight`, `textOnDark` and lists deleted ids as retired with teal's hex (older clients draw teal too). Gateway already routes `/v1/admin/palette-colors/**`; no gateway or trip-planning change.
+**Client (files on the current client branch `feat/profile-page-rework`, which also holds the other session's uncommitted profile work; not committed, not mixed):** reusable compound `components/color-picker/` (Root/Area/HueSlider/EyeDropper/Channels; keyboard + ARIA sliders, EyeDropper only where supported) and `lib/color/color-math.ts`. Palette admin: two-column layout with the picker card, `LabelTextPicker` (5 options incl. Automatic, low-contrast warning), split light/dark `PaletteThemePreview`, edit-label-text dialog, delete confirmation dialog, trash on removed tiles. No alpha slider (palette hex is opaque). `lib/palette/palette-colors.ts`: schema fields, `labelColor`, theme-aware CSS vars (`.dark` override), deleted ids point at teal's vars. `trip-block-colors.ts`: built-ins now `var(--palette-<id>, var(--planner-block-<id>))` and foreground `var(--palette-<id>-fg, ...)`; deleted ids resolve to teal. Proxy allowlist adds PATCH/DELETE `/{id}`.
+**Docs (root, uncommitted with the feature):** `docs/api/color-palette.md`, `docs/api/Navio Open API.yaml`, `docs/database/Navio Database.md`.
+**Verified:** IAM full `./mvnw -o test` 277 run / 0 fail (31 skipped Postgres). Disposable postgis 16 on 55433 + local config server: `PostgresSchemaTests` 6, `PaletteColorPostgresTests` 5 (incl. V11 seed labels and delete/reserve/re-add -> `red-2`), `GuidePostgresTests` 5, `UserGuidePostgresTests` 4 all pass; container and config server stopped. Client: tsc clean, scoped ESLint clean, full suite 591/591 (`node --experimental-transform-types --test "tests/**/*.test.mjs"`), new `tests/palette/color-math.test.mjs` and `label-text-styles.test.mjs`. Browser: temporary preview route (deleted) on the user's running dev server :3000, Playwright with the admin API mocked: drag area, keyboard hue, RGB format, add (POST carries text colors), edit label (PATCH), delete (DELETE 204), light/dark screenshots inspected, 375px no horizontal overflow after a `min-w-0` fix, no page errors. Not exercised: signed-in admin against a real IAM, production `next build`.
+**Next:** User review. To ship: commit IAM `feat/palette-text-and-delete` -> dev -> push; client on its own `feat/` branch from dev with only the palette files (do not include the profile-rework files or tsconfig/CLAUDE.md); server pin; root pin + the three docs. Release order matters: IAM V11 must be live before the new client (old IAM lacks PATCH/DELETE; the client tolerates missing fields). Rollback note: the previous IAM ignores the new table, so after a rollback a new color could reuse a deleted id.
+
+## 2026-10-31 - Claude - Profile, public profiles, following, blocking, reports, notifications (backend committed locally, client uncommitted)
+
+**Request:** Redesign the whole profile experience (settings, public profiles, follow, privacy/safety, in-app notifications) with full backend integration; /frontend-design + shadcn.
+**Backend (local commits, NOT pushed/merged):** Community `feat/profile-social` a338d53 (V8: follows+alerts, blocks, connection visibility, reports queue, post pins, notif.notifications/preferences; /v1/social/**, /v1/notifications/**, /v1/reports, /v1/admin/reports). Trip `feat/profile-social` ad1be8f (V24 pin column; /v1/shared-plans/by-author/{owner}, /{token}/pin, /{token}/author; only Explore listings with a byline). IAM in WORKTREE `Capstone/iam-profile-social` branch `feat/profile-social` 3a1cd0e (V12 username+history+bio+interests+pace+banner; by-username (410 deleted), search, username-availability, banner, /me/security, /me/sessions/revoke needing auth_time<10min; FIX: provisioning no longer overwrites Navio display name with Keycloak name). Gateway routes added (uncommitted) in server configuration-server and root .deploy/config/api-gateway.yml.
+**Verified:** real Postgres (disposable postgis 55433): IAM 299/0, Trip 306/0, Community 128/0 incl. new Postgres integration tests. Client: tsc clean, changed-file ESLint clean, 599/599 tests (`node --experimental-transform-types --test`), `next build` passes, headless screenshots of header/rail at 1280/375/dark: no overflow, no page errors.
+**Client (uncommitted, branch feat/profile-page-rework):** settings shell (Profile/Account/Security/Notifications/Privacy), banner+photo crop with upload progress, username availability, unsaved-changes guard, preview; /u/[username] (follow, alerts bell, report, block, followers/following dialog with search, Posts/Shared plans tabs with pins, deleted/404/blocked states); navbar+sidebar bell, /notifications; /admin/reports; community author + shared-reader byline links; plan announce after named listing.
+**Collision:** a Codex session built the same feature concurrently in the same trees. User stopped it. Its Kafka/SSE pipeline (community V9, trip V25, PublicationEvents/Relay, NotificationStreamController) and duplicate client/IAM files were removed; all 34 files backed up in this session's scratchpad `codex-backup-20261031`. Kept its fix to RestSharedPlanDirectory.listedByAuthor parsing (+ regression test). Unrelated foreign edits left untouched: community-comment-thread.tsx, new-guide-dialog.tsx, place-notes.tsx, trip-place-card.tsx, palette work.
+**Not done / limits:** no signed-in end-to-end run against live services; Keycloak access token must carry auth_time for sign-out-everywhere; email change goes to Keycloak console; Explore/Places card bylines not linked (reader is); browser Back not guarded; email/push not built.
+**Next:** review client on dev; commit client (exclude tsconfig.json, CLAUDE.md, r*.json, tests/planner/.output, palette files); push children; commit server (gateway yml + pins) and root (.deploy config). IAM V12 must release with/after palette V11. Remove worktree after merge.
+
+## 2026-10-31 - Codex - Last reply connector seam
+
+**Request:** Correct the remaining last-comment connector alignment shown in the user crop.
+**Done:** Replaced the rounded CSS border with a fixed SVG path using half-pixel stroke coordinates matching the 1px vertical border. Sibling rails end at their own article bottom instead of overlapping the next elbow. The path ends at avatar center height with a 4px horizontal gap.
+**Verified:** Targeted ESLint passes. Updated browser rendering not verified.
+**Remaining:** Client change and these notes uncommitted. Earlier notes-commit tool call was interrupted by the user; no new commit attempted. Preserve concurrent agent-note changes when committing. Root remains dev.
+
+## 2026-10-31 - Codex - Comment rail alignment correction
+
+**Request:** User screenshot showed the rounded connector still offset from its vertical rail.
+**Done:** Replaced the flex-centered rail with a row-positioned border at left:16px; elbows and sibling rails now use 44px indent minus 28px offset, exactly the same coordinate. Minimum row height protects short/deleted comments. Removed the independent flex rail sizing responsible for drift.
+**Verified:** Targeted ESLint passes. Live signed-in browser appearance still needs verification.
+**Remaining:** Client changes uncommitted alongside prior work. Session notes committed locally on a docs branch and merged to dev only; remote notes reconciliation from the earlier failed pull remains outstanding.
 
 ## 2026-10-30 - Codex - Final deadline detail addition v9
 
@@ -821,42 +1093,6 @@
 **Implemented:** SavedLayout wraps only Saved page. Desktop collection nav sits left of search/results and uses sticky positioning with a gap under measured navbar height. ResizeObserver updates a page-local CSS variable so expanded mobile navigation or navbar resizing cannot overlap it. Sidebar has viewport-bounded overflow; narrow screens use a compact horizontal collection row for readable content. Existing global navbar and dashboard/planner sidebar components untouched by this request. Existing Saved search/query/mutation/card behavior and all prior dirty work preserved.
 **Checks / state:** TypeScript, scoped ESLint,3 Saved model regressions and whitespace checks pass. No backend/schema changes, deployment, VM/data writes or source commit/push. Source saved-page.tsx plus new saved-layout.tsx remain uncommitted with prior feature work. Mandatory notes committed docs branch and merged local dev only. Interactive desktop/mobile scroll appearance still needs user review; no browser visual verification claimed. Saved backend release remains pending explicit approval; dev:vm persistence boundary unchanged. Deferred editorial/report exclusions unchanged.
 
-## 2026-10-29 - Codex - Implement Saved library; verified, VM release pending
-
-**Approved scope:** User authorized persistent Saved library implementation and explicitly Community navbar icon immediately left of theme, matching main navbar. Icon-only highlighted Save Place to right of Add to Plan, real Shared Plan/Place bookmarks, same canonical Places category with source links, Saved sidebar under profile. Recents saved then opened; All/Plans/Places/7day Recently Deleted, Guides/custom categories explicitly Later;50 active Plans, unlimited paged Places. Guides/social ratings/comments/share action remain backlog, editorial excluded.
-**Implemented:** IAM additive V10 saved_library_items/sources and pg_trgm in public with qualified SQL, normalized full-collection fuzzy search/filter/sort/page and account-scoped state batches. Canonical save/restore and Plan cap under user lock; known-token active publication metadata/source check through side-effect-free internal Trip reference endpoint (no views).7day trash/restore/permanent delete and hourly expiry. Existing active favorites imported; trigger bridges later favorite saves/edits without travel bookmarks changing Home/Work/default anchors or unbounded legacy pickers. Saved UI URL state/suggestions/advanced OR-within/AND-between filters, account caches and batch lookup, undo and source availability errors. Main/Community navbar, mobile and sidebar access; Places reader/cards show Save + source actions, Shared reader previews replaced for Save only. Add to Plan now also accepts validated saved coordinate/Mapbox/EV locations via backward-compatible SAVED_LOCATION atomic append, preserving existing Google flow. Copy resolves current published start date for retain/change dialog. Earlier6dirty note/sidebar files preserved.
-**Verified:** Full client524 tests, TypeScript, scoped ESLint and final production build pass. Final full IAM261 run0fail0error2skip including real isolated V9-to-V10 upgrade; Trip293 run0fail0error3skip with real PostgreSQL. Fresh/upgrade Flyway and Hibernate validation run against dedicated navio-roundtrip-pg-20261029 loopback55433, never shared5432/VM DB. Fresh final read-only review4P2 fixed with regressions: non-Google Add, page-deletion clamp, canonical favorite coordinates, imported accent normalization. Initial full IAM configuration failure fixed by isolated target/library-tests.yml; initial search extension-schema and favorite edit collision reproduced/fixed. No unresolved failing checks; no interactive saved-flow acceptance claim yet.
-**State / next:** Root/client/server/IAM/Trip remain dev. All source uncommitted for review; no source push, production deployment or VM migration/data writes. Mandatory docs committed docs branch/merged local dev only; no docs-only main push. User runs npm run dev:vm, so new backend must release before saved controls/page can actually persist there. Obtain explicit current feature release approval under docs/agents/release.md, then commit only authorized changes through child feature/dev/main before root pins/release; preserve previous note/sidebar work and untracked artifacts/logs/CLAUDE.md. Existing prior VM SSH connection/settings unchanged. Next review should use /saved after coordinated release, not a disconnected preview or local-backend requirement. See saved-content API and implementation ledger.
-
-## 2026-10-29 - Codex - Refine save icons and Saved navigation placement
-
-**User refinement:** Save Place is icon-only, highlighted when saved. A Shared Plan place matching an Explore saved location stays one entry and gains Go to Plan provenance action. Saved page access is a top-navbar icon immediately left of theme; sidebar-only layouts get icon plus label directly below profile, superseding earlier below-Dashboard proposal. Suggested consistent name Saved covers all content types; collapsed/mobile access remains usable.
-**State:** Updated Saved library draft only, no application/backend/data edits or tests needed. Multiple source-plan chooser is a proposed QOL detail, not an independently requested feature. Prior6dirty client files and all artifacts preserved. Mandatory notes committed docs branch merged local dev only; no push/deploy. Await full draft approval/implementation instruction. Deferred exclusions unchanged.
-
-## 2026-10-29 - Codex - Refine Saved library scope and Place-save priority
-
-**User direction:** Guides later. First priority persistent Save button to right of Add to Plan on Explore Places cards and reader, appropriate consistent spacing. Unified private Saved page nav Recents -> All -> Plans -> Guides -> Places -> Recently Deleted -> User Custom Category(TBD). Recents confirmed Recently Saved top plus Recently Opened below. Trash confirmed7days. User wants50 Plan/Guide limit (draft assumes50each) and unlimited Places. Basic-to-advanced search and integration with existing saved functionality, no disconnected preview.
-**Audit / draft:** Existing favorites auto-make first record default start and list all records; discovered need to separate general bookmarks from Home/Work/default-anchor behavior and add paged search before unlimited Places. Existing soft delete alone lacks restore/trash/expiry APIs. User confirmed location only plus a source-plan link/button, same Places category as Explore saves; no owner notes/checklists copied. Draft docs/superpowers/specs/2026-10-29-saved-content-library-design.md for user adjustment, not approved implementation. Comments/ratings backlog unchanged; deferred guide/custom-category functions not silently implemented.
-**State:** Planning only; no app/schema/data/deployment changes or tests needed. Prior6client dirty files preserved. Mandatory docs committed docs branch merged local dev only; no source push. PLACES_EDITORIAL/report exclusion preserved, existing artifacts/logs/CLAUDE.md untouched. Next: user reviews the revised draft, clarify remaining lifecycle/limits as needed, obtain design approval then implementation plan.
-
-## 2026-10-29 - Codex - Inventory missing engagement and Saved backend before scope selection
-
-**User request:** List unimplemented comment/rating/saving backend first; user will adjust before implementation. Audited reader UI, frontend routes/API clients, all relevant backend controllers/models/migrations and report scope. No application/schema/UI changes or feature implementation.
-**Findings:** Shared-plan comments/ratings/Save plan/Save place are preview-only. Guide reader bookmarks and unified saved-content page/listing absent. Share button preview needs UI wiring; public-link backend already works. Existing personal favorite places CRUD (Home/Work/CUSTOM,50/user), trip My List/Add to Plan, publishing/copy/date choice/counts, guide authoring/publishing and Community post comments/replies/votes/reactions are working foundations, not missing backend. Optional guide social features, saved posts, notifications, collections/following explicitly separated from confirmed backlog.
-**Next / state:** Inventory/proposed Saved tabs in docs/ui/saved-content-backend-inventory.md, pending user adjustment. No tests for read-only source audit, no source push/deploy. Prior6dirty client files (shared notes/sidebar plus tests) preserved; artifacts/logs/CLAUDE.md and deferred exclusions untouched. Mandatory notes committed docs branch merged local dev only.
-
-## 2026-10-29 - Codex - Move sidebar Dashboard below Home
-
-**Change:** Moved the existing Dashboard link from Trips into Discover directly after Home. Preserved icon, route highlighting, collapsed labels and navigation/mobile-close callback. Trips retains saved trip content without a duplicate Dashboard. Only sidebar.menu.tsx, sidebar-trips.tsx and existing sidebar render expectations changed; prior shared-note changes preserved.
-**Verified / state:**3 sidebar tests, scoped ESLint, full TypeScript and whitespace pass. No backend/data/normal planner behavior, source push or deployment. Client changes remain local/uncommitted on dev for review. Mandatory notes committed docs branch and merged local dev only. Existing artifacts/logs/CLAUDE.md and deferred PLACES_EDITORIAL unchanged.
-
-## 2026-10-29 - Codex - Shared reader notes fully expanded with Hide/Show
-
-**Request / scope:** All Shared Plan Read note content starts fully visible, including rich notes/checklists and attached visit schedule. Hide removes ordinary note content; Show Note restores it. Trip note alone retains its existing faded opening excerpt when collapsed, while starting expanded. Scope only shared reader; normal planner/map components, published content and VM records unchanged.
-**Implemented:** Shared ReaderDisclosure uses default-expanded React state, semantic button outside rich text, stable aria-controls and aria-expanded. ReaderNotes reuses it everywhere including shared map detail notes; full readonly renderer retains safe links/checklists. Stop timetable grouped with attached notes under same control. Standalone shared checklists get the same Hide/Show behavior. Trip note explicitly opts into collapsed preview. No new dependencies/API/schema changes.
-**Verified:** Two render regressions fail against old implementation then pass;17 focused/521 full frontend tests pass; TypeScript, scoped ESLint, whitespace and production build pass. Live Chrome localhost shared California page refreshed: defaults expanded, click Hide removes place note, keyboard Return on Show Note restores complete content. Computer Use then halted because it could not confidently determine current browser URL; no further browser automation attempted. Interactive collapsed Trip-note fade check not completed; existing preview renderer retained by code. Do not claim full visual acceptance.
-**State / next:** Three client files dirty (reader-ui.tsx, reader-itinerary.tsx, shared-reader.test.mjs), source not committed/pushed/deployed by this request. Current dev:vm frontend reflects change after reload; production UI remains previous release. User can review locally. Root mandatory notes/plan committed docs/shared-reader-note-disclosure-20261029 and merged dev only; no main deployment. Existing Team sample maintenance changes remain on dev; all30 actual samples already updated on VM. Deferred PLACES_EDITORIAL stays disabled/excluded; local artifacts/logs/CLAUDE.md preserved.
-
 ## 2026-10-30 - Claude - Release attempt 5d3ccb6: web-client image build failed, nothing deployed
 
 **Released through dev -> main:** trip-planning `99829f5` (day sections; the local `V21__block_item_sections.sql` was renumbered to `V23`, because it collided with the released `V21__shared_plan_copy_events` and Flyway would have refused to start). server `7aa2777`, client `fb3083b` (day sections, Add-to destination menu, My List summary, Before you go), root `5d3ccb6` (Tempo service graph, merged API/database docs). The root stash-pop conflicts in docs/api and docs/database were resolved by keeping both sides.
@@ -897,6 +1133,42 @@
 **Follow-up (same session):** My List now has a Planner / Summary switch (`layout/view-switch.tsx`, shared with the Itinerary switch). Summary (`list/my-list-summary.tsx`) shows each saved place as a horizontal card with a checkbox and an "Add to day" date menu (`list/add-to-day-menu.tsx`). Selecting several places shows a sticky bar that adds them all to one day through `scheduleSavedPlacesAtom`, which skips places a day already has and reports them. Before you go (Starting Part) moved out of My List to the top of the planner, above Explore (`BeforeYouGoSection` in `planner-detail.tsx`). It was redesigned on shadcn Card (`list/before-you-go-card.tsx`). In the shared reader it is now the first section, before Overview (`reader/reader-introduction.tsx`), credited to the author, and long notes fold behind "Read the whole note". New `tests/planner/my-list-summary.test.mjs`; full client suite 567/567, TypeScript and scoped ESLint clean. No visual/browser check. A parallel session was editing itinerary day controls at the same time; its 2 failing tests had passed again by the final run. Still uncommitted, for the same reasons as above.
 **Follow-up 2:** At the user's request, Before you go is now a collapsible section like Explore and My List (Accordion with a left chevron, a bold title and a Signpost caption, notes written in place with no border). The bordered card and `before-you-go-card.tsx` are gone, and the reader's introduction is a plain section too. The title is no longer editable in the planner; an existing custom title still displays and publishes. The share dialog now says "Before you go" instead of "Starting Part". Fixed a spacing bug: AccordionContent's `[&_p]:mb-4` was leaking into the note editor (empty lines about 41px tall), overridden with `[&_p]:mb-0` on this section. My List and Itinerary notes sit inside AccordionContent too and probably have the same leak; not changed. Visually checked with headless Chrome on a temporary dev-only preview page (deleted afterwards); the slash menu opens. The user's "/"-per-line screenshot was not reproduced exactly. 567/567 tests pass.
 **State / next:** The client tree already held another session's uncommitted planner work in the same files (both planner maps), so nothing was committed. The root repo is mid-merge with conflicts in docs/api and docs/database that this session did not make, so these notes are also uncommitted. Next: visually check the menu in the planner (dark/light, narrow map), then commit together with the owner of the existing client changes.
+
+## 2026-10-29 - Codex - Implement Saved library; verified, VM release pending
+
+**Approved scope:** User authorized persistent Saved library implementation and explicitly Community navbar icon immediately left of theme, matching main navbar. Icon-only highlighted Save Place to right of Add to Plan, real Shared Plan/Place bookmarks, same canonical Places category with source links, Saved sidebar under profile. Recents saved then opened; All/Plans/Places/7day Recently Deleted, Guides/custom categories explicitly Later;50 active Plans, unlimited paged Places. Guides/social ratings/comments/share action remain backlog, editorial excluded.
+**Implemented:** IAM additive V10 saved_library_items/sources and pg_trgm in public with qualified SQL, normalized full-collection fuzzy search/filter/sort/page and account-scoped state batches. Canonical save/restore and Plan cap under user lock; known-token active publication metadata/source check through side-effect-free internal Trip reference endpoint (no views).7day trash/restore/permanent delete and hourly expiry. Existing active favorites imported; trigger bridges later favorite saves/edits without travel bookmarks changing Home/Work/default anchors or unbounded legacy pickers. Saved UI URL state/suggestions/advanced OR-within/AND-between filters, account caches and batch lookup, undo and source availability errors. Main/Community navbar, mobile and sidebar access; Places reader/cards show Save + source actions, Shared reader previews replaced for Save only. Add to Plan now also accepts validated saved coordinate/Mapbox/EV locations via backward-compatible SAVED_LOCATION atomic append, preserving existing Google flow. Copy resolves current published start date for retain/change dialog. Earlier6dirty note/sidebar files preserved.
+**Verified:** Full client524 tests, TypeScript, scoped ESLint and final production build pass. Final full IAM261 run0fail0error2skip including real isolated V9-to-V10 upgrade; Trip293 run0fail0error3skip with real PostgreSQL. Fresh/upgrade Flyway and Hibernate validation run against dedicated navio-roundtrip-pg-20261029 loopback55433, never shared5432/VM DB. Fresh final read-only review4P2 fixed with regressions: non-Google Add, page-deletion clamp, canonical favorite coordinates, imported accent normalization. Initial full IAM configuration failure fixed by isolated target/library-tests.yml; initial search extension-schema and favorite edit collision reproduced/fixed. No unresolved failing checks; no interactive saved-flow acceptance claim yet.
+**State / next:** Root/client/server/IAM/Trip remain dev. All source uncommitted for review; no source push, production deployment or VM migration/data writes. Mandatory docs committed docs branch/merged local dev only; no docs-only main push. User runs npm run dev:vm, so new backend must release before saved controls/page can actually persist there. Obtain explicit current feature release approval under docs/agents/release.md, then commit only authorized changes through child feature/dev/main before root pins/release; preserve previous note/sidebar work and untracked artifacts/logs/CLAUDE.md. Existing prior VM SSH connection/settings unchanged. Next review should use /saved after coordinated release, not a disconnected preview or local-backend requirement. See saved-content API and implementation ledger.
+
+## 2026-10-29 - Codex - Refine save icons and Saved navigation placement
+
+**User refinement:** Save Place is icon-only, highlighted when saved. A Shared Plan place matching an Explore saved location stays one entry and gains Go to Plan provenance action. Saved page access is a top-navbar icon immediately left of theme; sidebar-only layouts get icon plus label directly below profile, superseding earlier below-Dashboard proposal. Suggested consistent name Saved covers all content types; collapsed/mobile access remains usable.
+**State:** Updated Saved library draft only, no application/backend/data edits or tests needed. Multiple source-plan chooser is a proposed QOL detail, not an independently requested feature. Prior6dirty client files and all artifacts preserved. Mandatory notes committed docs branch merged local dev only; no push/deploy. Await full draft approval/implementation instruction. Deferred exclusions unchanged.
+
+## 2026-10-29 - Codex - Refine Saved library scope and Place-save priority
+
+**User direction:** Guides later. First priority persistent Save button to right of Add to Plan on Explore Places cards and reader, appropriate consistent spacing. Unified private Saved page nav Recents -> All -> Plans -> Guides -> Places -> Recently Deleted -> User Custom Category(TBD). Recents confirmed Recently Saved top plus Recently Opened below. Trash confirmed7days. User wants50 Plan/Guide limit (draft assumes50each) and unlimited Places. Basic-to-advanced search and integration with existing saved functionality, no disconnected preview.
+**Audit / draft:** Existing favorites auto-make first record default start and list all records; discovered need to separate general bookmarks from Home/Work/default-anchor behavior and add paged search before unlimited Places. Existing soft delete alone lacks restore/trash/expiry APIs. User confirmed location only plus a source-plan link/button, same Places category as Explore saves; no owner notes/checklists copied. Draft docs/superpowers/specs/2026-10-29-saved-content-library-design.md for user adjustment, not approved implementation. Comments/ratings backlog unchanged; deferred guide/custom-category functions not silently implemented.
+**State:** Planning only; no app/schema/data/deployment changes or tests needed. Prior6client dirty files preserved. Mandatory docs committed docs branch merged local dev only; no source push. PLACES_EDITORIAL/report exclusion preserved, existing artifacts/logs/CLAUDE.md untouched. Next: user reviews the revised draft, clarify remaining lifecycle/limits as needed, obtain design approval then implementation plan.
+
+## 2026-10-29 - Codex - Inventory missing engagement and Saved backend before scope selection
+
+**User request:** List unimplemented comment/rating/saving backend first; user will adjust before implementation. Audited reader UI, frontend routes/API clients, all relevant backend controllers/models/migrations and report scope. No application/schema/UI changes or feature implementation.
+**Findings:** Shared-plan comments/ratings/Save plan/Save place are preview-only. Guide reader bookmarks and unified saved-content page/listing absent. Share button preview needs UI wiring; public-link backend already works. Existing personal favorite places CRUD (Home/Work/CUSTOM,50/user), trip My List/Add to Plan, publishing/copy/date choice/counts, guide authoring/publishing and Community post comments/replies/votes/reactions are working foundations, not missing backend. Optional guide social features, saved posts, notifications, collections/following explicitly separated from confirmed backlog.
+**Next / state:** Inventory/proposed Saved tabs in docs/ui/saved-content-backend-inventory.md, pending user adjustment. No tests for read-only source audit, no source push/deploy. Prior6dirty client files (shared notes/sidebar plus tests) preserved; artifacts/logs/CLAUDE.md and deferred exclusions untouched. Mandatory notes committed docs branch merged local dev only.
+
+## 2026-10-29 - Codex - Move sidebar Dashboard below Home
+
+**Change:** Moved the existing Dashboard link from Trips into Discover directly after Home. Preserved icon, route highlighting, collapsed labels and navigation/mobile-close callback. Trips retains saved trip content without a duplicate Dashboard. Only sidebar.menu.tsx, sidebar-trips.tsx and existing sidebar render expectations changed; prior shared-note changes preserved.
+**Verified / state:**3 sidebar tests, scoped ESLint, full TypeScript and whitespace pass. No backend/data/normal planner behavior, source push or deployment. Client changes remain local/uncommitted on dev for review. Mandatory notes committed docs branch and merged local dev only. Existing artifacts/logs/CLAUDE.md and deferred PLACES_EDITORIAL unchanged.
+
+## 2026-10-29 - Codex - Shared reader notes fully expanded with Hide/Show
+
+**Request / scope:** All Shared Plan Read note content starts fully visible, including rich notes/checklists and attached visit schedule. Hide removes ordinary note content; Show Note restores it. Trip note alone retains its existing faded opening excerpt when collapsed, while starting expanded. Scope only shared reader; normal planner/map components, published content and VM records unchanged.
+**Implemented:** Shared ReaderDisclosure uses default-expanded React state, semantic button outside rich text, stable aria-controls and aria-expanded. ReaderNotes reuses it everywhere including shared map detail notes; full readonly renderer retains safe links/checklists. Stop timetable grouped with attached notes under same control. Standalone shared checklists get the same Hide/Show behavior. Trip note explicitly opts into collapsed preview. No new dependencies/API/schema changes.
+**Verified:** Two render regressions fail against old implementation then pass;17 focused/521 full frontend tests pass; TypeScript, scoped ESLint, whitespace and production build pass. Live Chrome localhost shared California page refreshed: defaults expanded, click Hide removes place note, keyboard Return on Show Note restores complete content. Computer Use then halted because it could not confidently determine current browser URL; no further browser automation attempted. Interactive collapsed Trip-note fade check not completed; existing preview renderer retained by code. Do not claim full visual acceptance.
+**State / next:** Three client files dirty (reader-ui.tsx, reader-itinerary.tsx, shared-reader.test.mjs), source not committed/pushed/deployed by this request. Current dev:vm frontend reflects change after reload; production UI remains previous release. User can review locally. Root mandatory notes/plan committed docs/shared-reader-note-disclosure-20261029 and merged dev only; no main deployment. Existing Team sample maintenance changes remain on dev; all30 actual samples already updated on VM. Deferred PLACES_EDITORIAL stays disabled/excluded; local artifacts/logs/CLAUDE.md preserved.
 
 ## 2026-10-29 - Codex - Correct preview misunderstanding; update all actual Team samples
 
@@ -1063,6 +1335,7 @@
 **Verification:** client `tsc --noEmit` clean, ESLint on community folders clean, `tests/community` 29/29 (Node 25.8.1). No browser check.
 **Left alone:** `app/feature/explore/_components/data.ts` mock `PLANS` (still used by the legacy `/explore/view/[id]/[slug]`, planner templates and its "Discuss" link, which now opens an empty composer).
 **Recommended next feature:** attach a real published plan (publication token) to a community post: composer lists the owner's published plans, community-service validates the token against trip-planning `/v1/shared-plans/{token}` and stores it in `shared_trip_id`, cards render the sanitized summary with "Copy to my trips" (existing `/copies`), revoked plans show "no longer shared". Add a "Post to community" action in the publish dialog.
+
 ## 2026-10-17 - Claude - Day sections: several cities in one day, colored breaks for long days
 
 **Request / decision:** User asked whether a day should hold more than one city and whether a 30-stop day should be breakable into differently colored parts. User chose one concept, a section divider item (optional name, city and color, "same as day" by default), with stop numbering continuing across the day. After the first render the user asked for the divider to look like the Trip destination card but with a color choice; restyled accordingly.
@@ -1081,97 +1354,117 @@
 **Contents:** Itinerary All dates/By date toggle and day picker; compact readable sidebar and bounded profile name; missing Explore-stop visual metadata fallback; responsive planner map preview with accessible full details,80px banner; detached faint animated insertion gaps plus6px top breathing room; associated regressions. Existing local OWNER assignment is account state, not a Git change.
 **Verification:** Full55-file client suite now462/462 passes using cached Node22.23.3 --experimental-transform-types; full TypeScript, scoped ESLint, production Next build and staged whitespace pass. Initial broad suite exposed standalone Next AsyncLocalStorage setup and missing next/navigation resolution, then stale carousel arrow-size assertion. Corrected only those inherited test harness/assertions (no carousel/auth production changes) and reran whole suite green. No new backend checks required because no backend source changed. Live browser interaction/visual QA still unverified.
 **Preservation / remaining:** Local CLAUDE.md, service logs, env files, root reports/documents/output/recovery plan remain uncommitted. Root dev publication includes accumulated session documentation and this note; final action is root dev push and remote SHA/pin verification. Teammate pull from root dev then git submodule update --init --recursive, npm ci only if needed, and existing local dev setup. Client dev and published pin b92a8ec verified equal before root publication.
+
 ## 2026-10-16 - Codex - Add breathing room above insertion buttons
 
 **Request / change:** Add a little space above plus button. Added6px (0.375rem) top padding to dedicated insertion gap only; button dimensions/hover animation/actions unchanged.2 gap tests, CSS Modules compilation and whitespace pass. Existing source preserved, no source commit/push. Mandatory notes local docs/dev only.
+
 ## 2026-10-16 - Codex - Move insertion controls into animated card gaps
 
 **Request / clarification:** User wants plus controls detached from card borders, between items; small at idle, grow on nearby hover, neighboring cards make room with first/last moving only lower/upper item. User explicitly chose small faint idle plus over invisible. Preserve all insertion actions and existing planner behavior.
 **Implemented:** New block/item-insertion.module.css and independent n+1 gap siblings around route/card item groups in SortableBlockItems.32px stable gap,26px faint visual grows to40px within44px hit target; adjacent item groups shift8px away, endpoints16px on sole neighbor. Fixed hover zone avoids layout/hover feedback. Focus/menu/inline-input keeps active, touch visible, reduced-motion removes transitions. Controlled dropdown reports expanded state through local DOM attribute. Insertion positions and note/checklist/place/EV actions unchanged; gaps outside draggable wrappers. Read-only keeps prior spacing and no add controls. All movement selectors gated off while dragging after reviewer caught endpoint specificity issue.
 **Verified:** New rendered gap/readonly tests observed failing before implementation then passing.13 focused UI/model tests plus30 existing insertion/route tests pass (43 total); TypeScript/scoped ESLint/whitespace pass. Cached Node22.23.3 at npm-cache/_npx/52027bd8fc0022aa/node_modules/node/bin/node.exe with --experimental-transform-types runs previously runtime-blocked suites without dependency/repo config changes. Lightning CSS Modules compilation passes, including final drag-gate correction; gap tests rerun pass. Live hover/animation/drag/keyboard/touch visual QA not verified (no connected browser). Source uncommitted; no push/runtime/backend/data change. Prior source/docs/local artifacts retained; mandatory notes local docs/dev only.
+
 ## 2026-10-16 - Codex - Enlarge planner map card photo25 percent
 
 **Request / change:** Increase map location card picture25-30%. Changed only planner compact banner h16 to h20 (64 to80px,25% taller). Existing short-map photo suppression, layout, shared preview sizing and actions unchanged.4 preview tests and whitespace pass; no live visual confirmation. Prior source preserved; no application commit/push. Required notes local docs/dev only.
+
 ## 2026-10-16 - Codex - Fit planner map preview without card scrolling
 
 **Request / clarification:** User asks map location card fit without scrolling, then clarifies current design is good and must remain recognizable. Preserve wide top photo/current theme/shape/detail hierarchy and add/navigation callbacks; no unrelated changes.
 **Implementation:** Planner compact prop now uses bounded flex card without inner scrolling,64px wide banner, tighter spacing, clamped title/address, compact contact row and opening-hours summary. Full weekly hours/descriptions/notes/address/contact available in accessible Dialog via Hours or Details. ResizeObserver reads actual map parent height; short maps hide banner and very short maps reduce secondary facts, all accessible in Details. Fixed shrink0 action footer retains add/repeat/target/disabled/nav controls; total1 omits useless disabled navigation. Shared noncompact preview layout/scroll behavior retained.
 **Verification / review:** Updated layout regression observed fail before implementation.13 focused layout/saved-place/day-view tests passed, plus2 additional action/readonly cases; final4 preview tests, full TypeScript, scoped ESLint and whitespace pass. Reviewer identified clipped Details trigger on short maps; moved it into fixed footer and reran checks. Browser visual/resize/keyboard/focus restoration not live-verified; no connected browser. Source changes only place-preview-panel.tsx and map-preview-layout.test.mjs this turn; all previous source retained, no backend/data/runtime changes, source commit/push/deploy. Mandatory notes local docs/dev only.
+
 ## 2026-10-16 - Codex - Bound sidebar names and complete Explore stop card visuals
 
 **Request / diagnosis:** User wants sidebar username at most one line, or two when name contains spaces, ellipsis instead of mid-word wrapping; Explore-added itinerary stop must match ordinary map-added card. Both paths already use TripPlaceCard/PlaceCardVisual. Explore narrow append stores name/location/reference, so image/rating/address/type absent; existing opening-hours query already fetches full provider details.
 **Changes:** Sidebar opt-in ProfileMenu name splits first word and remaining name into two individually truncated lines for authenticated names with spaces; unspaced names use one truncated line, subtitle one line, full name tooltip. Non-sidebar typography/auth behavior retained. TripPlaceCard now reuses same usePlaceDetails query as opening hours to fill missing visual fields only, preserving saved names and existing nonempty fields/zero values. No snapshot write, provider payload persistence, backend/schema/map card layout change, or duplicate query identity; EV query disabled. Existing saved Explore stops benefit on reopening when provider details available.
 **Verified:** Observed new SSR regression fail for missing photo/rating/type/address before correction; after fix Explore-minimal stop markup exactly equals normal rich map-stop markup with same provider query. Added existing-field preservation test and nonmutation assertion.26 focused tests plus full TypeScript/scoped ESLint/whitespace pass;5 auth/profile tests and lint/whitespace pass after final sidebar-only scope refinement. Next Image mocked only in standalone SSR harness to handle Node CJS interop. No live browser verification claimed. All prior uncommitted source retained; no source commit/push/deploy. Mandatory notes local docs/dev only.
+
 ## 2026-10-16 - Codex - Refine itinerary toolbar and reduce navigation sidebar
 
 **Request:** User reports newly added date controls scatter other actions; wants clear Show label, improved date picker, organized layout, navigation sidebar about25% smaller with readable text.
 **Changes:** Expanded left navigation288px to216px (w72 to w54), horizontal padding16 to12px; collapsed rail unchanged. Profile name/subtitle wrapping opt-in only sidebar; menu/day/list/trip text can wrap without smaller fonts or permission changes. Itinerary controls use dedicated rows: Plan/Table and collapse/options above, Show: All dates / By date below. By date uses existing shadcn/BaseUI Select with calendar/day/full date, pressed toggle semantics, viewport-bounded popup, keyboard support and intentional container-responsive picker placement. Existing date-selection atoms/behavior unchanged; no backend/map/Admin/source authorization changes.
 **Verified:**12 focused model/SSR/sidebar/saved-Places tests, full TypeScript, scoped ESLint and whitespace pass. Independent reviewer identified potential date option clipping at medium drawer width; fixed with viewport-bounded popup minimum width and wrapped option text;6 date tests/lint/whitespace pass after CSS correction. No connected browser, so live responsive/keyboard/visual confirmation remains pending. All application changes remain uncommitted, prior source preserved, no push/deployment. Mandatory notes local docs/dev only.
+
 ## 2026-10-16 - Codex - Add itinerary All days and One day display toggle
 
 **Approval / scope:** User requests itinerary-only day-by-day view alongside existing all-day view and explicitly approved All days default, sidebar switches day in One day, compact mobile day selector, preserving edits/day numbering/collapse state and other planner sections/map behavior.
 **Implemented:** Added itinerary-day-view.atoms.ts (transient display mode, independent selected day, valid-day fallback and indexed visible projection) and itinerary-day-controls.tsx (accessible pressed buttons/native day selector). ItinerarySection renders only indexed selected day in One day, fully expanded without mutating All days open state; new Add day becomes visible. Full blocks remain source for destinations/anchors/routes. Sidebar direct and pending cross-page day navigation use guarded selection action; My List navigation retains existing behavior. No backend/API/schema/auth/map changes. Earlier uncommitted approved inset-ring changes preserved.
 **Verified:**6 new model/SSR tests,3 sidebar tests,3 saved-Places tests,3 planner Explore presentation tests pass (15 total); full TypeScript, scoped ESLint, whitespace pass. Independent focused reviewer found no concrete issues. Existing route-focus test cannot load under installed Node22.14 (node:module registerHooks absent); no route-test/code changes made. Browser inventory was empty in preceding turn; live visual/mobile/keyboard navigation not verified.
 **State / next:** Application changes uncommitted on client fix/sidebar-focus-clipping-20261016; include new tests/planner/itinerary-day-view/data.ts and test file when committing feature later. Previous local OWNER assignment remains account-data only. No source push/deploy, production unchanged. User review of toggle and day navigation next. Mandatory documentation integrated local root dev only; all prior local artifacts preserved.
+
 ## 2026-10-16 - Codex - Promote local account and contain sidebar focus outlines
 
 **Request:** User explicitly requests promoting current local account to Admin/highest role and sidebar rework, within preceding scope preserving drawer/highlight shape and unrelated areas.
 **Role action:** Verified supplied session subject against local navio-keycloak user, then granted existing OWNER realm role through Keycloak operator CLI. Independently verified effective OWNER and retained USER. Credentials stayed inside container and temporary CLI config removed. No production role, source authorization, realm import or database edits. Existing session must refresh; signout/signin recommended for immediate UI update.
 **Sidebar:** Two class-line changes only in client/components/sidebar/sidebar.tsx and sidebar.item.tsx: render existing 2px focus ring inset, remove external offset on navigation link rings. Existing radius, colour, selected background, dimensions, nav spacing, drawer structure and permissions preserved. Earlier nav margin/padding attempt remains reverted. Source uncommitted on existing fix/sidebar-focus-clipping-20261016 branch, not pushed.
 **Verified / limits:**3 existing sidebar navigation tests, full TypeScript, scoped ESLint, whitespace pass; installed Tailwind compiler emits expected inset ring CSS. Browser inventory apps/browsers empty, so no live visual verification claimed. Local role changes are account data and do not travel with Git. Existing untracked files/logs preserved. Mandatory notes local docs/dev only.
+
 ## 2026-10-16 - Codex - Audit Admin visibility and sidebar corner clipping
 
 **Request:** Investigate production/local Admin visibility and clipped selected day corner; preserve scope after user rejected prior drawer spacing fix.
 **Evidence:** Client sidebar.tsx and auth.ts have no diff in Places commit0691f9a. Admin console gate and existing links trace to2ec2c330 (September26), Guides tof3c63cad. Admin remains conditional on session MODERATOR/ADMIN/OWNER; auth.ts clears roles on token error. Current browser roles are not verified; requested only user.roles/error from local session, never token/full payload. Do not infer account role or grant access.
 **Clipping:** Day button uses external focus ring at full row width within overflow-y-auto nav, clipping its right edge. Prior margin/padding attempt is still reverted. No application, authorization, layout, runtime or environment change this turn; no claim of browser verification or fix. Client source remains committed state with only existing untracked CLAUDE.md. Next: confirm local session roles, visually verify a strictly row-scoped correction before changing drawer layout. Notes local dev only, no push/deploy.
+
 ## 2026-10-16 - Codex - Revert sidebar spacing correction at user request
 
 User reported the preceding nav margin/padding correction broke the drawer and explicitly requested reverting it. Restored the exact original nav class string in client/components/sidebar/sidebar.tsx. git diff --exit-code for that file passes; client source is back to committed state with only existing untracked CLAUDE.md. No other application changes, new fix attempt, runtime action or push. Original highlight-clipping issue remains unresolved. Required notes recorded local docs/dev only.
+
 ## 2026-10-16 - Codex - Correct sidebar selection outline clipping
 
 **Request / cause:** User requests only fixing the clipped right edge of selected/focused sidebar rows, preserving highlight and visible shape. Inspected real state and sidebar hierarchy: nav overflow-y-auto clips the outer day-row focus ring at its horizontal scrollport edge; outer drawer has padding but it does not extend nav's clip region.
 **Fix:** One class-line change in client/components/sidebar/sidebar.tsx: nav -mx-1 plus px-1 gives4px horizontal outline room on each side while cancelling content offset/width changes. Row classes, radius, ring colour/width, selected surface, behaviour and drawer dimensions unchanged. Client local fix/sidebar-focus-clipping-20261016; source uncommitted, not pushed. All existing untracked logs/editor files/documents preserved.
 **Verified:**3 existing sidebar navigation tests, scoped ESLint, full TypeScript and whitespace pass. Browser visual confirmation not performed. No backend/env/data/runtime change. Required agent notes local docs/dev only.
+
 ## 2026-10-16 - Codex - Publish complete Places version to dev
 
 **Authorization / integration:** User explicitly approved publishing everything for this feature to dev first. Fetched/pulled root/client/server/Mobility/Trip dev. Server advanced to6e09360; Trip advanced to5c089d5 with teammate V19/V20 time-source/schedule work. Preserved Trip source in stash places-pre-dev-integration-20261016, applied cleanly, then corrected two new test mocks to use findOwnedForUpdate while retaining all timing/schedule assertions. Recovery stash retained. No unrelated source/report/environment/log/editor files staged.
 **Published revisions:** Mobility c298ead, Trip6ea2b13, client0691f9a, server774ace6, root submodule pin4f2bbee. Each child feature/dev revision pushed before parent commit. Root dev publication includes prior local agent documentation and final session notes. Main branches untouched; no VM release or production enablement. Current application repos are on dev with only preserved local CLAUDE.md/logs and root documents/output artifacts untracked.
 **Verified:** Full suites Mobility154 tests/2skipped, Trip260/9skipped, Gateway15/1skipped, zero failures/errors; client39 focused tests, full TypeScript, ESLint on every staged TypeScript file, Places-enabled production build and staged whitespace pass. Environment-gated skipped tests remain unverified. Parent pins equal child origin/dev. Production flag wiring/VM rollout and live browser QA remain separate future work. Teammate run instructions and updated readiness: docs/features/places-release-readiness.md. Final operation is push root dev and verify remote SHA/pin alignment.
+
 ## 2026-10-16 - Codex - Assess sharing Places and VM readiness
 
 **Question / evidence:** User asks whether current local version can be pushed and work when teammate pulls, and whether local versus VM backend matters. Inspected real root/client/server/Mobility/Trip dirty feature state, release guide, submodule layout, feature flag, Docker build/workflow and backend key configuration. Application source is still uncommitted. Local feature is portable only with matching child/server/root pins and per-machine environment setup. Main push deploys; dev push does not.
 **Found / deliverable:** Places defaults enabled only in development. Production frontend requires NEXT_PUBLIC_PLACES_ENABLED=true at build time, but current web-client Dockerfile/workflow do not pass the flag. VM also needs matching backend endpoints and existing valid API/auth configuration. Wrote docs/features/places-release-readiness.md with exact local teammate pull/submodule/rebuild commands, production prerequisites, evidence and honest limits. No application/config/env changes, new runtime checks, source commit/push/main merge or deployment. Await explicit target decision before publishing this version; recommend dev for teammate testing first.
+
 ## 2026-10-16 - Codex - Implement fixed Places reader and diagnose session errors
 
 **Approved reader work:** Route-local h-dvh flex shell allocates actual Navbar/backbar space, no whole-page scrolling; independent accessible information article scroll, existing mobile Place/Map switch and desktop divider retained. Reader-only greedy scrollwheel/zoomControl, resize no longer recentres user's panned map. Essentials/provider editorial introduction before imagery; structured visit hours/contact/links below. Reader returns at most3distinct Google photos, each with its own attribution and source, enlarge dialog, legacy single-photo fallback. Discovery cards still resolve one image. No invented history/reviews/alternate images or cached provider payload. Nullable optional gallery added with compatible Java constructors; no schema/entity changes.
 **Steered errors:** User saw first-click lazy undefined at new client PlaceReaderViewport, refresh cleared it. Moved pure shell into default-server place-reader-viewport.tsx, eliminating unnecessary named client reference. Browser first-navigation confirmation pending. Profile console logs showed401; AuthSession refresh failures plus Keycloak invalid_token/Token is not active; user confirmed signout/signin resolves. Added valid-session guards to navbar/profile/sidebar/settings/byline and Places plan context; expired sessions offer signin rather than fetching known-rejected profiles. Reviewer found disabled-query isPending skeleton trap; observed red/green SSR regression now covers empty-cache expiry. No auth-token plumbing/credentials/accounts/DB edits.
 **Verified:**39 frontend tests and38 focused Mobility/provider/controller/search tests pass after observed red/green cycles; full TypeScript/scoped ESLint/production build/whitespace pass. Independent review addressed settings blocker, no other blockers. Selectively reloaded local Mobility (41s); all7 services/5containers healthy. Public local gateway search+reader probe returns1result,3photos/3credited photos/description present; no provider JSON retained. Live browser responsive/focus/first-navigation QA remains unverified. All other prior source preserved; application work remains uncommitted on feature branches, no source push/deployment. Required docs-only notes merge local root dev only.
+
 ## 2026-10-16 - Codex - Inspect Places reader viewport and richer drawer request
 
 **Request:** Places location reader must fit viewport with no whole-page scrolling, keep drawer scrolling, allow wheel zoom without Ctrl, and put essential summary first followed by richer factual reading and alternate views/photos where available.
 **Inspected:** PlaceReader uses its own calc(100dvh -4rem) beneath separate sticky Navbar (h16 plus border), map cooperative gestures, and large leading photo/credits before essentials. Existing reader provider exposes one photo plus editorial description/hours/contact/category/rating, not a gallery. Google raw response contains photos array; current adapter chooses first. Read root/client/server/Mobility branch/status and latest handoff/log; existing dirty source preserved.
 **Proposed bounded design, not implemented:** Route-local h-dvh flex shell using actual navbar/backbar flow and min-h0/overflowhidden; drawer is only information scroller; existing mobile Place/Map toggle/resizer retained. Reader-only greedy map gestures. Compact essentials first, provider-backed About/visit facts below, bounded attributed real-photo gallery when available, no fabricated history/claims/alternate images. Researched official Google interaction, Place Photos and attribution docs. Await approval of short in-chat design under brainstorming gate; no application edits/tests/runtime changes claimed. Mandatory notes local docs/dev only, no push/release.
+
 ## 2026-10-16 - Codex - Remove duplicate saved cards and constrain planner map preview
 
 **Feedback / investigation:** User wants saved ordinary places only in expandable Places, and original planner map card prioritized after screenshot showed nearly full-map coverage. Verified no prior local edits to PlacePreviewPanel or map callers before this task. Git blame identifies inherited max-height calc(100%-2rem) in client489525d (2026-10-11), allowing longer opening-hours/details to occupy almost whole map. Recent Places work did duplicate ordinary places via projection plus existing full list cards; acknowledged and corrected.
 **Done:** My List now renders a nonmutating filtered block view: ordinary places only in Places subsection; notes/checklists/EV stops and every original list's rename/delete/add controls remain. Compact Places rows retain source-list-specific remove control, hidden for read-only. Reviewer caught initial omission of place-only list shells; corrected by retaining all list management shells, regression verifies single Garden rendering plus list title management. Map preview preserves existing photo/content/actions/theme/bottom anchoring, with opt-in65% height cap and existing internal scrolling only for planner Google/Mapbox/saved-stop callers. Shared Guides preview defaults remain unchanged.
 **Verified / limits:** Observed two targeted regressions fail before correction. All30 focused frontend tests pass, including data preservation/single rendering/default shared-host layout; TypeScript/scoped ESLint/final Places-enabled production build/whitespace pass. Initial sandbox build could not fetch Google Fonts; retry with approved network access passed without font changes. Independent review found no remaining blockers. No live browser visual verification claimed. No backend/data/env/runtime/source commit/push/deployment change; prior uncommitted work preserved. Required notes integrated local docs/dev only.
+
 ## 2026-10-15 - Codex - Repair planner hydration after Explore append
 
 **Symptom / cause:** User reported saved Places count0 and planner hydration error after Add to Plan. Source trace found MyListPlaceService generated lists with null blockColor and places with null placeAddress. PlannerService returned null colorId/omitted address; strict client requires string colorId/address, rejecting the entire snapshot. User supplied console logs (not Network JSON); actual authenticated affected response remains uninspected. Reproduced two failing backend regression tests before changes.
 **Fix:** Append now writes teal display colour and empty unknown address. Snapshot mapping supplies these two defaults for already-saved nullable fields without writing to stored records. Non-null values remain unchanged; strict frontend validation unchanged. No migration/entity change, data deletion/backfill, ownership/version change or unrelated UI edits.
 **Verified / runtime:**30 focused Trip service/controller tests pass;26 frontend Explore tests pass including snapshot-contract acceptance/rejection regression. Independent review found no blockers; whitespace checks pass. Selectively reloaded local trip service using navio start trip -Online; startup succeeded26s and all7 services plus5 containers healthy. Environment's local backend host is localhost:8080. Other services/infra/accounts were not restarted or reset. Asked user to Retry/refresh; authenticated saved-plan visual confirmation pending. Source remains uncommitted on existing feature branches. Required notes committed local docs/dev only, no push/deploy.
+
 ## 2026-10-15 - Codex - Implement Add to Plan and expandable saved Places
 
 **Goal:** Execute the user-approved combined design; Places subsection must expand/collapse like a dropdown.
 **Done:** Replaced Explore card/reader Choose a plan/direct-save presentation with consistent Add to Plan responsive dialog/mobile sheet. Loads paginated owned trips, searches name/destination, groups Latest and Trip List without repeating latest, shows destination/dates/current-context badge, and preserves custom-list choice. Existing narrow append, expected-version retry and backend dedup remain. Added expandable My List Places projection across existing custom lists with compact rows/search/assigned-day labels, Add to day picker, and Saved places shortcut beside each day date. Shared Jotai atom rechecks source/day/read-only/normalized provider identity synchronously before copying a fresh visit; saved copy retained, EV chargers excluded. Last-work tracking prioritizes actual recent work over stale Explore context and updates after append without replacing sidebar snapshot. Account HOME/WORK address book remains separate. No backend/schema/environment/runtime changes or source commit/push.
 **Verified:** Observed new regression tests fail before implementation; all25 focused Explore/frontend tests now pass, including7 new model/atom/SSR cases. Full TypeScript, scoped ESLint (no warnings), Places-enabled production build and whitespace checks pass. Independent review found stale URL precedence and regression test covers correction. Browser inventory empty; attempted in-app preview reports Browser is not available: iab. No live responsive visual/keyboard/map or authenticated append/save/reopen verification claimed. Prior unrelated source/reports/data remain intact.
 **Next:** User reviews visual result. Verify authenticated Add to Plan with multiple trips/custom lists, collapse/expand Places, schedule/reopen, mobile sheet and desktop popover once browser/runtime are available. Application changes remain uncommitted on client feat/places-discovery. Docs-only notes commit follows local docs/dev workflow, no release.
+
 ## 2026-10-15 - Codex - Design Add to Plan and saved-place day shortcut
 
 **Request:** Rename Choose a plan to Add to Plan; open a plan picker grouped Latest / Trip List; save to the chosen plan's My List; make collected places easy to schedule through a My List subsection and/or day-date shortcut.
 **Inspected:** Existing Explore plan-context append flow, MyListSection, account HOME/WORK saved-place API, recent-plan sidebar atom and itinerary insertion atom. Existing plan append/version/ownership/dedup protections remain applicable. Recent opened-plan tracking is currently in-memory; trip updatedAt is a different signal. Preserve multiple custom list support and all existing uncommitted source.
 **Proposed, not implemented:** Bounded UI extension: consistent Add to Plan picker on cards/reader; owned recent plan labelled Latest, remaining paginated/searchable Trip List; Places subsection in My List plus compact day-header Saved places popover sharing the same list data. Recommend retaining saved places when scheduling, indicating scheduled days and preventing accidental same-day duplicate inserts. Do not merge this with account HOME/WORK anchors. Await user's design approval; no application changes, runtime changes or tests claimed this session.
+
 ## 2026-10-15 - Codex - Restore inspiring default discovery and adapt all sections to time
 
 **Feedback / cause:** User expected an inspiring populated landing without selections, and month/season to adapt every section. Prior implementation deliberately gated Any-country/no-query and had climate profiles only for JP/Thai cities; other countries had no seasonal fallback and supported ones mostly reordered an unchanged pool. User requested source-backed priority followed by believable algorithmic fill.
@@ -1237,6 +1530,7 @@ User reported the preceding nav margin/padding correction broke the drawer and e
 **Verified:** Inspected the Dockerfile, local storage Compose file, deployment build matrix, actual root/client/server/service status, upstream release/module files and official Go/Docker documentation. No reproduction on the friend's network or successful retry is claimed. No application source, database, running service, image, volume or checksum policy was changed.
 **Not done / left uncommitted:** The friend must retry the original build (optionally with `--progress=plain`; existing cache mounts retain successful downloads). If EOF repeats, try another network or check VPN/proxy and Docker Desktop proxy configuration. Local Compose uses prebuilt images and does not normally require this source build; the friend explicitly invoked it with a local MinIO image tag. Preserve unrelated client tsconfig/CLAUDE.md, docs/report and service logs/crash dumps. Required notes are committed on docs/minio-build-diagnosis-20261014 and merged into local root dev only; working-copy notes are mirrored for the next session. No push, main merge or deployment.
 **Follow-ups:** Obtain the retry outcome. After a successful build, start storage with `docker compose -f docker-compose.storage.yml up -d`. No Dockerfile/version/checksum change is justified by this log alone.
+
 ## 2026-10-14 - Codex - Diagnose empty local application after pull
 
 **Goal:** Diagnose why pages render but profile, Explore, and mobility data do not load; user explicitly requested no fix and a troubleshooting plan.
@@ -1244,29 +1538,6 @@ User reported the preceding nav margin/padding correction broke the drawer and e
 **Conclusion:** The pulled source is not the demonstrated cause. The browser is attached to a surviving local-mode Next process while its required Spring backend is stopped. The VM environment file is valid but was never active because the VM-mode Next process could not take ownership. A separate stale Auth.js PKCE error appears in the log and should be retested only after choosing one healthy runtime mode.
 **Follow-up blocker:** The user's `.\navio start` attempt failed before any Spring service launched. `docker-compose.storage.yml` requests `minio/minio:RELEASE.2025-04-22T22-12-26Z`; Docker Hub rejects the pull, and Docker has neither a local MinIO image nor container. The runner then waits for MinIO readiness and aborts infrastructure initialization. The production stack already uses `.deploy/docker/community-storage.Dockerfile` to build pinned MinIO and `mc` from source, but the local Compose file was not migrated to that approach.
 **Plan:** Added `docs/superpowers/plans/2026-10-14-runtime-loading-recovery.md`, separating local (`.\navio start` + `npm run dev`) and VM (`npm run dev:vm` after stopping the verified local server) recovery, then authentication and feature-level verification. The plan now first aligns local storage with the existing production source-built image and verifies health, idempotent bucket setup, and object round-trip. No source/config/service/process/database fix was performed.
-
-## 2026-10-13 - Codex - Pull and verify latest coordinated release
-
-**Goal:** Pull the latest work pushed by the user's teammate before starting new development, while preserving local reports, environment files, logs, and unfinished agent records.
-**Done:** Backed up the two locally modified agent-note files, fetched `main` and `dev` in the root, client, server, and all four service repositories, and fast-forwarded every checkout from `origin/dev` without conflicts. Reconciled the two local-only note entries with the teammate's newer shared notes. The checked-out revisions are root `056953bcc048`, client `3b16acd73441`, server `bc0d0dd05ea6`, user-management `6138990c262d`, trip-planning `2e4b051a7ad4`, mobility-and-ev `010e4efb0678`, and community `47a043941d37`; each equals both its `origin/dev` and `origin/main`. Root and server submodule pins equal the checked-out child revisions.
-**Incoming work:** Traveler-created guides and destination discovery, the redesigned Community experience with group artwork and comment reactions, and the optional OpenTripPlanner transit fallback. The fallback remains disabled by default for production unless its documented graph and settings are supplied.
-**Verified:** Client `npx tsc --noEmit` exits successfully. Focused Community and guide tests pass 19/19 under Node 22.23.3. The existing local development server responds at `http://localhost:3000/` with HTTP 200. Package manifests and lockfile did not change from the previously rebuilt client, so no dependency reinstall was required.
-**Preserved / not done:** Local reports under `documents/` and `output/`, `NAVIO_Development_Handoff.txt`, ignored environment files, `CLAUDE.md`, and service logs remain untouched and uncommitted. No application edit, database mutation, commit, push, merge, or deployment was performed. These agent-note updates remain uncommitted because the files contain preserved local/concurrent session history.
-
-## 2026-10-13 - Codex - Diagnose local versus production login identity
-
-**Goal:** Determine why the user's working production account is rejected after pulling and reconstructing the local workspace.
-**Evidence:** `.env.local` points Auth.js to local Keycloak on port 8180 and the local API gateway on port 8080. Local Keycloak responds successfully and runs `KC_DB=dev-mem`; production Compose runs Keycloak against PostgreSQL. A read-only admin query found exactly one matching enabled local user with a password credential and no required action. The local Keycloak container started at 21:10, that user was created at 21:13, and the login event was rejected as `invalid_user_credentials`. The local gateway is currently unreachable.
-**Conclusion:** This is local environment state, not missing Git code and not a production VM failure. The local password database was recreated and is independent from production. The gateway outage is a separate local runtime issue affecting the application after authentication.
-**Not done:** No credential reset, user mutation, realm change, service start, source edit, commit, push, or deployment. Credential values were not retrieved or printed.
-
-## 2026-10-13 - Codex - Reconstruct local workspace from fetched Git source
-
-**Goal:** Clean the tangled local workspace from Git while retaining reports, development records, agent instructions, environment files, and logs.
-**Investigation:** All application repositories were already at the production commits. Client/server/services had identical remote `main` and `dev` heads. Root `dev` was 31 documentation-only commits ahead of production `main`; its only tracked working changes were the shared agent notes. The prior TipTap failure had already changed state: TipTap existed, and the pre-reset build reached only a sandbox-blocked Google Fonts request.
-**Done:** Created a 684-file, 233 MB recovery backup at `C:/Users/suriy/AppData/Local/Temp/navio-workspace-cleanse-20261013-212333`, including manifests and binary Git patches. Fetched all repositories, hard-reset tracked trees to `origin/dev`, restored every preserved non-code/local file, removed generated Next/Maven outputs, stopped the confirmed stale Node listener on port 3000, and rebuilt the dependency tree with `npm ci`. Restarted the development server hidden; localhost returns HTTP 200. The restore initially created nested copies of existing directories; the integrity pass confirmed all 676 nested files were exact duplicates (apart from the intentionally newer top-level agent notes), then removed only those redundant directories.
-**Verified:** Child/root revision and submodule-pin checks confirm application source equals fetched production revisions. `.env.local` and `.env.local.prod` remain ignored/untracked and match the supplied files. `@tiptap/core` and `lightningcss` resolve. TypeScript passes; lint has zero errors/four warnings; `npm run build` succeeds. Current Node 22.23.3 test run passes 309/310; `planner-access.test.mjs` passes all six assertions then fails on post-test Next AsyncLocalStorage activity. System Node 22.14.0 cannot load tests using `registerHooks`. No source workaround was made.
-**Not done / left uncommitted:** No application source, package metadata, database, account, commit, push, or deployment change. Existing reports, output, handoff text, CLAUDE files, service logs, and the shared agent-note updates remain local. `npm ci` reported 19 audit findings; `npm audit fix` was intentionally not run. The two shared note files already contain concurrent session work, so these notes are not committed separately.
 
 ## 2026-10-14 - Claude - Release: planner table, handout, times, auto plan, transit, sharing
 
@@ -1421,6 +1692,7 @@ User reported the preceding nav margin/padding correction broke the drawer and e
 **Done (client, uncommitted, same mixed `feat/guide-auto-plan` tree):** Fixed time chips and the editing trigger use the day colour solid (`bg-primary text-primary-foreground`, no icon); calculated chips are a quiet dashed outline with the route icon. New `itinerary/itinerary-options-popover.tsx` (⋯ "Itinerary options" beside Collapse all days) holds `RouteLineModeSwitch` (now a stacked "Route lines on map" radio group with a description of the selected mode) and Export table; `ExportItineraryDialog` is now controlled (`open`/`onOpenChange`, no built-in trigger). `day-times-section.tsx` redesigned: one grouped control with Calculate times (tinted, solid when stale) and Recalculate all times rows, each with title + hint (aria-labelledby/-describedby), "Needs updating" badge beside the heading, results/Undo/problems on one live line below. itinerary-section.tsx edits are targeted (guide session also edits it).
 **Verified:** whole-client tsc clean, scoped ESLint clean (only pre-existing empty-itinerary-callout warning), 367/367 node tests, Chrome fixture tests/planner/day-timing.browser.mjs (now also covers the itinerary menu: keyboard End selects Place, Export table opens the dialog) passes dark 1440 and light 390.
 **Not done:** No application commit/push/deploy.
+
 ## 2026-10-14 - Claude - Itinerary time calculation (fixed and calculated times)
 
 **Goal:** Implement the agreed proposal: per-day Calculate times that keeps edited times fixed, a separate reviewed Recalculate all times with Undo, Times need updating, persistence. Mid-session the user asked to put the controls in the day's ⋯ Block options menu and to auto-time newly added cards.
@@ -1429,6 +1701,7 @@ User reported the preceding nav margin/padding correction broke the drawer and e
 **Verified:** trip-planning full `./mvnw -o test` 230 run, 0 failures, 6 Postgres skips (needed config server on 8888 and `-DargLine=-javaagent:<mockito-core-5.23.0.jar>` for host Mockito attach). `PostgresSchemaTests` 3/3 on a disposable postgis:16-3.5 (port 55432, removed). Client `tsc --noEmit` clean, scoped ESLint clean, 367/367 node tests (17 new in tests/planner/day-timing.test.mjs). New intercepted Chrome fixture tests/planner/day-timing.browser.mjs (run with NAVIO_PLAYWRIGHT_MODULE pointing at C:/Users/User/.codex/tmp/navio-profile-check/node_modules/playwright/index.mjs) passes dark 1440 and light 390: calculate, save, Undo, reload persistence, review/cancel/replace/undo, stale dot, no overflow, no page errors. Its two console errors are guide APIs rejecting the fixture's catch-all mock.
 **Not done / left uncommitted:** No application commit/push/pin/deploy (user did not ask). Client edits share files with the concurrent guide auto-plan session (types.ts, trip-builder.atoms.ts); stage by hunk. Started and stopped my own config server (PID 7200) and disposable DB.
 **Follow-ups:** Release order: trip-planning V19 can ship first; the client is guarded by `time-source-v1`. Guide auto-plan (`applyAutoPlanAtom`) writes times without a source, so they count as fixed; it should set `timeSource: "calculated"`. Optional: a user-set day start time and per-place default visit lengths.
+
 ## 2026-10-14 - Codex - Plan for me from guides and destination discovery
 
 **Goal:** Replace repeated guide Add clicks with an automatically suggested itinerary using proximity and restaurant opening/closing times. User chose both guides and discovery and explicitly requested frontend-design plus shadcn for UI changes.
@@ -1470,6 +1743,29 @@ User reported the preceding nav margin/padding correction broke the drawer and e
 **Verified:** Inspected the Dockerfile, local storage Compose file, deployment build matrix, actual root/client/server/service status, upstream release/module files and official Go/Docker documentation. No reproduction on the friend's network or successful retry is claimed. No application source, database, running service, image, volume or checksum policy was changed.
 **Not done / left uncommitted:** The friend must retry the original build (optionally with `--progress=plain`; existing cache mounts retain successful downloads). If EOF repeats, try another network or check VPN/proxy and Docker Desktop proxy configuration. Local Compose uses prebuilt images and does not normally require this source build; the friend explicitly invoked it with a local MinIO image tag. Preserve unrelated client tsconfig/CLAUDE.md, docs/report and service logs/crash dumps. Required notes are committed on docs/minio-build-diagnosis-20261014 and merged into local root dev only; working-copy notes are mirrored for the next session. No push, main merge or deployment.
 **Follow-ups:** Obtain the retry outcome. After a successful build, start storage with `docker compose -f docker-compose.storage.yml up -d`. No Dockerfile/version/checksum change is justified by this log alone.
+
+## 2026-10-13 - Codex - Pull and verify latest coordinated release
+
+**Goal:** Pull the latest work pushed by the user's teammate before starting new development, while preserving local reports, environment files, logs, and unfinished agent records.
+**Done:** Backed up the two locally modified agent-note files, fetched `main` and `dev` in the root, client, server, and all four service repositories, and fast-forwarded every checkout from `origin/dev` without conflicts. Reconciled the two local-only note entries with the teammate's newer shared notes. The checked-out revisions are root `056953bcc048`, client `3b16acd73441`, server `bc0d0dd05ea6`, user-management `6138990c262d`, trip-planning `2e4b051a7ad4`, mobility-and-ev `010e4efb0678`, and community `47a043941d37`; each equals both its `origin/dev` and `origin/main`. Root and server submodule pins equal the checked-out child revisions.
+**Incoming work:** Traveler-created guides and destination discovery, the redesigned Community experience with group artwork and comment reactions, and the optional OpenTripPlanner transit fallback. The fallback remains disabled by default for production unless its documented graph and settings are supplied.
+**Verified:** Client `npx tsc --noEmit` exits successfully. Focused Community and guide tests pass 19/19 under Node 22.23.3. The existing local development server responds at `http://localhost:3000/` with HTTP 200. Package manifests and lockfile did not change from the previously rebuilt client, so no dependency reinstall was required.
+**Preserved / not done:** Local reports under `documents/` and `output/`, `NAVIO_Development_Handoff.txt`, ignored environment files, `CLAUDE.md`, and service logs remain untouched and uncommitted. No application edit, database mutation, commit, push, merge, or deployment was performed. These agent-note updates remain uncommitted because the files contain preserved local/concurrent session history.
+
+## 2026-10-13 - Codex - Diagnose local versus production login identity
+
+**Goal:** Determine why the user's working production account is rejected after pulling and reconstructing the local workspace.
+**Evidence:** `.env.local` points Auth.js to local Keycloak on port 8180 and the local API gateway on port 8080. Local Keycloak responds successfully and runs `KC_DB=dev-mem`; production Compose runs Keycloak against PostgreSQL. A read-only admin query found exactly one matching enabled local user with a password credential and no required action. The local Keycloak container started at 21:10, that user was created at 21:13, and the login event was rejected as `invalid_user_credentials`. The local gateway is currently unreachable.
+**Conclusion:** This is local environment state, not missing Git code and not a production VM failure. The local password database was recreated and is independent from production. The gateway outage is a separate local runtime issue affecting the application after authentication.
+**Not done:** No credential reset, user mutation, realm change, service start, source edit, commit, push, or deployment. Credential values were not retrieved or printed.
+
+## 2026-10-13 - Codex - Reconstruct local workspace from fetched Git source
+
+**Goal:** Clean the tangled local workspace from Git while retaining reports, development records, agent instructions, environment files, and logs.
+**Investigation:** All application repositories were already at the production commits. Client/server/services had identical remote `main` and `dev` heads. Root `dev` was 31 documentation-only commits ahead of production `main`; its only tracked working changes were the shared agent notes. The prior TipTap failure had already changed state: TipTap existed, and the pre-reset build reached only a sandbox-blocked Google Fonts request.
+**Done:** Created a 684-file, 233 MB recovery backup at `C:/Users/suriy/AppData/Local/Temp/navio-workspace-cleanse-20261013-212333`, including manifests and binary Git patches. Fetched all repositories, hard-reset tracked trees to `origin/dev`, restored every preserved non-code/local file, removed generated Next/Maven outputs, stopped the confirmed stale Node listener on port 3000, and rebuilt the dependency tree with `npm ci`. Restarted the development server hidden; localhost returns HTTP 200. The restore initially created nested copies of existing directories; the integrity pass confirmed all 676 nested files were exact duplicates (apart from the intentionally newer top-level agent notes), then removed only those redundant directories.
+**Verified:** Child/root revision and submodule-pin checks confirm application source equals fetched production revisions. `.env.local` and `.env.local.prod` remain ignored/untracked and match the supplied files. `@tiptap/core` and `lightningcss` resolve. TypeScript passes; lint has zero errors/four warnings; `npm run build` succeeds. Current Node 22.23.3 test run passes 309/310; `planner-access.test.mjs` passes all six assertions then fails on post-test Next AsyncLocalStorage activity. System Node 22.14.0 cannot load tests using `registerHooks`. No source workaround was made.
+**Not done / left uncommitted:** No application source, package metadata, database, account, commit, push, or deployment change. Existing reports, output, handoff text, CLAUDE files, service logs, and the shared agent-note updates remain local. `npm ci` reported 19 audit findings; `npm audit fix` was intentionally not run. The two shared note files already contain concurrent session work, so these notes are not committed separately.
 
 ## 2026-10-13 - Claude - Release traveler guides, community redesign and open-transit fallback
 
@@ -1610,6 +1906,7 @@ User reported the preceding nav margin/padding correction broke the drawer and e
 **Release state:** Child main/dev pushes completed: user 512a884, trip 2e4b051, mobility c8a5e2a, client f3c63ca, server 05ed0cf. Root main/deploy still pending at this entry. Source backup stashes retained. Another trip dev worktree was left untouched; remote dev was integrated via a disposable detached worktree.
 **Not done / left uncommitted:** Production deployment verification follows the root release. Reports under docs/report, logs, credentials, local CLAUDE.md and existing tracked agent/editor history are preserved and excluded from new commits.
 **Follow-ups:** Complete root release and monitor the deployment; append the final run outcome to these notes on dev only. Browser-only guides must be imported from the browser/device that holds them.
+
 ## 2026-10-13 - Claude - Admin Guides Builder (frontend, browser-stored mock)
 
 **Goal:** The user asked for a Guides section in the admin sidebar (administrators only), built with /frontend-design and shadcn. It has a dashboard grouped by country with a "write a new guide" destination search, and a Notion-style editor: banner, title, description, categories with icon and color, place cards as blocks with text written under them, and a map on the right where clicking a place adds it to a list. Written guides must show in the planner's guide view, with a byline "By the Navio team".
@@ -1754,6 +2051,7 @@ The design note has a new Prototype section.
 **Request:** Treat the plan as complete, leave Phase 4C.1 deferred unless its hydration issue returns, commit/push the completed work to main, then pull the latest repository state.
 **Integration:** Rebased the preserved checkpoint work by cherry-picking it onto the current published dev histories in isolated worktrees. Resolved only additive contract conflicts so travel-mode/transit work and the approved Explore/UI remain intact. Published Trip Planning 72f01f6 and Mobility/EV 533850b through release branches to dev/main, then Navio-Server 7630e41 with those exact pins. Published Navio-Client contract fix 05df617 and Phase 5 display 19a6e1e through release branches to dev/main.
 **Verification:** Client 190/190, TypeScript and targeted ESLint pass. Trip Planning 217/217 and Mobility/EV 82/82 pass with disposable real PostgreSQL; Flyway and Hibernate schema validation pass. Root release/deployment verification remains the next step. No academic documents, generated output, CLAUDE.md, IDE state or local service logs were swept into application commits.
+
 ## 2026-10-13 - Codex - Release planner Explore carousel to main
 
 **Request:** Merge main.
@@ -1765,6 +2063,21 @@ The design note has a new Prototype section.
 **Request:** Commit all latest changes to Git.
 **Audit:** Confirmed Explore application work was already committed and pushed. Remaining dirty paths are explicitly preserved/excluded local state: line-ending-only client charger/`tsconfig` markers, `CLAUDE.md`, service logs, reports and generated output. No source change remained to commit in a child repository.
 **Done:** Fetched current root/client dev and main refs, verified `feat/planner-explore-carousel-dev` still descends from current client `origin/dev`, and created root `chore/planner-explore-carousel-pin` from root `origin/dev`. Committed only the client gitlink at `a0ca27e` and pushed the branch. No force-push, dev/main merge or deployment. Prior clean-client verification remains 173/173 tests plus TypeScript, lint, whitespace and production build; no code changed today.
+
+## 2026-10-13 - Codex - Release canonical energy and pull latest team changes
+
+**Request:** Complete the plan while leaving Phase 4C.1 deferred, commit/push the finished work through `main`, then pull the latest Git state.
+**Release:** Integrated the saved energy work onto current remote histories in isolated worktrees, preserving newer UI/transit work. Published Trip Planning `72f01f6`, Mobility/EV `533850b`, server `7630e41`, client `19a6e1e`, and root `ab94c35` through release branches, `dev`, and `main`. Run `38288732387` passed revision, PostgreSQL, build, and deployment jobs; production health/web returned `200` and unauthenticated trips returned `401`.
+**Pull:** During synchronization, newer team work appeared. Pulled client `f3c63ca`, server `05ed0cf`, Trip Planning `2e4b051`, Mobility/EV `c8a5e2a`, User Management `512a884`, and Community `5f0cf41`; root remote `dev` is `e79baac` and `main` is `3f96715`. Preserved divergent local documentation history with a merge rather than forcibly moving the branch. Team deployment run `38384565267` is successful, and production rechecked at `200`/`401`/`200`.
+**Checks/preservation:** Energy release evidence: client 190/190 plus TypeScript/ESLint, Trip Planning 217/217, Mobility/EV 82/82, both backend suites using disposable real PostgreSQL. Exact nested pins were verified before release and again after the pull. Stopped temporary config server and PostgreSQL container. Kept local reports/output/handoff text, `CLAUDE.md`, and service logs uncommitted. Phase 4C.1 remains deferred unless reproduced.
+
+## 2026-10-13 - Codex - Pull from main
+
+**Request/result:** Pulled `origin/main` into every active repository using `--ff-only`, ordered from child services/client through server and root. All pulls returned already up to date, with no conflict or tracked-file change. Repositories remain on `dev`; preserved local-only reports, `CLAUDE.md`, and service logs were not modified.
+
+## 2026-10-13 - Codex - Diagnose missing TipTap module
+
+**Request/result:** Diagnosed the Next/Turbopack `Can't resolve '@tiptap/core'` build error without fixing it. TipTap `3.31.4` is present in both committed dependency files, but absent from local `node_modules` and its installed-tree lock. `npm ls` and `require.resolve` independently confirm the missing installation. Local install metadata is older than the pulled package files, so the root cause is a stale local dependency tree after Git synchronization, not a missing import declaration or missing lockfile entry. No application or dependency changes were made.
 
 ## 2026-10-12 - Codex - Publish clean planner Explore carousel branch
 
@@ -1794,41 +2107,49 @@ The design note has a new Prototype section.
 **Checks:** Frontend 136/136 pass, TypeScript noEmit and targeted ESLint pass. Mobility 54 run, 0 failures/errors, 1 Postgres test skipped. Trip full suite attempted: 193 run, 44 context errors, 6 skipped; root cause unavailable local config server localhost:8888. Affected trip unit suites then pass 48/48. No claim of fresh PostgreSQL/startup/live acceptance. Logs stay untracked under output/pre-push-*.log. Whitespace checks passed. Preserve earlier successful real-Postgres evidence as historical only.
 **Excluded:** CLAUDE.md/local configuration, runtime logs, academic documents/output and NAVIO_Development_Handoff.txt were not staged. Remaining client M markers have no text/numstat diff (station rollback/tsconfig line endings); do not restore or reinterpret them as new feature edits. Service logs remain local. No application changes made during backup.
 **Next:** Resume only when requested. Complete deferred 4C.1 integration with published UI/JSON/transit changes, then remaining Phase 5 energy theme/narrow/keyboard and guest/saved catalogue/custom acceptance before release. Latest verified public Explore route intentionally excludes owner vehicle/energy/checkpoint data; old template view changes do not establish public-share energy parity.
+
 ## 2026-10-12 - Codex - Phase 5 browser verification continuation
 
 **Verified:** Authenticated existing saved trip renders all four dated day cards and Set battery level on normal stops. Its trip garage is empty, so it cannot verify Trip Energy. Explore listing and a public road-trip detail load. No intentional saved-trip edits or copy operation performed. Existing reset-after-hydration guard warning appeared in the development terminal; no hydration failure reproduced in this check.
 **Important scope correction:** Current Explore links use /explore/shared/[token] and SharedPlannerView, which intentionally omits owner vehicle/energy data. The Phase 5 edits in the older view/[id]/[slug]/plan-view.tsx only cover that template view; they are NOT proof of current public-share energy parity. Preserve the existing privacy boundary; do not add owner energy or checkpoints to public snapshots.
 **Checks/status:** TypeScript noEmit passed again. Earlier 136 frontend passes remain historical; not rerun for this browser-only session. No application edits, backend changes, integration, push or deployment. Phase 4C.1 remains ON HOLD. Phase 5 not fully accepted: energy light/dark/narrow/keyboard and guest/saved catalogue/custom save/reopen checks remain. Asked user whether a clearly named temporary account test trip may be created, or which existing trip to use; await answer before that write. Browser is signed in inside local VS Code; credentials are not stored in project files. Preserve all existing dirty application work.
+
 ## 2026-10-12 - Codex - VS Code browser access restored
 
 **Authorization/result:** User approved browser control and NAVIO sign-in. Computer Use now accesses the local VS Code integrated browser. Opened localhost:3000, followed NAVIO's normal Keycloak login and confirmed the authenticated saved-trip dashboard renders. Credentials were used only in the sign-in form, not written to files. Earlier ClientFetchError overlay did not prevent subsequent successful authentication.
 **Next:** Browser unavailable is no longer the Phase 5 verification blocker. Continue Trip Energy visual/mobile/theme/keyboard and account-flow checks; sign-in alone is not acceptance of those flows. No source changes, tests, deployment or remote integration this session. Phase 4C.1 remains ON HOLD.
+
 ## 2026-10-11 - Codex - Phase 5 Explore/display parity continuation
 
 **Boundary:** User explicitly authorized remaining Phase 5 work while halting 4C.1. No remote integration, migration/backend changes or deployment.
 **Done:** Shared VehicleUsageOverview now accepts explicit initial SoC and reserve assumptions; Explore passes its calculation's 80% initial SoC and 12% reserve instead of displaying unrelated current planner atom settings. Threaded the same reserve through gauge and day bars. Explore reuses its canonical projection's blocks/days for the existing daily-details disclosure, without introducing owner/private state. Added concise canonical reason-based notices for partial routes, unknown usable capacity and unavailable energy models. Added word wrapping to metric values for narrow cards. Existing layout and all calculation policies preserved.
 **Checks:** TypeScript passed after assumption wiring; full frontend suite 136/136, targeted ESLint and whitespace pass after final changes. New regression covers missing-route/capacity notices. The public view uses only its existing sanitized template adapter, not owner checkpoint/account data. No live visual/browser, signed-in save/reopen or four-flow acceptance claim: browser unavailable in prior attempt. No full Phase 5 acceptance yet; remaining browser mobile/theme/keyboard and guest/saved catalogue/custom verification needs a working browser session. 4C.1 remains ON HOLD. Application changes remain local/uncommitted with earlier work preserved. Notes only committed locally; no push.
+
 ## 2026-10-11 - Codex - Phase 5 initial Trip Energy consolidation implemented locally
 
 **Authorization:** User said Yes proceed after Phase 4C.1 was explicitly put on hold. Scope limited to Trip Energy information/display; no deferred integration fixes, backend, database, routing policy, energy formulas or deployment.
 **Changed:** Added energy-display.ts provenance/nullable formatters and trip-energy-details.tsx native accessible disclosure. Existing vehicle-usage-overview.tsx retains its card/header/metric/chart foundation and vehicle imagery/specifications remain in the existing VehicleCard without duplication. Adds Catalogue/Custom identity, honest direct/custom/legacy/rated-range basis, planned-distance wording, date-based canonical daily distance/driving energy/start/end battery/charging duration/energy added and distinct per-stop predicted versus observed SoC. Corrected unknown-charging note, removed misleading net-battery-decrease-as-energy-used wording, and removed artificial 1% fill for true zero. garage-section passes existing canonical day projections; no new calculation path. Compared both existing files to cached origin/dev: no incoming differences in these specific components.
 **Verified:** 135 frontend tests pass (6 new display/render regressions); TypeScript noEmit, targeted ESLint and diff whitespace pass. Renderer test initially used TypeScript default ES5 target which mishandled Map iteration; test loader corrected to ESNext, then all passed. Output: output/phase5-tests.log. Tests distinguish unknown/zero, provisional range/no fabricated consumption, custom/legacy provenance, date rendering, predicted/observed values and escaped stop names. Browser tool reports iab unavailable: no screenshot, actual mobile/dark-theme or authenticated four-flow acceptance claim.
 **Status/next:** Phase 5 initial local implementation ready for review, NOT full acceptance/release. Required next: visual keyboard/narrow-drawer/light-dark verification, all guest/saved catalogue/custom flows, read-only/Explore parity review and remaining Phase 5 display edge cases, then deferred Phase 4C.1 integration/live acceptance before release. Application edits remain uncommitted alongside preserved Phase 4C changes. Academic report untouched. Only these technical handoff/log notes committed locally; no push. Phase 4C.1 remains ON HOLD, station patch remains reverted, and current local backend still lacks published JSON hotfix.
+
 ## 2026-10-11 - Codex - User defers Phase 4C.1; Phase 5 preparation authorized
 
 **Decision:** User explicitly requested the post-incident findings be recorded and put on hold, and asked to proceed to the next phase. Phase 4C.1 is ON HOLD, not complete, fixed or waived. This supersedes the prior recommendation to do that sub-phase immediately. No fix, remote integration or deployment is authorized by this deferral.
 **Deferred register:** (1) Published planner JSON hotfix ca2befc/release 328f5b5 explains missing days and user-reported recovery; local trip checkout still lacks it. (2) Original EV station failure remains unconfirmed; last live GET passed, reverted resilience patch must remain reverted. (3) Divergent published transit/TWD/map/place/editor changes need reconciliation with existing local work, retaining published UI. (4) Incoming V16/local V17 and version/capability contracts need coordinated PostgreSQL/HTTP checks. (5) Authenticated create-all-days/save/reopen, garage, SoC checkpoint and optimize/apply/reopen acceptance remain required before release. Historical and current test evidence remains in the preceding audit, not converted into live acceptance.
 **Phase 5 next scope:** Consolidate Trip Energy information using its existing visual foundation and canonical Phases 2-4 model. Retain vehicle/catalogue-custom identity, specifications/connectors, average planned daily distance and compact date-based details without duplicated cards/images. Separate kWh from kWh/100 km, predicted from observed SoC, provisional rated-range results from direct/custom consumption, reserve from uncertainty, and unknown from zero. Keep guest/saved/read-only privacy behavior. No new energy formulas, calibration, routing policy or unrelated UI redesign.
 **Preparation performed:** Reviewed existing vehicle-usage-overview.tsx and the locked Phase 5 acceptance criteria. Next work must map canonical summary/projection fields to display requirements and compare the incoming Trip Energy UI before editing it, to avoid overwriting the friend's newer work. Current fallback/null labels, daily date labels and secondary details need review against those requirements; this is a review list, not newly implemented fixes. Phase 5 release sign-off still depends on deferred integration checks; preparation may proceed now. No application/report Word document changed, tests not rerun for documentation-only work. This entry is the project technical report/handoff, not an edit to the academic report.
+
 ## 2026-10-11 - Codex - Post-incident audit; recommend integration sub-phase
 
 **Scope:** Read-only application audit requested; no fixes, UI changes, merges or deployment. User reports day cards work again.
 **Root cause located:** Incoming trip commit ca2befc fixes Jackson 3 HTTP serialization of Jackson 2 JsonNode fields (energyState/observedSocCheckpoint/arrivalMode). Root release 328f5b5 records the exact invalid-planner/missing-days incident and deployed fix, real HTTP contract tests and 199 backend passes. This corroborates recovery; current authenticated response was not independently captured here. Local trip HEAD does NOT contain ca2befc, so releasing local work without integration risks recurrence.
 **Current verification:** 129 frontend tests pass, TypeScript noEmit and diff whitespace pass. Localhost station GET returns HTTP 200 with 20 items. Station-search rollback remains complete (two files show status due to line endings but have no content diff; helper/test absent). Original station failure remains unexplained; original Promise.all all-or-nothing behavior remains. No unmerged index entries in root/client/server/trip/mobility. Root cached origin/dev now has 19 incoming commits and local dev has 13 outgoing before this audit note; these are tracking refs, not a fresh fetch. Incoming work includes planner JSON hotfix, TWD, transit, map/place changes and markdown notes. Do not assume every remote handoff's locally uncommitted work was published.
 **Recommended next:** Phase 4C.1 integration/stability gate before Phase 5: preserve dirty work, integrate published hotfix and features in isolation, retain pulled UI, reconcile trip V16 arrival mode with local V17 charging fields, confirm current migration allocation, verify transit guards also cover following days and coordinated capability/version contracts. Rerun combined frontend/backend/Postgres/HTTP suites and authenticated create-all-days/save/reopen, garage, checkpoint, optimization preview/apply/reopen flows. Capture field-path validation diagnostics without logging private payloads if hydration recurs. Investigate station failure with actual status before proposing another resilience change. Existing 193 trip/54 mobility results are historical, not rerun in this audit. No Phase 5 or release approval recommended yet.
+
 ## 2026-10-11 - Codex - EV station search fix reverted at user request
 
 **Status:** User reported the last change broke the planner and requested reversal. Restored add-ev-station-button.tsx and ev-station-api.ts exactly to their pre-fix Git content after confirming their diffs contained only this session's edits. Removed only the newly created ev-station-search.ts and ev-station-search.test.mjs. Prior Phase 4C/batching work remains untouched. TypeScript noEmit passed; both restored files have no Git diff. Earlier station-search fix entry is historical and no longer describes current code. No further diagnosis, push or deployment.
+
 ## 2026-10-11 - Codex - Manual EV station search resilience
 
 **Request:** Fix Add EV station search failure without changing existing UI or unrelated Phase 4C work.
@@ -1836,6 +2157,7 @@ The design note has a new Prototype section.
 **Changed:** Client ev-station-search.ts limits searches to two concurrent requests, deduplicates exact coordinates while retaining anchor identities, retries network/502/503/504/timeout failures once, preserves successful areas and distinguishes partial/total failure from no stations. ev-station-api.ts adds a 20-second request timeout and typed HTTP errors; add-ev-station-button.tsx uses the helper and existing error display with readable diagnostics. JSX/styles unchanged; no routing, energy, backend or account behavior changed.
 **Verified:** 136 frontend tests passed (7 new regression tests); TypeScript noEmit, targeted ESLint and diff whitespace pass. Initial regression tests caught a missing break that retried non-transient errors; corrected before the full passing run. Test output: output/ev-station-search-tests.log. No live user-trip modification, push or deployment.
 **Next:** User retries Add EV station. If failure persists, the message now contains status; investigate that specific connected service failure. Application fix remains local/uncommitted alongside preserved Phase 4C work. Previous remote transit integration/migration V16/V17 release gate remains unchanged; Phase 5 not started.
+
 ## 2026-10-11 - Codex - Phase 4C final integration gate / migration collision resolved
 
 **Status:** Phase 4C implementation and local tests are ready for integration review, NOT release/Phase 5 sign-off. Final root check exposed divergent remote dev: origin/dev a9fc36f has five new transit/reporting commits, including trip 4fa2412, mobility 58ecef4 and client 44f5106. Fast-forward-only root pull refused safely; no merge, reset, child switch, pin change or push. Earlier "already up to date" output must not be treated as the final root state.
@@ -1850,824 +2172,6 @@ The design note has a new Prototype section.
 **Verified:** Final trip suite 193/193 passed, including real PostgreSQL migrations/Hibernate validation, apply-save-reopen, unchanged legacy save, post-flush rollback, competing same-version apply, privacy and HTTP version-contract tests. Mobility 54/54 passed including real PostgreSQL (zero skipped). Frontend all 129 tests passed; TypeScript noEmit and targeted lint passed. Unmodified trip HEAD extracted to output/phase4c-trip-baseline passed its 3 Postgres schema tests against V16. OpenAPI YAML parses; final diff whitespace checks pass. Initial test failures were local configuration/database setup and a test fixture's invalid null draft version/floating-point exact equality; corrected before final runs. Logs: trip and mobility target/phase4c-full-tests.log, output/phase4c-client-tests.log, output/phase4c-old-release-schema.log.
 **Not done / left uncommitted:** Application changes remain on the existing client/trip/mobility working branches with pre-existing work preserved; no code commit, child pin change, push or deployment. Only project documentation is committed via docs branch to local dev. Local checks use deterministic routing/test doubles; no fresh browser-to-live-Google acceptance or production validation was performed. Report/source document files unchanged. The test configuration process and disposable DB were stopped; existing MySQL and user app processes untouched.
 **Follow-ups:** Before release, review the combined pre-existing Phase 4B/batching and current 4C code, fetch every child and recheck V16 allocation, then run coordinated staging preview/apply/autosave/reopen against current Google routes. New trip service requires the v2 mobility endpoint; new client requires the precise capability. Keep rated-range automatic apply blocked. No Phase 5 UI consolidation without approval. Remote root dev check was already up to date; root dev prior HEAD 72f5ca4.
-
-## 2026-10-10 - Codex - PAUSED: Phase 4C workspace reconciliation
-
-**Status:** User explicitly requested a safe pause. STOPPED after read-only engineering inspection and documentation-history reconciliation. No new application edits, migrations, tests, push or deployment this session.
-**Completed:** Fetched all seven repositories. Only incoming root dev commit was eb5bbb0 (report handoff notes); no incoming client/trip/mobility application commits. Reconciled on docs/reconcile-handoff-2026-10-10, retaining BOTH local and remote report histories, committed e791463 and fast-forwarded local dev. Conflicts affected only the two agent documentation files and are resolved. No child pins or working files changed. Remote report note naming an older report as latest is historical; user's subsequently reviewed local documents remain authoritative for report edits.
-**Preserved:** Client fix/route-request-batching has trip-route-query.ts edits, new trip-route-api.ts/test plus pre-existing tsconfig/CLAUDE. Mobility fix/phase4b-route-feasibility has four optimization classes, PrecedingTripEnergyTests and new OptimizedRouteVerifierTests, plus logs. Trip fix/phase4c-apply-validation has TripEvOptimizationApplier.java and new TripEvOptimizationApplyValidationTests. Root/server dev, community detached with logs, IAM dev. Do not stage/discard these automatically.
-**Findings / resume:** Read database-changes.md and client/AGENTS.md. Confirmed TripEvOptimizationApplier line ~260 rounds double estimated charging minutes to Integer and does not save operation departureSocPct. BlockItem and PlannerEvChargerDto use Integer estimatedChargeMinutes and Integer targetBatteryPct; latest migration is V15. Need design additive continuous duration and optimizer-selected target persistence without conflating the user's explicit target/lock with an optimizer target. No design or migration implemented yet. Relevant mappings: PlannerService applyPlace/clearEvSnapshot/toPlannerItem; TripEvOptimizationService.mapStop; MobilityEvOptimizationRequest.Stop; mobility EvRouteStopRequest; PrecedingTripEnergy; OptimizedRouteVerifier; client trip-energy-projection.ts chargingEventForCar and planner-api.ts capability-aware save/validation. Existing saved manual targets take precedence; precision must survive save/reopen and guest state. Publication sanitization must not leak private charge state.
-**Remaining:** Finish precision/target data contract and tests; review retained-charger search/replay consistency and cross-span positions; whole-trip downstream validation (current request only includes precedingDays); real database atomic rollback/concurrency and connected preview/apply/save/reopen parity. Existing Phase 4B and partial 4C test results are historical and were NOT rerun. UI remains unchanged; Phase 5 not started. Resume only when user asks.
-
-## 2026-10-08 - Codex - Proposal equipment and references
-
-**Goal:** Complete only equipment/software costs and references in the user's CS-project-proposal-template (2).docx, using friend's research proposal as a structural example.
-**Done:** documents/reports/NAVIO_Project_Proposal_Equipment.docx (4 pages). Hardware/software/external-services subsections adapted to NAVIO; no GPU/LLM research costs copied. Existing equipment/software incremental cost zero under stated assumptions; Google Maps budget remains unconfirmed. Five verified official documentation references added. Original Downloads document untouched.
-**Verified:** Native Word save and PDF layout review, original section text retained. Existing paragraph layout retained; Word normalized one font hint and style-gallery visibility only, without changing font/spacing definitions. New text matches Times New Roman and 1.5 spacing. Preview/scripts in documents/working/proposal-equipment. No code changes or tests.
-**Git/next:** Local docs-only log commit; no push or remote integration. Known diverged dev from earlier fetch remains unresolved. User reviews proposal; external API budget requires actual billing/budget confirmation.
-
-## 2026-10-08 - Codex - Phase durations and system data-flow figure
-
-**Goal:** Use the latest reviewed Downloads/NAVIO_CSC499_Report_Revised.docx; edit only approximate phase durations and missing system data-flow diagram, preserving user styling.
-**Done:** Separate documents/reports/NAVIO_CSC499_Report_Updated.docx and PDF (51 pages), plus NAVIO_System_Data_Flow.png. Added approximate overlapping phase durations 17/22/4/13/9/6/4/8 weeks and a short qualification. Filled Figure 3.5 with a context-level DFD grounded in local client/auth.ts, shared-plan/trip optimization controllers/services and Google Places/Routes adapters. Context boundary includes client and backend; external actors are travellers, Keycloak and Google Maps Platform. Added a compact explanatory paragraph. Original reviewed copy and earlier deliverables untouched.
-**Verified:** Native Word COM save/PDF export. Reviewed all pages as sheets and changed pages at full size. 237 protected body paragraphs retain text and paragraph properties; styles.xml identical; original media preserved by content hashes despite Word filename renumbering. Figure/contents lists refreshed by page numbers only, preserving existing entries. Source uses user-updated 1.5 spacing; no global style changes. Scripts and source backup in documents/working/revision2. No code tests needed or code/UI edits.
-**Git:** Required dev pull attempted; origin/dev advanced to eb5bbb0, but fast-forward refused because local dev diverges. No remote merge/rebase/push or submodule changes. Record this session with a local docs branch merged only to local dev. All pre-existing dirty work preserved.
-**Next:** User reviews Updated report; do not replace with earlier builder output. Future coding must reconcile diverged dev deliberately. Engineering phases remain paused/incomplete as below. Context-level figure intentionally abstracts internal databases/services; ER diagrams and architecture retain that detail.
-
-## 2026-10-08 - Codex - Scoped report feedback revision
-
-**Goal:** Revise only Implementation Plan 2.6, architecture placement/explanation and compact ER explanations, preserving the user-reviewed report. User additionally approved correcting abstract metadata and adding a credit reminder.
-**Done:** Saved separate documents/reports/NAVIO_CSC499_Report_Revised.docx and PDF (41 pages), plus NAVIO_Compact_Gantt.png. Restored eight-phase implementation narrative from prior chapters with current scope. Gantt spans Dec 2025-Nov 2026: early periods are explicitly reconstructed estimates per user instruction; later periods consolidate recovered screenshots. Moved the supplied architecture image to Figure 4.1 with current-service explanation and a short note on its older design labels. Added four compact ER relationship explanations, retaining all image bytes. Updated affected numbering and generated lists. Corrected NAVIO abstract details and left (Reminder: confirm credits).
-**Verified:** Native Word edits/save/export; all final pages inspected as rendered sheets and detailed changed pages. 266 protected nonempty paragraphs retain text and paragraph formatting; existing styles.xml byte-identical; original images retained byte-for-byte; page geometry unchanged. Header/footer relationship IDs renumbered only due new chart. Download/project sources had identical body content/styles and are untouched. Read-only baseline export stalled; stopped only automation Word PID 24344, not the user's Word session. Subsequent Word edit/export succeeded.
-**Git:** No code/UI or source-report modifications. Existing client batching, mobility Phase 4B and trip Phase 4C work preserved. Only required agent docs committed locally via docs branch/dev; no push/deploy.
-**Next:** User reviews separate revised report. Credit total remains unconfirmed; data-flow figure remains a captioned space; architecture still contains historical labels, explained rather than redrawn. Do not regenerate from old report builder: source-of-truth is the user-reviewed copy and scoped revision in documents/working/revision1. Further unrelated text/style edits require user approval. Coding remains paused.
-
-## 2026-10-07 - Codex - Final CSC499 report export
-
-**Goal:** Resume the final report, using the university manual and supplied source documents; project coding remains paused.
-**Done:** Completed Chapters 1-5 and front matter in documents/reports/NAVIO_CSC499_Report.docx, with legacy DOC and PDF copies. Final PDF is 39 pages. Preserved four original ER images; Figures 3.1 and 3.6 are captioned spaces for the user to insert architecture/data-flow diagrams. Testing is qualitative, reflecting the user report; advanced EV/Maps integration remains under refinement. Original source files copied into documents/references, not modified.
-**Verified:** Word refreshed contents/fields and exported both formats. Reviewed all PDF pages as rendered contact sheets and detailed affected layout; corrected theme-overridden heading fonts and an isolated paragraph page. All sections A4 with 30/40/20/20 mm top/left/bottom/right margins. No fabricated user-study metrics. No project source edits or code tests for this document-only task.
-**Git:** Existing client batching, mobility Phase 4B and trip Phase 4C edits preserved. Reports/references/working files remain local and untracked; commit only agent reporting files on a docs branch and merge to local dev. No push/deployment.
-**Next:** User reviews report and inserts the two missing diagrams. Use documents/working/report-blocks.json and build-report-fallback.py for revisions, then native Word render-report.ps1; prepare-content.py predates figure insertion and must not overwrite the final blocks. Engineering Phase 4C remains incomplete as recorded below.
-
-## 2026-10-06 - Codex - Review optimization apply safety
-
-**Goal:** Check for issues before proceeding to the next phase.
-**Done:** Found charging duration/target persistence gap and unsafe handling of invalid apply operations. Added complete operation preflight, checkpoint protection, station identity and malformed-state guards. No UI/schema/energy-formula changes; Phase 4C remains incomplete.
-**Verified:** Full trip suite 184/184 passed with real PostgreSQL. Two later test-only additions also passed in 14/14 focused applier tests. Eleven new validation cases total; whitespace checks passed. No live deployment certification.
-**Git:** Trip fix/phase4c-apply-validation source/tests remain uncommitted. Previous client/mobility work preserved. Root dev pull found no incoming updates. Required reporting-only docs commit merged to local dev; nothing pushed.
-**Next:** Finish precise charging target/duration round-trip and whole-trip downstream consistency; test real transaction rollback/concurrency and connected preview/apply/reopen. No Phase 5.
-## 2026-10-06 - Codex - Phase 4B routed feasibility checks
-
-**Goal:** Continue after user-reported billing resolution with Phase 4B; preserve existing UI and route-loading fix.
-**Done:** Strengthened actual-road detour/reserve/physical reachability checks, origin charging, final saved charging replay, connector/power eligibility, prior-day reserve enforcement and truthful availability diagnostics. Added road-request chunking for expanded optimizer routes. No canonical formulas, public DTOs, schema or UI components changed; unused frontend Auto Add helper remains unused.
-**Verified:** Full mobility suite 53/53 passed with real disposable PostgreSQL schema validation; 14 new adversarial tests. git diff --check passed. No live provider/connected-system acceptance claim. Updated existing API documentation and handoff.
-**Git:** Mobility fix/phase4b-route-feasibility source remains uncommitted; client fix/route-request-batching preserved. Documentation-only local docs commit merged to dev. No push/deployment and no parent-pin changes.
-**Next:** Phase 4C target/duration persistence precision, downstream whole-trip verification and preview/apply/reload parity. Additional route-call latency remains a connected release check; Phase 5 deferred.
-
-## 2026-10-05 - Codex - Fix route request batching and diagnostics
-
-**Goal:** Resolve the reproduced route-loading request-limit mismatch without UI or energy changes.
-**Done:** Added client transport batching (10 groups/request, 25 points/group, shared chunk boundary), complete-response checks, cancellation forwarding and informative backend error extraction. Preserved route order/identity and fallback/unknown values. No backend, database, billing or visual changes.
-**Verified:** Connected proxy previously reproduced HTTP 400 for 11 groups. All 127 frontend unit tests passed; after a typing correction, TypeScript, targeted lint and eight affected routing tests passed. Whitespace check passed. No live user-trip payload capture or Google provider acceptance claimed.
-**Git:** Local fix/route-request-batching; unrelated files preserved. Session docs on a docs branch merged to root dev only. No push/deployment; published submodule pins unchanged.
-**Next:** User rechecks affected trip; diagnose any remaining response-specific failure. Continue Phase 4B separately.
-## 2026-10-07 - Codex - Create latest Navio Chapters 1-5 report from supplied templates
-
-**Goal:** Produce a new complete Word report through Chapter 5, using the supplied templates and Chapter 3 as the prior version, with project context, references and reusable figures.
-**Done:** Created docs/report/Navio_Report_Chapters_1-5_Latest_2026-10-07.docx and matching PDF through native Microsoft Word COM. Preserved the template-derived cover/approval pages, used supplied native DOTX front matter and the official chapter outline/manual, revised Chapters 1-3 and completed Chapters 4-5, 16 references and an evidence appendix. Reused six original ER diagrams and added three current architecture/navigation/data-flow figures. Used the exact three author names and IDs confirmed by the user. Originals remain unchanged.
-**Verified:** Inspected latest root dev 9fb2619 and its child pins via Git objects/temporary exports without changing child worktrees. Fresh frontend run: 119 passes, zero failures/skips, against client ba01a1b with unchanged assertions. Backend evidence is explicitly dated and distinguished from the newer recorded Phase 4A verification; no backend rerun or live acceptance claimed. Reviewed rendered pages, cover spacing, abstract alignment, headings, references, tables, figures, generated lists and Roman/Arabic pagination. Source hashes and all six reused ERD image hashes match the originals.
-**Limits:** Physical EV accuracy, connected two-account acceptance, user evaluation and capacity remain unmeasured. Planned features and Phase 4B/4C are not described as completed. No application changes, main push or deployment.
-**Git:** Mandatory notes are committed as docs(agents): log session 2026-10-07 on docs/report-session-2026-10-07 from dev and merged to dev only. Pre-existing docs/report files and the new deliverables remain untracked/local. Existing client CLAUDE.md, mobility logs and older checked-out submodules are preserved.
-**Next:** Use the new template-based Word/PDF as the latest report; future edits should preserve its template and update fields. Follow the retained Phase 4A handoff for development work. Local reproduction scripts/evidence: %LOCALAPPDATA%/Temp/navio-report-20261007.
-
-## 2026-10-05 - Codex - Publish verified Phase 4A to dev
-
-**Goal:** Push latest verified changes safely at the user's request.
-**Done:** Fetched all seven repositories, confirmed remote dev alignment and pulled dev before commits. Committed/pushed mobility b5a80eb, trip 957cfbf, client ba01a1b, then server f4a2813 and root pins e8b21b7 in dependency order. Published feature/chore branches and fast-forwarded dev. Updated existing API/handoff/session documentation on a docs branch for dev only.
-**Verified:** Staged paths and whitespace checks; no incoming changes or conflicts, no force pushes. Existing successful Phase 4A verification remains applicable; no code changes or new test runs this session.
-**Limits:** Main and production are untouched. Reports, logs, local editor/env files remain local. Google Maps billing diagnosis remains unresolved externally. Phase 4B/4C and connected release acceptance remain outstanding.
-**Next:** Pull root dev and its recursive submodule pins to obtain Phase 4A; continue the approved remaining phases separately.
-
-## 2026-10-03 - Codex - Complete Phase 4A after resumption
-
-**Goal:** Resume the saved Phase 4A checkpoint, preserve existing work/UI, and finish focused verification.
-**Done:** Finished saved canonical optimizer inputs and policy, earlier-day battery replay, endpoint protection, incomplete-charger rejection, version checks around preview, autosave flush/capability checks and stale-response preservation including budget edits. Restored only the previously approved normal-stop battery checkpoint control. Updated existing API documentation and handoff; no Phase 5 or schema changes.
-**Verified:** Trip 175/175 and mobility 39/39 tests pass, including disposable PostgreSQL checks. Frontend 119/119 unit tests, TypeScript, targeted lint and production build pass. Latest production-build guest and synthetic authenticated energy/garage browser walkthroughs pass without private account writes. Test-only configuration and mock-type failures were corrected before final passing runs; Windows build-log lock resolved by using TEMP.
-**Limits:** No full distributed/live-account optimization acceptance or production deployment. Browser Explore feed integration is not certified. Remaining Phase 4B/C feasibility/reserve and charging target/duration preview/apply/reload work is explicit in handoff. Some necessary stale-state safeguards were completed ahead of broader 4C.
-**Git:** All implementation remains local/uncommitted on feat/phase4-canonical-optimization in client/trip/mobility; root/server dev. Preserved previous dirty files. No commit/push under the existing restriction; reporting files remain local. Test server3113 stopped; user server3000 untouched.
-**Next:** Review Phase 4A, then proceed with explicitly scoped 4B/C; coordinate compatible service release and connected-system acceptance before claiming release readiness.
-
-## 2026-10-03 - Codex - PAUSED at user request: Phase 4A in progress
-
-**Authority/status:** User approved baseline verification and Phase 4A, then requested a safe pause because hourly usage was low. STOPPED without claiming Phase 4A complete. Resume from this entry, not from the older report or maintainer handoff. No commits, pushes, merges or deployment this session. User separately approved restoring the existing observed-SoC control on normal stops; otherwise existing UI must remain unchanged.
-
-**Git baseline:** Fresh fetch of all seven origins found no HEAD..origin/dev or HEAD..origin/main commits. Root dev 0421513, client d3d0563, server e836f76; preserved all pre-existing documentation/report/editor/log files. Created local feat/phase4-canonical-optimization branches in client, trip-planning-service and mobility-and-ev-service. All new implementation remains UNCOMMITTED on these branches. Root/server remain dev. Do not discard or automatically commit pre-existing files (client tsconfig flag/CLAUDE.md, service logs, report output and earlier documentation changes).
-
-**Completed narrow regression fix:** trip-place-card.tsx had ObservedSocControl inside the EV-only branch, so normal stops never displayed it. Moved the unchanged control to the regular-place branch, still hidden read-only. Updated energy browser test for current custom-list buttons and mocked profile response. Synthetic signed-in browser test PASSED: initial SoC immediate save/reload, checkpoint save/reload/clear, immutable trip vehicle snapshot after garage refresh, trip-only membership/removal, custom reuse, no garage writes, responsive themes. No real account mutated.
-
-**Phase 4A implementation so far (needs finishing/review):**
-- TripOptimizationEnergy resolves vehicle profile, charging limits/connectors and initial SoC from owned saved trip; ignores request vehicle/SoC. Rejects insufficient usable capacity for consumption, missing snapshot or missing explicitly saved initial SoC. Rated range can preview but never apply. Applies only supported authoritative battery-side catalogue provenance, user-observed override or explicitly confirmed legacy; preserves legacy numbers/source.
-- TripEvOptimizationService now gathers chronologically preceding saved itinerary days/anchors/stops, observations and charge durations. Checks expectedVersion on preview as well as existing apply path. New additive precedingDays/estimatedChargeMinutes internal DTOs retain old constructors.
-- Mobility PrecedingTripEnergy replays earlier days through existing CanonicalEnergy and road routes, including observations/charging; refuses unknown/unreachable earlier legs and disconnected day boundaries. Earlier observations cannot erase prior infeasibility. Only selected day is optimized.
-- New internal /internal/v1/ev-route/optimize-canonical route (old /optimize retained) and trip client uses new route, so old mobility cannot silently ignore context. Planner capability canonical-optimization-v1 added.
-- Frontend optimization-state.ts flushes autosave, checks version/capability, and keys previews on blocks plus energy state plus request. Panel sends expectedVersion, checks stale apply. Existing autosave flush now waits through pending/in-flight mutation scope and refuses local-only/unsynced settings. No visual changes here.
-
-**Verification at pause:**
-- Frontend all 116 unit tests PASS, TypeScript PASS, targeted changed-file ESLint PASS, production Next build PASS (font downloads required approved network access).
-- Full mobility suite: 33 total, 32 PASS, 1 database test skipped, zero failures/errors. New prior-day tests cover propagation, checkpoint removal, unreachable prior leg despite observation, fallback route refusal, discontinuity and Day 1.
-- Latest full trip suite: 173 total, 171 PASS, 2 context setup errors, zero assertion failures. PostgreSQL schema/migration/upgrade tests passed in this latest run. ONLY TripPlanningServiceApplicationTests and VerificationTests fail: isolated target/phase4-test.yml omits required navio.currency-provider.base-url. Add the normal https://api.frankfurter.dev setting to this ignored test config and rerun. Earlier failed runs were configserver import setup failures, not passing tests; latest XML/log is authoritative.
-- Guest browser walkthrough remains INCOMPLETE due outdated selectors, not a demonstrated application failure at last step. Current failure tests/guest/browser-check.mjs line ~74 searches 'Search Thailand vehicles'; actual current aria-label is 'Search vehicle catalog'. Already updated old 'Thailand catalogue' button to 'EV Vehicle List', scoped stop search to Itinerary, and added mock public /api/vehicle-models page/detail responses. Continue updating selectors to current UI, NOT changing UI to satisfy tests. Earlier dev overlay came from mocked profile shape/external Google Maps failures; production localhost:3113 used to avoid dev overlay. No full live-account acceptance claimed.
-
-**Next exact steps:**
-1. Recheck working tree and review this session's edits. Finish guest browser walkthrough, add multiple checkpoint/readonly coverage and optimizer flush/stale integration coverage. Energy browser test uses synthetic APIs and must remain isolated from real account data.
-2. Fix ignored test configuration currency provider property and rerun full trip suite on disposable Postgres. New TripOptimizationEnergyTests passed in latest suite; cover policy matrix/unknown capacity/missing initial state. Add preceding-days charging and JSON round-trip tests as needed.
-3. Review edge cases before calling 4A complete: mapCharger still maps incomplete charger snapshots to ordinary waypoints (risk for earlier-day replay); selected day at a replaceable first charger; concurrent edits during apply response; version-consistent snapshot reads; unknown connector treatment. Do not silently weaken eligibility or fabricate capacity/consumption. Further optimizer/precision changes belong 4B/4C, document boundary clearly.
-4. Update existing API documentation for canonical capability/internal request contract; not done yet. No entity/migration edits introduced. Review diff, rerun affected checks, document exact remaining release gates. No Phase 5 UI consolidation.
-
-**Local tools/resources:** Bundled Node24 C:/Users/suriy/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe; normal PATH node22 cannot run registerHooks tests. Browser env NAVIO_PLAYWRIGHT_MODULE=file:///C:/Users/suriy/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright/index.mjs; NAVIO_TEST_ORIGIN=http://127.0.0.1:3113. Maven C:/Users/suriy/.m2/wrapper/dists/apache-maven-3.9.16/0daed3be3ebd1c706f0e69e8b07c6b73f5cc4ea3dfce72a8d0ec2e849ca2ddb0/bin/mvn.cmd -o test requires approved cache access. Test configuration: set SPRING_CONFIG_LOCATION=file:./target/phase4-test.yml and NAVIO_TEST_DB_URL=jdbc:postgresql://localhost:55434/navio_phase4. Logs: trip target/phase4-verification.log, Surefire XML; client .next/phase4-unit-tests.log.
-
-**Processes:** Disposable Docker navio-phase4-verify-pg (--rm) on localhost55434, DB navio_phase4, test username/password tripplanner; no live DB touched. Container retained for resumption. Existing user dev server PID32332/localhost3000 was not stopped. Session-created production test server on3113 is being stopped for pause; restart with bundled Node next start --hostname127.0.0.1 --port3113 (Next warns standalone build prefers standalone/server.js). No further tests/background work should continue after pause.
-
-**Usage:** Agent cannot observe hourly quota. User explicitly requested pause; wait for user to resume. Reporting files updated locally; prior documentation Git restriction remains respected.
-
-## 2026-10-03 - Codex - Pre-Phase-4 readiness recommendation
-
-**Goal:** User is considering resuming development and asks what should precede Phase 4.
-**Reviewed:** Current handoff, session history and local repository status. Local root/client/server remain on dev; existing report/documentation, editor and log changes preserved. No fresh remote fetch or claim that the friend has not pushed.
-**Recommendation:** First run integrated browser acceptance of garage, trip state, checkpoints, reload and sharing; verify connected backend capabilities and inspect migration history before release. Fix reproduced baseline regressions narrowly. Then implement Phase 4 server model-policy enforcement, canonical optimizer state, route/charger feasibility and preview/apply/reload consistency; finish with focused integration/security tests. Phase 5 visual consolidation remains deferred and existing UI must be preserved without approval.
-**Limits:** Planning review only; no code changes or fresh tests. No commit/push/deployment; local reporting updates retained under the existing documentation Git restriction.
-
-## 2026-10-01 - Codex - NAVIO report draft and visual verification
-
-**Goal:** Review supplied historical slides and Chapters 1-3 against current scope and implementation; revise chapters as needed and prepare Chapters 4-5 without changing application code.
-
-**Done:** Completed output/doc/NAVIO_Project_Report.docx (35 pages) and output/doc/NAVIO_Report_Revision_Notes.txt. Rewrote Chapters 1-3 and added Chapters 4-5, references, three diagrams and six tables. Preserved original documents. Planner, EV Integration, Explore and Community are treated as main features; moderation is excluded, AI and additional Explore recommendations conditional. Current code and historical test evidence are distinguished from planned acceptance and empirical evaluation.
-
-**Verified:** Exported final DOCX through Word and inspected every rendered page; checked pagination, tables, figures and text layout. Document structural checks completed. No application tests rerun for this report-only task.
-
-**Outstanding:** Confirm official cover/team spelling/course formatting and Community scope assumption. Linked DB diagrams and Gantt were not readable as source exports; request PDF/PNG/DBML exports before inserting detailed ERDs and actual dated schedule. Report is a review draft, not a claim of completed user or road testing.
-
-**Git:** Existing application and documentation changes preserved. No code changes, commit, push or deployment. Reporting updates remain local because earlier documentation Git actions were declined.
-
-# Session Log
-
-## 2026-09-30 - Codex - Revised remaining plan for maintainer handoff
-
-**Goal:** Pause coding and prepare a current, considerate plan for the user's friend to own.
-**Done:** Reviewed workspace states, latest handoff, selection/canonical calculations, optimizer preview/apply and chart integration. Added a superseding maintainer handoff at the top of handoff.md with completed baseline, concrete Phase 4 gaps, Phase 5 scope and release prerequisites. Explicitly transferred subsequent decisions to the friend; historical approval holds are not demands for this agent's approval.
-**Findings:** Server model-policy enforcement, pending-edit/preview integrity and charge-target precision need Phase 4 attention; guest optimization is currently authenticated-only; chart profiles suppress observed checkpoints; legacy-confirmation copy no longer matches the settings UI. These are planning findings, not application fixes.
-**Verified:** Read-only source/Git inspection; no tests rerun or source/UI changes. Prior tested/pushed baseline remains root 0421513. Existing unrelated files preserved. No main push/deployment.
-**Next:** Friend validates baseline and decides remaining work; user proceeds with proposal report. See newest handoff entry for full revised plan and evidence limits.
-
-
-## 2026-09-30 - Codex - Verify and publish integrated dev
-
-**Goal:** Check and push the integrated project. No source or UI changes requested or made.
-**Verified:** Fresh fetch of all seven repositories found no unintegrated remote dev/main commits. No unmerged entries or whitespace errors. Re-ran all 113 frontend tests, planner model checks and TypeScript: passed. Reviewed unchanged backend Surefire reports: trip 166 passed; gateway 12 passed/1 skipped; mobility 26 passed/1 skipped, zero failures/errors. Previous production build passed on the same source. No additional browser or live production migration validation claimed.
-**Publication:** Pushed IAM 6183185, trip f724442, mobility 322b616, client d3d0563 and server e836f76 to origin/dev, in dependency order. Root dev publication includes this reporting entry and the integrated child pins. Community is already current. No force pushes, main updates or production deployment. Local logs/editor files and the pre-existing tsconfig status flag remain untouched (no textual tsconfig diff).
-**Remaining:** Production release still requires the merged browser walkthrough and actual deployment migration-history check documented below. Continue remaining energy phases only with user direction.
-
-
-## 2026-09-30 - Codex - Integrate published main with Phase 3.1
-
-**Goal:** User requested current-workspace main integration, incoming UI preferred, preserving valid prior work. User asked how to reconcile competing energy approaches; retained approved canonical energy policy beneath incoming presentation. No further phase or production release authorized by this integration.
-
-**Done:** Fetched/rechecked all seven main refs; every origin/main is now an ancestor of the corresponding workspace HEAD. Resolved client/server/root merges and fast-forwarded local dev branches. Preserved backups at backup/pre-main-integration-20260929. Incoming admin/catalogue/public-sharing/Explore and visual components retained. Restored trip-only garage membership, reusable personal custom EVs, guest public catalogue detail checks, provenance-aware energy commands, live trip starting SoC and stop observations. Incoming road-route verification now uses canonical continuous energy/SoC rather than the parallel simulation factors. Rated-range automatic application remains preview-only; no fabricated consumption, hidden standard factors or 12% correction reinstated. Unavailable driving/battery/energy stays unavailable. Public catalogue GET routes are narrowly allowed; private garage operations remain authenticated.
-
-**Commits:** client d3d0563; IAM 6183185 (tree equals released main); trip f724442; mobility 322b616; server e836f76; root integration 6019c49. Child/server integration branches published before parent pins. Local dev contains integration; remote main/dev and production were not changed. Community remains at published main. Unrelated client tsconfig.json flag, CLAUDE.md and service logs preserved.
-
-**Database:** Published V11 publication/V13 sharing migrations preserved. Local canonical energy/membership additions moved to V14/V15 to eliminate duplicate V11. Full real-PostgreSQL trip suite validates schema and persistence. Added an isolated upgrade test from published V13 to V15, preserving an existing trip and leaving new fields null. A local database that previously applied the old unpublished V11/V12 energy migrations needs explicit history reconciliation before startup; never blindly repair or replace production migration history. Production history inspection remains a release gate.
-
-**Verified:** 113 frontend tests passed; planner model script passed; production Next build and TypeScript passed. Targeted changed-file lint: 0 errors, one incoming unused RouteSegmentStatus import warning. Trip: 166 passed, including PostgreSQL schema/reload and published-schema upgrade. Gateway: 12 passed, 1 disabled. Mobility: 26 passed, 1 database test skipped; stress test first timed out under concurrent load, then passed isolated and in final full suite. Maven shell stderr warnings produced misleading shell exit status on gateway/mobility; fresh Surefire XML confirms zero failures/errors. IAM tree is identical to the previously released/tested main (161 passed, 2 disabled); not rerun this session. No new authenticated browser or production-account mutation test performed. Existing synthetic browser script needs selector adaptation for incoming vehicle switcher/custom-list layout before rerun.
-
-**Remaining plan:** First browser-check merged guest/signed-in catalogue, custom reuse, trip separation, settings/checkpoints and shared read-only views; inspect actual deployment migration history before releasing. Then Phase 4 should integrate/evaluate charger optimization on canonical road-leg energy, distinguish feasibility from automatic-apply eligibility and test reserves/checkpoints/unknown data. Incoming simulation modules remain reference code, not approved runtime policy. Do not adopt standard factors/margins or rated-range automatic apply without explicit policy approval. Phase 5 retains incoming Trip Energy visual foundation, incorporates useful old overview detail from canonical results, and never presents unknown as confirmed zero. Friend's unpushed hybrid branch remains unavailable; no claim to have integrated unpublished commits.
-
-
-## 2026-09-27 â€” Claude â€” Admin route fix, OWNER provisioning, Explore seeded
-
-**Goal:** `/admin/users` reload showed Keycloak's "internal server error"; production had no OWNER role; run the Explore seed as "Navio Team".
-**Done:** nginx routed every `/admin/` path to Keycloak; now only `/admin/realms/`, `/admin/serverinfo` and `/admin/<realm>/console/` go there (Keycloak console is `/admin/master/console/`). deploy.sh creates the OWNER realm role if missing and adds it to the `navio-web` scope; a smoke check asserts anonymous `/admin/users` redirects to `/sign-in`. First release (`ac8ed60`, run `36332867659`) failed and rolled back: the pre-existing scope-mapping `printf '...'` inside `bash -euc '...'` broke the quoting (never ran before because all roles were already mapped). Fixed in `b853d1a`; OWNER scope mapping was also added manually. Root `main` `6915bca`, run `36333726651` succeeded. Created Keycloak user `navio-team@example.com` (Navio Team, id `0ae736e4-a315-456e-bb2e-7257d419b2d9`, no password, no IAM profile yet). Ran the seed on the VM from `~/navio-maintenance/seed-explore` (log `run-2026-09-27.log`): 30 published, 0 failed.
-**Verified:** `/admin/users` -> 307 sign-in; `/admin/master/console/` 200; OWNER role exists and is in the `navio-web` scope; replayed smoke checks pass; feed lists 30 plans with `authorName` "Navio Team"; a seeded `/explore/shared/<token>` returns 200.
-**Not verified:** no one holds OWNER yet (manual steps 3-5 in owner-role.md); seeded plans were not browser-checked.
-
-## 2026-09-27 â€” Claude â€” Explore seed script (30 real plans)
-
-**Goal:** fill Explore with many real plans: 5 Thailand, 5 Japan, 20 elsewhere.
-**Done (uncommitted, root `dev`):** `.deploy/scripts/seed-explore/` with `seed.mjs`, `plans.mjs` (30 itineraries) and `README.md`. The script uses the real API only: `POST /v1/trips` (destination = Google place id from `/v1/geo/places/search`), `PUT .../planner` with stops resolved to real Google places (photo, rating, coordinates) and real chargers from `/v1/ev/chargers/near` for the two Thai EV trips, then `PUT .../publication` with `listInExplore`, `includeNotes`, byline "Navio Team". It calls trip-planning and mobility directly with `X-User-Id`, because Keycloak has direct-access grants off. It is idempotent by trip title and has `DRY_RUN`/`ONLY`.
-**Verified:** `node --check`; plan counts and time order; full run against a contract stub (`scratchpad/stub.mjs`): 30 published, 4 charger stops, the re-run skipped 30, and a missing user id was refused.
-**Not verified:** not run against a real backend or Google (nothing was running locally, and production needs a seed account id).
-**Follow-ups:** create the seed account, run with `DRY_RUN=1` on the VM (`docker run --network navio-backend ...`, see README), check the resolved places, then run for real.
-
-## 2026-09-27 â€” Claude â€” Commit and release Owner role, Explore sharing and observability
-
-**Goal:** `/commit` everything dirty across all repos and release it through `main` (user chose "Everything" and "Through main (deploys)").
-**Done:**
-- client: the dirty `feat/admin-console` tree was 5 commits behind `origin/dev`, whose released admin files were untracked here. Snapshotted it as temp commit `0b54f2c` (the old branch still points at it), cherry-picked onto `feat/explore-read-only-planner` from `origin/dev`, and resolved all 22 add/add conflicts to the snapshot after confirming every dev-only line was superseded; the final tree equals the snapshot. Commits `c072bce` feat(admin) Owner role, `1296322` feat(explore) read-only planner. `main` = `f790652` (merged in the `%TEMP%/navio-client-admin-release-20260926` worktree, which holds `main`). The main client worktree is left detached at `f790652`.
-- IAM (was dirty on `main`): `e9dac80` fix(admin) null-free user search on `fix/admin-user-search`, `27295c9` feat(admin) Owner role + V6 on `feat/owner-role`; `main` = `9351eb8`.
-- trip-planning (was dirty on `main`): `8e4ff37` feat(sharing) trending/V13, located stops, copies; `main` = `f0549d4`.
-- server: `feat/gateway-owner-role` (OWNER authority), pins `f5f1cb9`, and **new** `fix/shared-plan-copy-route`: neither gateway config routed `POST /v1/shared-plans/{token}/copies` (would 404). `main` = `4395d86`.
-- root: `fix/shared-plan-copy-route` (same route in `.deploy/config/api-gateway.yml`), `feat/owner-realm-role`, `fix/grafana-proxy-headers`, `feat/production-tracing` (Zipkin), `docs/owner-explore-release`, pins. `main` = `881ea96` (merged in `%TEMP%/navio-root-admin-release-20260926`), Actions run `36327266654` succeeded (pins, Postgres schema, 9 builds, deploy). Live smoke: `/health` 200, feed and trending 200, anonymous copies/trips/admin 401, Grafana health 200.
-**Verified:** IAM full suite 148 (2 skipped by design) incl. `PostgresSchemaTests`, admin repository and catalog Postgres tests on disposable PostGIS 16; trip-planning full suite 157 incl. V13 on Postgres; gateway 12 (1 skipped); client `tsc` clean, ESLint 0 errors on changed files, 13 admin tests (`node --experimental-transform-types --test`). Production compose validated with `docker compose config`. First IAM run had 8 errors only because the config server was still starting (connection refused on 8888); rerun passed.
-**Not verified:** live Keycloak/two-account acceptance, copy end to end, nginx `-t`, VM memory headroom for Zipkin.
-**Follow-ups:** Raum-1's `fix/trip-specific-garage` still carries trip-planning `V11`/`V12`; renumber above V13 before merging. Existing production realm needs the manual OWNER setup in `owner-role.md`.
-
-## 2026-09-27 â€” Claude â€” Explore shared plan rendered by the planner itself
-
-**Goal:** make an Explore plan page 1:1 with the planner (map on the right), fed by the real published plan, copyable, and automatically updated whenever planner cards change.
-**Done (all uncommitted):**
-- User decision: published itinerary stops (places and chargers) may expose coordinates; day anchors stay private.
-- trip-planning `main`: `PlanPublicationSanitizer.sanitizePlace` now publishes `placeId`/`address`/`lat`/`lng` only for valid coordinates; `SANITIZER_VERSION` deliberately unchanged (adding fields must not dead-link live plans; old snapshots just lack pins). Copy no longer requires an address. Tests updated and added.
-- client `feat/admin-console`: new `plannerReadOnlyAtom`; read-only branches in `ItinerarySection` (+ `renderDayAnchors` slot), `SortableBlockItems`, `TripPlaceCard`, `TripNoteItem`, `TripChecklistItem`, `BudgetSection`/`ExpenseCard`, and both planner maps (no POI add). New `share/shared-plan-blocks.ts` (snapshot â†’ `TripBlockData`/budget) and `share/shared-day-anchors.tsx`; `SharedPlannerView` rewritten to hydrate a scoped Jotai `Provider` and render the real planner components + `PlannerMap`; `/explore/shared/[token]` uses the planner's sidebar layout. Deleted the unused custom `shared-planner-map.tsx`.
-**Verified:** `PlanPublicationSanitizerTests` 33/33, `TripPublicationServiceTests` 39/39; client `tsc` clean, scoped ESLint clean (one pre-existing warning). Headless Chrome against a stub gateway at 1440px: planner layout, real cards, numbered/charger pins, budget. Phone width not truly verifiable (headless min width). Not verified: live routes, real accounts, copy end to end, full trip-planning suite, Postgres.
-**Follow-ups:** `/share/plans/[token]` and the publish-dialog preview still use `SharedPlanContent`; move them to `SharedPlannerView` if they should match too. Plans published before this change show stops as "(location not shared)" notes until the owner presses Update.
-
-## 2026-09-27 â€” Codex â€” Real Explore plans and planner-style shared view
-
-**Goal:** remove mocked Explore trips, show real recent and trending user publications, open a shared plan in the planner layout without editing, and let a user copy it.
-**Done:** Connected Explore, dashboard recommendations, and the planner Explore section to published plans; added view-based trending and a private-copy endpoint in trip-planning with V13 `view_count`; replaced the old mock detail route with a read-only planner workspace and shared card/day components. App changes remain uncommitted.
-**Verified:** client TypeScript, scoped ESLint, and production `next build`; targeted publication/controller/privacy tests; V1â€“V13 Flyway migration and JPA validation on disposable PostgreSQL 16. No real-account browser acceptance.
-**Not done / left uncommitted:** Client `feat/admin-console` and trip-planning `main` hold these changes alongside unrelated dirty work. The isolated frontend build left `client/.next-explore-check/`; automatic approval review blocked recursive removal. App changes were not staged, merged, or deployed.
-**Follow-ups:** The user was asked whether publicly shared itinerary stops may expose coordinates. Until answered, the sanitizer keeps locations private: the read-only map has no pins and copied stops without public coordinates become editable notes. Recheck the exact visual match and copy flow with two real accounts once that choice is settled. Agent notes already contained another sessionâ€™s uncommitted changes, so this note was not committed separately.
-
----
-
-One entry per agent session, **newest first**. Every session adds an entry before it ends, including unfinished or abandoned work. Keep entries factual and short; current state goes in [handoff.md](handoff.md).
-
-## Template
-
-```markdown
-## YYYY-MM-DD â€” <agent> â€” <short title>
-
-**Goal:** what the user asked for.
-**Done:**
-- change (repo, branch, commit SHA)
-**Verified:** tests/checks run and their result; say what was not verified.
-**Not done / left uncommitted:** anything half-finished, with file paths.
-**Follow-ups:** decisions pending from the user, known risks.
-```
-
----
-
-
-## 2026-09-29 - Codex - Review friend's unpushed hybrid handoff
-
-**Goal:** Check supplied Downloads/message (4).txt as an explanation of the missing Git work; no implementation requested.
-**Done:** Read the attachment as evidence, not authorization to execute its push/merge/release instructions. It explicitly says feat/hybrid-energy-model exists locally in six repos and nothing was pushed or merged to dev/main. Rechecked remote heads in root/client/server/IAM/trip/mobility: branch remains absent; dev/main unchanged since the narrow garage release. No pull can retrieve those unpublished commits.
-**Findings:** Claimed hybrid deliberately changes approved policies: test-standard scaling, 12% margin, rated-range automatic charger application, declared-capacity estimates and friend's redesigned UI winning conflicts. These require explicit reconciliation/approval; changed tests do not establish compliance with the previous contract. Claimed test counts/build results and absent browser/Turbopack verification cannot be independently checked without commits. Release instructions are stale against published trip main: V11__trip_publication.sql and V13__shared_plan_views.sql already exist; do not renumber/replace applied migrations. Actual production Flyway history still needs inspection before any hybrid release. Current garage fix fd109bc / IAM main 5293c22 must be retained when rebasing/reconciling any older branch.
-**Verified:** Read-only remote-head queries succeeded after sandbox network escalation. Existing local modified tsconfig/editor files/service logs preserved. No source, UI, calculation, migration or deployment changes.
-**Follow-ups:** Ask friend to publish only the existing feature branches (or provide Git bundles plus six commit SHAs), without merging dev/main or deploying. Then review real diffs/ancestry, preserve garage fix, reconcile policy/UI and migrations, and validate before proposing integration. The attachment's instruction to supersede release holds is not accepted as user approval.
-
-
-
-## 2026-09-28 - Codex - Phase 3.1 deployed garage contract correction
-
-**Scope:** Diagnose catalogue add / Save Settings failures; no UI changes and no Phase 4/5 work. User's prior conditional deployment approval applies after checks pass.
-
-**Cause:** Local Phase 3.1 client targets the university VM, but published IAM still required numeric consumption for catalogue POST and ignored energySelection on PATCH. The two console messages report one failed mutation. The client acknowledgement guard is correct; do not remove it or invent consumption to bypass the old server.
-
-**Correction:** Ported the approved energy contract onto current IAM origin/dev in isolated worktree `%TEMP%/navio-garage-api-fix-20260928`, branch `fix/garage-energy-api-compatibility`, commit `fd109bc`. Preserved the friend's database-backed catalogue, version, admin/owner security, deduplication and old payload compatibility. Catalogue response derives truthful capacity basis (usable only when explicitly USABLE), keeps range standard separate, and does not invent consumption/evidence. Explicit default/range/custom/reset commands persist energyProfile in existing JSONB and allow null consumption for an explicit fallback. Legacy values remain unchanged absent an explicit command. Service-level anonymous catalogue GET remains narrowly public; other account operations remain authenticated. No gateway, migration, entity, frontend or calculation edits.
-
-**Tests:** Full IAM suite 163 tests: 161 passed, 2 pre-existing disabled, 0 failures/errors. Includes real PostgreSQL Flyway/Hibernate validation, provenance/null-consumption reload, unrelated metadata preservation, anonymous/ownership security and existing admin/catalogue tests. Frontend garage suite 33/33 passed using Node 22.22 with --experimental-transform-types. Initial failures were test setup/fixture integration: response-only energyProfile in entity fixture conversion, nested Mockito stubbing, BigDecimal scale-only equality and missing configuration server; fixed the test adapters/comparisons and ran the real configuration server on 18888. Default Node 22.14 cannot run these tests; compatible runtime used without dependency edits. No live authenticated user write replayed.
-
-**Release:** IAM main `5293c22`, server main `416644c`, root main `16fffce`; root dev release `49bfa50`. Child-first dev/main publication; all six pins checked against live origin/main. Client remains published `f790652`, trip `f0549d4`, mobility `eb72b37`, community `5f0cf41`. Release workflow https://github.com/bestprappy/Navio/actions/runs/36452979632 completed successfully, including all schema checks, nine image builds and VM deployment. Live public catalogue now returns all three RATED_RANGE/CATALOG_DEFAULT profiles with null consumption and NEDC range basis; health 200; anonymous private garage and trips 401. The legacy catalogue URL /v1/users/me/vehicles/catalog still returns 401 at the current gateway, while /v1/vehicle-models is public; guest legacy-route reconciliation remains separate. Authenticated end-to-end adds were covered by controller/service tests, not replayed against a real user account.
-
-**Boundary / follow-up:** This is a narrow garage compatibility release, not complete Phase 3.1 reconciliation. Original local Phase 3.1 worktrees and UI are preserved; remote UI/energy-model differences and trip migration collisions remain for the separate reconciliation gate. Production trip service still lacks the local canonical trip energy/membership persistence contract, so this release does not claim to fix its local-draft compatibility warning. Do not advance phases automatically. Preserve unrelated client tsconfig flag/CLAUDE.md and service logs. Temporary PostgreSQL container and configuration-server process stopped; existing dev server left running.
-
-
-
-## 2026-09-28 - Codex - Pull published updates and revise remaining energy phases
-
-**Goal:** Review friend's Git updates, preserve completed Phase 3.1 and propose remaining plan; no new phase implementation.
-**Done:** Fetched/rechecked existing remotes and pulled root dev `24c7f1f` with recursive published pins into `%TEMP%/navio-plan-review-20260928`. Original working trees preserved. Reviewed global catalogue/admin, sharing/copies/read-only planner, alternate simulation, backend optimizer/road verifier and anchor integration. Documented revised reconciliation gate, Phase 4 correctness/preview/apply/validation and Phase 5 approval-gated consolidation in existing handoff.
-**Verified:** Six published mobility optimizer/simulation tests pass. Planner regression script fails at CommonJS JSON/TypeScript module-name resolution before assertions; not classified as runtime app failure. Clone reset recovered on Git retry. Checkpoint branches unchanged and not ancestors of main; handoff's hybrid branch absent from remote heads/history after second check.
-**Not done / left uncommitted:** No application edits, migration changes, destructive merge, push or deployment. No full integrated build/DB/live-account certification. Unrelated tsconfig flag/editor files/service logs remain untouched.
-**Follow-ups:** Approve reconciliation-first plan; resolve model/visual baseline explicitly, new catalogue provenance and sharing privacy, and deployed V11/V13 collision before merging Phase 3.1. Do not start Phase 4/5 automatically.
-
-## 2026-09-25 - Codex - Publish tested Phase 3.1 checkpoint
-
-**Goal:** Check, commit and push completed work; await next prompt before further phases.
-**Done:** Published user `20a41c4`, trip `73668d3`, mobility `61294ab`, client `ddeff88` on separate feature/fix branches. Server checkpoint `c85586a` publishes trip pin; root `chore/phase31-checkpoint` contains updated pins/reporting. Child-first order; no remote dev/main merge or production deployment.
-**Verified:** All origins fetched, working trees/pins/diffs reviewed; 70 frontend tests and TypeScript pass again. Prior unchanged-code backend 54/54 real-Postgres tests, lint and browser checks remain valid.
-**Not done / left uncommitted:** Unrelated tsconfig flag, CLAUDE.md and service logs preserved. Conflicting remote UI/model histories not merged; release hold remains.
-**Follow-ups:** Wait for next user prompt. No further phases implemented.
-
-## 2026-09-24 - Codex - Phase 3.1 trip-specific garage correction
-
-**Goal:** Make each trip's garage independent, retain custom vehicles in a reusable personal list, rename/category the picker; preserve other UI and deploy only when safe.
-**Done:** Client `ddeff88`, trip service `73668d3` on local `fix/trip-specific-garage` branches. Trip membership JSONB V12/capability, explicit add/select/remove, no automatic account list/default import, reusable custom list categories/search, catalogue record reuse, membership-preserving battery edits and late-response guard. Updated existing API/database docs and handoff.
-**Verified:** 70 frontend tests; TypeScript/targeted lint; 54/54 trip tests including real PostgreSQL migration/Hibernate/reload/clear. Mocked Chrome new-trip/custom-reuse/reload/remove/other-trip preservation plus battery/checkpoint scenario passes, with no account writes for reuse/removal. No live account writes or deployed-service claims.
-**Not done / left uncommitted:** No push/deployment/remote merge. Conditional release approval held because fetched remote client has a conflicting garage redesign and alternate range-factor/simulation model. Parent pins left uncommitted pending child publishing; unrelated tsconfig/editor/log files preserved.
-**Follow-ups:** Resolve overlapping remote UI/model work explicitly before releasing; existing VM still lacks required energy/garage commands. Keep the trip-specific garage rule and no-unapproved-UI-change rule. No Phase 4/5 work.
-
-## 2026-09-24 - Codex - Phase 3.1 garage compatibility troubleshooting
-
-**Goal:** Diagnose and fix failed Save/catalogue adds while preserving all existing UI; log Phase 3.1.
-**Done:** Client `d15dd47` verifies energy-command acknowledgements and identifies old-backend catalogue validation, with regression tests. Existing backend support is already implemented in local user-service `20a41c4`. VM/frontend mismatch explains failed catalogue adds and ignored model changes; repeated cars are account garage entries. Corrected prior missed-save diagnosis. No UI/layout or account data changes.
-**Verified:** 68 frontend tests; 39 user-service garage/API/security tests; TypeScript, targeted lint and diff checks pass. Public catalogue through localhost returned 401; local configuration targets VM. Private account requests not replayed.
-**Not done / left uncommitted:** VM functionality remains pending deployment approval, not falsely marked fixed. No pushes/deployment, new schema or Phase 4 work. Unrelated files preserved.
-**Follow-ups:** User was asked to approve lifting prior deployment restriction for safe remote reconciliation and tested backend release. Standing no-UI-change requirement recorded in handoff.
-
-
-## 2026-09-24 - Codex - Battery unavailable screenshot diagnosis
-
-**Request:** Check why battery predictions appear unavailable after Phase 3; investigation only, no application changes or deployment.
-**Findings:** Screenshots show an unsaved NAVIO Estimate selection (Save settings enabled and explicit save-to-apply text), while Trip Energy still reports legacy 18.1 kWh/100 km. Current settings form applies model changes only on save, as requested. Legacy/unknown usable capacity allows nominal driving kWh but leaves SoC null; catalogue 82.56 kWh is declared capacity and cannot be silently promoted. Saving a successful RATED_RANGE selection enables range-based SoC without usable capacity, subject to route completeness. The old-server local-only toast proves some required snapshot capabilities are missing, but exact live capabilities/garage command support were not inspected; no claim of live backend verification. Driving total becomes unavailable if any route duration is missing. UI shortcomings: unexplained question marks, clipped Unavailable text, and local-only toast naming only older fields. These need a focused follow-up, not changed arithmetic or automatic legacy conversion.
-**Verified:** Existing energy suites 31/31 passed, including unknown-capacity, rated range, propagation and capability downgrade. Inspected current branch/status, settings submit, canonical arithmetic and summary conditions. No private account values changed. Unrelated tsconfig flag, CLAUDE.md and service logs preserved.
-
-
-
-## 2026-09-24 - Codex - Complete Phase 3 canonical trip energy
-
-**Goal:** Continue the approved Phase 3 implementation from the existing checkpoint, preserving prior work; no Phase 4/5, push or deployment.
-**Done:** Local feature commits trip `1068215`, mobility `61294ab`, client `13fc1c8`, server pins `c380949`, root `b4d30bc`, merged to local dev. Canonical TS/Java energy/SoC, trip snapshot/initial state, observed checkpoints, additive V11/API, shared Planner/Explore projection and bounded continuous optimizer. Fixed first-edit autosave skip and unknown-duration DTO/energy transport integration. Updated existing API/database documentation and handoff, preserving history.
-**Verified:** 65 frontend tests, 53 trip tests, 25 mobility tests including separately enabled real-Postgres test; 18 identical single-case goldens + 3 chronological fixtures (1e-9 tolerance); dense-search/1,000-segment regression; TypeScript/targeted lint; planner model script; guest and synthetic authenticated Chrome scenarios. Disposable PostgreSQL 16.15 Flyway/Hibernate and saved/reloaded/cleared initial/observed state passed. Initial full-trip context DB-port error resolved by pointing all contexts to the disposable DB. No live-account/deployed-service validation claimed.
-**Not done / left uncommitted:** No Phase 4/5 or remote integration. Preserve client tsconfig flag, CLAUDE.md and service logs. Legacy integer applied-charge-minute storage remains for Phase 4; canonical calculations/preview are continuous. Application commits are local-only and remote branches diverge.
-**Follow-ups:** Await Phase 4 approval; exact deferred items and release constraints in handoff. Reconcile remote changes and recheck migration allocation before any authorized release; push children before parent pins. No production main changes.
-
-## 2026-09-22 - Codex - Checkpoint implementation and plan canonical energy model
-
-**Goal:** Commit completed application work locally, then perform read-only Phase 3 planning.
-**Done:** Local commits user service 20a41c4, client c83dd28, server 8fff0bb, root 99cbdf8; docs history including cd9db54 preserved. Detailed plan supplied in conversation; only existing handoff/log updated for session reporting.
-**Verified:** Inspected real code/persistence/calculation paths, checked checkpoint diffs and residual workspace status. No application changes or new test execution during planning; previous reported tests remain the baseline.
-**Not done / left uncommitted:** No Phase 3 code/migrations, push, deployment or remote integration. Unrelated tsconfig flag/editor file/service logs preserved. No duplicate requirements or master-plan edits.
-**Follow-ups:** Await plan approval; future release must push child commits before parent pins and integrate diverged remote work separately.
-
-## 2026-09-22 - Codex - Record approved Phase 3 trip battery state
-
-**Goal:** Preserve approved persisted trip-start SoC and optional stop observations in Phase 3 planning.
-**Done:** Updated existing handoff with canonical semantics, persistence/API work explicitly included in Phase 3, guest/account boundaries, compatibility, chronological integration and acceptance checks. No new report system or application changes.
-**Verified:** Reviewed current handoff, newest session entries and repository state; documentation diff checked. Application tests not rerun for documentation-only changes.
-**Not done / left uncommitted:** Existing client/server implementation work preserved. No Phase 3 implementation, schema changes, deployment or automatic calibration.
-**Follow-ups:** Resolve exact trip/stop storage fields and checkpoint/charging ordering in the Phase 3 plan; retain distinct predicted and observed SoC. Existing root Git divergence is not merged by this task.
-
-## 2026-09-22 - Codex - Complete pre-Phase-3 vehicle settings cleanup
-
-**Goal:** Finish clarified consumption selector and immediate trip-only starting battery; preserve checkpoint requirement for Phase 3.
-**Done:** Three choices with suitable direct-data gate, explicit USE_RATED_RANGE guest/server command, honest range-basis display and accessible information, Custom observed average, optional nickname/divider, one Save settings action. Battery overlay updates immediately without garage mutation, scoped by trip provider. Recorded deferred stop SoC checkpoints; no Phase 3 calculations.
-**Verified:** 34 frontend tests, TypeScript, targeted lint, 39 backend tests pass; 2 conditional PostgreSQL tests skipped. Mocked-public-data Chrome guest scenario passes including live battery/no account requests; authenticated callbacks/API/service tested. Diff whitespace checks pass.
-**Not done / left uncommitted:** Application sources remain stacked with earlier Phase 1/1.1/2 work. No deployment, live authenticated browser or real PostgreSQL validation. Battery overlay is in-memory only, not persisted to saved trips. Existing remote divergence not merged.
-**Follow-ups:** Deploy new backend command before client; obtain Phase 3 approval and implement canonical projections/checkpoints there. Preserve Phase 5 UI consolidation requirement.
-
-## 2026-09-22 - Codex - Start requested vehicle settings refinement
-
-**Goal:** Refine vehicle settings before Phase 3 and clarify the newly requested NAVIO Estimates mode.
-**Done:** Optional nickname label, divider, removed standalone confirmation button, immediate trip-battery overlay without requiring form save; session cleanup preserves guest isolation. Existing source work preserved. No new estimation formula, backend change or Phase 3 implementation.
-**Verified:** TypeScript and targeted lint passed for the live-state/label changes; 14 focused state/selection/settings tests passed. No browser check for this partial refinement yet. Required fast-forward pull was refused because local dev and origin/dev diverged; remote history was not merged.
-**Not done / left uncommitted:** Refinement remains in client alongside Phase 1/1.1/2 work. Awaiting definitions of NAVIO Estimates and battery autosave vs trip-only behavior; final selector/tooltip and related tests/documentation still pending. No push/deployment.
-**Follow-ups:** Resolve those two questions, finish the shared guest/account settings UX, rerun checks/browser validation and provide the requested copyable instruction/change summary. Do not proceed to Phase 3.
-
-## 2026-09-22 - Codex - Phase 2 direct selection, range fallback and overrides
-
-**Goal:** Implement only the supplied Phase 2 section of the full redesign; retain Phase 1/1.1 and defer Phases 3-5.
-**Done:** Added explicit energy-selection commands and backend-resolved defaults; suitable direct consumption precedes rated-range fallback, user average overrides, and reset clears the override. Removed frontend standard-factor default derivation. Range fallback stores null consumption, legacy values remain unchanged/unknown and confirmation is separate. Updated guest/account forms, active selection vs calculation readiness, client automatic-application guards and null-profile persistence mapping. Existing JSONB only; no migration. Updated existing API/database/handoff documentation. Source/tests remain uncommitted alongside prior work; docs committed separately and merged locally to dev only.
-**Verified:** 32 frontend garage/guest/filter tests; 39 backend garage/controller/service tests; TypeScript; targeted lint; whitespace checks passed. Two conditional PostgreSQL tests skipped without a disposable test database; extended test covers observed-to-range reset. Actual Chrome guest scenario with public API mocks passed catalogue/default/override/reset/custom flows and guest isolation, with no browser errors/account requests. Existing positive-consumption calculator and backend 1.12 unchanged. Initial obsolete consumption-required test was revised to require a value OR explicit default; test harness resolver/VM-object assertions corrected.
-**Not done / left uncommitted:** All Phase 1/1.1/2 implementation files remain uncommitted in client, gateway and user service; unrelated files preserved. No push/deployment. No live authenticated browser/backend integration or real PostgreSQL check. Rated-range numerical predictions are deferred to Phase 3, not recreated in the selection layer.
-**Follow-ups:** Backend-first rollout, real PostgreSQL and authenticated integration checks; await Phase 3 approval. Existing declared capacity/reference-range requirements remain; usable capacity is not inferred. Phase 4 must integrate server optimizer eligibility/model contracts; Phase 5 UI consolidation stays deferred in handoff.
-
-## 2026-09-21 - Codex - Record deferred Phase 5 Trip Energy consolidation
-
-**Goal:** Preserve the approved Usage Overview/Trip Energy consolidation as a Phase 5 requirement and proceed only within the approved Phase 2 plan.
-**Done:** Recorded design foundation, useful retained information, canonical model dependency, honest missing-value/provenance presentation, shared guest/account behavior and eventual validation criteria in the existing handoff. Recorded Phase 2 authorization. No UI/calculation changes.
-**Verified:** Inspected root/client/server and changed service Git state, current handoff/history, vehicle mapping and available plan references. Local search and GitHub code search did not locate the full approved PLAN 2; the original planning request is available but is not the approved plan. Documentation diff checked; application tests are not applicable to this documentation-only change.
-**Not done / left uncommitted:** Existing Phase 1/1.1 application changes, local tsconfig flag, CLAUDE.md and service logs preserved. Phase 2 implementation awaits the approved Phase 2 section requested from the user. No UI consolidation, push or deployment.
-**Follow-ups:** Use the supplied approved Phase 2 text as the implementation boundary; do not reconstruct it from phase summaries. Implement deferred UI consolidation only in Phase 5 after Phases 2-4 outputs stabilize. Phase 1 PostgreSQL and Phase 1.1 live browser/backend verification remain pending.
-
-## 2026-09-21 - Codex - Phase 1.1 guest catalogue UX correction
-
-**Goal:** Restore catalogue-first selection for guests and signed-in users, with narrowly scoped public reads; do not begin Phase 2.
-**Done:** Shared Catalogue/Custom EV choices; temporary guest catalogue snapshots and unchanged authenticated saves; exact catalogue GET exception across frontend proxy, gateway and user security; public controller returns only curated specifications without user resolution. Added component-callback, guest-provenance and security coverage; updated existing browser scenario and API docs. Reporting committed on docs branch then merged locally to dev only.
-**Verified:** 22 frontend tests, 33 user-service tests, 9 gateway tests passed; TypeScript and targeted ESLint passed; diff whitespace checks clean. Root fast-forward-only pre-commit pull already up to date. No calculation, standard-factor, optimizer multiplier, reachability or Phase 2 policy changes.
-**Not done / left uncommitted:** Phase 1 and 1.1 source/tests remain in client, server/api-gateway and user service; unrelated prior files preserved. Full browser/live-backend scenario not executed. Phase 1 PostgreSQL persistence verification remains pending. No push/deployment.
-**Follow-ups:** Backend/gateway first deployment; browser integration check; await Phase 2 approval.
-
-## 2026-09-19 - Codex - Vehicle consumption provenance Phase 1
-
-**Goal:** Add the minimum backward-compatible provenance contract, with separate range/consumption standards and field-specific evidence; implement no later phases.
-**Done:** Added typed energyProfile responses/JSONB metadata, restricted observed-provenance requests, legacy unknown fallback without numeric changes, catalogue defaults with no fabricated consumption/usable capacity, frontend profile transport and minimal explicit-average submission wiring. Guest updates follow the same provenance semantics. API/database docs updated. Reporting is committed on a docs branch and merged locally to dev only; implementation remains uncommitted in client and user-management-service.
-**Verified:** 32 backend tests passed, 2 PostgreSQL tests skipped (Docker unavailable/no test DB). 17 frontend garage/provenance/guest tests passed using Node 22.22; TypeScript, targeted lint, and diff whitespace checks passed. Root pre-commit fast-forward pull was already up to date. No source research, migration, battery/charger/optimizer changes, or deployment.
-**Not done / left uncommitted:** Phase 1 implementation and tests in client/user service; pre-existing local files preserved. Actual PostgreSQL persistence and browser/backend integration were not run. Installed Node 22.14 cannot run the existing registerHooks-based tests; Node 22.22 was used without changing dependencies.
-**Follow-ups:** Run real PostgreSQL persistence check when available. Backend-first deployment for new request fields. Await explicit approval before Phase 2; no new selection/gating policy is active.
-
-## 2026-09-16 - Codex - Pull latest integrated release
-
-**Goal:** Pull all latest Git changes and resolve conflicts while preserving local work.
-**Done:** Fast-forwarded root to 3ee0228, client to 4622b54, server to 8eb47de; synchronized all four service gitlinks. Root/client/server on dev. Prior guest/drawer commits are ancestors of the incoming release. Backed up the local AGENTS files before accepting shared versions; no code conflicts. Installed incoming frontend dependencies and retained the upstream lockfile.
-**Verified:** All six submodules equal origin/dev and their parent pins. TypeScript passes after regenerating route types and moving a malformed old generated validator out of .next/dev/types. 44 frontend tests pass; planner/anchor/overnight model checks pass; lint zero errors/two existing warnings. No unresolved index entries.
-**Not done / left uncommitted:** Existing local client tsconfig working-tree flag (no textual diff), CLAUDE.md and service logs preserved. No production build, browser run, backend/PostgreSQL tests or deployment in this pull-only session.
-**Follow-ups:** Runtime/production health and schema validation remain separate from Git synchronization. Session docs committed locally only per AGENTS.md; no push requested.
-
-## 2026-09-27 â€” Codex â€” Repair admin users and add Owner role
-
-**Goal:** fix the admin users 500, present users in a role-badge table, and let an Owner grant administrator roles while admins manage lower roles.
-**Done:** changed IAM search to avoid nullable PostgreSQL query parameters; added `OWNER` through IAM, gateway, Keycloak import, client role gates, V6 migration, and docs; added audited role controls in the account drawer and colored badges in the users table; stopped logging handled admin HTTP failures to the Next development error overlay. No commits or deployment.
-**Verified:** client typecheck after `next typegen`, scoped ESLint, 13 admin transport tests; IAM 47 targeted controller/service tests plus 13 final role/guard tests; gateway suite and new Owner converter test; disposable PostgreSQL 16 migration/schema/search/Owner constraint tests (5 passed). No live authenticated Keycloak or browser check. The exact backend exception behind the reported 500 was unavailable, so the null-parameter query is a tested likely cause.
-**Not done / left uncommitted:** all changes are uncommitted. Root agent notes and deployment files, client Explore/planner work, and server submodule work were already dirty before this session and may belong to other sessions; they were not staged or discarded. `docs/agents/owner-role.md` records existing-realm setup, including the display snapshot row. The local Chrome extension timeout is unrelated to Navio.
-**Follow-ups:** the local client's API base URL points at production, so its reported 500 can persist until the IAM change is released. Complete live authenticated acceptance and release through the repository's submodule order. Keep the existing dirty work separate when committing.
-
----
-
-## 2026-09-26 â€” Codex â€” Release admin dashboard, vehicle catalog, and shared-plan titles
-
-**Goal:** finish the admin dashboard and global vehicle catalog, let a shared plan have a public name, fix the live Explore/shared-link 404, then commit and deploy to root `main`.
-**Done:** IAM admin account, catalog, and activity backend (`dfb14c0`, main `8056fb6`); client admin UI, catalog picker, activity, and share-name dialog (`2ec2c33`, `c3faf9a`, main `465720e`); trip publication custom title (`9b63ff3`, main `a79a085`); dedicated shared-plan gateway route, catalog routes, and gateway tests (server `8ef99e5`, main `de5bd91`); root pins (`525c4da`, main `78ea743`). The first deployment succeeded but the live public routes still 404ed because the root's mounted production gateway YAML was stale. Fixed that file and added public-route deployment checks (`2051204`, root main `eb00cff`); follow-up Actions run `36241742100` succeeded.
-**Verified:** IAM 138 tests passed, plus 4 real-PostgreSQL catalog/schema tests; trip 150 tests passed with PostgreSQL and standalone service config; gateway 11 tests and configuration-server 1 test passed. Isolated client `tsc`, scoped ESLint, 12 admin transport tests, prior admin Chrome workflow, and new Chrome catalog draft/activity workflow passed. Live shared-plan feed and vehicle catalog returned 200; a listed plan opened in both reading pages and appeared in Explore HTML; invalid token returned the trip service's 404; anonymous activity returned 401; health returned 200. The browser checks used fixtures, not live Keycloak.
-**Not done / left uncommitted:** root deployment/observability edits, old dirty client `feat/admin-console` worktree and concurrent Explore/planner edits, `docs/agents/plan-link-sharing-plan.md`, and `docs/research/` were preserved. The release client was assembled in a clean worktree from `origin/dev`; its main commit is deployed by the root pin. Live two-account Keycloak acceptance is outstanding.
-**Follow-ups:** live authenticated admin and two-account share acceptance remains; no test credentials were available. The production shared-plan 404 was reproduced and fixed by updating the mounted gateway config.
-
-
----
-
-## 2026-09-26 â€” Claude â€” Share published plans to Explore
-
-**Goal:** continue plan sharing so a published plan can be shared to the Explore page, keep Explore seamless, and use `/frontend-design` for the UI.
-**Done:** (all **uncommitted**; trip-planning `dev`, api-gateway in server `dev`, client `feat/admin-console`)
-- trip-planning: V13 (never merged, edited in place) gains `listed_in_explore`, `listed_at`, a listed-only-when-active CHECK and a partial feed index. `TripPublication.applyListing`, a repository `findListedInExplore` JPQL query, `ExplorePlanSummary`/`UpdateExploreListingRequest` DTOs, `listInExplore` on `PublishPlanRequest`, `listedInExplore` on `PublicationResponse` and `SharedPlanResponse`, `ExplorePlanSummarizer`, service `updateExploreListing`/`listExplorePlans` (revoke also unlists), `PATCH /v1/trips/{id}/publication` and anonymous `GET /v1/shared-plans` (size capped at 48, `no-store`).
-- api-gateway: permit `GET /v1/shared-plans` alongside `/{token}`; new routing test in `GroupPublicRoutesTest`.
-- client: "List on Explore" in `PublishPlanDialog` (a draft before publish, immediate PATCH after), plus an Explore access row and a "View on Explore" link. Explore "Shared by travelers" section with a server-fetched first page and infinite "Show more". Search/filters merge shared plans into results. `SharedPlanCard` with a `RouteStrip` (the design's one distinctive element: stops per day, chargers as bolts; with no photo the cover becomes the per-day itinerary). New `/explore/shared/[token]` reading page (listed plans only), shared `SharedPlanHeader`, and a GET-only `/api/shared-plans` proxy.
-**Verified:** trip-planning full suite, 142 run: only the two known full-context tests error (Postgres 5432); all publication, summarizer and controller-slice tests pass with the config server up. `PostgresSchemaTests` passes on disposable Postgres; the CHECK constraint was exercised in psql. api-gateway 10/10 (1 skipped as before). Client `tsc`, scoped ESLint and `next build` are clean. Chromium against a stub gateway: feed, search merge, keyboard navigation, light/dark/390px, and `/explore/shared` refusing unlisted/dead tokens. No new console errors (the existing `/help` 404 and `/community/create` sign-in prefetches are unrelated). **Not verified:** the owner dialog in a browser, and anything against a real backend or accounts.
-**Not done / left uncommitted:** everything above, alongside other sessions' uncommitted admin and observability work. OpenAPI not updated.
-**Follow-up request, same session: show the author's name.** Added `author_display_name` to V13 and the entity. `authorDisplayName` (max 120) on `PublishPlanRequest` and `UpdateExploreListingRequest`; `authorName` on `ExplorePlanSummary` and `SharedPlanResponse`; `authorDisplayName` on `PublicationResponse`. `PlanPublicationSanitizer.sanitizeAuthorName`. Client: the dialog reads the profile name (shared `currentUserProfileQueryKey` cache) and shows "Shown as â€¦". New `PlanAuthor` widget on cards and in `SharedPlanHeader`; Explore search also matches author names. New tests: byline frozen and sanitized on publish, a PATCH without a name keeps the stored one, the feed and shared plan carry the name but no owner id, 121-character names rejected with 400, and sanitizer normalization. Verified as noted in the handoff. Still uncommitted.
-**Follow-ups:** unlisting does not revoke the link, and anyone who opened it from Explore keeps it (the UI says so). Decide whether listings need moderation/reporting before release. Clean `target/` after migration renames (a stale V11 artifact masked V13). Split the gateway file's vehicle-models change from this work when committing.
-
----
-
-## 2026-09-26 â€” Codex â€” Continue admin dashboard with shadcn
-
-**Goal:** continue the admin dashboard; use frontend-design and shadcn for UI.
-**Done:**
-- Continued existing uncommitted client admin work on `feat/admin-console`: account search from the dashboard, refresh for all overview queries, accurate count-link semantics, shared shadcn Sheet, paginated moderation history, strict page URL parsing, and honest write-failure feedback.
-- Fixed a browser-observed race where refreshing the newly banned account changed its still-open confirmation into an unban dialog. Preserved the submitted action and reset sheet state per account.
-- Added the UI brief (`docs/agents/admin-dashboard-ui.md`) and repeatable fixture-backed browser coverage (`client/tests/admin/browser-check.mjs`). Applied frontend-design, security-review and anti-ai-ui-review to this slice.
-**Verified:** final TypeScript and scoped ESLint clean; 12 client admin tests; 37 IAM controller/service tests; 3 real PostgreSQL 16 Flyway/entity/aggregate/lock tests. Chrome checks passed for search, overview refresh, history paging/error recovery, ban failure/success, unban, keyboard focus return, page role gates, actual Next proxy guest/CSRF/route gates, and 390/768/1440px light/dark screens. No live Keycloak end-to-end test or production build/release. Full typecheck temporarily caught concurrent Explore/sharing edits; the final run passed.
-**Not done / left uncommitted:** application work and both agent notes remain uncommitted. Notes already included another session's unfinished changes, which were not authorized for inclusion in a commit. Pre-existing backend admin code was verified but not modified. Unrelated deployment, sharing and concurrent Explore work preserved.
-**Follow-ups:** live Keycloak/two-account acceptance; catalog persistence/publishing and global activity are still separate work. See handoff for repeatable Postgres setup. Isolated test server/container cleaned up; screenshots remain under ignored `client/.next/admin-screenshots/`.
-
----
-
-## 2026-09-26 â€” Codex â€” Clarify global car and admin backend scope
-
-**Goal:** confirm the planned global-car feature and existing admin backend work.
-**Done:** checked the original admin plan, current IAM diff, catalog service, and migration files. Global catalog management remains in the original scope; the prior account-focused continuation did not complete the full plan. IAM admin statistics/details/history and safeguards already exist uncommitted. The vehicle catalog remains JSON-backed, with authenticated garage integration.
-**Verified:** source inspection only; no additional tests or application edits.
-**Not done / left uncommitted:** catalog persistence/admin publishing/guest integration still pending; updated notes remain uncommitted with pre-existing notes.
-**Follow-ups:** continue the global vehicle catalog portion of the original plan.
-
----
-
-
-## 2026-09-26 â€” Claude â€” Review Raum-1's Phase 3.1 branches and council the reconciliation
-
-**Goal:** read the friend's (Raum-1) newly pushed work, find conflicts with `dev` and local work, and use `/llm-council` to decide what to take.
-**Done:**
-- Mapped Raum-1's branches (none on `dev`/`main`): root/server `chore/phase31-checkpoint`, client and trip-planning `fix/trip-specific-garage`, mobility `feat/canonical-trip-energy` (61294ab), user-management `feat/vehicle-energy-selection` (20a41c4). All branched before the garage/EV-charger redesign and the `EvSimulationModel`, which is already on `main`.
-- Dry-run merges (`git merge-tree`): client 11 conflicting files (garage/charger); mobility `SocConstrainedRouteOptimizer` (integer `EvSimulationModel` vs continuous `CanonicalEnergy`); root `session-log.md` and pins; trip-planning and user-management merge cleanly as text.
-- Council verdict: merge nothing to `dev` until both devs agree a written energy contract; production model wins a tie; keep the friend's commits (merge, not squash); owner's UI wins client markup conflicts.
-- Renamed the local, uncommitted `V11__trip_publication.sql` to `V13__trip_publication.sql` (the friend's pushed V11 `trip_energy_state` and V12 `trip_garage_membership` keep their numbers). Updated the reference in `TripPublication.java` and in handoff.md.
-**Verified facts:** the friend's trip-planning commit 1068215 changes the contract it sends to mobility: `batteryKwh`/`consumptionKwhPer100km` become optional, and it adds `energyModel` (`RATED_RANGE`) and per-stop `observedSocPct`. Production mobility still requires those fields, so trip-planning **cannot** merge without mobility. V12 is stacked on V11. The friend's migrations are nullable `ADD COLUMN` only. No test pins the migration number. Nothing was compiled or tested this session.
-**Not done / left uncommitted:** no merges performed. These docs edits and the rename are uncommitted, alongside the earlier uncommitted plan-sharing, admin-console and observability work.
-**Follow-ups:** a meeting between the two devs to decide the energy model (integer v1 vs continuous as `model-v2`) and the `energy_vehicle_snapshot` JSON shape. Tell Raum-1 about the V13 renumber. Add a routing test for `/v1/users/me/vehicles/catalog` vs `/{id}` when merging. V11â€“V13 must reach `main` in one release.
-
----
-
-## 2026-09-23 â€” Claude â€” LLM council on implementing the admin dashboard plan
-
-**Goal:** user ran `/llm-council` with "read admin-dashboard-plan.md and implement it".
-**Done:** five advisors, five anonymous peer reviews, and a chairman verdict. No application code was changed. Verdict: build it in slices, not six phases. Slice 1 is the admin shell plus the Users page on the existing search/suspend/reactivate endpoints, and a statistics endpoint placed under `/v1/admin/users/...`. Slice 2 is the catalog table. Gateway ban enforcement and public catalog routes are deferred until the uncommitted link-sharing gateway work is resolved.
-**Verified facts:** `accessTokenLifespan` is 300 s (`.deploy/keycloak/navio-realm.json:15`), so a suspended user's token already expires within 5 minutes. No service outside user-management checks ban status. The gateway (`api-gateway.yml:49`) routes only `/v1/users/**` and `/v1/admin/users/**` to user-management, so any new `/v1/admin/*` or `/v1/vehicle-models` path needs a gateway config edit, and that file is dirty with link-sharing work.
-**Not done / left uncommitted:** this entry and the handoff note. Earlier uncommitted work in root/client/server was left untouched.
-**Follow-ups:** the user must approve the slice-1 scope and say how the dirty gateway files should be handled (commit link-sharing first, or wait) before gateway-dependent work can start.
-
----
-
-## 2026-09-23 â€” Claude â€” Build the client half of plan link sharing
-
-**Goal:** finish "publish plan as a link", which a previous session had left as a complete backend and no client at all.
-
-**Done:** (client, branch `feat/garage-ev-redesign`, **uncommitted**)
-- `app/feature/planner/_components/share/publication-api.ts` â€” typed mirrors of the server DTOs (`PublicationOptions`, `Publication`, `PublicPlanSnapshot` and its nested day/item/anchor/charger/budget shapes), owner fetchers for get/preview/publish/revoke, and `sharedPlanPath`/`sharedPlanUrl`. Unreadable options parse to "nothing extra was shared", never the reverse.
-- `app/feature/planner/_components/share/use-publication.ts` â€” TanStack Query hooks. `staleTime: 0, gcTime: 0` on the link state so a revocation in another tab cannot be masked by cache.
-- `app/feature/planner/_components/planner-autosave-flush.ts` (new) and `planId/_components/overview/planner-persistence.tsx` â€” the save-flush barrier the plan required. `PlannerPersistence` now records its pending debounced save in `pendingSaveRef` and registers a flush handler keyed by trip id; `usePublishPlan` calls it, then publishes that exact version. Deliberately **not** in the `planner-autosave-<tripId>` mutation scope: the flush calls the autosave mutation, so taking the same scope would deadlock the two.
-- `app/feature/planner/_components/share/publish-plan-dialog.tsx` plus `share-option-row.tsx` and `shared-link-field.tsx` â€” the owner dialog: access summary, three opt-ins (all off by default), inline preview with Back, published state with selectable URL and copy, update-when-changed, and an inline stop-sharing confirmation. Clipboard failure leaves the URL selectable with `role="status"` feedback.
-- `app/feature/planner/_components/share/shared-plan-content.tsx` â€” one renderer for the projected snapshot, used by **both** the owner's preview and the recipient page, so the preview cannot drift from the real page. Takes only the sanitised snapshot.
-- `app/share/plans/[token]/page.tsx` and `shared-plan-request.ts` â€” the recipient page as a **Server Component** fetching the gateway directly, `force-dynamic`, `robots: noindex/nofollow/nocache`, generic metadata so unfurl services retain nothing. One "no longer available" page for every dead-link cause.
-- `app/feature/planner/_components/trip-actions-menu.tsx` â€” entry point above Delete, labelled "Publish plan as a link" / "Manage published link". The publication query is enabled only while the dropdown is open, so the dashboard does not fire one request per trip card.
-- Deleted the `app/api/shared-plans/[token]` proxy I had written first: with the page fetching server-side it had no consumer, and an unauthenticated route on our origin with no caller is surface for nothing.
-
-**Verified:** client `npx tsc --noEmit` clean; ESLint clean on all new and changed files; `npx next build` exit 0 with `/share/plans/[token]` registered as a dynamic server route. trip-planning-service `./mvnw -o test`: the 69 publication tests pass (`SharedPlanControllerTests` 5, `TripPublicationControllerTests` 12, `PlanPublicationSanitizerTests` 32, `TripPublicationServiceTests` 20); `TripPlanningServiceApplicationTests` and `VerificationTests` error for the pre-existing environmental reason (config server on 8888, Postgres on 5432).
-**Not verified â€” nothing here has been run:** no browser session, no request ever made against a running backend, so publish, preview, copy, revoke and the recipient page are all unexercised end to end. The two-account and signed-out journeys in the plan's must-pass list have not been run. The autosave flush has not been observed firing.
-
-**Not done / left uncommitted:** everything above, plus the backend work from the earlier session it builds on (`server/trip-planning-service` V11 migration, model, repository, sanitizer, service, both controllers, tests; `server/api-gateway` `GatewaySecurityConfig`; `server/configuration-server` `api-gateway.yml`). Not implemented from the plan and **not started**: replace link / token rotation (`POST .../publication/rotation`), the allow-copy option (`PATCH .../publication`, no `allow_copy` column in V11), and independent copying (`POST /v1/shared-plans/{token}/copies`) â€” the earlier session deferred copying and I did not add it. Guest "Sign in to publish" is not built: the menu is only rendered where a persisted trip exists. Preserved untouched: the garage/EV redesign edits on this branch, `.deploy/` changes, `docs/agents/admin-dashboard-plan.md`, `docs/research/`.
-
-**Follow-ups:** nothing was committed â€” the client working tree still holds another session's uncommitted EV work on `feat/garage-ev-redesign`, so a commit here would mix the two. The user needs to decide whether to split this onto its own `feat/` branch cut from `dev`. `docs/api/Navio Open API.yaml` has not been updated with the publication routes. Browser and two-account verification remain the real gate before this goes anywhere near `main`.
-
-## 2026-09-23 â€” Claude â€” Fix the Grafana proxy and turn on production tracing
-
-**Goal:** make Grafana work in production and get Zipkin tracing running there.
-**Done:** (all root-repo, branch `dev`, **uncommitted**)
-- `.deploy/nginx/navio.conf` â€” confirmed the previous session's hypothesis and fixed it: a `location`-level `proxy_set_header` discards every server-level one, so `/grafana/` was sending `Host: navio_grafana`, and Grafana's CSRF middleware answered 403 to every `POST /api/ds/query`. Re-declared all six inherited headers. Applied the same fix to `location /` (navio-web), which had the identical defect and guards Server Actions the same way.
-- `.deploy/compose.production.yml` â€” added an internal `zipkin` service (`openzipkin/zipkin:3.5.1`, `STORAGE_TYPE: mem`, `MEM_MAX_SPANS=50000`, `mem_limit: 320m`, `healthcheck: disable: true` so it can never fail `compose up --wait` and trigger a rollback); replaced the no-op `MANAGEMENT_TRACING_EXPORT_ZIPKIN_ENABLED` with `MANAGEMENT_TRACING_EXPORT_ENABLED` plus `MANAGEMENT_TRACING_EXPORT_ZIPKIN_ENDPOINT`; sampling is now `${NAVIO_TRACING_SAMPLING_PROBABILITY:-0.1}`; `GF_SERVER_ROOT_URL` default corrected to `https://`.
-- `.deploy/observability/prometheus.yml` â€” `zipkin` scrape job mirroring the dev stack's.
-- `.deploy/observability/grafana/datasources.yml` and `grafana/provisioning/datasources/datasources.yml` â€” production gains the Zipkin datasource (traceâ†’logs/metrics, copied from the dev stack's working config); both gain a Loki `derivedFields` entry linking the trace id in Spring Boot's `[app,traceId,spanId]` log prefix into Zipkin.
-- `.deploy/.env.example` â€” documented `NAVIO_TRACING_SAMPLING_PROBABILITY`.
-- `grafana/dashboards/navio-overview.json` â€” removed two `http://localhost:` dashboard links that could never work in production.
-
-**Verified:** YAML and JSON parse; the shared Java env anchor was confirmed by parsing the compose file to reach all seven Java services; the dev and production Zipkin scrape jobs differ only in the `environment` label. **Not verified:** nothing was deployed or exercised against the live VM â€” the 403 root cause, the Zipkin target coming up, the derived-field regex against real log lines, and the traceâ†’logs links are all unconfirmed in a running stack.
-
-**Not done / left uncommitted:** everything above. Untouched and preserved as other sessions' work: the `client` and `server` submodule working trees, `docs/agents/admin-dashboard-plan.md`, `docs/agents/plan-link-sharing-plan.md`, `docs/research/`.
-
-**Follow-ups:** declared `mem_limit` across the stack is now ~8.3 GB â€” check `free -h` on the VM before releasing. Not fixed because it needs a `server` submodule change: the config server hardcodes `management.tracing.sampling.probability: 1.0` for three services and uses a different env name (`TRACING_SAMPLING_PROBABILITY`) for two others; harmless only while `spring.config.import` config-data mode keeps `systemEnvironment` above config-server values.
-
-## 2026-09-23 â€” Claude â€” Browser-verify and commit the garage and EV charger redesign
-
-**Goal:** verify the uncommitted garage/EV-charger redesign in a real browser, then commit it.
-**Done:**
-- Browser-verified the redesign with Playwright against `next dev`, using live Google Places/Maps and a real Bangkok trip: planner, garage (light, dark, 390px), EV charger panel (list cards, power tiles, connector chips, opening-hours track), block action button dark tints.
-- client `feat/garage-ev-redesign`, merged `--no-ff` to `dev` = `ffd252a` and pushed: `ac46d10` real-world range and `range-efficiency-field.tsx`; `8c7a457` featured vehicle card, `battery-gauge.tsx`, `vehicle-switcher.tsx`, `vehicle-name-editor.tsx`, `spec-tile.tsx`; `ddf900e` station cards, specifications, opening hours, `connector-chips.tsx`, `spec-cell.tsx` deleted; `8bf23ba` connector/battery tokens and removal of the trip member controls. 30 files, +1328/-538.
-- root `chore/bump-client-garage-ev-redesign` `ed02ac2`, merged to `dev` = `bda8c20` and pushed. Neither repo's `main` was touched.
-
-**Verified:** `tsc --noEmit` clean and ESLint clean (0 errors) on the committed tree, including the six new files, which an earlier lint over `git diff --name-only` had missed because they were untracked. Zero console errors and zero uncaught exceptions across the browser run. The charger preview panel's dark mode was confirmed by computed style (`bg lab(11.1%)`, `fg lab(98.6%)`); an earlier white-panel screenshot was a repaint artifact from toggling emulated `prefers-color-scheme` after paint, not a bug. **Not verified:** authenticated flows (catalog picker, save-to-garage), the battery route chart with real leg distances, drag interaction on the battery gauge, keyboard-only dialog traversal, and anything against the deployed backend.
-
-**Not done / left uncommitted:** deliberately left alone as earlier Codex sessions' work (AGENTS.md Â§1.3) â€” `docs/agents/admin-dashboard-plan.md`, `docs/agents/plan-link-sharing-plan.md`, `docs/research/` (including the `ev-range-test-standards.md` that the garage work cites), `.deploy/compose.production.yml`, `.deploy/nginx/navio.conf`, `.deploy/observability/*`, `grafana/dashboards/navio-overview.json`, and a dirty `server` submodule working tree. Committing this log necessarily includes those sessions' six uncommitted log entries and their handoff edits, since they share these two files.
-
-**Follow-ups:** the untracked root docs need an owner to commit them. `client/CLAUDE.md` is not gitignored and must be excluded by hand every session. The "Charge each stop to" slider question from 2026-09-22 is still unanswered. Release requires the `release.md` flow (child `main`s first, then root `main`).
-
-## 2026-09-23 ? Codex ? Investigate Grafana no-data screenshot
-
-**Goal:** diagnose warning icons and empty production dashboard panels.
-**Done:** verified dashboard/provisioning datasource UID consistency; identified NGINX location-level proxy headers suppressing parent Host/forwarded headers as a likely origin-check issue. Asked for exact panel error before confirming live root cause.
-**Verified:** repository configuration inspection and official troubleshooting documentation; no authenticated production query available.
-**Not done / left uncommitted:** no application edits; agent notes remain uncommitted alongside existing unfinished changes.
-**Follow-ups:** obtain warning/Query Inspector error; if origin rejection, restore explicit Host/forwarded headers in Grafana location and validate/reload via release flow.
-
-## 2026-09-23 ? Codex ? Production Grafana and Zipkin guidance
-
-**Goal:** explain how to make Grafana and Zipkin work in production.
-**Done:** inspected production Compose, provisioning, NGINX, scrape config, deployment paths, tracing dependencies/settings and official Spring/Grafana/Zipkin docs. Identified existing Grafana stack and explicitly disabled/missing Zipkin; supplied configuration and verification guidance. No application/deployment changes.
-**Verified:** root/client/server/changed trip service state; public Grafana health HTTP 200 and database ok, version 12.3.2 with diagnostic TLS bypass. Normal TLS verification fails with untrusted root on this machine. No authenticated metrics or trace check.
-**Not done / left uncommitted:** both agent notes already contained prior unfinished work, so updates remain uncommitted; unrelated changes preserved.
-**Follow-ups:** verify Grafana data in Explore; implement internal Zipkin, storage/retention, export endpoint and sampling, datasource, then verify full request traces if requested. Investigate TLS chain/client trust.
-
-## 2026-09-23 â€” Codex â€” Council on Community next milestone
-
-**Goal:** inspect Navio Community and use the requested llm-council skill to recommend the next step.
-**Done:** inspected community client/service source and sharing proposal; ran five independent advisor passes in capacity-limited batches, followed by five anonymous peer reviews of faithfully condensed responses and chairman synthesis. Recommended real saved-trip publication/read integration with Community, explicit audience/ownership/revocation contract, and later optional copying. No application code changed.
-**Verified:** all 20 client community API/posts/upload-proxy tests passed. Confirmed fixture-backed trip selector/resolver, unchecked publication reference persistence, identical best/top sort, and no consumers for mock copied-trip panel. Browser check source uses stubbed APIs; no live browser/backend or database verification performed. Checked root/client/server/community/trip-planning status and branches.
-**Not done / left uncommitted:** these agent notes; both already contained prior unfinished edits and were not committed without authorization to include that work. Preserved unrelated client changes and untracked trip publication DTO work.
-**Follow-ups:** first define two-account publish/attach/read/revoke acceptance and audience contract against the existing sharing proposal; coordinate publication work before implementation. Correct misleading feed/fixture affordances as part of the milestone. Copying and notifications remain later scope decisions.
-
-## 2026-09-23 â€” Codex â€” Rehearse sharing plan with relevant skills
-
-**Goal:** revise the link-sharing plan so implementation reads and applies relevant skills, including frontend-design for UI.
-**Done:** found repository-local skills under `.claude/skills`; read frontend-design and applied its planning/self-critique guidance to a Navio-specific UI rehearsal. Added skill-to-phase mapping, supporting rule/document requirements, dialog wireframe, full interaction states and staged security/visual reviews to `docs/agents/plan-link-sharing-plan.md`. Updated handoff. No application code changed.
-**Verified:** skill discovery, current root/client/server status and branches, and documentation whitespace check. No browser or application tests; implementation has not started.
-**Not done / left uncommitted:** proposal and agent notes remain uncommitted; both agent notes already contained other unfinished work, which was preserved.
-**Follow-ups:** when implementation is requested, read/apply each phase's relevant skills and record actual verification; preserve existing Navio tokens and the user's removal of depth styling.
-
-## 2026-09-23 â€” Codex â€” Plan admin dashboard and shared vehicle catalog
-
-**Goal:** plan an Admin sidebar/dashboard, user counts and bans, and centrally managed vehicles; assign relevant skills including frontend-design.
-**Done:** wrote `docs/agents/admin-dashboard-plan.md` after inspecting sidebar/auth, existing admin endpoints, moderation, catalog and garage snapshots. Included UI contract, capability matrix, proposed APIs/migration, six delivery phases and acceptance tests. Read local frontend-design guidance and assigned it to UI planning/building; identified local security/UI review skills and optional GSD stages. Updated handoff.
-**Verified:** repository state and code inspection; documentation whitespace check. No application code, migrations or runtime tests executed.
-**Not done / left uncommitted:** plan and both agent notes; notes already had prior unfinished edits, so did not commit those edits or switch branches. Existing client work preserved.
-**Follow-ups:** implementation only when requested; verify existing-token ban enforcement across services, last-admin protection and database startup before release.
-
-## 2026-09-23 â€” Codex â€” Plan link publishing and permissions
-
-**Goal:** review the current implementation and plan seamless sharing from the three-dot menu with clear permissions.
-**Done:** wrote `docs/agents/plan-link-sharing-plan.md`: evidence from menu, Explore sharing/viewer, ownership services, proxy/gateway and persistence; proposed unlisted read-only snapshots, explicit updates, owner-managed links, privacy options and independent copying; API/data design and staged acceptance tests. Updated handoff.
-**Verified:** source inspection and repo status/branches (root/client/server/trip-planning on `dev`); documentation whitespace check. No application changes or runtime tests.
-**Not done / left uncommitted:** proposal and both agent notes. Notes already contained prior uncommitted work, so did not commit them or disturb existing UI edits.
-**Follow-ups:** implement only when requested, using the proposal's permission/sanitizer contract and database/release instructions.
-## 2026-09-23 â€” Codex â€” Remove trip member controls
-
-**Goal:** remove the avatar and add-member button shown in the screenshot.
-**Done:** removed the members UI, placeholder image, member prop/type and mock member passed by `planner-detail.tsx`; client `dev`, uncommitted.
-**Verified:** targeted ESLint, `tsc --noEmit`, and `git diff --check` passed. Not browser-checked.
-**Not done / left uncommitted:** two client files and updated agent notes. Both notes already contained uncommitted edits at session start; preserved them without committing prior work. Existing unrelated client changes preserved.
-**Follow-ups:** none for this removal.
-
-## 2026-09-22 â€” Claude â€” Cite range-standard factors and show real-world range
-
-**Goal:** the user asked what NEDC is and why one consumption rate misestimates distance, then for research backing the NEDC/CLTC/WLTP/EPA factors, a doc in `docs/`, and a UI showing the official and adjusted range.
-**Done (uncommitted):** new `docs/research/ev-range-test-standards.md` (factors table, EPA 40 CFR 0.7 rule as the anchor, Liu 2022 CLTCâ‰ˆNEDC, 120 km/h study, Weiss 2020 counter-evidence of ~10% gap, verification status). Client `dev`: `vehicle-mappers.ts` exports `REAL_WORLD_RANGE_FACTOR` and `estimateRealWorldRange` (rounded to 10 km, null for custom/unknown standard); `SpecTile` gained an optional `detail` line; `vehicle-card.tsx` shows "About N km real-world" under the range and a note with the factor; the add-vehicle dialog states the estimate.
-**Verified:** client `tsc --noEmit` 0; ESLint on the four changed files 0. Not browser-checked. Only the EPA source was read in full; the paper figures came from abstracts (publishers blocked fetches).
-**Not done / left uncommitted:** all of the above, on top of the earlier uncommitted client work.
-**Follow-ups:** the user should confirm the paper figures before citing them in the report.
-**Then (plan with real-world range, own range option):** new `garage/range-efficiency-field.tsx`: one input the driver fills as "Range on a full charge" (km) or kWh/100 km, a ruler of planning range against the official tick, and "Use estimate". Used in `vehicle-settings-form.tsx` and in the add-vehicle dialog, which now pre-fills the estimate instead of the old "I know my consumption" checkbox. The vehicle card leads with "Real range" (battery Ã· consumption) and shows the official figure beneath. New `consumptionForRange` / `rangeForConsumption` in `vehicle-mappers.ts`; estimates are now saved to 0.001 instead of 0.1. Battery capacity deliberately stays declared, because the factor already sits in consumption. No API or schema change. `tsc` 0; garage ESLint 0; field rendered in headless Chrome at 320px light and dark (temporary preview page, deleted). The real settings form and dialog were not rendered.
-
-## 2026-09-22 â€” Claude â€” Redesign opening hours on place/charger cards
-
-**Goal:** the user asked to redesign the opening-hours block on the EV station card, which showed the raw "Monday: Open 24 hours | Tuesday: â€¦" string.
-**Done (client `dev`, uncommitted):** added `getOpeningHoursSchedule` / `parseOpenSegments` to `charger/opening-hours.ts` (handles 24h, closed, split and overnight ranges; unparseable text falls back to plain text) and removed the now-unused `formatOpeningHours`. Rebuilt `StationOpeningHours` as grouped day rows with a 24-hour track and today highlighted (`aria-current="date"`), and used it in `charger-preview-panel.tsx` and `place-preview-panel.tsx`.
-**Verified:** client `tsc --noEmit` exit 0; ESLint on planner `_components` 0 errors (1 existing warning); parser checked with tsx against sample strings. Not browser-checked.
-**Then (station list card):** redesigned `charger/ev-station-list-card.tsx`: the stock Unsplash thumbnail (random, often failed to load) became a max-kW power tile shaded by speed tier, plus connector chips, distance ("300 m from stop"), port count and a one-line address. Removed the `visual` prop and `getEvStationVisual` / `EvStationVisual` from `ev-station-panel.data.ts`. `tsc` 0; charger ESLint 0. Follow-up: each connector family has its own colour via new `--connector-*` tokens in `globals.css` (light and dark; hues kept away from brand blue; CCS1/CCS2 share one), with a DC/AC title and screen-reader text. The distance icon is `primary` and the port icon `rating` yellow.
-**Then (block action buttons):** "Add a note / Add checklist / Add EV station" showed grey in dark mode because the Button `outline` variant's `dark:border-input dark:bg-input/30` beat their tints; added matching `dark:` tint overrides in `block/trip-block.tsx` and `charger/add-ev-station-button.tsx`. ESLint 0.
-**Then (route estimate card):** redesigned `garage/route-estimate.tsx`: start â†’ end battery header (level-coloured, gradient connector), a sentence when the battery dips below reserve mid-route, non-monospace stats ("Energy needed", stop count under charging time), method note collapsed into "How this is estimated". `garage/battery-route-chart.tsx`: Chart/Table segmented toggle replaces the "Show as table" disclosure, the reserve label sits on the dashed line, chargers show "+N%". Same props, so `plan-view.tsx` (explore) picks it up too. Rendered with headless Chrome via a temporary `app/zz-preview` page (deleted) at about 480px and 220px; the table view was not screenshotted (no click automation available). `tsc` 0; garage ESLint 0.
-**Then (garage redesign):** `garage-section.tsx` now shows one featured `VehicleCard` for the trip vehicle (photo, 2Ã—2 colour-coded spec tiles, plugs, trip settings inside) plus a `VehicleSwitcher` chip strip (new file) instead of a grid of full cards. New `battery-gauge.tsx` (`BatteryGauge`, `BatteryInput`): a 10-cell battery with nub and dashed reserve mark; the starting-battery slider in `vehicle-settings-form.tsx` is now the draggable battery (native range input overlay) with a range readout. `vehicle-usage-overview.tsx` uses the gauge (faded start, solid end), the per-day bars are upright batteries with a per-battery reserve tick, and the monospace numbers are gone. Nickname field removed from the settings form: new `vehicle-name-editor.tsx` renames the title in place (Enter/Escape; clearing or retyping the car name clears the nickname), and a nickname shows the real car name as a tag. `BatterySlider` still exists for the EV side panel. Rendered with a temporary preview page (deleted); the real settings form was not rendered (needs the garage provider). `tsc` 0; garage ESLint 0.
-**Then (charging stop card):** `station-charging-control.tsx` now uses `BatteryGauge` (new `chargeTo` striped segment via `.charge-stripes` in `globals.css`, and a `markerPct` knob) with the native range input overlaid, "Arrive with / Leave with" labels, and an Adds/Takes row with icons; monospace removed. `station-specifications.tsx`: Max power (blue) and Ports (yellow) tiles from new shared `garage/spec-tile.tsx`, coloured plug chips from new shared `charger/connector-chips.tsx` (also used by the station list card and the garage vehicle card), and price/hours rows. `trip-place-card.tsx` header lost its middle dots; the locked state is a badge. Deleted the now-unused `charger/spec-cell.tsx`. Preview-rendered (deleted); the live control with a real car and route was not rendered. `tsc` 0; ESLint 0.
-**Then (light-mode colour fix):** light-mode tints were muddy (dark, low-chroma tokens). In `globals.css` light theme only: raised chroma of `--warning`, `--note`, `--checklist`, `--charging`, `--premade`, `--tag`; battery text tokens now `high 0.48 0.16 148`, `mid 0.56 0.15 70` (amber-gold, ~3.9:1, was olive), `low 0.52 0.19 42`, `critical 0.5 0.21 27`. `.charge-stripes` now use `--battery-high`. `SpecTile` uses a paler wash in light mode (`/10`, ring `/30`) and a warning-coloured icon for the rating tone; the battery's faded "used" part is `/10` in light mode. Dark theme unchanged. Verified with headless Chrome using `--blink-settings=preferredColorScheme=1` (the app follows the system theme). Note: `--warning` and the others are app-wide, so other warning/feature UI shifts slightly in light mode.
-**Not done / left uncommitted:** all of the above plus these notes.
-**Follow-ups:** the user to check it visually and ask for a commit.
-
-## 2026-09-22 â€” Claude â€” LLM council: EV calibration and adoption
-
-**Goal:** the professor asked how battery differences are calibrated (the user answered "we use consumption rate"); the user asked what to improve in the EV feature, whether NEDC/WLTP etc. matter, and how to make real EV drivers want it.
-**Done:** advice only, via a 5-advisor council with peer review. No code changes.
-**Verdict:** the consumption answer is half right. Consumption covers energy, but the number comes from unsourced factors (NEDC/CLTC 0.7, WLTP 0.85, EPA 0.9, plus the 1.12 margin, 12% reserve and 0.9 charge efficiency), and one charge curve for every car ignores LFP vs NMC. Next: (1) run the flow in the browser with live routes; (2) a small evaluation: fixed Thai routes Ã— cars against published real-world figures, pass/fail thresholds set before measuring, plus a Â±15% consumption sensitivity rerun that checks whether the charging stops change; (3) sourced real-world consumption and usable kWh per catalog car, with test-cycle factors only as a cited fallback; (4) HVAC as a per-hour load (route duration Ã— kW); (5) LFP/NMC charge-curve profiles. Position Navio as a trip planner with charging built into the itinerary, not as a physics rival to ABRP.
-**Verified:** n/a (no code).
-**Not done / left uncommitted:** this entry and the handoff note. `handoff.md` already had uncommitted edits at session start, so nothing was committed.
-**Follow-ups:** the user to choose which steps to implement. A change to the catalog schema needs a new migration (see `database-changes.md`) and regression tests on the optimizer before recalibrating.
-
-## 2026-09-22 â€” Claude â€” Advise on EV simulation panel and planner UX
-
-**Goal:** the user asked for an opinion on Codex's EV simulation work, the "EV Trip Planner Research" UX critique, and whether the Energy simulation panel is too complex for users.
-**Done:** read-only review. Recommended taking `EnergySimulationPanel` out of the user-facing garage (research/dev-only), keeping the engine; adding a user-set arrival buffer and one battery-along-route chart instead. Flagged that the `vehicle-mappers.ts` edit removed the real-world range factor, so catalogue consumption for NEDC/CLTC cars is now about 30% optimistic and only partly offset by the 12% margin.
-**Then (user approved step 1):** restored the real-world range factor in `client/.../garage/vehicle-mappers.ts`, updated the add-vehicle hint, and corrected a comment in `simulation-model.ts` that pointed to a parity script that doesn't exist. Committed Codex's work: client `feat/ev-simulation` `9ae6f5a`, mobility `feat/ev-simulation` `eb72b37`; both pushed.
-**Verified:** client `tsc --noEmit` exit 0; garage ESLint exit 0; mobility `./mvnw -o test` exit 0. Not browser-checked.
-**Then (user approved merging):** fast-forwarded client and mobility `dev` to the feature branches; server `dev` `cdcd736` and root `dev` bump the pins. Agent notes committed to root `dev`, including Codex's earlier notes and `ev-simulation-proposal-review.md`. Nothing is on `main`.
-**Then (energy-path map, user chose backend-only stop planning):** found that displayed SOC (`projectTripCharging`) already does the same arithmetic as backend `OptimizedRouteVerifier`; the split was two stop planners. Removed the client planner (about 840 lines) in client `eb8c757` on `dev` (via `feat/backend-stop-planner`). Fixed the hard-coded 12% reserve and the day-start SOC sent to the optimizer. Root `dev` `257734d`.
-**Verified:** `tsc --noEmit` 0; ESLint on `app/feature/planner` 0 errors (only the 2 known warnings). Not browser-checked, and the guest flow (sign-in prompt) is untested.
-**Then (arrival reserve):** client `4d6a90e` on `dev` (via `feat/arrival-reserve`) adds the "Arrive with at least" 10/12/15/20% setting and routes it to the optimizer, reserve lines and battery colours. `tsc` 0; planner ESLint 0 errors.
-**Then (battery chart):** client `9bd8ccb` on `dev` (via `feat/battery-route-chart`) adds `BatteryRouteChart` and `DayEvProjection.profile`. Rendered with headless Chrome against the running dev server using sample data, in light and dark mode with focus tooltips; moved the tooltip beside the crosshair after it covered the charger marker. `tsc` 0; planner ESLint 0 errors.
-**Then (panel):** at the user's request, removed `EnergySimulationPanel` (client `7dee312` on `dev`); the physics model stays. `tsc` 0; planner ESLint 0 errors.
-**Then (release, user asked to deploy):** fast-forwarded `main` to `dev` in mobility (`eb72b37`), server (`cdcd736`), client (`7dee312`) and root (`28b6d7e`, deploys). All pins matched `origin/main` before the root push. Deploy run 35700267438 succeeded; after the deploy `/health` 200, `/v1/trips` 401, `/` 200. Also explained the formula changes, the reserve and "Plan charging stops" controls, and the status of the physics model to the user.
-**Then (production bug):** the user reported "temporarily unavailable", then "could not be optimized". The VM logs showed no mobility error. Cause of the 422: trip-planning ignored day start/end anchors. Fixed on `dev` (trip-planning `c6d5b8c`, server `1657da2`, client `a4ab4b1`); see the handoff. Not deployed yet.
-**Not done:** deploy the fix; check in the real planner with live routes; decision on removing the "Charge each stop to" slider; evaluation harness (the user may want Thai cars and routes; ask).
-**Follow-ups:** user to decide where the panel goes and whether to restore the range factor. An LLM council on the plan agreed on: one energy model shared by planner and chart (backend as the source of truth), the arrival buffer passed through to the optimizer, the panel moved to a reachable `/research/energy` route, the driving-conditions preset dropped, and a real evaluation (public reference data, elevation, error measured by charging decisions). Nothing implemented.
-
-## 2026-09-22 â€” Claude â€” Revert depth rework, keep EV simulation
-
-**Goal:** return the UI to `main` with no 3D depth while keeping Codex's new EV work.
-**Done (client `main` working tree, uncommitted):** stashed the full tree as `backup: depth rework before revert 2026-09-22`; restored 26 depth-only files to `main` (sidebar, planner layout/blocks/itinerary/place/charger components, `globals.css`, `button.tsx`); deleted `app/depth.css`; removed depth classes from the two mixed files `route-estimate.tsx` and `vehicle-usage-overview.tsx`. EV files and edits left intact.
-**Verified:** `tsc --noEmit` exit 0; ESLint on `garage/` exit 0; no remaining references to depth utilities. Not browser-checked. `tests/simulation` is ignored by ESLint and was not run.
-**Not done / left uncommitted:** EV simulation work; root agent notes (they already held Codex's uncommitted edits).
-**Follow-ups:** commit the EV work on a `feat/` branch from `dev` when the user asks. The `EvStationDetailCard` kW unit fix went away with the depth revert (component is unused).
-
-## 2026-09-22 â€” Codex â€” Validate EV simulation proposal
-
-**Goal:** validate the supplied simulation-based EV planning proposal and recommend whether to implement it instead of the current approach.
-**Done:** compared current frontend energy/charging calculations, backend SOC-constrained optimizer, route adapter and vehicle provenance with the proposal; checked primary EPA, Google, FASTSim and UNECE references; wrote `docs/agents/ev-simulation-proposal-review.md`. Recommend incremental adoption, first resolving frontend/backend model differences and establishing independent evaluation. Corrected the worked trip's SOC arithmetic.
-**Verified:** read-only implementation review and source checks; no application tests, simulation experiments or empirical accuracy validation. UNECE search listing available but full page fetch failed.
-**Not done / left uncommitted:** review plus updated handoff/session log. Both agent documents already had another session's uncommitted changes; did not commit that work or switch branches. Existing client depth/UI work preserved. No application implementation or deployment.
-**Follow-ups:** if implementation is requested, use the review's staged scope and follow database-change instructions before model/schema edits.
-
-## 2026-09-15 â€” Claude â€” Depth rework for sidebar, planner and EV cards
-
-**Goal:** use `/ui-depth` to give the sidebar and whole planner clearly visible 3D depth, and rework the EV station cards. User then asked for no thick coloured side/bottom borders, only depth.
-**Done (client `feat/ui-reworked`, uncommitted):**
-- Found an unlogged earlier depth pass on this branch (`app/planner-depth.css` plus class hooks). Replaced it with `app/depth.css` (imported from `globals.css`): canvas/section/card/raised/well tokens and `--depth-shadow-sm|md|lg|inset`, light and dark. Utilities: `surface-section`, `surface-block`, `surface-card`, `surface-elevated`, `surface-floating`, `surface-panel`, `surface-interactive`, `surface-tile`, `surface-key`, `surface-well`, `surface-groove`, `divider-groove-t|b`, `surface-nav-item`, `sidebar-depth`, `planner-depth` (sections as slabs, inputs as wells, non-ghost buttons as keys with lift and press).
-- `Button` now emits `data-variant` so planner CSS can skip ghost/link buttons.
-- Sidebar: raised panel with cast shadow, raised active nav items (`aria-current`/`data-active`), recessed trip list, engraved dividers, New Trip key.
-- Planner: day/list blocks on the card layer (padding moved into `TripBlock.Root`), trip info card elevated, side panel and map preview panels floating, mobile tabs as well + raised thumb, engraved resize handles.
-- Day anchor rail: tried raised cards for the start/end rows; user did not like it, reverted to the flat rows. The "Private" badge is raised instead (`surface-tile` on the raised surface color).
-- Day action buttons (note, checklist, EV) use a 20% tint of `note`/`checklist`/`charging` with no border, including a `dark:` override because the outline variant's `dark:bg-input/30` otherwise wins; depth still comes from the planner key rule.
-- Add-place box: the whole field wrapper is the well; its inner input carries `data-depth="flat"`, which the planner input rules in `depth.css` now skip (use it for any icon + input composite field).
-- EV: charging stop card engraved dividers; station list cards raised and interactive with recessed photo; `EvStationDetailCard` rebuilt with raised stat tiles and a price well, and its power unit fixed from kWh to kW (component is currently not imported anywhere).
-**Verified:** `tsc --noEmit` exit 0; ESLint on changed files exit 0. Not checked in a browser (light/dark, narrow widths, drag-and-drop over lifted cards).
-**Not done / left uncommitted:** all of the above; client `CLAUDE.md`.
-**Follow-ups:** browser-check the look; `DESIGN.md` does not yet describe the depth tokens.
-
-## 2026-09-15 â€” Claude â€” Commit and release accumulated client and trip title work
-
-**Goal:** `/commit` everything uncommitted, split by type, merged through `dev` to `main` (user chose all three options explicitly, including production release and the undocumented title change).
-**Done:**
-- client (`dev` and `main` = `4622b54`, stacked branches): `44386d8` chore(deps) on `chore/client-deps-agents`; `279dfac` docs(design) on `docs/client-design-md`; `406468c` style(planner) on `style/brand-theme-redesign`; `4622b54` feat(dashboard) on `feat/dashboard-trip-management`. Client `CLAUDE.md` left untracked.
-- trip-planning-service (`dev` and `main` = `fde94e0`, `fix/trip-title-country-first`): title falls back name -> country -> city; test updated.
-- server: pin bump on `chore/bump-trip-planning-title`, merged to `dev` and `main`.
-- root: these notes on a `docs/` branch and the `client`/`server` pins on a `chore/` branch, merged to `dev` and `main` (deploys).
-**Verified:** client full `tsc --noEmit` exit 0 and `eslint .` (0 errors, 2 warnings) on the full tree, which equals the committed tree. trip-planning-service `./mvnw -o test` with a local config server: 46 run, 44 pass, 1 skipped, 2 errors in `TripPlanningServiceApplicationTests`/`VerificationTests` because Postgres on 5432 was not running (Docker Desktop off); not a code failure, but the local real-Postgres check was not run. No browser check of any client work.
-**Not done / left uncommitted:** client `CLAUDE.md` (must never be committed).
-**Follow-ups:** watch the deploy run; browser-check the released UI; intermediate client commits were split by file and not type-checked individually.
-
-## 2026-09-15 - Codex - Blur garage photo background
-
-**Goal:** match community post image backgrounds in the garage.
-**Done:** VehicleMedia now layers a decorative object-cover copy with scale-110, blur-2xl and brightness-75 behind the sharp object-contain vehicle image. Removed foreground multiply blending. Reuses the same image URL and sizes; missing-image fallback retained.
-**Verified:** full TypeScript check and targeted client ESLint pass. Isolated Chrome render of the actual component with application CSS and BYD Atto 3 asset: background blur/brightness and foreground contain/no filter confirmed; dark screenshot inspected.
-**Not done / left uncommitted:** client garage/vehicle-media.tsx under app/feature/planner/planId/_components, alongside prior work. No deployment.
-**Follow-ups:** none.
-
-
-## 2026-09-15 - Codex - Match block accents to selected color
-
-**Goal:** replace blue primary accents inside each trip block with that block's selected color.
-**Done:** TripBlock.Root scopes primary, primary foreground, and focus-ring CSS variables to the selected block palette entry. Descendant actions, icons, borders and focus states update together when the block color changes.
-**Verified:** full TypeScript check and targeted ESLint pass; Chrome guest planner verified six primary elements change together from Rose to Teal, matching focus-ring color, with global primary unchanged. Inspected Rose screenshot.
-**Not done / left uncommitted:** client app/feature/planner/planId/_components/block/trip-block.tsx on feat/structured-trip-location; prior edits preserved; no deployment.
-**Follow-ups:** none.
-
-
-## 2026-09-15 ï¿½ Codex ï¿½ Fix route and battery row alignment
-
-**Goal:** align the drive time/distance and battery details shown in the screenshot.
-**Done:** changed RouteSegmentInfo (normal, loading, fallback) and DischargeSegmentInfo outer elements from paragraphs to layout divs. The accordion's descendant paragraph rule added a bottom margin only to the first row, causing an 8.625px vertical offset. Existing client changes preserved; application edits remain uncommitted.
-**Verified:** Chrome guest planner with mocked directions: both rows now have identical y coordinates and zero margins; 390px layout wraps without overlap. Full TypeScript check and targeted ESLint passed.
-**Not done / left uncommitted:** client routes/route-segment-info.tsx and routes/charge-segment-info.tsx under app/feature/planner/planId/_components; no deployment.
-**Follow-ups:** none for alignment. Other sessions' unfinished changes preserved.
-
-
-## 2026-09-15 - Codex - Redesign daily route estimate
-
-**Goal:** redesign the pictured route estimate using DESIGN.md and the anti-ai-ui-review skill.
-**Done:**
-- New shared client `garage/route-estimate.tsx`, consumed by planner `day-route-overview.tsx` and Explore `plan-view.tsx` on `feat/structured-trip-location` (uncommitted).
-- Battery-led header, existing battery colors and 12% reserve marker, mono labeled metrics, compatibility footer, responsive two/four-column layout, semantic meter, and visible low/reserve labels. Removed repeated icons, blue action-like charging text, uppercase heading and shadow. Preserved calculations and existing Explore edits.
-**Verified:** full `tsc --noEmit`; targeted ESLint; changed-file `git diff --check` (repository-wide check finds pre-existing dashboard whitespace); isolated Chrome checks with actual component/CSS at 360/768/1024/1440px in light/dark and battery/warning variants (no overflow, meter correct). Inspected light desktop/dark mobile screenshots. Isolated preview uses fallback fonts; full application integration not browser-tested.
-**Not done / left uncommitted:** three client files above plus these notes; both agent documents already contain other sessions' uncommitted edits, so no combined docs commit was made without authorization to include them.
-**Follow-ups:** review within the live planner with loaded fonts; commit with the existing client work when its owner approves.
-
-## 2026-09-15 â€” Claude â€” Rework charging stop card and route leg rows
-
-**Goal:** redesign the planner charging-stop card and the drive/battery leg rows with the anti-ai-ui-review skill.
-**Done (client, uncommitted):**
-- `block/items/trip-place-card.tsx` (charger branch): removed the icon-plus-pill-plus-title repetition and the blue tinted card; header is block-color marker, title, and a meta line (Charging stop Â· operator Â· kept when optimizing). Duplicate `ChargeSegmentInfo` hidden when the charging control is shown. Earlier token swaps by another session kept.
-- `charger/station-specifications.tsx`: ruled spec grid (Max power, Ports, Plugs) via new `charger/spec-cell.tsx`; per-row blue icons removed. `station-opening-hours.tsx` icon muted.
-- `charger/station-charging-control.tsx`: large mono target, segmented 60/80/100 picker, custom track (arrival dimmed, added charge lit in battery ramp colors) over a transparent native range input, and Arrive at / Adds / Takes cells; incompatible plugs shown as a warning.
-- `routes/charge-segment-info.tsx`: new `ChargeBar`; `ChargeSegmentInfo` (explore) and `DischargeSegmentInfo` restyled without boxes; discharge shows a mini battery bar, from â†’ to, usage, and a Low label.
-- `routes/route-segment-info.tsx`: boxless row (route-colored car icon, mono time and distance); clearer loading and no-route text.
-- Leg wrappers in `block/sortable-block-items.tsx`, `itinerary/anchor-stop-card.tsx`, and explore `plan-view.tsx` now lay the drive and battery rows on one wrapping line.
-**Verified:** full `tsc --noEmit` and ESLint on the changed planner files pass. Not browser-checked (slider thumb alignment with the native input, dark mode, narrow widths, drag handles).
-**Not done / left uncommitted:** all files above.
-**Follow-ups:** browser check; confirm the transparent range input still works with the card's drag-and-drop (`data-no-drag` kept).
-**Revision (same session):** user reported the drive and battery rows were vertically misaligned. Both `RouteSegmentInfo` and `DischargeSegmentInfo` rows now use a fixed `h-6` flex row with `leading-none`, so they share one center line (fallback row uses `min-h-6` since it may wrap). A suspected IBM Plex Mono fallback was ruled out: the built CSS registers the face under its real name, so a temporary `layout.tsx`/`globals.css` font change was reverted.
-**Revision 2 (same session):** user asked for colored percentages. Added `--battery-{high,mid,low,critical}-text` tokens (light: deepened shades; dark: the fill colors) and `.battery-text-*` utilities in `globals.css`; `BATTERY_TONES[tone].valueText` and `BATTERY_CHANGE_TEXT` in `garage-formatters.ts`. `DischargeSegmentInfo` colors from/to by level and the usage (âˆ’N%) red; `ChargeSegmentInfo` colors from/to and adds a green +N%. Computed contrast: light â‰¥5.88:1, dark â‰¥5.44:1. `DESIGN.md` battery section updated. tsc and ESLint pass; not browser-checked. Rows were meanwhile changed from `<p>` to `<div>` on disk (accordion prose margins); kept.
-**Revision 3 (same session):** user asked for the charge-to thumb to match the garage starting battery slider ("only the circle"). `station-charging-control.tsx` keeps the arrival/added `ChargeBar` track but its thumb is now the slider's 20px level-colored circle (`getBatteryColor`) with a 7px light center dot; track inset widened to `inset-x-2.5`. A brief swap to the full `BatterySlider` was reverted, leaving `battery-slider.tsx` with only the earlier tone-color change. tsc and ESLint pass; not browser-checked.
-**Revision 4 (same session, reverted):** added meaning-based color to the charging card (plugs that fit the EV in `text-charging` with a text note, muted spec grid surface, green 24-hour hours, battery-colored quick target and Arrive at, green +kWh, 5% `bg-charging` tint on the charge section). The user asked to revert; all of it was undone, returning `spec-cell.tsx`, `station-specifications.tsx`, `station-opening-hours.tsx`, `station-charging-control.tsx` and the `trip-place-card.tsx` wrapper to their Revision 3 state (`opening-hours.ts` has no diff). tsc and ESLint pass.
-
-## 2026-09-15 â€” Claude â€” Rework garage vehicle card and trip energy panel
-
-**Goal:** make the garage vehicle card and usage overview look less AI-generated, using `client/DESIGN.md` and the anti-ai-ui-review skill.
-**Done (client, uncommitted, garage folder):**
-- `vehicle-card.tsx`: spec sheet layout: title + one meta line (Catalogue pill removed), 4-cell spec grid in mono numbers, connectors as one "Plugs" line (no pills), source sentence with external-link cue. The duplicate battery bar is gone (the slider below owns it). Active card shows a check + "Used for this trip's battery estimates" instead of a disabled button; inactive shows "Use for this trip".
-- `vehicle-usage-overview.tsx`: renamed "Trip energy"; removed the repeated photo and name header (also redundant in explore `plan-view.tsx`), the fake 8-segment battery and all icon-circle tiles. Now: battery at trip end + range left, a start/end track with a 12% reserve marker, a 4-cell stat grid (Distance, Energy used, Driving, Charging; "Mileage" and the duplicated Connector tile removed), and a per-day bar chart with value labels, reserve line, screen-reader text, and a real empty state.
-- `garage-formatters.ts`: shared `getBatteryTone` (critical < 12% planner reserve, low <= 25%) used by card, chart and `battery-slider.tsx`; previously three different thresholds turned 45% amber/brown. Added connector, date and distance formatters.
-- `garage-section.tsx`: removed the uppercase "USAGE OVERVIEW" divider, non-pill Add button, neutral empty state (primary text failed contrast), outer route warning hidden when the overview shows its own empty state.
-- `vehicle-media.tsx`: `mix-blend-multiply` in light mode so studio photo backdrops blend into the frame.
-**Verified:** `tsc --noEmit` and ESLint on the six files pass. Not checked in a browser (light/dark, narrow two-column cards, many-day chart scroll).
-**Not done / left uncommitted:** the six garage files above.
-**Follow-ups:** browser check.
-**Revision (same session):** user asked for colorful battery fills. Added `--battery-high|mid|low|critical` tokens (light and `.dark`) and `.battery-fill` / `.battery-fill-up` / `.battery-<level>` utilities in `globals.css` (same-hue gradient, top highlight, glow). Bands: green >=50%, yellow 26-49%, orange 12-25% ("Low"), red <12% ("Below reserve"). Used by the trip-end track, daily bars, and the starting-battery slider. `DESIGN.md` gained the tokens and a Battery level section. tsc, ESLint and DESIGN.md lint (0 errors, same 3 warnings) pass; not browser-checked.
-
-## 2026-09-15 â€” Claude â€” Add client DESIGN.md
-
-**Goal:** describe Navio's visual identity in the DESIGN.md format (Google `@google/design.md`, alpha) for coding agents.
-**Done:** new `client/DESIGN.md`: YAML tokens (brand pair, light and `-dark` colors, feature tints, media/map colors, 10 type styles, radii, spacing, 40 component entries) taken from `app/globals.css`, `app/layout.tsx` fonts, and the shadcn `button`/`card`/`input`/`badge` primitives, plus prose in the spec's section order.
-**Verified:** `npx -p @google/design.md designmd lint DESIGN.md` (CLI 0.4.0): 0 errors, 3 contrast warnings that reflect real tokens: light primary with Paper text 3.27:1, and dark `destructive` with white text 3.76:1. Heading sizes above `text-lg` are a proposed scale, not measured from pages.
-**Not done / left uncommitted:** `client/DESIGN.md` (client tree holds other sessions' uncommitted work on `feat/structured-trip-location`).
-**Follow-ups:** decide whether to darken light `--primary` or accept 3.3:1 for short labels; set dark `--destructive-foreground` to navy if solid red fills are used; keep DESIGN.md in sync when `globals.css` changes (the user plans to convert hardcoded colors to tokens).
-
-## 2026-09-15 â€” Claude â€” Rebase light/dark theme on brand Paper and Pine
-
-**Goal:** base light and dark mode on the two brand colors `#FAFBFE` (Paper) and `#06211A` (Pine).
-**Done (client, uncommitted, `app/globals.css` only):**
-- Added `--brand-paper` `oklch(0.988 0.004 271)` and `--brand-pine` `oklch(0.2245 0.036 173)`.
-- Light: page = Paper, text and default primary = Pine; cards white; muted/border/input/sidebar/secondary are low-chroma Pine-hue (173) steps.
-- Dark: page = Pine, text = Paper; card/popover/muted/border step lighter in hue 173, sidebar darker; default primary is a light Pine mint `oklch(0.86 0.075 173)` with Pine text. Dark status foregrounds and red/neutral color-theme dark overrides use Pine/Paper.
-**Verified:** WCAG contrast computed for key pairs: fg/bg 16.3:1 both modes, muted text â‰¥6.2:1, primary text â‰¥11.4:1, light input border raised to â‰¥3:1. Not checked in a browser.
-**Not done / left uncommitted:** `client/app/globals.css` (already held other uncommitted work).
-**Follow-ups:** browser check of both modes; hardcoded non-token colors (scrim, map pins, planner block palette) were left unchanged.
-**Revision (same session):** user changed `--brand-pine` to a dark navy `oklch(0.157 0.049 271)` and asked for blue-gray, not green, neutrals. Dark mode now uses blue-gray (hue 265, chroma â‰¤0.022): background 0.19, card 0.235, popover 0.265, sidebar 0.165; primary is light brand blue `oklch(0.84 0.06 271)`. Light-mode neutrals moved to hue 265 too. Recomputed contrast: text â‰¥17.8:1, muted text â‰¥6:1, primary â‰¥10:1, input borders â‰¥3:1. The token name `--brand-pine` is kept though it now holds navy.
-**Revision 2 (same session):** user chose a single neutral color theme for now. Removed `--theme-*` tokens and all `[data-color-theme]` blocks from `globals.css`; primary is `--brand-pine` (navy) in light and `--brand-paper` in dark. Unwired the picker from `sidebar-account-actions.tsx` and the init script from `app/layout.tsx`; `components/theme/*` kept (unused) for later. Full `tsc --noEmit` and ESLint on both files pass. Next: user will add hardcoded colors and ask for them to be converted to tokens.
-**Revision 3 (same session):** sidebar active state moved off `bg-secondary` to its own `--sidebar-accent` tokens (`sidebar.item.tsx`, `sidebar.dropdown.tsx`, `sidebar.tsx` block list); `--sidebar-accent` is now neutral gray `oklch(0.9 0.004 265)` light / `oklch(0.32 0.006 265)` dark. Label contrast 14.5:1 light, 12.3:1 dark; ESLint passes. Active icon still `text-primary`: the user-set bright blue primary is 2.5:1 on the light gray (below 3:1, label text carries the meaning).
-
-## 2026-09-15 â€” Codex â€” Repair trip country data and refresh sidebar after creation
-
-**Goal:** fix sidebar pins, including the user's report of a new trip without country information.
-**Done:** backed up production `trip.trip` to VM `/home/adminnav/navio-maintenance/flags-2026-09-15/trip-before-backfill.sql`; ran existing deployed backfill once in an isolated 700 MB container with discovery and Flyway disabled (6 of 9 unresolved trips repaired). Removed temporary container. Resolved legacy IDs 101/102/105 to matching Google destinations through mobility, checked matching names/countries and coordinate proximity, and repaired three trips through the trip service PUT endpoint. Local creation paths now invalidate trip-list queries.
-**Verified:** final live API check: all 6 currently remaining trips have valid TH/IN codes; SQL: zero null codes; service healthy. Count changed during concurrent activity. Client full type-check and targeted ESLint passed. Browser not verified.
-**Not done / left uncommitted:** client `planner-setup.tsx` and `planId/_components/overview/planner-persistence.tsx`; unrelated concurrent client/backend work untouched. No code deployment.
-**Follow-ups:** user was asked for the new trip destination and environment; inspect that specific case if browser refresh still shows a pin.
-
-## 2026-09-15 â€” Claude â€” Delete trip from dashboard and planner
-
-**Goal:** add a delete trip action to the dashboard trip cards and the planner.
-**Done (client, uncommitted, on `feat/structured-trip-location` alongside the earlier Codex work):**
-- `planner-api.ts`: `deleteTrip(tripId)` -> `DELETE /api/trips/{id}` (proxy already forwards DELETE to `/v1/trips/{id}`).
-- New `use-delete-trip.ts`: mutation in the `planner-autosave-<id>` scope (waits for an in-flight save); treats 404 as success; clears the local draft and the recent-plan sidebar atom, drops the trip from every `["planner","trips"]` page and invalidates it; removes only *inactive* metadata/stats/snapshot queries, because refetching an open planner's snapshot would 404 and `PlannerPersistence` would recreate the trip.
-- New `trip-actions-menu.tsx`: "â‹¯" dropdown with "Delete trip" and a confirmation dialog (Cancel focused first, pending/error states, optional `redirectTo`).
-- `trip-summary-card.tsx`: menu replaces the decorative top-right arrow.
-- `trip-info-card.tsx`: now a client component; menu beside the trip name for signed-in users with a persisted trip; redirects to `/dashboard`.
-**Verified:** full client `tsc --noEmit` and ESLint on the five files pass. Not run in a browser; delete not exercised against the backend.
-**Not done / left uncommitted:** all five client files above (not committed because the client tree holds ~57 unreviewed files from another session on the same branch).
-**Follow-ups:** browser check (menu keyboard nav, dialog focus, redirect, sidebar refresh); decide how to commit the client tree. `TripHeroCard` has no menu because the dashboard does not render it.
-
-## 2026-09-15 â€” Codex â€” Explain sidebar pin fallback
-
-**Goal:** explain why saved trips still show pins after the flag work.
-**Done:** inspected sidebar rendering and the country flag component; flags already use `destinationCountryCode`, with a pin for missing/invalid codes. Confirmed the backend backfill runner is opt-in.
-**Verified:** source inspection and repository status; no live trip responses inspected, so missing country codes for the pictured trips remain an inference supported by the prior handoff.
-**Not done / left uncommitted:** existing client changes preserved; no application changes or production operations.
-**Follow-ups:** inspect affected trip responses and run the existing location backfill if their country codes are null.
-
-## 2026-09-14 â€” Claude â€” Finish structured trip location, fix failed release, add agent context
-
-**Goal:** continue Codex's structured trip location work, commit, and deploy.
-
-**Done:**
-
-- mobility-and-ev-service `f4e5493`: place details expose structured city/region/country (`GooglePlaceLocationMapper`).
-- trip-planning-service `0e11894`: trips resolve `destinationId` through mobility and store city/region/country code; optional display name with derived `title`; V10 migration; opt-in backfill runner.
-- client `19e7bf1`: server-resolved titles and locations; premade plan copy resolves a place id by name; only trip-location files committed (partial commit of `planner-detail.tsx`).
-- First release (root `363145a`) failed: trip-planning crash-looped on schema validation of the `char(2)` column; deploy rolled back. Fixed in trip-planning `cb3879c` (`@JdbcTypeCode(SqlTypes.CHAR)` + mapping test); released as root `3fb68c4`, deploy succeeded.
-- Added `AGENTS.md` (now committed), `docs/agents/database-changes.md`, `release.md`, `handoff.md`, this log.
-- Added `PostgresSchemaTests` to user-management, trip-planning, mobility, and community (skipped unless `NAVIO_TEST_DB_URL` is set) and a `verify-database-schema` job that gates image builds in `deploy-backend.yml`.
-
-**Verified:** mobility 19/19 tests; trip-planning 45/45 including full context against disposable Postgres 16 + PostGIS; reproduced the production failure without the fix. Client type-check and lint pass on the committed file set in isolation. All four `PostgresSchemaTests` pass on PostGIS 16; the trip-planning one fails when the `@JdbcTypeCode` fix is removed. Full suites still pass with the test skipped (user-management 95, trip-planning 46, mobility 20, community 74). The new `verify-database-schema` job passed its first GitHub run (deploy run 34829001804, root `0a4acc4`), and the deploy succeeded. Premade plan copy not tested in a browser.
-
-**Not done / left uncommitted:** ~57 client files from the Codex session (see handoff).
-
-**Follow-ups:** user decision on uncommitted client work; run the trip location backfill in production.
-
-## 2026-09-14 â€” Codex â€” Structured trip location (unfinished)
-
-**Goal:** store structured destination location for trips.
-
-**Done (uncommitted when the session ended):** backend changes in mobility-and-ev-service and trip-planning-service with tests; client migration to the new trip contract, plus unrelated dashboard, sidebar, and theme work in the same working tree.
-
-**Verified:** not recorded.
-
-**Not done / left uncommitted:** two client type errors (`itinerary-section.tsx`, `tests/planner/data.ts`); premade plan copy would have failed trip creation; nothing committed. Picked up by the Claude session above.
 
 ## 2026-10-11 - Codex - Redeploy backend rail-routing fix
 
@@ -2853,6 +2357,268 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 **Git:** Client/trip stale local dev refs fast-forwarded to published ba01a1b/957cfbf before creating feat/twd-expense-currency branches; feature source/tests remain uncommitted. A concurrent session switched both worktrees to feat/transit-route-legs at the same tested HEADs before final verification; preserved those switches and recorded them in this follow-up documentation commit. Required session notes and API documentation are committed locally as docs(agents): log session 2026-10-11 on docs/twd-currency-session-2026-10-11 from dev and merged to dev only. No push, main update, deployment or submodule-pin commit. Pre-existing report files, client CLAUDE.md, mobility logs and other child checkouts preserved.
 **Next:** Review and publish TWD child changes when requested; publish compatible client/trip changes before hosted acceptance. Existing Phase 4B/4C remain outside this task. Local backend evidence: target/twd-verification.log.
 
+## 2026-10-10 - Codex - PAUSED: Phase 4C workspace reconciliation
+
+**Status:** User explicitly requested a safe pause. STOPPED after read-only engineering inspection and documentation-history reconciliation. No new application edits, migrations, tests, push or deployment this session.
+**Completed:** Fetched all seven repositories. Only incoming root dev commit was eb5bbb0 (report handoff notes); no incoming client/trip/mobility application commits. Reconciled on docs/reconcile-handoff-2026-10-10, retaining BOTH local and remote report histories, committed e791463 and fast-forwarded local dev. Conflicts affected only the two agent documentation files and are resolved. No child pins or working files changed. Remote report note naming an older report as latest is historical; user's subsequently reviewed local documents remain authoritative for report edits.
+**Preserved:** Client fix/route-request-batching has trip-route-query.ts edits, new trip-route-api.ts/test plus pre-existing tsconfig/CLAUDE. Mobility fix/phase4b-route-feasibility has four optimization classes, PrecedingTripEnergyTests and new OptimizedRouteVerifierTests, plus logs. Trip fix/phase4c-apply-validation has TripEvOptimizationApplier.java and new TripEvOptimizationApplyValidationTests. Root/server dev, community detached with logs, IAM dev. Do not stage/discard these automatically.
+**Findings / resume:** Read database-changes.md and client/AGENTS.md. Confirmed TripEvOptimizationApplier line ~260 rounds double estimated charging minutes to Integer and does not save operation departureSocPct. BlockItem and PlannerEvChargerDto use Integer estimatedChargeMinutes and Integer targetBatteryPct; latest migration is V15. Need design additive continuous duration and optimizer-selected target persistence without conflating the user's explicit target/lock with an optimizer target. No design or migration implemented yet. Relevant mappings: PlannerService applyPlace/clearEvSnapshot/toPlannerItem; TripEvOptimizationService.mapStop; MobilityEvOptimizationRequest.Stop; mobility EvRouteStopRequest; PrecedingTripEnergy; OptimizedRouteVerifier; client trip-energy-projection.ts chargingEventForCar and planner-api.ts capability-aware save/validation. Existing saved manual targets take precedence; precision must survive save/reopen and guest state. Publication sanitization must not leak private charge state.
+**Remaining:** Finish precision/target data contract and tests; review retained-charger search/replay consistency and cross-span positions; whole-trip downstream validation (current request only includes precedingDays); real database atomic rollback/concurrency and connected preview/apply/save/reopen parity. Existing Phase 4B and partial 4C test results are historical and were NOT rerun. UI remains unchanged; Phase 5 not started. Resume only when user asks.
+
+## 2026-10-08 - Codex - Proposal equipment and references
+
+**Goal:** Complete only equipment/software costs and references in the user's CS-project-proposal-template (2).docx, using friend's research proposal as a structural example.
+**Done:** documents/reports/NAVIO_Project_Proposal_Equipment.docx (4 pages). Hardware/software/external-services subsections adapted to NAVIO; no GPU/LLM research costs copied. Existing equipment/software incremental cost zero under stated assumptions; Google Maps budget remains unconfirmed. Five verified official documentation references added. Original Downloads document untouched.
+**Verified:** Native Word save and PDF layout review, original section text retained. Existing paragraph layout retained; Word normalized one font hint and style-gallery visibility only, without changing font/spacing definitions. New text matches Times New Roman and 1.5 spacing. Preview/scripts in documents/working/proposal-equipment. No code changes or tests.
+**Git/next:** Local docs-only log commit; no push or remote integration. Known diverged dev from earlier fetch remains unresolved. User reviews proposal; external API budget requires actual billing/budget confirmation.
+
+## 2026-10-08 - Codex - Phase durations and system data-flow figure
+
+**Goal:** Use the latest reviewed Downloads/NAVIO_CSC499_Report_Revised.docx; edit only approximate phase durations and missing system data-flow diagram, preserving user styling.
+**Done:** Separate documents/reports/NAVIO_CSC499_Report_Updated.docx and PDF (51 pages), plus NAVIO_System_Data_Flow.png. Added approximate overlapping phase durations 17/22/4/13/9/6/4/8 weeks and a short qualification. Filled Figure 3.5 with a context-level DFD grounded in local client/auth.ts, shared-plan/trip optimization controllers/services and Google Places/Routes adapters. Context boundary includes client and backend; external actors are travellers, Keycloak and Google Maps Platform. Added a compact explanatory paragraph. Original reviewed copy and earlier deliverables untouched.
+**Verified:** Native Word COM save/PDF export. Reviewed all pages as sheets and changed pages at full size. 237 protected body paragraphs retain text and paragraph properties; styles.xml identical; original media preserved by content hashes despite Word filename renumbering. Figure/contents lists refreshed by page numbers only, preserving existing entries. Source uses user-updated 1.5 spacing; no global style changes. Scripts and source backup in documents/working/revision2. No code tests needed or code/UI edits.
+**Git:** Required dev pull attempted; origin/dev advanced to eb5bbb0, but fast-forward refused because local dev diverges. No remote merge/rebase/push or submodule changes. Record this session with a local docs branch merged only to local dev. All pre-existing dirty work preserved.
+**Next:** User reviews Updated report; do not replace with earlier builder output. Future coding must reconcile diverged dev deliberately. Engineering phases remain paused/incomplete as below. Context-level figure intentionally abstracts internal databases/services; ER diagrams and architecture retain that detail.
+
+## 2026-10-08 - Codex - Scoped report feedback revision
+
+**Goal:** Revise only Implementation Plan 2.6, architecture placement/explanation and compact ER explanations, preserving the user-reviewed report. User additionally approved correcting abstract metadata and adding a credit reminder.
+**Done:** Saved separate documents/reports/NAVIO_CSC499_Report_Revised.docx and PDF (41 pages), plus NAVIO_Compact_Gantt.png. Restored eight-phase implementation narrative from prior chapters with current scope. Gantt spans Dec 2025-Nov 2026: early periods are explicitly reconstructed estimates per user instruction; later periods consolidate recovered screenshots. Moved the supplied architecture image to Figure 4.1 with current-service explanation and a short note on its older design labels. Added four compact ER relationship explanations, retaining all image bytes. Updated affected numbering and generated lists. Corrected NAVIO abstract details and left (Reminder: confirm credits).
+**Verified:** Native Word edits/save/export; all final pages inspected as rendered sheets and detailed changed pages. 266 protected nonempty paragraphs retain text and paragraph formatting; existing styles.xml byte-identical; original images retained byte-for-byte; page geometry unchanged. Header/footer relationship IDs renumbered only due new chart. Download/project sources had identical body content/styles and are untouched. Read-only baseline export stalled; stopped only automation Word PID 24344, not the user's Word session. Subsequent Word edit/export succeeded.
+**Git:** No code/UI or source-report modifications. Existing client batching, mobility Phase 4B and trip Phase 4C work preserved. Only required agent docs committed locally via docs branch/dev; no push/deploy.
+**Next:** User reviews separate revised report. Credit total remains unconfirmed; data-flow figure remains a captioned space; architecture still contains historical labels, explained rather than redrawn. Do not regenerate from old report builder: source-of-truth is the user-reviewed copy and scoped revision in documents/working/revision1. Further unrelated text/style edits require user approval. Coding remains paused.
+
+## 2026-10-07 - Codex - Final CSC499 report export
+
+**Goal:** Resume the final report, using the university manual and supplied source documents; project coding remains paused.
+**Done:** Completed Chapters 1-5 and front matter in documents/reports/NAVIO_CSC499_Report.docx, with legacy DOC and PDF copies. Final PDF is 39 pages. Preserved four original ER images; Figures 3.1 and 3.6 are captioned spaces for the user to insert architecture/data-flow diagrams. Testing is qualitative, reflecting the user report; advanced EV/Maps integration remains under refinement. Original source files copied into documents/references, not modified.
+**Verified:** Word refreshed contents/fields and exported both formats. Reviewed all PDF pages as rendered contact sheets and detailed affected layout; corrected theme-overridden heading fonts and an isolated paragraph page. All sections A4 with 30/40/20/20 mm top/left/bottom/right margins. No fabricated user-study metrics. No project source edits or code tests for this document-only task.
+**Git:** Existing client batching, mobility Phase 4B and trip Phase 4C edits preserved. Reports/references/working files remain local and untracked; commit only agent reporting files on a docs branch and merge to local dev. No push/deployment.
+**Next:** User reviews report and inserts the two missing diagrams. Use documents/working/report-blocks.json and build-report-fallback.py for revisions, then native Word render-report.ps1; prepare-content.py predates figure insertion and must not overwrite the final blocks. Engineering Phase 4C remains incomplete as recorded below.
+
+## 2026-10-07 - Codex - Create latest Navio Chapters 1-5 report from supplied templates
+
+**Goal:** Produce a new complete Word report through Chapter 5, using the supplied templates and Chapter 3 as the prior version, with project context, references and reusable figures.
+**Done:** Created docs/report/Navio_Report_Chapters_1-5_Latest_2026-10-07.docx and matching PDF through native Microsoft Word COM. Preserved the template-derived cover/approval pages, used supplied native DOTX front matter and the official chapter outline/manual, revised Chapters 1-3 and completed Chapters 4-5, 16 references and an evidence appendix. Reused six original ER diagrams and added three current architecture/navigation/data-flow figures. Used the exact three author names and IDs confirmed by the user. Originals remain unchanged.
+**Verified:** Inspected latest root dev 9fb2619 and its child pins via Git objects/temporary exports without changing child worktrees. Fresh frontend run: 119 passes, zero failures/skips, against client ba01a1b with unchanged assertions. Backend evidence is explicitly dated and distinguished from the newer recorded Phase 4A verification; no backend rerun or live acceptance claimed. Reviewed rendered pages, cover spacing, abstract alignment, headings, references, tables, figures, generated lists and Roman/Arabic pagination. Source hashes and all six reused ERD image hashes match the originals.
+**Limits:** Physical EV accuracy, connected two-account acceptance, user evaluation and capacity remain unmeasured. Planned features and Phase 4B/4C are not described as completed. No application changes, main push or deployment.
+**Git:** Mandatory notes are committed as docs(agents): log session 2026-10-07 on docs/report-session-2026-10-07 from dev and merged to dev only. Pre-existing docs/report files and the new deliverables remain untracked/local. Existing client CLAUDE.md, mobility logs and older checked-out submodules are preserved.
+**Next:** Use the new template-based Word/PDF as the latest report; future edits should preserve its template and update fields. Follow the retained Phase 4A handoff for development work. Local reproduction scripts/evidence: %LOCALAPPDATA%/Temp/navio-report-20261007.
+
+## 2026-10-06 - Codex - Review optimization apply safety
+
+**Goal:** Check for issues before proceeding to the next phase.
+**Done:** Found charging duration/target persistence gap and unsafe handling of invalid apply operations. Added complete operation preflight, checkpoint protection, station identity and malformed-state guards. No UI/schema/energy-formula changes; Phase 4C remains incomplete.
+**Verified:** Full trip suite 184/184 passed with real PostgreSQL. Two later test-only additions also passed in 14/14 focused applier tests. Eleven new validation cases total; whitespace checks passed. No live deployment certification.
+**Git:** Trip fix/phase4c-apply-validation source/tests remain uncommitted. Previous client/mobility work preserved. Root dev pull found no incoming updates. Required reporting-only docs commit merged to local dev; nothing pushed.
+**Next:** Finish precise charging target/duration round-trip and whole-trip downstream consistency; test real transaction rollback/concurrency and connected preview/apply/reopen. No Phase 5.
+
+## 2026-10-06 - Codex - Phase 4B routed feasibility checks
+
+**Goal:** Continue after user-reported billing resolution with Phase 4B; preserve existing UI and route-loading fix.
+**Done:** Strengthened actual-road detour/reserve/physical reachability checks, origin charging, final saved charging replay, connector/power eligibility, prior-day reserve enforcement and truthful availability diagnostics. Added road-request chunking for expanded optimizer routes. No canonical formulas, public DTOs, schema or UI components changed; unused frontend Auto Add helper remains unused.
+**Verified:** Full mobility suite 53/53 passed with real disposable PostgreSQL schema validation; 14 new adversarial tests. git diff --check passed. No live provider/connected-system acceptance claim. Updated existing API documentation and handoff.
+**Git:** Mobility fix/phase4b-route-feasibility source remains uncommitted; client fix/route-request-batching preserved. Documentation-only local docs commit merged to dev. No push/deployment and no parent-pin changes.
+**Next:** Phase 4C target/duration persistence precision, downstream whole-trip verification and preview/apply/reload parity. Additional route-call latency remains a connected release check; Phase 5 deferred.
+
+## 2026-10-05 - Codex - Fix route request batching and diagnostics
+
+**Goal:** Resolve the reproduced route-loading request-limit mismatch without UI or energy changes.
+**Done:** Added client transport batching (10 groups/request, 25 points/group, shared chunk boundary), complete-response checks, cancellation forwarding and informative backend error extraction. Preserved route order/identity and fallback/unknown values. No backend, database, billing or visual changes.
+**Verified:** Connected proxy previously reproduced HTTP 400 for 11 groups. All 127 frontend unit tests passed; after a typing correction, TypeScript, targeted lint and eight affected routing tests passed. Whitespace check passed. No live user-trip payload capture or Google provider acceptance claimed.
+**Git:** Local fix/route-request-batching; unrelated files preserved. Session docs on a docs branch merged to root dev only. No push/deployment; published submodule pins unchanged.
+**Next:** User rechecks affected trip; diagnose any remaining response-specific failure. Continue Phase 4B separately.
+
+## 2026-10-05 - Codex - Publish verified Phase 4A to dev
+
+**Goal:** Push latest verified changes safely at the user's request.
+**Done:** Fetched all seven repositories, confirmed remote dev alignment and pulled dev before commits. Committed/pushed mobility b5a80eb, trip 957cfbf, client ba01a1b, then server f4a2813 and root pins e8b21b7 in dependency order. Published feature/chore branches and fast-forwarded dev. Updated existing API/handoff/session documentation on a docs branch for dev only.
+**Verified:** Staged paths and whitespace checks; no incoming changes or conflicts, no force pushes. Existing successful Phase 4A verification remains applicable; no code changes or new test runs this session.
+**Limits:** Main and production are untouched. Reports, logs, local editor/env files remain local. Google Maps billing diagnosis remains unresolved externally. Phase 4B/4C and connected release acceptance remain outstanding.
+**Next:** Pull root dev and its recursive submodule pins to obtain Phase 4A; continue the approved remaining phases separately.
+
+## 2026-10-03 - Codex - Complete Phase 4A after resumption
+
+**Goal:** Resume the saved Phase 4A checkpoint, preserve existing work/UI, and finish focused verification.
+**Done:** Finished saved canonical optimizer inputs and policy, earlier-day battery replay, endpoint protection, incomplete-charger rejection, version checks around preview, autosave flush/capability checks and stale-response preservation including budget edits. Restored only the previously approved normal-stop battery checkpoint control. Updated existing API documentation and handoff; no Phase 5 or schema changes.
+**Verified:** Trip 175/175 and mobility 39/39 tests pass, including disposable PostgreSQL checks. Frontend 119/119 unit tests, TypeScript, targeted lint and production build pass. Latest production-build guest and synthetic authenticated energy/garage browser walkthroughs pass without private account writes. Test-only configuration and mock-type failures were corrected before final passing runs; Windows build-log lock resolved by using TEMP.
+**Limits:** No full distributed/live-account optimization acceptance or production deployment. Browser Explore feed integration is not certified. Remaining Phase 4B/C feasibility/reserve and charging target/duration preview/apply/reload work is explicit in handoff. Some necessary stale-state safeguards were completed ahead of broader 4C.
+**Git:** All implementation remains local/uncommitted on feat/phase4-canonical-optimization in client/trip/mobility; root/server dev. Preserved previous dirty files. No commit/push under the existing restriction; reporting files remain local. Test server3113 stopped; user server3000 untouched.
+**Next:** Review Phase 4A, then proceed with explicitly scoped 4B/C; coordinate compatible service release and connected-system acceptance before claiming release readiness.
+
+## 2026-10-03 - Codex - PAUSED at user request: Phase 4A in progress
+
+**Authority/status:** User approved baseline verification and Phase 4A, then requested a safe pause because hourly usage was low. STOPPED without claiming Phase 4A complete. Resume from this entry, not from the older report or maintainer handoff. No commits, pushes, merges or deployment this session. User separately approved restoring the existing observed-SoC control on normal stops; otherwise existing UI must remain unchanged.
+
+**Git baseline:** Fresh fetch of all seven origins found no HEAD..origin/dev or HEAD..origin/main commits. Root dev 0421513, client d3d0563, server e836f76; preserved all pre-existing documentation/report/editor/log files. Created local feat/phase4-canonical-optimization branches in client, trip-planning-service and mobility-and-ev-service. All new implementation remains UNCOMMITTED on these branches. Root/server remain dev. Do not discard or automatically commit pre-existing files (client tsconfig flag/CLAUDE.md, service logs, report output and earlier documentation changes).
+
+**Completed narrow regression fix:** trip-place-card.tsx had ObservedSocControl inside the EV-only branch, so normal stops never displayed it. Moved the unchanged control to the regular-place branch, still hidden read-only. Updated energy browser test for current custom-list buttons and mocked profile response. Synthetic signed-in browser test PASSED: initial SoC immediate save/reload, checkpoint save/reload/clear, immutable trip vehicle snapshot after garage refresh, trip-only membership/removal, custom reuse, no garage writes, responsive themes. No real account mutated.
+
+**Phase 4A implementation so far (needs finishing/review):**
+- TripOptimizationEnergy resolves vehicle profile, charging limits/connectors and initial SoC from owned saved trip; ignores request vehicle/SoC. Rejects insufficient usable capacity for consumption, missing snapshot or missing explicitly saved initial SoC. Rated range can preview but never apply. Applies only supported authoritative battery-side catalogue provenance, user-observed override or explicitly confirmed legacy; preserves legacy numbers/source.
+- TripEvOptimizationService now gathers chronologically preceding saved itinerary days/anchors/stops, observations and charge durations. Checks expectedVersion on preview as well as existing apply path. New additive precedingDays/estimatedChargeMinutes internal DTOs retain old constructors.
+- Mobility PrecedingTripEnergy replays earlier days through existing CanonicalEnergy and road routes, including observations/charging; refuses unknown/unreachable earlier legs and disconnected day boundaries. Earlier observations cannot erase prior infeasibility. Only selected day is optimized.
+- New internal /internal/v1/ev-route/optimize-canonical route (old /optimize retained) and trip client uses new route, so old mobility cannot silently ignore context. Planner capability canonical-optimization-v1 added.
+- Frontend optimization-state.ts flushes autosave, checks version/capability, and keys previews on blocks plus energy state plus request. Panel sends expectedVersion, checks stale apply. Existing autosave flush now waits through pending/in-flight mutation scope and refuses local-only/unsynced settings. No visual changes here.
+
+**Verification at pause:**
+- Frontend all 116 unit tests PASS, TypeScript PASS, targeted changed-file ESLint PASS, production Next build PASS (font downloads required approved network access).
+- Full mobility suite: 33 total, 32 PASS, 1 database test skipped, zero failures/errors. New prior-day tests cover propagation, checkpoint removal, unreachable prior leg despite observation, fallback route refusal, discontinuity and Day 1.
+- Latest full trip suite: 173 total, 171 PASS, 2 context setup errors, zero assertion failures. PostgreSQL schema/migration/upgrade tests passed in this latest run. ONLY TripPlanningServiceApplicationTests and VerificationTests fail: isolated target/phase4-test.yml omits required navio.currency-provider.base-url. Add the normal https://api.frankfurter.dev setting to this ignored test config and rerun. Earlier failed runs were configserver import setup failures, not passing tests; latest XML/log is authoritative.
+- Guest browser walkthrough remains INCOMPLETE due outdated selectors, not a demonstrated application failure at last step. Current failure tests/guest/browser-check.mjs line ~74 searches 'Search Thailand vehicles'; actual current aria-label is 'Search vehicle catalog'. Already updated old 'Thailand catalogue' button to 'EV Vehicle List', scoped stop search to Itinerary, and added mock public /api/vehicle-models page/detail responses. Continue updating selectors to current UI, NOT changing UI to satisfy tests. Earlier dev overlay came from mocked profile shape/external Google Maps failures; production localhost:3113 used to avoid dev overlay. No full live-account acceptance claimed.
+
+**Next exact steps:**
+1. Recheck working tree and review this session's edits. Finish guest browser walkthrough, add multiple checkpoint/readonly coverage and optimizer flush/stale integration coverage. Energy browser test uses synthetic APIs and must remain isolated from real account data.
+2. Fix ignored test configuration currency provider property and rerun full trip suite on disposable Postgres. New TripOptimizationEnergyTests passed in latest suite; cover policy matrix/unknown capacity/missing initial state. Add preceding-days charging and JSON round-trip tests as needed.
+3. Review edge cases before calling 4A complete: mapCharger still maps incomplete charger snapshots to ordinary waypoints (risk for earlier-day replay); selected day at a replaceable first charger; concurrent edits during apply response; version-consistent snapshot reads; unknown connector treatment. Do not silently weaken eligibility or fabricate capacity/consumption. Further optimizer/precision changes belong 4B/4C, document boundary clearly.
+4. Update existing API documentation for canonical capability/internal request contract; not done yet. No entity/migration edits introduced. Review diff, rerun affected checks, document exact remaining release gates. No Phase 5 UI consolidation.
+
+**Local tools/resources:** Bundled Node24 C:/Users/suriy/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node.exe; normal PATH node22 cannot run registerHooks tests. Browser env NAVIO_PLAYWRIGHT_MODULE=file:///C:/Users/suriy/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright/index.mjs; NAVIO_TEST_ORIGIN=http://127.0.0.1:3113. Maven C:/Users/suriy/.m2/wrapper/dists/apache-maven-3.9.16/0daed3be3ebd1c706f0e69e8b07c6b73f5cc4ea3dfce72a8d0ec2e849ca2ddb0/bin/mvn.cmd -o test requires approved cache access. Test configuration: set SPRING_CONFIG_LOCATION=file:./target/phase4-test.yml and NAVIO_TEST_DB_URL=jdbc:postgresql://localhost:55434/navio_phase4. Logs: trip target/phase4-verification.log, Surefire XML; client .next/phase4-unit-tests.log.
+
+**Processes:** Disposable Docker navio-phase4-verify-pg (--rm) on localhost55434, DB navio_phase4, test username/password tripplanner; no live DB touched. Container retained for resumption. Existing user dev server PID32332/localhost3000 was not stopped. Session-created production test server on3113 is being stopped for pause; restart with bundled Node next start --hostname127.0.0.1 --port3113 (Next warns standalone build prefers standalone/server.js). No further tests/background work should continue after pause.
+
+**Usage:** Agent cannot observe hourly quota. User explicitly requested pause; wait for user to resume. Reporting files updated locally; prior documentation Git restriction remains respected.
+
+## 2026-10-03 - Codex - Pre-Phase-4 readiness recommendation
+
+**Goal:** User is considering resuming development and asks what should precede Phase 4.
+**Reviewed:** Current handoff, session history and local repository status. Local root/client/server remain on dev; existing report/documentation, editor and log changes preserved. No fresh remote fetch or claim that the friend has not pushed.
+**Recommendation:** First run integrated browser acceptance of garage, trip state, checkpoints, reload and sharing; verify connected backend capabilities and inspect migration history before release. Fix reproduced baseline regressions narrowly. Then implement Phase 4 server model-policy enforcement, canonical optimizer state, route/charger feasibility and preview/apply/reload consistency; finish with focused integration/security tests. Phase 5 visual consolidation remains deferred and existing UI must be preserved without approval.
+**Limits:** Planning review only; no code changes or fresh tests. No commit/push/deployment; local reporting updates retained under the existing documentation Git restriction.
+
+## 2026-10-01 - Codex - NAVIO report draft and visual verification
+
+**Goal:** Review supplied historical slides and Chapters 1-3 against current scope and implementation; revise chapters as needed and prepare Chapters 4-5 without changing application code.
+
+**Done:** Completed output/doc/NAVIO_Project_Report.docx (35 pages) and output/doc/NAVIO_Report_Revision_Notes.txt. Rewrote Chapters 1-3 and added Chapters 4-5, references, three diagrams and six tables. Preserved original documents. Planner, EV Integration, Explore and Community are treated as main features; moderation is excluded, AI and additional Explore recommendations conditional. Current code and historical test evidence are distinguished from planned acceptance and empirical evaluation.
+
+**Verified:** Exported final DOCX through Word and inspected every rendered page; checked pagination, tables, figures and text layout. Document structural checks completed. No application tests rerun for this report-only task.
+
+**Outstanding:** Confirm official cover/team spelling/course formatting and Community scope assumption. Linked DB diagrams and Gantt were not readable as source exports; request PDF/PNG/DBML exports before inserting detailed ERDs and actual dated schedule. Report is a review draft, not a claim of completed user or road testing.
+
+**Git:** Existing application and documentation changes preserved. No code changes, commit, push or deployment. Reporting updates remain local because earlier documentation Git actions were declined.
+
+# Session Log
+
+## 2026-09-30 - Codex - Revised remaining plan for maintainer handoff
+
+**Goal:** Pause coding and prepare a current, considerate plan for the user's friend to own.
+**Done:** Reviewed workspace states, latest handoff, selection/canonical calculations, optimizer preview/apply and chart integration. Added a superseding maintainer handoff at the top of handoff.md with completed baseline, concrete Phase 4 gaps, Phase 5 scope and release prerequisites. Explicitly transferred subsequent decisions to the friend; historical approval holds are not demands for this agent's approval.
+**Findings:** Server model-policy enforcement, pending-edit/preview integrity and charge-target precision need Phase 4 attention; guest optimization is currently authenticated-only; chart profiles suppress observed checkpoints; legacy-confirmation copy no longer matches the settings UI. These are planning findings, not application fixes.
+**Verified:** Read-only source/Git inspection; no tests rerun or source/UI changes. Prior tested/pushed baseline remains root 0421513. Existing unrelated files preserved. No main push/deployment.
+**Next:** Friend validates baseline and decides remaining work; user proceeds with proposal report. See newest handoff entry for full revised plan and evidence limits.
+
+## 2026-09-30 - Codex - Verify and publish integrated dev
+
+**Goal:** Check and push the integrated project. No source or UI changes requested or made.
+**Verified:** Fresh fetch of all seven repositories found no unintegrated remote dev/main commits. No unmerged entries or whitespace errors. Re-ran all 113 frontend tests, planner model checks and TypeScript: passed. Reviewed unchanged backend Surefire reports: trip 166 passed; gateway 12 passed/1 skipped; mobility 26 passed/1 skipped, zero failures/errors. Previous production build passed on the same source. No additional browser or live production migration validation claimed.
+**Publication:** Pushed IAM 6183185, trip f724442, mobility 322b616, client d3d0563 and server e836f76 to origin/dev, in dependency order. Root dev publication includes this reporting entry and the integrated child pins. Community is already current. No force pushes, main updates or production deployment. Local logs/editor files and the pre-existing tsconfig status flag remain untouched (no textual tsconfig diff).
+**Remaining:** Production release still requires the merged browser walkthrough and actual deployment migration-history check documented below. Continue remaining energy phases only with user direction.
+
+## 2026-09-30 - Codex - Integrate published main with Phase 3.1
+
+**Goal:** User requested current-workspace main integration, incoming UI preferred, preserving valid prior work. User asked how to reconcile competing energy approaches; retained approved canonical energy policy beneath incoming presentation. No further phase or production release authorized by this integration.
+
+**Done:** Fetched/rechecked all seven main refs; every origin/main is now an ancestor of the corresponding workspace HEAD. Resolved client/server/root merges and fast-forwarded local dev branches. Preserved backups at backup/pre-main-integration-20260929. Incoming admin/catalogue/public-sharing/Explore and visual components retained. Restored trip-only garage membership, reusable personal custom EVs, guest public catalogue detail checks, provenance-aware energy commands, live trip starting SoC and stop observations. Incoming road-route verification now uses canonical continuous energy/SoC rather than the parallel simulation factors. Rated-range automatic application remains preview-only; no fabricated consumption, hidden standard factors or 12% correction reinstated. Unavailable driving/battery/energy stays unavailable. Public catalogue GET routes are narrowly allowed; private garage operations remain authenticated.
+
+**Commits:** client d3d0563; IAM 6183185 (tree equals released main); trip f724442; mobility 322b616; server e836f76; root integration 6019c49. Child/server integration branches published before parent pins. Local dev contains integration; remote main/dev and production were not changed. Community remains at published main. Unrelated client tsconfig.json flag, CLAUDE.md and service logs preserved.
+
+**Database:** Published V11 publication/V13 sharing migrations preserved. Local canonical energy/membership additions moved to V14/V15 to eliminate duplicate V11. Full real-PostgreSQL trip suite validates schema and persistence. Added an isolated upgrade test from published V13 to V15, preserving an existing trip and leaving new fields null. A local database that previously applied the old unpublished V11/V12 energy migrations needs explicit history reconciliation before startup; never blindly repair or replace production migration history. Production history inspection remains a release gate.
+
+**Verified:** 113 frontend tests passed; planner model script passed; production Next build and TypeScript passed. Targeted changed-file lint: 0 errors, one incoming unused RouteSegmentStatus import warning. Trip: 166 passed, including PostgreSQL schema/reload and published-schema upgrade. Gateway: 12 passed, 1 disabled. Mobility: 26 passed, 1 database test skipped; stress test first timed out under concurrent load, then passed isolated and in final full suite. Maven shell stderr warnings produced misleading shell exit status on gateway/mobility; fresh Surefire XML confirms zero failures/errors. IAM tree is identical to the previously released/tested main (161 passed, 2 disabled); not rerun this session. No new authenticated browser or production-account mutation test performed. Existing synthetic browser script needs selector adaptation for incoming vehicle switcher/custom-list layout before rerun.
+
+**Remaining plan:** First browser-check merged guest/signed-in catalogue, custom reuse, trip separation, settings/checkpoints and shared read-only views; inspect actual deployment migration history before releasing. Then Phase 4 should integrate/evaluate charger optimization on canonical road-leg energy, distinguish feasibility from automatic-apply eligibility and test reserves/checkpoints/unknown data. Incoming simulation modules remain reference code, not approved runtime policy. Do not adopt standard factors/margins or rated-range automatic apply without explicit policy approval. Phase 5 retains incoming Trip Energy visual foundation, incorporates useful old overview detail from canonical results, and never presents unknown as confirmed zero. Friend's unpushed hybrid branch remains unavailable; no claim to have integrated unpublished commits.
+
+## 2026-09-29 - Codex - Review friend's unpushed hybrid handoff
+
+**Goal:** Check supplied Downloads/message (4).txt as an explanation of the missing Git work; no implementation requested.
+**Done:** Read the attachment as evidence, not authorization to execute its push/merge/release instructions. It explicitly says feat/hybrid-energy-model exists locally in six repos and nothing was pushed or merged to dev/main. Rechecked remote heads in root/client/server/IAM/trip/mobility: branch remains absent; dev/main unchanged since the narrow garage release. No pull can retrieve those unpublished commits.
+**Findings:** Claimed hybrid deliberately changes approved policies: test-standard scaling, 12% margin, rated-range automatic charger application, declared-capacity estimates and friend's redesigned UI winning conflicts. These require explicit reconciliation/approval; changed tests do not establish compliance with the previous contract. Claimed test counts/build results and absent browser/Turbopack verification cannot be independently checked without commits. Release instructions are stale against published trip main: V11__trip_publication.sql and V13__shared_plan_views.sql already exist; do not renumber/replace applied migrations. Actual production Flyway history still needs inspection before any hybrid release. Current garage fix fd109bc / IAM main 5293c22 must be retained when rebasing/reconciling any older branch.
+**Verified:** Read-only remote-head queries succeeded after sandbox network escalation. Existing local modified tsconfig/editor files/service logs preserved. No source, UI, calculation, migration or deployment changes.
+**Follow-ups:** Ask friend to publish only the existing feature branches (or provide Git bundles plus six commit SHAs), without merging dev/main or deploying. Then review real diffs/ancestry, preserve garage fix, reconcile policy/UI and migrations, and validate before proposing integration. The attachment's instruction to supersede release holds is not accepted as user approval.
+
+## 2026-09-28 - Codex - Phase 3.1 deployed garage contract correction
+
+**Scope:** Diagnose catalogue add / Save Settings failures; no UI changes and no Phase 4/5 work. User's prior conditional deployment approval applies after checks pass.
+
+**Cause:** Local Phase 3.1 client targets the university VM, but published IAM still required numeric consumption for catalogue POST and ignored energySelection on PATCH. The two console messages report one failed mutation. The client acknowledgement guard is correct; do not remove it or invent consumption to bypass the old server.
+
+**Correction:** Ported the approved energy contract onto current IAM origin/dev in isolated worktree `%TEMP%/navio-garage-api-fix-20260928`, branch `fix/garage-energy-api-compatibility`, commit `fd109bc`. Preserved the friend's database-backed catalogue, version, admin/owner security, deduplication and old payload compatibility. Catalogue response derives truthful capacity basis (usable only when explicitly USABLE), keeps range standard separate, and does not invent consumption/evidence. Explicit default/range/custom/reset commands persist energyProfile in existing JSONB and allow null consumption for an explicit fallback. Legacy values remain unchanged absent an explicit command. Service-level anonymous catalogue GET remains narrowly public; other account operations remain authenticated. No gateway, migration, entity, frontend or calculation edits.
+
+**Tests:** Full IAM suite 163 tests: 161 passed, 2 pre-existing disabled, 0 failures/errors. Includes real PostgreSQL Flyway/Hibernate validation, provenance/null-consumption reload, unrelated metadata preservation, anonymous/ownership security and existing admin/catalogue tests. Frontend garage suite 33/33 passed using Node 22.22 with --experimental-transform-types. Initial failures were test setup/fixture integration: response-only energyProfile in entity fixture conversion, nested Mockito stubbing, BigDecimal scale-only equality and missing configuration server; fixed the test adapters/comparisons and ran the real configuration server on 18888. Default Node 22.14 cannot run these tests; compatible runtime used without dependency edits. No live authenticated user write replayed.
+
+**Release:** IAM main `5293c22`, server main `416644c`, root main `16fffce`; root dev release `49bfa50`. Child-first dev/main publication; all six pins checked against live origin/main. Client remains published `f790652`, trip `f0549d4`, mobility `eb72b37`, community `5f0cf41`. Release workflow https://github.com/bestprappy/Navio/actions/runs/36452979632 completed successfully, including all schema checks, nine image builds and VM deployment. Live public catalogue now returns all three RATED_RANGE/CATALOG_DEFAULT profiles with null consumption and NEDC range basis; health 200; anonymous private garage and trips 401. The legacy catalogue URL /v1/users/me/vehicles/catalog still returns 401 at the current gateway, while /v1/vehicle-models is public; guest legacy-route reconciliation remains separate. Authenticated end-to-end adds were covered by controller/service tests, not replayed against a real user account.
+
+**Boundary / follow-up:** This is a narrow garage compatibility release, not complete Phase 3.1 reconciliation. Original local Phase 3.1 worktrees and UI are preserved; remote UI/energy-model differences and trip migration collisions remain for the separate reconciliation gate. Production trip service still lacks the local canonical trip energy/membership persistence contract, so this release does not claim to fix its local-draft compatibility warning. Do not advance phases automatically. Preserve unrelated client tsconfig flag/CLAUDE.md and service logs. Temporary PostgreSQL container and configuration-server process stopped; existing dev server left running.
+
+## 2026-09-28 - Codex - Pull published updates and revise remaining energy phases
+
+**Goal:** Review friend's Git updates, preserve completed Phase 3.1 and propose remaining plan; no new phase implementation.
+**Done:** Fetched/rechecked existing remotes and pulled root dev `24c7f1f` with recursive published pins into `%TEMP%/navio-plan-review-20260928`. Original working trees preserved. Reviewed global catalogue/admin, sharing/copies/read-only planner, alternate simulation, backend optimizer/road verifier and anchor integration. Documented revised reconciliation gate, Phase 4 correctness/preview/apply/validation and Phase 5 approval-gated consolidation in existing handoff.
+**Verified:** Six published mobility optimizer/simulation tests pass. Planner regression script fails at CommonJS JSON/TypeScript module-name resolution before assertions; not classified as runtime app failure. Clone reset recovered on Git retry. Checkpoint branches unchanged and not ancestors of main; handoff's hybrid branch absent from remote heads/history after second check.
+**Not done / left uncommitted:** No application edits, migration changes, destructive merge, push or deployment. No full integrated build/DB/live-account certification. Unrelated tsconfig flag/editor files/service logs remain untouched.
+**Follow-ups:** Approve reconciliation-first plan; resolve model/visual baseline explicitly, new catalogue provenance and sharing privacy, and deployed V11/V13 collision before merging Phase 3.1. Do not start Phase 4/5 automatically.
+
+## 2026-09-27 â€” Claude â€” Admin route fix, OWNER provisioning, Explore seeded
+
+**Goal:** `/admin/users` reload showed Keycloak's "internal server error"; production had no OWNER role; run the Explore seed as "Navio Team".
+**Done:** nginx routed every `/admin/` path to Keycloak; now only `/admin/realms/`, `/admin/serverinfo` and `/admin/<realm>/console/` go there (Keycloak console is `/admin/master/console/`). deploy.sh creates the OWNER realm role if missing and adds it to the `navio-web` scope; a smoke check asserts anonymous `/admin/users` redirects to `/sign-in`. First release (`ac8ed60`, run `36332867659`) failed and rolled back: the pre-existing scope-mapping `printf '...'` inside `bash -euc '...'` broke the quoting (never ran before because all roles were already mapped). Fixed in `b853d1a`; OWNER scope mapping was also added manually. Root `main` `6915bca`, run `36333726651` succeeded. Created Keycloak user `navio-team@example.com` (Navio Team, id `0ae736e4-a315-456e-bb2e-7257d419b2d9`, no password, no IAM profile yet). Ran the seed on the VM from `~/navio-maintenance/seed-explore` (log `run-2026-09-27.log`): 30 published, 0 failed.
+**Verified:** `/admin/users` -> 307 sign-in; `/admin/master/console/` 200; OWNER role exists and is in the `navio-web` scope; replayed smoke checks pass; feed lists 30 plans with `authorName` "Navio Team"; a seeded `/explore/shared/<token>` returns 200.
+**Not verified:** no one holds OWNER yet (manual steps 3-5 in owner-role.md); seeded plans were not browser-checked.
+
+## 2026-09-27 â€” Claude â€” Explore seed script (30 real plans)
+
+**Goal:** fill Explore with many real plans: 5 Thailand, 5 Japan, 20 elsewhere.
+**Done (uncommitted, root `dev`):** `.deploy/scripts/seed-explore/` with `seed.mjs`, `plans.mjs` (30 itineraries) and `README.md`. The script uses the real API only: `POST /v1/trips` (destination = Google place id from `/v1/geo/places/search`), `PUT .../planner` with stops resolved to real Google places (photo, rating, coordinates) and real chargers from `/v1/ev/chargers/near` for the two Thai EV trips, then `PUT .../publication` with `listInExplore`, `includeNotes`, byline "Navio Team". It calls trip-planning and mobility directly with `X-User-Id`, because Keycloak has direct-access grants off. It is idempotent by trip title and has `DRY_RUN`/`ONLY`.
+**Verified:** `node --check`; plan counts and time order; full run against a contract stub (`scratchpad/stub.mjs`): 30 published, 4 charger stops, the re-run skipped 30, and a missing user id was refused.
+**Not verified:** not run against a real backend or Google (nothing was running locally, and production needs a seed account id).
+**Follow-ups:** create the seed account, run with `DRY_RUN=1` on the VM (`docker run --network navio-backend ...`, see README), check the resolved places, then run for real.
+
+## 2026-09-27 â€” Claude â€” Commit and release Owner role, Explore sharing and observability
+
+**Goal:** `/commit` everything dirty across all repos and release it through `main` (user chose "Everything" and "Through main (deploys)").
+**Done:**
+- client: the dirty `feat/admin-console` tree was 5 commits behind `origin/dev`, whose released admin files were untracked here. Snapshotted it as temp commit `0b54f2c` (the old branch still points at it), cherry-picked onto `feat/explore-read-only-planner` from `origin/dev`, and resolved all 22 add/add conflicts to the snapshot after confirming every dev-only line was superseded; the final tree equals the snapshot. Commits `c072bce` feat(admin) Owner role, `1296322` feat(explore) read-only planner. `main` = `f790652` (merged in the `%TEMP%/navio-client-admin-release-20260926` worktree, which holds `main`). The main client worktree is left detached at `f790652`.
+- IAM (was dirty on `main`): `e9dac80` fix(admin) null-free user search on `fix/admin-user-search`, `27295c9` feat(admin) Owner role + V6 on `feat/owner-role`; `main` = `9351eb8`.
+- trip-planning (was dirty on `main`): `8e4ff37` feat(sharing) trending/V13, located stops, copies; `main` = `f0549d4`.
+- server: `feat/gateway-owner-role` (OWNER authority), pins `f5f1cb9`, and **new** `fix/shared-plan-copy-route`: neither gateway config routed `POST /v1/shared-plans/{token}/copies` (would 404). `main` = `4395d86`.
+- root: `fix/shared-plan-copy-route` (same route in `.deploy/config/api-gateway.yml`), `feat/owner-realm-role`, `fix/grafana-proxy-headers`, `feat/production-tracing` (Zipkin), `docs/owner-explore-release`, pins. `main` = `881ea96` (merged in `%TEMP%/navio-root-admin-release-20260926`), Actions run `36327266654` succeeded (pins, Postgres schema, 9 builds, deploy). Live smoke: `/health` 200, feed and trending 200, anonymous copies/trips/admin 401, Grafana health 200.
+**Verified:** IAM full suite 148 (2 skipped by design) incl. `PostgresSchemaTests`, admin repository and catalog Postgres tests on disposable PostGIS 16; trip-planning full suite 157 incl. V13 on Postgres; gateway 12 (1 skipped); client `tsc` clean, ESLint 0 errors on changed files, 13 admin tests (`node --experimental-transform-types --test`). Production compose validated with `docker compose config`. First IAM run had 8 errors only because the config server was still starting (connection refused on 8888); rerun passed.
+**Not verified:** live Keycloak/two-account acceptance, copy end to end, nginx `-t`, VM memory headroom for Zipkin.
+**Follow-ups:** Raum-1's `fix/trip-specific-garage` still carries trip-planning `V11`/`V12`; renumber above V13 before merging. Existing production realm needs the manual OWNER setup in `owner-role.md`.
+
+## 2026-09-27 â€” Claude â€” Explore shared plan rendered by the planner itself
+
+**Goal:** make an Explore plan page 1:1 with the planner (map on the right), fed by the real published plan, copyable, and automatically updated whenever planner cards change.
+**Done (all uncommitted):**
+- User decision: published itinerary stops (places and chargers) may expose coordinates; day anchors stay private.
+- trip-planning `main`: `PlanPublicationSanitizer.sanitizePlace` now publishes `placeId`/`address`/`lat`/`lng` only for valid coordinates; `SANITIZER_VERSION` deliberately unchanged (adding fields must not dead-link live plans; old snapshots just lack pins). Copy no longer requires an address. Tests updated and added.
+- client `feat/admin-console`: new `plannerReadOnlyAtom`; read-only branches in `ItinerarySection` (+ `renderDayAnchors` slot), `SortableBlockItems`, `TripPlaceCard`, `TripNoteItem`, `TripChecklistItem`, `BudgetSection`/`ExpenseCard`, and both planner maps (no POI add). New `share/shared-plan-blocks.ts` (snapshot â†’ `TripBlockData`/budget) and `share/shared-day-anchors.tsx`; `SharedPlannerView` rewritten to hydrate a scoped Jotai `Provider` and render the real planner components + `PlannerMap`; `/explore/shared/[token]` uses the planner's sidebar layout. Deleted the unused custom `shared-planner-map.tsx`.
+**Verified:** `PlanPublicationSanitizerTests` 33/33, `TripPublicationServiceTests` 39/39; client `tsc` clean, scoped ESLint clean (one pre-existing warning). Headless Chrome against a stub gateway at 1440px: planner layout, real cards, numbered/charger pins, budget. Phone width not truly verifiable (headless min width). Not verified: live routes, real accounts, copy end to end, full trip-planning suite, Postgres.
+**Follow-ups:** `/share/plans/[token]` and the publish-dialog preview still use `SharedPlanContent`; move them to `SharedPlannerView` if they should match too. Plans published before this change show stops as "(location not shared)" notes until the owner presses Update.
+
+## 2026-09-27 â€” Codex â€” Real Explore plans and planner-style shared view
+
+**Goal:** remove mocked Explore trips, show real recent and trending user publications, open a shared plan in the planner layout without editing, and let a user copy it.
+**Done:** Connected Explore, dashboard recommendations, and the planner Explore section to published plans; added view-based trending and a private-copy endpoint in trip-planning with V13 `view_count`; replaced the old mock detail route with a read-only planner workspace and shared card/day components. App changes remain uncommitted.
+**Verified:** client TypeScript, scoped ESLint, and production `next build`; targeted publication/controller/privacy tests; V1â€“V13 Flyway migration and JPA validation on disposable PostgreSQL 16. No real-account browser acceptance.
+**Not done / left uncommitted:** Client `feat/admin-console` and trip-planning `main` hold these changes alongside unrelated dirty work. The isolated frontend build left `client/.next-explore-check/`; automatic approval review blocked recursive removal. App changes were not staged, merged, or deployed.
+**Follow-ups:** The user was asked whether publicly shared itinerary stops may expose coordinates. Until answered, the sanitizer keeps locations private: the read-only map has no pins and copied stops without public coordinates become editable notes. Recheck the exact visual match and copy flow with two real accounts once that choice is settled. Agent notes already contained another sessionâ€™s uncommitted changes, so this note was not committed separately.
+
+---
+
+One entry per agent session, **newest first**. Every session adds an entry before it ends, including unfinished or abandoned work. Keep entries factual and short; current state goes in [handoff.md](handoff.md).
+
+## 2026-09-27 â€” Codex â€” Repair admin users and add Owner role
+
+**Goal:** fix the admin users 500, present users in a role-badge table, and let an Owner grant administrator roles while admins manage lower roles.
+**Done:** changed IAM search to avoid nullable PostgreSQL query parameters; added `OWNER` through IAM, gateway, Keycloak import, client role gates, V6 migration, and docs; added audited role controls in the account drawer and colored badges in the users table; stopped logging handled admin HTTP failures to the Next development error overlay. No commits or deployment.
+**Verified:** client typecheck after `next typegen`, scoped ESLint, 13 admin transport tests; IAM 47 targeted controller/service tests plus 13 final role/guard tests; gateway suite and new Owner converter test; disposable PostgreSQL 16 migration/schema/search/Owner constraint tests (5 passed). No live authenticated Keycloak or browser check. The exact backend exception behind the reported 500 was unavailable, so the null-parameter query is a tested likely cause.
+**Not done / left uncommitted:** all changes are uncommitted. Root agent notes and deployment files, client Explore/planner work, and server submodule work were already dirty before this session and may belong to other sessions; they were not staged or discarded. `docs/agents/owner-role.md` records existing-realm setup, including the display snapshot row. The local Chrome extension timeout is unrelated to Navio.
+**Follow-ups:** the local client's API base URL points at production, so its reported 500 can persist until the IAM change is released. Complete live authenticated acceptance and release through the repository's submodule order. Keep the existing dirty work separate when committing.
+
+---
+
 ## 2026-09-27 — Claude — Admin route fix, OWNER provisioning, Explore seeded
 
 **Goal:** `/admin/users` reload showed Keycloak's "internal server error"; production had no OWNER role; run the Explore seed as "Navio Team".
@@ -2903,18 +2669,6 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 
 One entry per agent session, **newest first**. Every session adds an entry before it ends, including unfinished or abandoned work. Keep entries factual and short; current state goes in [handoff.md](handoff.md).
 
-## YYYY-MM-DD — <agent> — <short title>
-
-**Goal:** what the user asked for.
-**Done:**
-- change (repo, branch, commit SHA)
-**Verified:** tests/checks run and their result; say what was not verified.
-**Not done / left uncommitted:** anything half-finished, with file paths.
-**Follow-ups:** decisions pending from the user, known risks.
-```
-
----
-
 ## 2026-09-27 — Codex — Repair admin users and add Owner role
 
 **Goal:** fix the admin users 500, present users in a role-badge table, and let an Owner grant administrator roles while admins manage lower roles.
@@ -2922,6 +2676,68 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 **Verified:** client typecheck after `next typegen`, scoped ESLint, 13 admin transport tests; IAM 47 targeted controller/service tests plus 13 final role/guard tests; gateway suite and new Owner converter test; disposable PostgreSQL 16 migration/schema/search/Owner constraint tests (5 passed). No live authenticated Keycloak or browser check. The exact backend exception behind the reported 500 was unavailable, so the null-parameter query is a tested likely cause.
 **Not done / left uncommitted:** all changes are uncommitted. Root agent notes and deployment files, client Explore/planner work, and server submodule work were already dirty before this session and may belong to other sessions; they were not staged or discarded. `docs/agents/owner-role.md` records existing-realm setup, including the display snapshot row. The local Chrome extension timeout is unrelated to Navio.
 **Follow-ups:** the local client's API base URL points at production, so its reported 500 can persist until the IAM change is released. Complete live authenticated acceptance and release through the repository's submodule order. Keep the existing dirty work separate when committing.
+
+---
+
+## 2026-09-26 â€” Codex â€” Release admin dashboard, vehicle catalog, and shared-plan titles
+
+**Goal:** finish the admin dashboard and global vehicle catalog, let a shared plan have a public name, fix the live Explore/shared-link 404, then commit and deploy to root `main`.
+**Done:** IAM admin account, catalog, and activity backend (`dfb14c0`, main `8056fb6`); client admin UI, catalog picker, activity, and share-name dialog (`2ec2c33`, `c3faf9a`, main `465720e`); trip publication custom title (`9b63ff3`, main `a79a085`); dedicated shared-plan gateway route, catalog routes, and gateway tests (server `8ef99e5`, main `de5bd91`); root pins (`525c4da`, main `78ea743`). The first deployment succeeded but the live public routes still 404ed because the root's mounted production gateway YAML was stale. Fixed that file and added public-route deployment checks (`2051204`, root main `eb00cff`); follow-up Actions run `36241742100` succeeded.
+**Verified:** IAM 138 tests passed, plus 4 real-PostgreSQL catalog/schema tests; trip 150 tests passed with PostgreSQL and standalone service config; gateway 11 tests and configuration-server 1 test passed. Isolated client `tsc`, scoped ESLint, 12 admin transport tests, prior admin Chrome workflow, and new Chrome catalog draft/activity workflow passed. Live shared-plan feed and vehicle catalog returned 200; a listed plan opened in both reading pages and appeared in Explore HTML; invalid token returned the trip service's 404; anonymous activity returned 401; health returned 200. The browser checks used fixtures, not live Keycloak.
+**Not done / left uncommitted:** root deployment/observability edits, old dirty client `feat/admin-console` worktree and concurrent Explore/planner edits, `docs/agents/plan-link-sharing-plan.md`, and `docs/research/` were preserved. The release client was assembled in a clean worktree from `origin/dev`; its main commit is deployed by the root pin. Live two-account Keycloak acceptance is outstanding.
+**Follow-ups:** live authenticated admin and two-account share acceptance remains; no test credentials were available. The production shared-plan 404 was reproduced and fixed by updating the mounted gateway config.
+
+
+---
+
+## 2026-09-26 â€” Claude â€” Share published plans to Explore
+
+**Goal:** continue plan sharing so a published plan can be shared to the Explore page, keep Explore seamless, and use `/frontend-design` for the UI.
+**Done:** (all **uncommitted**; trip-planning `dev`, api-gateway in server `dev`, client `feat/admin-console`)
+- trip-planning: V13 (never merged, edited in place) gains `listed_in_explore`, `listed_at`, a listed-only-when-active CHECK and a partial feed index. `TripPublication.applyListing`, a repository `findListedInExplore` JPQL query, `ExplorePlanSummary`/`UpdateExploreListingRequest` DTOs, `listInExplore` on `PublishPlanRequest`, `listedInExplore` on `PublicationResponse` and `SharedPlanResponse`, `ExplorePlanSummarizer`, service `updateExploreListing`/`listExplorePlans` (revoke also unlists), `PATCH /v1/trips/{id}/publication` and anonymous `GET /v1/shared-plans` (size capped at 48, `no-store`).
+- api-gateway: permit `GET /v1/shared-plans` alongside `/{token}`; new routing test in `GroupPublicRoutesTest`.
+- client: "List on Explore" in `PublishPlanDialog` (a draft before publish, immediate PATCH after), plus an Explore access row and a "View on Explore" link. Explore "Shared by travelers" section with a server-fetched first page and infinite "Show more". Search/filters merge shared plans into results. `SharedPlanCard` with a `RouteStrip` (the design's one distinctive element: stops per day, chargers as bolts; with no photo the cover becomes the per-day itinerary). New `/explore/shared/[token]` reading page (listed plans only), shared `SharedPlanHeader`, and a GET-only `/api/shared-plans` proxy.
+**Verified:** trip-planning full suite, 142 run: only the two known full-context tests error (Postgres 5432); all publication, summarizer and controller-slice tests pass with the config server up. `PostgresSchemaTests` passes on disposable Postgres; the CHECK constraint was exercised in psql. api-gateway 10/10 (1 skipped as before). Client `tsc`, scoped ESLint and `next build` are clean. Chromium against a stub gateway: feed, search merge, keyboard navigation, light/dark/390px, and `/explore/shared` refusing unlisted/dead tokens. No new console errors (the existing `/help` 404 and `/community/create` sign-in prefetches are unrelated). **Not verified:** the owner dialog in a browser, and anything against a real backend or accounts.
+**Not done / left uncommitted:** everything above, alongside other sessions' uncommitted admin and observability work. OpenAPI not updated.
+**Follow-up request, same session: show the author's name.** Added `author_display_name` to V13 and the entity. `authorDisplayName` (max 120) on `PublishPlanRequest` and `UpdateExploreListingRequest`; `authorName` on `ExplorePlanSummary` and `SharedPlanResponse`; `authorDisplayName` on `PublicationResponse`. `PlanPublicationSanitizer.sanitizeAuthorName`. Client: the dialog reads the profile name (shared `currentUserProfileQueryKey` cache) and shows "Shown as â€¦". New `PlanAuthor` widget on cards and in `SharedPlanHeader`; Explore search also matches author names. New tests: byline frozen and sanitized on publish, a PATCH without a name keeps the stored one, the feed and shared plan carry the name but no owner id, 121-character names rejected with 400, and sanitizer normalization. Verified as noted in the handoff. Still uncommitted.
+**Follow-ups:** unlisting does not revoke the link, and anyone who opened it from Explore keeps it (the UI says so). Decide whether listings need moderation/reporting before release. Clean `target/` after migration renames (a stale V11 artifact masked V13). Split the gateway file's vehicle-models change from this work when committing.
+
+---
+
+## 2026-09-26 â€” Codex â€” Continue admin dashboard with shadcn
+
+**Goal:** continue the admin dashboard; use frontend-design and shadcn for UI.
+**Done:**
+- Continued existing uncommitted client admin work on `feat/admin-console`: account search from the dashboard, refresh for all overview queries, accurate count-link semantics, shared shadcn Sheet, paginated moderation history, strict page URL parsing, and honest write-failure feedback.
+- Fixed a browser-observed race where refreshing the newly banned account changed its still-open confirmation into an unban dialog. Preserved the submitted action and reset sheet state per account.
+- Added the UI brief (`docs/agents/admin-dashboard-ui.md`) and repeatable fixture-backed browser coverage (`client/tests/admin/browser-check.mjs`). Applied frontend-design, security-review and anti-ai-ui-review to this slice.
+**Verified:** final TypeScript and scoped ESLint clean; 12 client admin tests; 37 IAM controller/service tests; 3 real PostgreSQL 16 Flyway/entity/aggregate/lock tests. Chrome checks passed for search, overview refresh, history paging/error recovery, ban failure/success, unban, keyboard focus return, page role gates, actual Next proxy guest/CSRF/route gates, and 390/768/1440px light/dark screens. No live Keycloak end-to-end test or production build/release. Full typecheck temporarily caught concurrent Explore/sharing edits; the final run passed.
+**Not done / left uncommitted:** application work and both agent notes remain uncommitted. Notes already included another session's unfinished changes, which were not authorized for inclusion in a commit. Pre-existing backend admin code was verified but not modified. Unrelated deployment, sharing and concurrent Explore work preserved.
+**Follow-ups:** live Keycloak/two-account acceptance; catalog persistence/publishing and global activity are still separate work. See handoff for repeatable Postgres setup. Isolated test server/container cleaned up; screenshots remain under ignored `client/.next/admin-screenshots/`.
+
+---
+
+## 2026-09-26 â€” Codex â€” Clarify global car and admin backend scope
+
+**Goal:** confirm the planned global-car feature and existing admin backend work.
+**Done:** checked the original admin plan, current IAM diff, catalog service, and migration files. Global catalog management remains in the original scope; the prior account-focused continuation did not complete the full plan. IAM admin statistics/details/history and safeguards already exist uncommitted. The vehicle catalog remains JSON-backed, with authenticated garage integration.
+**Verified:** source inspection only; no additional tests or application edits.
+**Not done / left uncommitted:** catalog persistence/admin publishing/guest integration still pending; updated notes remain uncommitted with pre-existing notes.
+**Follow-ups:** continue the global vehicle catalog portion of the original plan.
+
+---
+
+## 2026-09-26 â€” Claude â€” Review Raum-1's Phase 3.1 branches and council the reconciliation
+
+**Goal:** read the friend's (Raum-1) newly pushed work, find conflicts with `dev` and local work, and use `/llm-council` to decide what to take.
+**Done:**
+- Mapped Raum-1's branches (none on `dev`/`main`): root/server `chore/phase31-checkpoint`, client and trip-planning `fix/trip-specific-garage`, mobility `feat/canonical-trip-energy` (61294ab), user-management `feat/vehicle-energy-selection` (20a41c4). All branched before the garage/EV-charger redesign and the `EvSimulationModel`, which is already on `main`.
+- Dry-run merges (`git merge-tree`): client 11 conflicting files (garage/charger); mobility `SocConstrainedRouteOptimizer` (integer `EvSimulationModel` vs continuous `CanonicalEnergy`); root `session-log.md` and pins; trip-planning and user-management merge cleanly as text.
+- Council verdict: merge nothing to `dev` until both devs agree a written energy contract; production model wins a tie; keep the friend's commits (merge, not squash); owner's UI wins client markup conflicts.
+- Renamed the local, uncommitted `V11__trip_publication.sql` to `V13__trip_publication.sql` (the friend's pushed V11 `trip_energy_state` and V12 `trip_garage_membership` keep their numbers). Updated the reference in `TripPublication.java` and in handoff.md.
+**Verified facts:** the friend's trip-planning commit 1068215 changes the contract it sends to mobility: `batteryKwh`/`consumptionKwhPer100km` become optional, and it adds `energyModel` (`RATED_RANGE`) and per-stop `observedSocPct`. Production mobility still requires those fields, so trip-planning **cannot** merge without mobility. V12 is stacked on V11. The friend's migrations are nullable `ADD COLUMN` only. No test pins the migration number. Nothing was compiled or tested this session.
+**Not done / left uncommitted:** no merges performed. These docs edits and the rename are uncommitted, alongside the earlier uncommitted plan-sharing, admin-console and observability work.
+**Follow-ups:** a meeting between the two devs to decide the energy model (integer v1 vs continuous as `model-v2`) and the `energy_vehicle_snapshot` JSON shape. Tell Raum-1 about the V13 renumber. Add a routing test for `/v1/users/me/vehicles/catalog` vs `/{id}` when merging. V11â€“V13 must reach `main` in one release.
 
 ---
 
@@ -2986,6 +2802,162 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 **Follow-ups:** a meeting between the two devs to decide the energy model (integer v1 vs continuous as `model-v2`) and the `energy_vehicle_snapshot` JSON shape. Tell Raum-1 about the V13 renumber. Add a routing test for `/v1/users/me/vehicles/catalog` vs `/{id}` when merging. V11–V13 must reach `main` in one release.
 
 ---
+
+## 2026-09-25 - Codex - Publish tested Phase 3.1 checkpoint
+
+**Goal:** Check, commit and push completed work; await next prompt before further phases.
+**Done:** Published user `20a41c4`, trip `73668d3`, mobility `61294ab`, client `ddeff88` on separate feature/fix branches. Server checkpoint `c85586a` publishes trip pin; root `chore/phase31-checkpoint` contains updated pins/reporting. Child-first order; no remote dev/main merge or production deployment.
+**Verified:** All origins fetched, working trees/pins/diffs reviewed; 70 frontend tests and TypeScript pass again. Prior unchanged-code backend 54/54 real-Postgres tests, lint and browser checks remain valid.
+**Not done / left uncommitted:** Unrelated tsconfig flag, CLAUDE.md and service logs preserved. Conflicting remote UI/model histories not merged; release hold remains.
+**Follow-ups:** Wait for next user prompt. No further phases implemented.
+
+## 2026-09-24 - Codex - Phase 3.1 trip-specific garage correction
+
+**Goal:** Make each trip's garage independent, retain custom vehicles in a reusable personal list, rename/category the picker; preserve other UI and deploy only when safe.
+**Done:** Client `ddeff88`, trip service `73668d3` on local `fix/trip-specific-garage` branches. Trip membership JSONB V12/capability, explicit add/select/remove, no automatic account list/default import, reusable custom list categories/search, catalogue record reuse, membership-preserving battery edits and late-response guard. Updated existing API/database docs and handoff.
+**Verified:** 70 frontend tests; TypeScript/targeted lint; 54/54 trip tests including real PostgreSQL migration/Hibernate/reload/clear. Mocked Chrome new-trip/custom-reuse/reload/remove/other-trip preservation plus battery/checkpoint scenario passes, with no account writes for reuse/removal. No live account writes or deployed-service claims.
+**Not done / left uncommitted:** No push/deployment/remote merge. Conditional release approval held because fetched remote client has a conflicting garage redesign and alternate range-factor/simulation model. Parent pins left uncommitted pending child publishing; unrelated tsconfig/editor/log files preserved.
+**Follow-ups:** Resolve overlapping remote UI/model work explicitly before releasing; existing VM still lacks required energy/garage commands. Keep the trip-specific garage rule and no-unapproved-UI-change rule. No Phase 4/5 work.
+
+## 2026-09-24 - Codex - Phase 3.1 garage compatibility troubleshooting
+
+**Goal:** Diagnose and fix failed Save/catalogue adds while preserving all existing UI; log Phase 3.1.
+**Done:** Client `d15dd47` verifies energy-command acknowledgements and identifies old-backend catalogue validation, with regression tests. Existing backend support is already implemented in local user-service `20a41c4`. VM/frontend mismatch explains failed catalogue adds and ignored model changes; repeated cars are account garage entries. Corrected prior missed-save diagnosis. No UI/layout or account data changes.
+**Verified:** 68 frontend tests; 39 user-service garage/API/security tests; TypeScript, targeted lint and diff checks pass. Public catalogue through localhost returned 401; local configuration targets VM. Private account requests not replayed.
+**Not done / left uncommitted:** VM functionality remains pending deployment approval, not falsely marked fixed. No pushes/deployment, new schema or Phase 4 work. Unrelated files preserved.
+**Follow-ups:** User was asked to approve lifting prior deployment restriction for safe remote reconciliation and tested backend release. Standing no-UI-change requirement recorded in handoff.
+
+## 2026-09-24 - Codex - Battery unavailable screenshot diagnosis
+
+**Request:** Check why battery predictions appear unavailable after Phase 3; investigation only, no application changes or deployment.
+**Findings:** Screenshots show an unsaved NAVIO Estimate selection (Save settings enabled and explicit save-to-apply text), while Trip Energy still reports legacy 18.1 kWh/100 km. Current settings form applies model changes only on save, as requested. Legacy/unknown usable capacity allows nominal driving kWh but leaves SoC null; catalogue 82.56 kWh is declared capacity and cannot be silently promoted. Saving a successful RATED_RANGE selection enables range-based SoC without usable capacity, subject to route completeness. The old-server local-only toast proves some required snapshot capabilities are missing, but exact live capabilities/garage command support were not inspected; no claim of live backend verification. Driving total becomes unavailable if any route duration is missing. UI shortcomings: unexplained question marks, clipped Unavailable text, and local-only toast naming only older fields. These need a focused follow-up, not changed arithmetic or automatic legacy conversion.
+**Verified:** Existing energy suites 31/31 passed, including unknown-capacity, rated range, propagation and capability downgrade. Inspected current branch/status, settings submit, canonical arithmetic and summary conditions. No private account values changed. Unrelated tsconfig flag, CLAUDE.md and service logs preserved.
+
+## 2026-09-24 - Codex - Complete Phase 3 canonical trip energy
+
+**Goal:** Continue the approved Phase 3 implementation from the existing checkpoint, preserving prior work; no Phase 4/5, push or deployment.
+**Done:** Local feature commits trip `1068215`, mobility `61294ab`, client `13fc1c8`, server pins `c380949`, root `b4d30bc`, merged to local dev. Canonical TS/Java energy/SoC, trip snapshot/initial state, observed checkpoints, additive V11/API, shared Planner/Explore projection and bounded continuous optimizer. Fixed first-edit autosave skip and unknown-duration DTO/energy transport integration. Updated existing API/database documentation and handoff, preserving history.
+**Verified:** 65 frontend tests, 53 trip tests, 25 mobility tests including separately enabled real-Postgres test; 18 identical single-case goldens + 3 chronological fixtures (1e-9 tolerance); dense-search/1,000-segment regression; TypeScript/targeted lint; planner model script; guest and synthetic authenticated Chrome scenarios. Disposable PostgreSQL 16.15 Flyway/Hibernate and saved/reloaded/cleared initial/observed state passed. Initial full-trip context DB-port error resolved by pointing all contexts to the disposable DB. No live-account/deployed-service validation claimed.
+**Not done / left uncommitted:** No Phase 4/5 or remote integration. Preserve client tsconfig flag, CLAUDE.md and service logs. Legacy integer applied-charge-minute storage remains for Phase 4; canonical calculations/preview are continuous. Application commits are local-only and remote branches diverge.
+**Follow-ups:** Await Phase 4 approval; exact deferred items and release constraints in handoff. Reconcile remote changes and recheck migration allocation before any authorized release; push children before parent pins. No production main changes.
+
+## 2026-09-23 â€” Claude â€” LLM council on implementing the admin dashboard plan
+
+**Goal:** user ran `/llm-council` with "read admin-dashboard-plan.md and implement it".
+**Done:** five advisors, five anonymous peer reviews, and a chairman verdict. No application code was changed. Verdict: build it in slices, not six phases. Slice 1 is the admin shell plus the Users page on the existing search/suspend/reactivate endpoints, and a statistics endpoint placed under `/v1/admin/users/...`. Slice 2 is the catalog table. Gateway ban enforcement and public catalog routes are deferred until the uncommitted link-sharing gateway work is resolved.
+**Verified facts:** `accessTokenLifespan` is 300 s (`.deploy/keycloak/navio-realm.json:15`), so a suspended user's token already expires within 5 minutes. No service outside user-management checks ban status. The gateway (`api-gateway.yml:49`) routes only `/v1/users/**` and `/v1/admin/users/**` to user-management, so any new `/v1/admin/*` or `/v1/vehicle-models` path needs a gateway config edit, and that file is dirty with link-sharing work.
+**Not done / left uncommitted:** this entry and the handoff note. Earlier uncommitted work in root/client/server was left untouched.
+**Follow-ups:** the user must approve the slice-1 scope and say how the dirty gateway files should be handled (commit link-sharing first, or wait) before gateway-dependent work can start.
+
+---
+
+## 2026-09-23 â€” Claude â€” Build the client half of plan link sharing
+
+**Goal:** finish "publish plan as a link", which a previous session had left as a complete backend and no client at all.
+
+**Done:** (client, branch `feat/garage-ev-redesign`, **uncommitted**)
+- `app/feature/planner/_components/share/publication-api.ts` â€” typed mirrors of the server DTOs (`PublicationOptions`, `Publication`, `PublicPlanSnapshot` and its nested day/item/anchor/charger/budget shapes), owner fetchers for get/preview/publish/revoke, and `sharedPlanPath`/`sharedPlanUrl`. Unreadable options parse to "nothing extra was shared", never the reverse.
+- `app/feature/planner/_components/share/use-publication.ts` â€” TanStack Query hooks. `staleTime: 0, gcTime: 0` on the link state so a revocation in another tab cannot be masked by cache.
+- `app/feature/planner/_components/planner-autosave-flush.ts` (new) and `planId/_components/overview/planner-persistence.tsx` â€” the save-flush barrier the plan required. `PlannerPersistence` now records its pending debounced save in `pendingSaveRef` and registers a flush handler keyed by trip id; `usePublishPlan` calls it, then publishes that exact version. Deliberately **not** in the `planner-autosave-<tripId>` mutation scope: the flush calls the autosave mutation, so taking the same scope would deadlock the two.
+- `app/feature/planner/_components/share/publish-plan-dialog.tsx` plus `share-option-row.tsx` and `shared-link-field.tsx` â€” the owner dialog: access summary, three opt-ins (all off by default), inline preview with Back, published state with selectable URL and copy, update-when-changed, and an inline stop-sharing confirmation. Clipboard failure leaves the URL selectable with `role="status"` feedback.
+- `app/feature/planner/_components/share/shared-plan-content.tsx` â€” one renderer for the projected snapshot, used by **both** the owner's preview and the recipient page, so the preview cannot drift from the real page. Takes only the sanitised snapshot.
+- `app/share/plans/[token]/page.tsx` and `shared-plan-request.ts` â€” the recipient page as a **Server Component** fetching the gateway directly, `force-dynamic`, `robots: noindex/nofollow/nocache`, generic metadata so unfurl services retain nothing. One "no longer available" page for every dead-link cause.
+- `app/feature/planner/_components/trip-actions-menu.tsx` â€” entry point above Delete, labelled "Publish plan as a link" / "Manage published link". The publication query is enabled only while the dropdown is open, so the dashboard does not fire one request per trip card.
+- Deleted the `app/api/shared-plans/[token]` proxy I had written first: with the page fetching server-side it had no consumer, and an unauthenticated route on our origin with no caller is surface for nothing.
+
+**Verified:** client `npx tsc --noEmit` clean; ESLint clean on all new and changed files; `npx next build` exit 0 with `/share/plans/[token]` registered as a dynamic server route. trip-planning-service `./mvnw -o test`: the 69 publication tests pass (`SharedPlanControllerTests` 5, `TripPublicationControllerTests` 12, `PlanPublicationSanitizerTests` 32, `TripPublicationServiceTests` 20); `TripPlanningServiceApplicationTests` and `VerificationTests` error for the pre-existing environmental reason (config server on 8888, Postgres on 5432).
+**Not verified â€” nothing here has been run:** no browser session, no request ever made against a running backend, so publish, preview, copy, revoke and the recipient page are all unexercised end to end. The two-account and signed-out journeys in the plan's must-pass list have not been run. The autosave flush has not been observed firing.
+
+**Not done / left uncommitted:** everything above, plus the backend work from the earlier session it builds on (`server/trip-planning-service` V11 migration, model, repository, sanitizer, service, both controllers, tests; `server/api-gateway` `GatewaySecurityConfig`; `server/configuration-server` `api-gateway.yml`). Not implemented from the plan and **not started**: replace link / token rotation (`POST .../publication/rotation`), the allow-copy option (`PATCH .../publication`, no `allow_copy` column in V11), and independent copying (`POST /v1/shared-plans/{token}/copies`) â€” the earlier session deferred copying and I did not add it. Guest "Sign in to publish" is not built: the menu is only rendered where a persisted trip exists. Preserved untouched: the garage/EV redesign edits on this branch, `.deploy/` changes, `docs/agents/admin-dashboard-plan.md`, `docs/research/`.
+
+**Follow-ups:** nothing was committed â€” the client working tree still holds another session's uncommitted EV work on `feat/garage-ev-redesign`, so a commit here would mix the two. The user needs to decide whether to split this onto its own `feat/` branch cut from `dev`. `docs/api/Navio Open API.yaml` has not been updated with the publication routes. Browser and two-account verification remain the real gate before this goes anywhere near `main`.
+
+## 2026-09-23 â€” Claude â€” Fix the Grafana proxy and turn on production tracing
+
+**Goal:** make Grafana work in production and get Zipkin tracing running there.
+**Done:** (all root-repo, branch `dev`, **uncommitted**)
+- `.deploy/nginx/navio.conf` â€” confirmed the previous session's hypothesis and fixed it: a `location`-level `proxy_set_header` discards every server-level one, so `/grafana/` was sending `Host: navio_grafana`, and Grafana's CSRF middleware answered 403 to every `POST /api/ds/query`. Re-declared all six inherited headers. Applied the same fix to `location /` (navio-web), which had the identical defect and guards Server Actions the same way.
+- `.deploy/compose.production.yml` â€” added an internal `zipkin` service (`openzipkin/zipkin:3.5.1`, `STORAGE_TYPE: mem`, `MEM_MAX_SPANS=50000`, `mem_limit: 320m`, `healthcheck: disable: true` so it can never fail `compose up --wait` and trigger a rollback); replaced the no-op `MANAGEMENT_TRACING_EXPORT_ZIPKIN_ENABLED` with `MANAGEMENT_TRACING_EXPORT_ENABLED` plus `MANAGEMENT_TRACING_EXPORT_ZIPKIN_ENDPOINT`; sampling is now `${NAVIO_TRACING_SAMPLING_PROBABILITY:-0.1}`; `GF_SERVER_ROOT_URL` default corrected to `https://`.
+- `.deploy/observability/prometheus.yml` â€” `zipkin` scrape job mirroring the dev stack's.
+- `.deploy/observability/grafana/datasources.yml` and `grafana/provisioning/datasources/datasources.yml` â€” production gains the Zipkin datasource (traceâ†’logs/metrics, copied from the dev stack's working config); both gain a Loki `derivedFields` entry linking the trace id in Spring Boot's `[app,traceId,spanId]` log prefix into Zipkin.
+- `.deploy/.env.example` â€” documented `NAVIO_TRACING_SAMPLING_PROBABILITY`.
+- `grafana/dashboards/navio-overview.json` â€” removed two `http://localhost:` dashboard links that could never work in production.
+
+**Verified:** YAML and JSON parse; the shared Java env anchor was confirmed by parsing the compose file to reach all seven Java services; the dev and production Zipkin scrape jobs differ only in the `environment` label. **Not verified:** nothing was deployed or exercised against the live VM â€” the 403 root cause, the Zipkin target coming up, the derived-field regex against real log lines, and the traceâ†’logs links are all unconfirmed in a running stack.
+
+**Not done / left uncommitted:** everything above. Untouched and preserved as other sessions' work: the `client` and `server` submodule working trees, `docs/agents/admin-dashboard-plan.md`, `docs/agents/plan-link-sharing-plan.md`, `docs/research/`.
+
+**Follow-ups:** declared `mem_limit` across the stack is now ~8.3 GB â€” check `free -h` on the VM before releasing. Not fixed because it needs a `server` submodule change: the config server hardcodes `management.tracing.sampling.probability: 1.0` for three services and uses a different env name (`TRACING_SAMPLING_PROBABILITY`) for two others; harmless only while `spring.config.import` config-data mode keeps `systemEnvironment` above config-server values.
+
+## 2026-09-23 â€” Claude â€” Browser-verify and commit the garage and EV charger redesign
+
+**Goal:** verify the uncommitted garage/EV-charger redesign in a real browser, then commit it.
+**Done:**
+- Browser-verified the redesign with Playwright against `next dev`, using live Google Places/Maps and a real Bangkok trip: planner, garage (light, dark, 390px), EV charger panel (list cards, power tiles, connector chips, opening-hours track), block action button dark tints.
+- client `feat/garage-ev-redesign`, merged `--no-ff` to `dev` = `ffd252a` and pushed: `ac46d10` real-world range and `range-efficiency-field.tsx`; `8c7a457` featured vehicle card, `battery-gauge.tsx`, `vehicle-switcher.tsx`, `vehicle-name-editor.tsx`, `spec-tile.tsx`; `ddf900e` station cards, specifications, opening hours, `connector-chips.tsx`, `spec-cell.tsx` deleted; `8bf23ba` connector/battery tokens and removal of the trip member controls. 30 files, +1328/-538.
+- root `chore/bump-client-garage-ev-redesign` `ed02ac2`, merged to `dev` = `bda8c20` and pushed. Neither repo's `main` was touched.
+
+**Verified:** `tsc --noEmit` clean and ESLint clean (0 errors) on the committed tree, including the six new files, which an earlier lint over `git diff --name-only` had missed because they were untracked. Zero console errors and zero uncaught exceptions across the browser run. The charger preview panel's dark mode was confirmed by computed style (`bg lab(11.1%)`, `fg lab(98.6%)`); an earlier white-panel screenshot was a repaint artifact from toggling emulated `prefers-color-scheme` after paint, not a bug. **Not verified:** authenticated flows (catalog picker, save-to-garage), the battery route chart with real leg distances, drag interaction on the battery gauge, keyboard-only dialog traversal, and anything against the deployed backend.
+
+**Not done / left uncommitted:** deliberately left alone as earlier Codex sessions' work (AGENTS.md Â§1.3) â€” `docs/agents/admin-dashboard-plan.md`, `docs/agents/plan-link-sharing-plan.md`, `docs/research/` (including the `ev-range-test-standards.md` that the garage work cites), `.deploy/compose.production.yml`, `.deploy/nginx/navio.conf`, `.deploy/observability/*`, `grafana/dashboards/navio-overview.json`, and a dirty `server` submodule working tree. Committing this log necessarily includes those sessions' six uncommitted log entries and their handoff edits, since they share these two files.
+
+**Follow-ups:** the untracked root docs need an owner to commit them. `client/CLAUDE.md` is not gitignored and must be excluded by hand every session. The "Charge each stop to" slider question from 2026-09-22 is still unanswered. Release requires the `release.md` flow (child `main`s first, then root `main`).
+
+## 2026-09-23 ? Codex ? Investigate Grafana no-data screenshot
+
+**Goal:** diagnose warning icons and empty production dashboard panels.
+**Done:** verified dashboard/provisioning datasource UID consistency; identified NGINX location-level proxy headers suppressing parent Host/forwarded headers as a likely origin-check issue. Asked for exact panel error before confirming live root cause.
+**Verified:** repository configuration inspection and official troubleshooting documentation; no authenticated production query available.
+**Not done / left uncommitted:** no application edits; agent notes remain uncommitted alongside existing unfinished changes.
+**Follow-ups:** obtain warning/Query Inspector error; if origin rejection, restore explicit Host/forwarded headers in Grafana location and validate/reload via release flow.
+
+## 2026-09-23 ? Codex ? Production Grafana and Zipkin guidance
+
+**Goal:** explain how to make Grafana and Zipkin work in production.
+**Done:** inspected production Compose, provisioning, NGINX, scrape config, deployment paths, tracing dependencies/settings and official Spring/Grafana/Zipkin docs. Identified existing Grafana stack and explicitly disabled/missing Zipkin; supplied configuration and verification guidance. No application/deployment changes.
+**Verified:** root/client/server/changed trip service state; public Grafana health HTTP 200 and database ok, version 12.3.2 with diagnostic TLS bypass. Normal TLS verification fails with untrusted root on this machine. No authenticated metrics or trace check.
+**Not done / left uncommitted:** both agent notes already contained prior unfinished work, so updates remain uncommitted; unrelated changes preserved.
+**Follow-ups:** verify Grafana data in Explore; implement internal Zipkin, storage/retention, export endpoint and sampling, datasource, then verify full request traces if requested. Investigate TLS chain/client trust.
+
+## 2026-09-23 â€” Codex â€” Council on Community next milestone
+
+**Goal:** inspect Navio Community and use the requested llm-council skill to recommend the next step.
+**Done:** inspected community client/service source and sharing proposal; ran five independent advisor passes in capacity-limited batches, followed by five anonymous peer reviews of faithfully condensed responses and chairman synthesis. Recommended real saved-trip publication/read integration with Community, explicit audience/ownership/revocation contract, and later optional copying. No application code changed.
+**Verified:** all 20 client community API/posts/upload-proxy tests passed. Confirmed fixture-backed trip selector/resolver, unchecked publication reference persistence, identical best/top sort, and no consumers for mock copied-trip panel. Browser check source uses stubbed APIs; no live browser/backend or database verification performed. Checked root/client/server/community/trip-planning status and branches.
+**Not done / left uncommitted:** these agent notes; both already contained prior unfinished edits and were not committed without authorization to include that work. Preserved unrelated client changes and untracked trip publication DTO work.
+**Follow-ups:** first define two-account publish/attach/read/revoke acceptance and audience contract against the existing sharing proposal; coordinate publication work before implementation. Correct misleading feed/fixture affordances as part of the milestone. Copying and notifications remain later scope decisions.
+
+## 2026-09-23 â€” Codex â€” Rehearse sharing plan with relevant skills
+
+**Goal:** revise the link-sharing plan so implementation reads and applies relevant skills, including frontend-design for UI.
+**Done:** found repository-local skills under `.claude/skills`; read frontend-design and applied its planning/self-critique guidance to a Navio-specific UI rehearsal. Added skill-to-phase mapping, supporting rule/document requirements, dialog wireframe, full interaction states and staged security/visual reviews to `docs/agents/plan-link-sharing-plan.md`. Updated handoff. No application code changed.
+**Verified:** skill discovery, current root/client/server status and branches, and documentation whitespace check. No browser or application tests; implementation has not started.
+**Not done / left uncommitted:** proposal and agent notes remain uncommitted; both agent notes already contained other unfinished work, which was preserved.
+**Follow-ups:** when implementation is requested, read/apply each phase's relevant skills and record actual verification; preserve existing Navio tokens and the user's removal of depth styling.
+
+## 2026-09-23 â€” Codex â€” Plan admin dashboard and shared vehicle catalog
+
+**Goal:** plan an Admin sidebar/dashboard, user counts and bans, and centrally managed vehicles; assign relevant skills including frontend-design.
+**Done:** wrote `docs/agents/admin-dashboard-plan.md` after inspecting sidebar/auth, existing admin endpoints, moderation, catalog and garage snapshots. Included UI contract, capability matrix, proposed APIs/migration, six delivery phases and acceptance tests. Read local frontend-design guidance and assigned it to UI planning/building; identified local security/UI review skills and optional GSD stages. Updated handoff.
+**Verified:** repository state and code inspection; documentation whitespace check. No application code, migrations or runtime tests executed.
+**Not done / left uncommitted:** plan and both agent notes; notes already had prior unfinished edits, so did not commit those edits or switch branches. Existing client work preserved.
+**Follow-ups:** implementation only when requested; verify existing-token ban enforcement across services, last-admin protection and database startup before release.
+
+## 2026-09-23 â€” Codex â€” Plan link publishing and permissions
+
+**Goal:** review the current implementation and plan seamless sharing from the three-dot menu with clear permissions.
+**Done:** wrote `docs/agents/plan-link-sharing-plan.md`: evidence from menu, Explore sharing/viewer, ownership services, proxy/gateway and persistence; proposed unlisted read-only snapshots, explicit updates, owner-managed links, privacy options and independent copying; API/data design and staged acceptance tests. Updated handoff.
+**Verified:** source inspection and repo status/branches (root/client/server/trip-planning on `dev`); documentation whitespace check. No application changes or runtime tests.
+**Not done / left uncommitted:** proposal and both agent notes. Notes already contained prior uncommitted work, so did not commit them or disturb existing UI edits.
+**Follow-ups:** implement only when requested, using the proposal's permission/sanitizer contract and database/release instructions.
+
+## 2026-09-23 â€” Codex â€” Remove trip member controls
+
+**Goal:** remove the avatar and add-member button shown in the screenshot.
+**Done:** removed the members UI, placeholder image, member prop/type and mock member passed by `planner-detail.tsx`; client `dev`, uncommitted.
+**Verified:** targeted ESLint, `tsc --noEmit`, and `git diff --check` passed. Not browser-checked.
+**Not done / left uncommitted:** two client files and updated agent notes. Both notes already contained uncommitted edits at session start; preserved them without committing prior work. Existing unrelated client changes preserved.
+**Follow-ups:** none for this removal.
 
 ## 2026-09-23 — Claude — LLM council on implementing the admin dashboard plan
 
@@ -3089,6 +3061,111 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 **Not done / left uncommitted:** two client files and updated agent notes. Both notes already contained uncommitted edits at session start; preserved them without committing prior work. Existing unrelated client changes preserved.
 **Follow-ups:** none for this removal.
 
+## 2026-09-22 - Codex - Checkpoint implementation and plan canonical energy model
+
+**Goal:** Commit completed application work locally, then perform read-only Phase 3 planning.
+**Done:** Local commits user service 20a41c4, client c83dd28, server 8fff0bb, root 99cbdf8; docs history including cd9db54 preserved. Detailed plan supplied in conversation; only existing handoff/log updated for session reporting.
+**Verified:** Inspected real code/persistence/calculation paths, checked checkpoint diffs and residual workspace status. No application changes or new test execution during planning; previous reported tests remain the baseline.
+**Not done / left uncommitted:** No Phase 3 code/migrations, push, deployment or remote integration. Unrelated tsconfig flag/editor file/service logs preserved. No duplicate requirements or master-plan edits.
+**Follow-ups:** Await plan approval; future release must push child commits before parent pins and integrate diverged remote work separately.
+
+## 2026-09-22 - Codex - Record approved Phase 3 trip battery state
+
+**Goal:** Preserve approved persisted trip-start SoC and optional stop observations in Phase 3 planning.
+**Done:** Updated existing handoff with canonical semantics, persistence/API work explicitly included in Phase 3, guest/account boundaries, compatibility, chronological integration and acceptance checks. No new report system or application changes.
+**Verified:** Reviewed current handoff, newest session entries and repository state; documentation diff checked. Application tests not rerun for documentation-only changes.
+**Not done / left uncommitted:** Existing client/server implementation work preserved. No Phase 3 implementation, schema changes, deployment or automatic calibration.
+**Follow-ups:** Resolve exact trip/stop storage fields and checkpoint/charging ordering in the Phase 3 plan; retain distinct predicted and observed SoC. Existing root Git divergence is not merged by this task.
+
+## 2026-09-22 - Codex - Complete pre-Phase-3 vehicle settings cleanup
+
+**Goal:** Finish clarified consumption selector and immediate trip-only starting battery; preserve checkpoint requirement for Phase 3.
+**Done:** Three choices with suitable direct-data gate, explicit USE_RATED_RANGE guest/server command, honest range-basis display and accessible information, Custom observed average, optional nickname/divider, one Save settings action. Battery overlay updates immediately without garage mutation, scoped by trip provider. Recorded deferred stop SoC checkpoints; no Phase 3 calculations.
+**Verified:** 34 frontend tests, TypeScript, targeted lint, 39 backend tests pass; 2 conditional PostgreSQL tests skipped. Mocked-public-data Chrome guest scenario passes including live battery/no account requests; authenticated callbacks/API/service tested. Diff whitespace checks pass.
+**Not done / left uncommitted:** Application sources remain stacked with earlier Phase 1/1.1/2 work. No deployment, live authenticated browser or real PostgreSQL validation. Battery overlay is in-memory only, not persisted to saved trips. Existing remote divergence not merged.
+**Follow-ups:** Deploy new backend command before client; obtain Phase 3 approval and implement canonical projections/checkpoints there. Preserve Phase 5 UI consolidation requirement.
+
+## 2026-09-22 - Codex - Start requested vehicle settings refinement
+
+**Goal:** Refine vehicle settings before Phase 3 and clarify the newly requested NAVIO Estimates mode.
+**Done:** Optional nickname label, divider, removed standalone confirmation button, immediate trip-battery overlay without requiring form save; session cleanup preserves guest isolation. Existing source work preserved. No new estimation formula, backend change or Phase 3 implementation.
+**Verified:** TypeScript and targeted lint passed for the live-state/label changes; 14 focused state/selection/settings tests passed. No browser check for this partial refinement yet. Required fast-forward pull was refused because local dev and origin/dev diverged; remote history was not merged.
+**Not done / left uncommitted:** Refinement remains in client alongside Phase 1/1.1/2 work. Awaiting definitions of NAVIO Estimates and battery autosave vs trip-only behavior; final selector/tooltip and related tests/documentation still pending. No push/deployment.
+**Follow-ups:** Resolve those two questions, finish the shared guest/account settings UX, rerun checks/browser validation and provide the requested copyable instruction/change summary. Do not proceed to Phase 3.
+
+## 2026-09-22 - Codex - Phase 2 direct selection, range fallback and overrides
+
+**Goal:** Implement only the supplied Phase 2 section of the full redesign; retain Phase 1/1.1 and defer Phases 3-5.
+**Done:** Added explicit energy-selection commands and backend-resolved defaults; suitable direct consumption precedes rated-range fallback, user average overrides, and reset clears the override. Removed frontend standard-factor default derivation. Range fallback stores null consumption, legacy values remain unchanged/unknown and confirmation is separate. Updated guest/account forms, active selection vs calculation readiness, client automatic-application guards and null-profile persistence mapping. Existing JSONB only; no migration. Updated existing API/database/handoff documentation. Source/tests remain uncommitted alongside prior work; docs committed separately and merged locally to dev only.
+**Verified:** 32 frontend garage/guest/filter tests; 39 backend garage/controller/service tests; TypeScript; targeted lint; whitespace checks passed. Two conditional PostgreSQL tests skipped without a disposable test database; extended test covers observed-to-range reset. Actual Chrome guest scenario with public API mocks passed catalogue/default/override/reset/custom flows and guest isolation, with no browser errors/account requests. Existing positive-consumption calculator and backend 1.12 unchanged. Initial obsolete consumption-required test was revised to require a value OR explicit default; test harness resolver/VM-object assertions corrected.
+**Not done / left uncommitted:** All Phase 1/1.1/2 implementation files remain uncommitted in client, gateway and user service; unrelated files preserved. No push/deployment. No live authenticated browser/backend integration or real PostgreSQL check. Rated-range numerical predictions are deferred to Phase 3, not recreated in the selection layer.
+**Follow-ups:** Backend-first rollout, real PostgreSQL and authenticated integration checks; await Phase 3 approval. Existing declared capacity/reference-range requirements remain; usable capacity is not inferred. Phase 4 must integrate server optimizer eligibility/model contracts; Phase 5 UI consolidation stays deferred in handoff.
+
+## 2026-09-22 â€” Claude â€” Cite range-standard factors and show real-world range
+
+**Goal:** the user asked what NEDC is and why one consumption rate misestimates distance, then for research backing the NEDC/CLTC/WLTP/EPA factors, a doc in `docs/`, and a UI showing the official and adjusted range.
+**Done (uncommitted):** new `docs/research/ev-range-test-standards.md` (factors table, EPA 40 CFR 0.7 rule as the anchor, Liu 2022 CLTCâ‰ˆNEDC, 120 km/h study, Weiss 2020 counter-evidence of ~10% gap, verification status). Client `dev`: `vehicle-mappers.ts` exports `REAL_WORLD_RANGE_FACTOR` and `estimateRealWorldRange` (rounded to 10 km, null for custom/unknown standard); `SpecTile` gained an optional `detail` line; `vehicle-card.tsx` shows "About N km real-world" under the range and a note with the factor; the add-vehicle dialog states the estimate.
+**Verified:** client `tsc --noEmit` 0; ESLint on the four changed files 0. Not browser-checked. Only the EPA source was read in full; the paper figures came from abstracts (publishers blocked fetches).
+**Not done / left uncommitted:** all of the above, on top of the earlier uncommitted client work.
+**Follow-ups:** the user should confirm the paper figures before citing them in the report.
+**Then (plan with real-world range, own range option):** new `garage/range-efficiency-field.tsx`: one input the driver fills as "Range on a full charge" (km) or kWh/100 km, a ruler of planning range against the official tick, and "Use estimate". Used in `vehicle-settings-form.tsx` and in the add-vehicle dialog, which now pre-fills the estimate instead of the old "I know my consumption" checkbox. The vehicle card leads with "Real range" (battery Ã· consumption) and shows the official figure beneath. New `consumptionForRange` / `rangeForConsumption` in `vehicle-mappers.ts`; estimates are now saved to 0.001 instead of 0.1. Battery capacity deliberately stays declared, because the factor already sits in consumption. No API or schema change. `tsc` 0; garage ESLint 0; field rendered in headless Chrome at 320px light and dark (temporary preview page, deleted). The real settings form and dialog were not rendered.
+
+## 2026-09-22 â€” Claude â€” Redesign opening hours on place/charger cards
+
+**Goal:** the user asked to redesign the opening-hours block on the EV station card, which showed the raw "Monday: Open 24 hours | Tuesday: â€¦" string.
+**Done (client `dev`, uncommitted):** added `getOpeningHoursSchedule` / `parseOpenSegments` to `charger/opening-hours.ts` (handles 24h, closed, split and overnight ranges; unparseable text falls back to plain text) and removed the now-unused `formatOpeningHours`. Rebuilt `StationOpeningHours` as grouped day rows with a 24-hour track and today highlighted (`aria-current="date"`), and used it in `charger-preview-panel.tsx` and `place-preview-panel.tsx`.
+**Verified:** client `tsc --noEmit` exit 0; ESLint on planner `_components` 0 errors (1 existing warning); parser checked with tsx against sample strings. Not browser-checked.
+**Then (station list card):** redesigned `charger/ev-station-list-card.tsx`: the stock Unsplash thumbnail (random, often failed to load) became a max-kW power tile shaded by speed tier, plus connector chips, distance ("300 m from stop"), port count and a one-line address. Removed the `visual` prop and `getEvStationVisual` / `EvStationVisual` from `ev-station-panel.data.ts`. `tsc` 0; charger ESLint 0. Follow-up: each connector family has its own colour via new `--connector-*` tokens in `globals.css` (light and dark; hues kept away from brand blue; CCS1/CCS2 share one), with a DC/AC title and screen-reader text. The distance icon is `primary` and the port icon `rating` yellow.
+**Then (block action buttons):** "Add a note / Add checklist / Add EV station" showed grey in dark mode because the Button `outline` variant's `dark:border-input dark:bg-input/30` beat their tints; added matching `dark:` tint overrides in `block/trip-block.tsx` and `charger/add-ev-station-button.tsx`. ESLint 0.
+**Then (route estimate card):** redesigned `garage/route-estimate.tsx`: start â†’ end battery header (level-coloured, gradient connector), a sentence when the battery dips below reserve mid-route, non-monospace stats ("Energy needed", stop count under charging time), method note collapsed into "How this is estimated". `garage/battery-route-chart.tsx`: Chart/Table segmented toggle replaces the "Show as table" disclosure, the reserve label sits on the dashed line, chargers show "+N%". Same props, so `plan-view.tsx` (explore) picks it up too. Rendered with headless Chrome via a temporary `app/zz-preview` page (deleted) at about 480px and 220px; the table view was not screenshotted (no click automation available). `tsc` 0; garage ESLint 0.
+**Then (garage redesign):** `garage-section.tsx` now shows one featured `VehicleCard` for the trip vehicle (photo, 2Ã—2 colour-coded spec tiles, plugs, trip settings inside) plus a `VehicleSwitcher` chip strip (new file) instead of a grid of full cards. New `battery-gauge.tsx` (`BatteryGauge`, `BatteryInput`): a 10-cell battery with nub and dashed reserve mark; the starting-battery slider in `vehicle-settings-form.tsx` is now the draggable battery (native range input overlay) with a range readout. `vehicle-usage-overview.tsx` uses the gauge (faded start, solid end), the per-day bars are upright batteries with a per-battery reserve tick, and the monospace numbers are gone. Nickname field removed from the settings form: new `vehicle-name-editor.tsx` renames the title in place (Enter/Escape; clearing or retyping the car name clears the nickname), and a nickname shows the real car name as a tag. `BatterySlider` still exists for the EV side panel. Rendered with a temporary preview page (deleted); the real settings form was not rendered (needs the garage provider). `tsc` 0; garage ESLint 0.
+**Then (charging stop card):** `station-charging-control.tsx` now uses `BatteryGauge` (new `chargeTo` striped segment via `.charge-stripes` in `globals.css`, and a `markerPct` knob) with the native range input overlaid, "Arrive with / Leave with" labels, and an Adds/Takes row with icons; monospace removed. `station-specifications.tsx`: Max power (blue) and Ports (yellow) tiles from new shared `garage/spec-tile.tsx`, coloured plug chips from new shared `charger/connector-chips.tsx` (also used by the station list card and the garage vehicle card), and price/hours rows. `trip-place-card.tsx` header lost its middle dots; the locked state is a badge. Deleted the now-unused `charger/spec-cell.tsx`. Preview-rendered (deleted); the live control with a real car and route was not rendered. `tsc` 0; ESLint 0.
+**Then (light-mode colour fix):** light-mode tints were muddy (dark, low-chroma tokens). In `globals.css` light theme only: raised chroma of `--warning`, `--note`, `--checklist`, `--charging`, `--premade`, `--tag`; battery text tokens now `high 0.48 0.16 148`, `mid 0.56 0.15 70` (amber-gold, ~3.9:1, was olive), `low 0.52 0.19 42`, `critical 0.5 0.21 27`. `.charge-stripes` now use `--battery-high`. `SpecTile` uses a paler wash in light mode (`/10`, ring `/30`) and a warning-coloured icon for the rating tone; the battery's faded "used" part is `/10` in light mode. Dark theme unchanged. Verified with headless Chrome using `--blink-settings=preferredColorScheme=1` (the app follows the system theme). Note: `--warning` and the others are app-wide, so other warning/feature UI shifts slightly in light mode.
+**Not done / left uncommitted:** all of the above plus these notes.
+**Follow-ups:** the user to check it visually and ask for a commit.
+
+## 2026-09-22 â€” Claude â€” LLM council: EV calibration and adoption
+
+**Goal:** the professor asked how battery differences are calibrated (the user answered "we use consumption rate"); the user asked what to improve in the EV feature, whether NEDC/WLTP etc. matter, and how to make real EV drivers want it.
+**Done:** advice only, via a 5-advisor council with peer review. No code changes.
+**Verdict:** the consumption answer is half right. Consumption covers energy, but the number comes from unsourced factors (NEDC/CLTC 0.7, WLTP 0.85, EPA 0.9, plus the 1.12 margin, 12% reserve and 0.9 charge efficiency), and one charge curve for every car ignores LFP vs NMC. Next: (1) run the flow in the browser with live routes; (2) a small evaluation: fixed Thai routes Ã— cars against published real-world figures, pass/fail thresholds set before measuring, plus a Â±15% consumption sensitivity rerun that checks whether the charging stops change; (3) sourced real-world consumption and usable kWh per catalog car, with test-cycle factors only as a cited fallback; (4) HVAC as a per-hour load (route duration Ã— kW); (5) LFP/NMC charge-curve profiles. Position Navio as a trip planner with charging built into the itinerary, not as a physics rival to ABRP.
+**Verified:** n/a (no code).
+**Not done / left uncommitted:** this entry and the handoff note. `handoff.md` already had uncommitted edits at session start, so nothing was committed.
+**Follow-ups:** the user to choose which steps to implement. A change to the catalog schema needs a new migration (see `database-changes.md`) and regression tests on the optimizer before recalibrating.
+
+## 2026-09-22 â€” Claude â€” Advise on EV simulation panel and planner UX
+
+**Goal:** the user asked for an opinion on Codex's EV simulation work, the "EV Trip Planner Research" UX critique, and whether the Energy simulation panel is too complex for users.
+**Done:** read-only review. Recommended taking `EnergySimulationPanel` out of the user-facing garage (research/dev-only), keeping the engine; adding a user-set arrival buffer and one battery-along-route chart instead. Flagged that the `vehicle-mappers.ts` edit removed the real-world range factor, so catalogue consumption for NEDC/CLTC cars is now about 30% optimistic and only partly offset by the 12% margin.
+**Then (user approved step 1):** restored the real-world range factor in `client/.../garage/vehicle-mappers.ts`, updated the add-vehicle hint, and corrected a comment in `simulation-model.ts` that pointed to a parity script that doesn't exist. Committed Codex's work: client `feat/ev-simulation` `9ae6f5a`, mobility `feat/ev-simulation` `eb72b37`; both pushed.
+**Verified:** client `tsc --noEmit` exit 0; garage ESLint exit 0; mobility `./mvnw -o test` exit 0. Not browser-checked.
+**Then (user approved merging):** fast-forwarded client and mobility `dev` to the feature branches; server `dev` `cdcd736` and root `dev` bump the pins. Agent notes committed to root `dev`, including Codex's earlier notes and `ev-simulation-proposal-review.md`. Nothing is on `main`.
+**Then (energy-path map, user chose backend-only stop planning):** found that displayed SOC (`projectTripCharging`) already does the same arithmetic as backend `OptimizedRouteVerifier`; the split was two stop planners. Removed the client planner (about 840 lines) in client `eb8c757` on `dev` (via `feat/backend-stop-planner`). Fixed the hard-coded 12% reserve and the day-start SOC sent to the optimizer. Root `dev` `257734d`.
+**Verified:** `tsc --noEmit` 0; ESLint on `app/feature/planner` 0 errors (only the 2 known warnings). Not browser-checked, and the guest flow (sign-in prompt) is untested.
+**Then (arrival reserve):** client `4d6a90e` on `dev` (via `feat/arrival-reserve`) adds the "Arrive with at least" 10/12/15/20% setting and routes it to the optimizer, reserve lines and battery colours. `tsc` 0; planner ESLint 0 errors.
+**Then (battery chart):** client `9bd8ccb` on `dev` (via `feat/battery-route-chart`) adds `BatteryRouteChart` and `DayEvProjection.profile`. Rendered with headless Chrome against the running dev server using sample data, in light and dark mode with focus tooltips; moved the tooltip beside the crosshair after it covered the charger marker. `tsc` 0; planner ESLint 0 errors.
+**Then (panel):** at the user's request, removed `EnergySimulationPanel` (client `7dee312` on `dev`); the physics model stays. `tsc` 0; planner ESLint 0 errors.
+**Then (release, user asked to deploy):** fast-forwarded `main` to `dev` in mobility (`eb72b37`), server (`cdcd736`), client (`7dee312`) and root (`28b6d7e`, deploys). All pins matched `origin/main` before the root push. Deploy run 35700267438 succeeded; after the deploy `/health` 200, `/v1/trips` 401, `/` 200. Also explained the formula changes, the reserve and "Plan charging stops" controls, and the status of the physics model to the user.
+**Then (production bug):** the user reported "temporarily unavailable", then "could not be optimized". The VM logs showed no mobility error. Cause of the 422: trip-planning ignored day start/end anchors. Fixed on `dev` (trip-planning `c6d5b8c`, server `1657da2`, client `a4ab4b1`); see the handoff. Not deployed yet.
+**Not done:** deploy the fix; check in the real planner with live routes; decision on removing the "Charge each stop to" slider; evaluation harness (the user may want Thai cars and routes; ask).
+**Follow-ups:** user to decide where the panel goes and whether to restore the range factor. An LLM council on the plan agreed on: one energy model shared by planner and chart (backend as the source of truth), the arrival buffer passed through to the optimizer, the panel moved to a reachable `/research/energy` route, the driving-conditions preset dropped, and a real evaluation (public reference data, elevation, error measured by charging decisions). Nothing implemented.
+
+## 2026-09-22 â€” Claude â€” Revert depth rework, keep EV simulation
+
+**Goal:** return the UI to `main` with no 3D depth while keeping Codex's new EV work.
+**Done (client `main` working tree, uncommitted):** stashed the full tree as `backup: depth rework before revert 2026-09-22`; restored 26 depth-only files to `main` (sidebar, planner layout/blocks/itinerary/place/charger components, `globals.css`, `button.tsx`); deleted `app/depth.css`; removed depth classes from the two mixed files `route-estimate.tsx` and `vehicle-usage-overview.tsx`. EV files and edits left intact.
+**Verified:** `tsc --noEmit` exit 0; ESLint on `garage/` exit 0; no remaining references to depth utilities. Not browser-checked. `tests/simulation` is ignored by ESLint and was not run.
+**Not done / left uncommitted:** EV simulation work; root agent notes (they already held Codex's uncommitted edits).
+**Follow-ups:** commit the EV work on a `feat/` branch from `dev` when the user asks. The `EvStationDetailCard` kW unit fix went away with the depth revert (component is unused).
+
+## 2026-09-22 â€” Codex â€” Validate EV simulation proposal
+
+**Goal:** validate the supplied simulation-based EV planning proposal and recommend whether to implement it instead of the current approach.
+**Done:** compared current frontend energy/charging calculations, backend SOC-constrained optimizer, route adapter and vehicle provenance with the proposal; checked primary EPA, Google, FASTSim and UNECE references; wrote `docs/agents/ev-simulation-proposal-review.md`. Recommend incremental adoption, first resolving frontend/backend model differences and establishing independent evaluation. Corrected the worked trip's SOC arithmetic.
+**Verified:** read-only implementation review and source checks; no application tests, simulation experiments or empirical accuracy validation. UNECE search listing available but full page fetch failed.
+**Not done / left uncommitted:** review plus updated handoff/session log. Both agent documents already had another session's uncommitted changes; did not commit that work or switch branches. Existing client depth/UI work preserved. No application implementation or deployment.
+**Follow-ups:** if implementation is requested, use the review's staged scope and follow database-change instructions before model/schema edits.
+
 ## 2026-09-22 — Claude — Cite range-standard factors and show real-world range
 
 **Goal:** the user asked what NEDC is and why one consumption rate misestimates distance, then for research backing the NEDC/CLTC/WLTP/EPA factors, a doc in `docs/`, and a UI showing the official and adjusted range.
@@ -3153,6 +3230,183 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 **Verified:** read-only implementation review and source checks; no application tests, simulation experiments or empirical accuracy validation. UNECE search listing available but full page fetch failed.
 **Not done / left uncommitted:** review plus updated handoff/session log. Both agent documents already had another session's uncommitted changes; did not commit that work or switch branches. Existing client depth/UI work preserved. No application implementation or deployment.
 **Follow-ups:** if implementation is requested, use the review's staged scope and follow database-change instructions before model/schema edits.
+
+## 2026-09-21 - Codex - Record deferred Phase 5 Trip Energy consolidation
+
+**Goal:** Preserve the approved Usage Overview/Trip Energy consolidation as a Phase 5 requirement and proceed only within the approved Phase 2 plan.
+**Done:** Recorded design foundation, useful retained information, canonical model dependency, honest missing-value/provenance presentation, shared guest/account behavior and eventual validation criteria in the existing handoff. Recorded Phase 2 authorization. No UI/calculation changes.
+**Verified:** Inspected root/client/server and changed service Git state, current handoff/history, vehicle mapping and available plan references. Local search and GitHub code search did not locate the full approved PLAN 2; the original planning request is available but is not the approved plan. Documentation diff checked; application tests are not applicable to this documentation-only change.
+**Not done / left uncommitted:** Existing Phase 1/1.1 application changes, local tsconfig flag, CLAUDE.md and service logs preserved. Phase 2 implementation awaits the approved Phase 2 section requested from the user. No UI consolidation, push or deployment.
+**Follow-ups:** Use the supplied approved Phase 2 text as the implementation boundary; do not reconstruct it from phase summaries. Implement deferred UI consolidation only in Phase 5 after Phases 2-4 outputs stabilize. Phase 1 PostgreSQL and Phase 1.1 live browser/backend verification remain pending.
+
+## 2026-09-21 - Codex - Phase 1.1 guest catalogue UX correction
+
+**Goal:** Restore catalogue-first selection for guests and signed-in users, with narrowly scoped public reads; do not begin Phase 2.
+**Done:** Shared Catalogue/Custom EV choices; temporary guest catalogue snapshots and unchanged authenticated saves; exact catalogue GET exception across frontend proxy, gateway and user security; public controller returns only curated specifications without user resolution. Added component-callback, guest-provenance and security coverage; updated existing browser scenario and API docs. Reporting committed on docs branch then merged locally to dev only.
+**Verified:** 22 frontend tests, 33 user-service tests, 9 gateway tests passed; TypeScript and targeted ESLint passed; diff whitespace checks clean. Root fast-forward-only pre-commit pull already up to date. No calculation, standard-factor, optimizer multiplier, reachability or Phase 2 policy changes.
+**Not done / left uncommitted:** Phase 1 and 1.1 source/tests remain in client, server/api-gateway and user service; unrelated prior files preserved. Full browser/live-backend scenario not executed. Phase 1 PostgreSQL persistence verification remains pending. No push/deployment.
+**Follow-ups:** Backend/gateway first deployment; browser integration check; await Phase 2 approval.
+
+## 2026-09-19 - Codex - Vehicle consumption provenance Phase 1
+
+**Goal:** Add the minimum backward-compatible provenance contract, with separate range/consumption standards and field-specific evidence; implement no later phases.
+**Done:** Added typed energyProfile responses/JSONB metadata, restricted observed-provenance requests, legacy unknown fallback without numeric changes, catalogue defaults with no fabricated consumption/usable capacity, frontend profile transport and minimal explicit-average submission wiring. Guest updates follow the same provenance semantics. API/database docs updated. Reporting is committed on a docs branch and merged locally to dev only; implementation remains uncommitted in client and user-management-service.
+**Verified:** 32 backend tests passed, 2 PostgreSQL tests skipped (Docker unavailable/no test DB). 17 frontend garage/provenance/guest tests passed using Node 22.22; TypeScript, targeted lint, and diff whitespace checks passed. Root pre-commit fast-forward pull was already up to date. No source research, migration, battery/charger/optimizer changes, or deployment.
+**Not done / left uncommitted:** Phase 1 implementation and tests in client/user service; pre-existing local files preserved. Actual PostgreSQL persistence and browser/backend integration were not run. Installed Node 22.14 cannot run the existing registerHooks-based tests; Node 22.22 was used without changing dependencies.
+**Follow-ups:** Run real PostgreSQL persistence check when available. Backend-first deployment for new request fields. Await explicit approval before Phase 2; no new selection/gating policy is active.
+
+## 2026-09-16 - Codex - Pull latest integrated release
+
+**Goal:** Pull all latest Git changes and resolve conflicts while preserving local work.
+**Done:** Fast-forwarded root to 3ee0228, client to 4622b54, server to 8eb47de; synchronized all four service gitlinks. Root/client/server on dev. Prior guest/drawer commits are ancestors of the incoming release. Backed up the local AGENTS files before accepting shared versions; no code conflicts. Installed incoming frontend dependencies and retained the upstream lockfile.
+**Verified:** All six submodules equal origin/dev and their parent pins. TypeScript passes after regenerating route types and moving a malformed old generated validator out of .next/dev/types. 44 frontend tests pass; planner/anchor/overnight model checks pass; lint zero errors/two existing warnings. No unresolved index entries.
+**Not done / left uncommitted:** Existing local client tsconfig working-tree flag (no textual diff), CLAUDE.md and service logs preserved. No production build, browser run, backend/PostgreSQL tests or deployment in this pull-only session.
+**Follow-ups:** Runtime/production health and schema validation remain separate from Git synchronization. Session docs committed locally only per AGENTS.md; no push requested.
+
+## 2026-09-15 â€” Claude â€” Depth rework for sidebar, planner and EV cards
+
+**Goal:** use `/ui-depth` to give the sidebar and whole planner clearly visible 3D depth, and rework the EV station cards. User then asked for no thick coloured side/bottom borders, only depth.
+**Done (client `feat/ui-reworked`, uncommitted):**
+- Found an unlogged earlier depth pass on this branch (`app/planner-depth.css` plus class hooks). Replaced it with `app/depth.css` (imported from `globals.css`): canvas/section/card/raised/well tokens and `--depth-shadow-sm|md|lg|inset`, light and dark. Utilities: `surface-section`, `surface-block`, `surface-card`, `surface-elevated`, `surface-floating`, `surface-panel`, `surface-interactive`, `surface-tile`, `surface-key`, `surface-well`, `surface-groove`, `divider-groove-t|b`, `surface-nav-item`, `sidebar-depth`, `planner-depth` (sections as slabs, inputs as wells, non-ghost buttons as keys with lift and press).
+- `Button` now emits `data-variant` so planner CSS can skip ghost/link buttons.
+- Sidebar: raised panel with cast shadow, raised active nav items (`aria-current`/`data-active`), recessed trip list, engraved dividers, New Trip key.
+- Planner: day/list blocks on the card layer (padding moved into `TripBlock.Root`), trip info card elevated, side panel and map preview panels floating, mobile tabs as well + raised thumb, engraved resize handles.
+- Day anchor rail: tried raised cards for the start/end rows; user did not like it, reverted to the flat rows. The "Private" badge is raised instead (`surface-tile` on the raised surface color).
+- Day action buttons (note, checklist, EV) use a 20% tint of `note`/`checklist`/`charging` with no border, including a `dark:` override because the outline variant's `dark:bg-input/30` otherwise wins; depth still comes from the planner key rule.
+- Add-place box: the whole field wrapper is the well; its inner input carries `data-depth="flat"`, which the planner input rules in `depth.css` now skip (use it for any icon + input composite field).
+- EV: charging stop card engraved dividers; station list cards raised and interactive with recessed photo; `EvStationDetailCard` rebuilt with raised stat tiles and a price well, and its power unit fixed from kWh to kW (component is currently not imported anywhere).
+**Verified:** `tsc --noEmit` exit 0; ESLint on changed files exit 0. Not checked in a browser (light/dark, narrow widths, drag-and-drop over lifted cards).
+**Not done / left uncommitted:** all of the above; client `CLAUDE.md`.
+**Follow-ups:** browser-check the look; `DESIGN.md` does not yet describe the depth tokens.
+
+## 2026-09-15 â€” Claude â€” Commit and release accumulated client and trip title work
+
+**Goal:** `/commit` everything uncommitted, split by type, merged through `dev` to `main` (user chose all three options explicitly, including production release and the undocumented title change).
+**Done:**
+- client (`dev` and `main` = `4622b54`, stacked branches): `44386d8` chore(deps) on `chore/client-deps-agents`; `279dfac` docs(design) on `docs/client-design-md`; `406468c` style(planner) on `style/brand-theme-redesign`; `4622b54` feat(dashboard) on `feat/dashboard-trip-management`. Client `CLAUDE.md` left untracked.
+- trip-planning-service (`dev` and `main` = `fde94e0`, `fix/trip-title-country-first`): title falls back name -> country -> city; test updated.
+- server: pin bump on `chore/bump-trip-planning-title`, merged to `dev` and `main`.
+- root: these notes on a `docs/` branch and the `client`/`server` pins on a `chore/` branch, merged to `dev` and `main` (deploys).
+**Verified:** client full `tsc --noEmit` exit 0 and `eslint .` (0 errors, 2 warnings) on the full tree, which equals the committed tree. trip-planning-service `./mvnw -o test` with a local config server: 46 run, 44 pass, 1 skipped, 2 errors in `TripPlanningServiceApplicationTests`/`VerificationTests` because Postgres on 5432 was not running (Docker Desktop off); not a code failure, but the local real-Postgres check was not run. No browser check of any client work.
+**Not done / left uncommitted:** client `CLAUDE.md` (must never be committed).
+**Follow-ups:** watch the deploy run; browser-check the released UI; intermediate client commits were split by file and not type-checked individually.
+
+## 2026-09-15 - Codex - Blur garage photo background
+
+**Goal:** match community post image backgrounds in the garage.
+**Done:** VehicleMedia now layers a decorative object-cover copy with scale-110, blur-2xl and brightness-75 behind the sharp object-contain vehicle image. Removed foreground multiply blending. Reuses the same image URL and sizes; missing-image fallback retained.
+**Verified:** full TypeScript check and targeted client ESLint pass. Isolated Chrome render of the actual component with application CSS and BYD Atto 3 asset: background blur/brightness and foreground contain/no filter confirmed; dark screenshot inspected.
+**Not done / left uncommitted:** client garage/vehicle-media.tsx under app/feature/planner/planId/_components, alongside prior work. No deployment.
+**Follow-ups:** none.
+
+## 2026-09-15 - Codex - Match block accents to selected color
+
+**Goal:** replace blue primary accents inside each trip block with that block's selected color.
+**Done:** TripBlock.Root scopes primary, primary foreground, and focus-ring CSS variables to the selected block palette entry. Descendant actions, icons, borders and focus states update together when the block color changes.
+**Verified:** full TypeScript check and targeted ESLint pass; Chrome guest planner verified six primary elements change together from Rose to Teal, matching focus-ring color, with global primary unchanged. Inspected Rose screenshot.
+**Not done / left uncommitted:** client app/feature/planner/planId/_components/block/trip-block.tsx on feat/structured-trip-location; prior edits preserved; no deployment.
+**Follow-ups:** none.
+
+## 2026-09-15 ï¿½ Codex ï¿½ Fix route and battery row alignment
+
+**Goal:** align the drive time/distance and battery details shown in the screenshot.
+**Done:** changed RouteSegmentInfo (normal, loading, fallback) and DischargeSegmentInfo outer elements from paragraphs to layout divs. The accordion's descendant paragraph rule added a bottom margin only to the first row, causing an 8.625px vertical offset. Existing client changes preserved; application edits remain uncommitted.
+**Verified:** Chrome guest planner with mocked directions: both rows now have identical y coordinates and zero margins; 390px layout wraps without overlap. Full TypeScript check and targeted ESLint passed.
+**Not done / left uncommitted:** client routes/route-segment-info.tsx and routes/charge-segment-info.tsx under app/feature/planner/planId/_components; no deployment.
+**Follow-ups:** none for alignment. Other sessions' unfinished changes preserved.
+
+## 2026-09-15 - Codex - Redesign daily route estimate
+
+**Goal:** redesign the pictured route estimate using DESIGN.md and the anti-ai-ui-review skill.
+**Done:**
+- New shared client `garage/route-estimate.tsx`, consumed by planner `day-route-overview.tsx` and Explore `plan-view.tsx` on `feat/structured-trip-location` (uncommitted).
+- Battery-led header, existing battery colors and 12% reserve marker, mono labeled metrics, compatibility footer, responsive two/four-column layout, semantic meter, and visible low/reserve labels. Removed repeated icons, blue action-like charging text, uppercase heading and shadow. Preserved calculations and existing Explore edits.
+**Verified:** full `tsc --noEmit`; targeted ESLint; changed-file `git diff --check` (repository-wide check finds pre-existing dashboard whitespace); isolated Chrome checks with actual component/CSS at 360/768/1024/1440px in light/dark and battery/warning variants (no overflow, meter correct). Inspected light desktop/dark mobile screenshots. Isolated preview uses fallback fonts; full application integration not browser-tested.
+**Not done / left uncommitted:** three client files above plus these notes; both agent documents already contain other sessions' uncommitted edits, so no combined docs commit was made without authorization to include them.
+**Follow-ups:** review within the live planner with loaded fonts; commit with the existing client work when its owner approves.
+
+## 2026-09-15 â€” Claude â€” Rework charging stop card and route leg rows
+
+**Goal:** redesign the planner charging-stop card and the drive/battery leg rows with the anti-ai-ui-review skill.
+**Done (client, uncommitted):**
+- `block/items/trip-place-card.tsx` (charger branch): removed the icon-plus-pill-plus-title repetition and the blue tinted card; header is block-color marker, title, and a meta line (Charging stop Â· operator Â· kept when optimizing). Duplicate `ChargeSegmentInfo` hidden when the charging control is shown. Earlier token swaps by another session kept.
+- `charger/station-specifications.tsx`: ruled spec grid (Max power, Ports, Plugs) via new `charger/spec-cell.tsx`; per-row blue icons removed. `station-opening-hours.tsx` icon muted.
+- `charger/station-charging-control.tsx`: large mono target, segmented 60/80/100 picker, custom track (arrival dimmed, added charge lit in battery ramp colors) over a transparent native range input, and Arrive at / Adds / Takes cells; incompatible plugs shown as a warning.
+- `routes/charge-segment-info.tsx`: new `ChargeBar`; `ChargeSegmentInfo` (explore) and `DischargeSegmentInfo` restyled without boxes; discharge shows a mini battery bar, from â†’ to, usage, and a Low label.
+- `routes/route-segment-info.tsx`: boxless row (route-colored car icon, mono time and distance); clearer loading and no-route text.
+- Leg wrappers in `block/sortable-block-items.tsx`, `itinerary/anchor-stop-card.tsx`, and explore `plan-view.tsx` now lay the drive and battery rows on one wrapping line.
+**Verified:** full `tsc --noEmit` and ESLint on the changed planner files pass. Not browser-checked (slider thumb alignment with the native input, dark mode, narrow widths, drag handles).
+**Not done / left uncommitted:** all files above.
+**Follow-ups:** browser check; confirm the transparent range input still works with the card's drag-and-drop (`data-no-drag` kept).
+**Revision (same session):** user reported the drive and battery rows were vertically misaligned. Both `RouteSegmentInfo` and `DischargeSegmentInfo` rows now use a fixed `h-6` flex row with `leading-none`, so they share one center line (fallback row uses `min-h-6` since it may wrap). A suspected IBM Plex Mono fallback was ruled out: the built CSS registers the face under its real name, so a temporary `layout.tsx`/`globals.css` font change was reverted.
+**Revision 2 (same session):** user asked for colored percentages. Added `--battery-{high,mid,low,critical}-text` tokens (light: deepened shades; dark: the fill colors) and `.battery-text-*` utilities in `globals.css`; `BATTERY_TONES[tone].valueText` and `BATTERY_CHANGE_TEXT` in `garage-formatters.ts`. `DischargeSegmentInfo` colors from/to by level and the usage (âˆ’N%) red; `ChargeSegmentInfo` colors from/to and adds a green +N%. Computed contrast: light â‰¥5.88:1, dark â‰¥5.44:1. `DESIGN.md` battery section updated. tsc and ESLint pass; not browser-checked. Rows were meanwhile changed from `<p>` to `<div>` on disk (accordion prose margins); kept.
+**Revision 3 (same session):** user asked for the charge-to thumb to match the garage starting battery slider ("only the circle"). `station-charging-control.tsx` keeps the arrival/added `ChargeBar` track but its thumb is now the slider's 20px level-colored circle (`getBatteryColor`) with a 7px light center dot; track inset widened to `inset-x-2.5`. A brief swap to the full `BatterySlider` was reverted, leaving `battery-slider.tsx` with only the earlier tone-color change. tsc and ESLint pass; not browser-checked.
+**Revision 4 (same session, reverted):** added meaning-based color to the charging card (plugs that fit the EV in `text-charging` with a text note, muted spec grid surface, green 24-hour hours, battery-colored quick target and Arrive at, green +kWh, 5% `bg-charging` tint on the charge section). The user asked to revert; all of it was undone, returning `spec-cell.tsx`, `station-specifications.tsx`, `station-opening-hours.tsx`, `station-charging-control.tsx` and the `trip-place-card.tsx` wrapper to their Revision 3 state (`opening-hours.ts` has no diff). tsc and ESLint pass.
+
+## 2026-09-15 â€” Claude â€” Rework garage vehicle card and trip energy panel
+
+**Goal:** make the garage vehicle card and usage overview look less AI-generated, using `client/DESIGN.md` and the anti-ai-ui-review skill.
+**Done (client, uncommitted, garage folder):**
+- `vehicle-card.tsx`: spec sheet layout: title + one meta line (Catalogue pill removed), 4-cell spec grid in mono numbers, connectors as one "Plugs" line (no pills), source sentence with external-link cue. The duplicate battery bar is gone (the slider below owns it). Active card shows a check + "Used for this trip's battery estimates" instead of a disabled button; inactive shows "Use for this trip".
+- `vehicle-usage-overview.tsx`: renamed "Trip energy"; removed the repeated photo and name header (also redundant in explore `plan-view.tsx`), the fake 8-segment battery and all icon-circle tiles. Now: battery at trip end + range left, a start/end track with a 12% reserve marker, a 4-cell stat grid (Distance, Energy used, Driving, Charging; "Mileage" and the duplicated Connector tile removed), and a per-day bar chart with value labels, reserve line, screen-reader text, and a real empty state.
+- `garage-formatters.ts`: shared `getBatteryTone` (critical < 12% planner reserve, low <= 25%) used by card, chart and `battery-slider.tsx`; previously three different thresholds turned 45% amber/brown. Added connector, date and distance formatters.
+- `garage-section.tsx`: removed the uppercase "USAGE OVERVIEW" divider, non-pill Add button, neutral empty state (primary text failed contrast), outer route warning hidden when the overview shows its own empty state.
+- `vehicle-media.tsx`: `mix-blend-multiply` in light mode so studio photo backdrops blend into the frame.
+**Verified:** `tsc --noEmit` and ESLint on the six files pass. Not checked in a browser (light/dark, narrow two-column cards, many-day chart scroll).
+**Not done / left uncommitted:** the six garage files above.
+**Follow-ups:** browser check.
+**Revision (same session):** user asked for colorful battery fills. Added `--battery-high|mid|low|critical` tokens (light and `.dark`) and `.battery-fill` / `.battery-fill-up` / `.battery-<level>` utilities in `globals.css` (same-hue gradient, top highlight, glow). Bands: green >=50%, yellow 26-49%, orange 12-25% ("Low"), red <12% ("Below reserve"). Used by the trip-end track, daily bars, and the starting-battery slider. `DESIGN.md` gained the tokens and a Battery level section. tsc, ESLint and DESIGN.md lint (0 errors, same 3 warnings) pass; not browser-checked.
+
+## 2026-09-15 â€” Claude â€” Add client DESIGN.md
+
+**Goal:** describe Navio's visual identity in the DESIGN.md format (Google `@google/design.md`, alpha) for coding agents.
+**Done:** new `client/DESIGN.md`: YAML tokens (brand pair, light and `-dark` colors, feature tints, media/map colors, 10 type styles, radii, spacing, 40 component entries) taken from `app/globals.css`, `app/layout.tsx` fonts, and the shadcn `button`/`card`/`input`/`badge` primitives, plus prose in the spec's section order.
+**Verified:** `npx -p @google/design.md designmd lint DESIGN.md` (CLI 0.4.0): 0 errors, 3 contrast warnings that reflect real tokens: light primary with Paper text 3.27:1, and dark `destructive` with white text 3.76:1. Heading sizes above `text-lg` are a proposed scale, not measured from pages.
+**Not done / left uncommitted:** `client/DESIGN.md` (client tree holds other sessions' uncommitted work on `feat/structured-trip-location`).
+**Follow-ups:** decide whether to darken light `--primary` or accept 3.3:1 for short labels; set dark `--destructive-foreground` to navy if solid red fills are used; keep DESIGN.md in sync when `globals.css` changes (the user plans to convert hardcoded colors to tokens).
+
+## 2026-09-15 â€” Claude â€” Rebase light/dark theme on brand Paper and Pine
+
+**Goal:** base light and dark mode on the two brand colors `#FAFBFE` (Paper) and `#06211A` (Pine).
+**Done (client, uncommitted, `app/globals.css` only):**
+- Added `--brand-paper` `oklch(0.988 0.004 271)` and `--brand-pine` `oklch(0.2245 0.036 173)`.
+- Light: page = Paper, text and default primary = Pine; cards white; muted/border/input/sidebar/secondary are low-chroma Pine-hue (173) steps.
+- Dark: page = Pine, text = Paper; card/popover/muted/border step lighter in hue 173, sidebar darker; default primary is a light Pine mint `oklch(0.86 0.075 173)` with Pine text. Dark status foregrounds and red/neutral color-theme dark overrides use Pine/Paper.
+**Verified:** WCAG contrast computed for key pairs: fg/bg 16.3:1 both modes, muted text â‰¥6.2:1, primary text â‰¥11.4:1, light input border raised to â‰¥3:1. Not checked in a browser.
+**Not done / left uncommitted:** `client/app/globals.css` (already held other uncommitted work).
+**Follow-ups:** browser check of both modes; hardcoded non-token colors (scrim, map pins, planner block palette) were left unchanged.
+**Revision (same session):** user changed `--brand-pine` to a dark navy `oklch(0.157 0.049 271)` and asked for blue-gray, not green, neutrals. Dark mode now uses blue-gray (hue 265, chroma â‰¤0.022): background 0.19, card 0.235, popover 0.265, sidebar 0.165; primary is light brand blue `oklch(0.84 0.06 271)`. Light-mode neutrals moved to hue 265 too. Recomputed contrast: text â‰¥17.8:1, muted text â‰¥6:1, primary â‰¥10:1, input borders â‰¥3:1. The token name `--brand-pine` is kept though it now holds navy.
+**Revision 2 (same session):** user chose a single neutral color theme for now. Removed `--theme-*` tokens and all `[data-color-theme]` blocks from `globals.css`; primary is `--brand-pine` (navy) in light and `--brand-paper` in dark. Unwired the picker from `sidebar-account-actions.tsx` and the init script from `app/layout.tsx`; `components/theme/*` kept (unused) for later. Full `tsc --noEmit` and ESLint on both files pass. Next: user will add hardcoded colors and ask for them to be converted to tokens.
+**Revision 3 (same session):** sidebar active state moved off `bg-secondary` to its own `--sidebar-accent` tokens (`sidebar.item.tsx`, `sidebar.dropdown.tsx`, `sidebar.tsx` block list); `--sidebar-accent` is now neutral gray `oklch(0.9 0.004 265)` light / `oklch(0.32 0.006 265)` dark. Label contrast 14.5:1 light, 12.3:1 dark; ESLint passes. Active icon still `text-primary`: the user-set bright blue primary is 2.5:1 on the light gray (below 3:1, label text carries the meaning).
+
+## 2026-09-15 â€” Codex â€” Repair trip country data and refresh sidebar after creation
+
+**Goal:** fix sidebar pins, including the user's report of a new trip without country information.
+**Done:** backed up production `trip.trip` to VM `/home/adminnav/navio-maintenance/flags-2026-09-15/trip-before-backfill.sql`; ran existing deployed backfill once in an isolated 700 MB container with discovery and Flyway disabled (6 of 9 unresolved trips repaired). Removed temporary container. Resolved legacy IDs 101/102/105 to matching Google destinations through mobility, checked matching names/countries and coordinate proximity, and repaired three trips through the trip service PUT endpoint. Local creation paths now invalidate trip-list queries.
+**Verified:** final live API check: all 6 currently remaining trips have valid TH/IN codes; SQL: zero null codes; service healthy. Count changed during concurrent activity. Client full type-check and targeted ESLint passed. Browser not verified.
+**Not done / left uncommitted:** client `planner-setup.tsx` and `planId/_components/overview/planner-persistence.tsx`; unrelated concurrent client/backend work untouched. No code deployment.
+**Follow-ups:** user was asked for the new trip destination and environment; inspect that specific case if browser refresh still shows a pin.
+
+## 2026-09-15 â€” Claude â€” Delete trip from dashboard and planner
+
+**Goal:** add a delete trip action to the dashboard trip cards and the planner.
+**Done (client, uncommitted, on `feat/structured-trip-location` alongside the earlier Codex work):**
+- `planner-api.ts`: `deleteTrip(tripId)` -> `DELETE /api/trips/{id}` (proxy already forwards DELETE to `/v1/trips/{id}`).
+- New `use-delete-trip.ts`: mutation in the `planner-autosave-<id>` scope (waits for an in-flight save); treats 404 as success; clears the local draft and the recent-plan sidebar atom, drops the trip from every `["planner","trips"]` page and invalidates it; removes only *inactive* metadata/stats/snapshot queries, because refetching an open planner's snapshot would 404 and `PlannerPersistence` would recreate the trip.
+- New `trip-actions-menu.tsx`: "â‹¯" dropdown with "Delete trip" and a confirmation dialog (Cancel focused first, pending/error states, optional `redirectTo`).
+- `trip-summary-card.tsx`: menu replaces the decorative top-right arrow.
+- `trip-info-card.tsx`: now a client component; menu beside the trip name for signed-in users with a persisted trip; redirects to `/dashboard`.
+**Verified:** full client `tsc --noEmit` and ESLint on the five files pass. Not run in a browser; delete not exercised against the backend.
+**Not done / left uncommitted:** all five client files above (not committed because the client tree holds ~57 unreviewed files from another session on the same branch).
+**Follow-ups:** browser check (menu keyboard nav, dialog focus, redirect, sidebar refresh); decide how to commit the client tree. `TripHeroCard` has no menu because the dashboard does not render it.
+
+## 2026-09-15 â€” Codex â€” Explain sidebar pin fallback
+
+**Goal:** explain why saved trips still show pins after the flag work.
+**Done:** inspected sidebar rendering and the country flag component; flags already use `destinationCountryCode`, with a pin for missing/invalid codes. Confirmed the backend backfill runner is opt-in.
+**Verified:** source inspection and repository status; no live trip responses inspected, so missing country codes for the pictured trips remain an inference supported by the prior handoff.
+**Not done / left uncommitted:** existing client changes preserved; no application changes or production operations.
+**Follow-ups:** inspect affected trip responses and run the existing location backfill if their country codes are null.
 
 ## 2026-09-15 — Claude — Depth rework for sidebar, planner and EV cards
 
@@ -3273,6 +3527,35 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 **Not done / left uncommitted:** existing client changes preserved; no application changes or production operations.
 **Follow-ups:** inspect affected trip responses and run the existing location backfill if their country codes are null.
 
+## 2026-09-14 â€” Claude â€” Finish structured trip location, fix failed release, add agent context
+
+**Goal:** continue Codex's structured trip location work, commit, and deploy.
+
+**Done:**
+
+- mobility-and-ev-service `f4e5493`: place details expose structured city/region/country (`GooglePlaceLocationMapper`).
+- trip-planning-service `0e11894`: trips resolve `destinationId` through mobility and store city/region/country code; optional display name with derived `title`; V10 migration; opt-in backfill runner.
+- client `19e7bf1`: server-resolved titles and locations; premade plan copy resolves a place id by name; only trip-location files committed (partial commit of `planner-detail.tsx`).
+- First release (root `363145a`) failed: trip-planning crash-looped on schema validation of the `char(2)` column; deploy rolled back. Fixed in trip-planning `cb3879c` (`@JdbcTypeCode(SqlTypes.CHAR)` + mapping test); released as root `3fb68c4`, deploy succeeded.
+- Added `AGENTS.md` (now committed), `docs/agents/database-changes.md`, `release.md`, `handoff.md`, this log.
+- Added `PostgresSchemaTests` to user-management, trip-planning, mobility, and community (skipped unless `NAVIO_TEST_DB_URL` is set) and a `verify-database-schema` job that gates image builds in `deploy-backend.yml`.
+
+**Verified:** mobility 19/19 tests; trip-planning 45/45 including full context against disposable Postgres 16 + PostGIS; reproduced the production failure without the fix. Client type-check and lint pass on the committed file set in isolation. All four `PostgresSchemaTests` pass on PostGIS 16; the trip-planning one fails when the `@JdbcTypeCode` fix is removed. Full suites still pass with the test skipped (user-management 95, trip-planning 46, mobility 20, community 74). The new `verify-database-schema` job passed its first GitHub run (deploy run 34829001804, root `0a4acc4`), and the deploy succeeded. Premade plan copy not tested in a browser.
+
+**Not done / left uncommitted:** ~57 client files from the Codex session (see handoff).
+
+**Follow-ups:** user decision on uncommitted client work; run the trip location backfill in production.
+
+## 2026-09-14 â€” Codex â€” Structured trip location (unfinished)
+
+**Goal:** store structured destination location for trips.
+
+**Done (uncommitted when the session ended):** backend changes in mobility-and-ev-service and trip-planning-service with tests; client migration to the new trip contract, plus unrelated dashboard, sidebar, and theme work in the same working tree.
+
+**Verified:** not recorded.
+
+**Not done / left uncommitted:** two client type errors (`itinerary-section.tsx`, `tests/planner/data.ts`); premade plan copy would have failed trip creation; nothing committed. Picked up by the Claude session above.
+
 ## 2026-09-14 — Claude — Finish structured trip location, fix failed release, add agent context
 
 **Goal:** continue Codex's structured trip location work, commit, and deploy.
@@ -3301,15 +3584,32 @@ One entry per agent session, **newest first**. Every session adds an entry befor
 **Verified:** not recorded.
 
 **Not done / left uncommitted:** two client type errors (`itinerary-section.tsx`, `tests/planner/data.ts`); premade plan copy would have failed trip creation; nothing committed. Picked up by the Claude session above.
-## 2026-10-13 - Codex - Release canonical energy and pull latest team changes
 
-**Request:** Complete the plan while leaving Phase 4C.1 deferred, commit/push the finished work through `main`, then pull the latest Git state.
-**Release:** Integrated the saved energy work onto current remote histories in isolated worktrees, preserving newer UI/transit work. Published Trip Planning `72f01f6`, Mobility/EV `533850b`, server `7630e41`, client `19a6e1e`, and root `ab94c35` through release branches, `dev`, and `main`. Run `38288732387` passed revision, PostgreSQL, build, and deployment jobs; production health/web returned `200` and unauthenticated trips returned `401`.
-**Pull:** During synchronization, newer team work appeared. Pulled client `f3c63ca`, server `05ed0cf`, Trip Planning `2e4b051`, Mobility/EV `c8a5e2a`, User Management `512a884`, and Community `5f0cf41`; root remote `dev` is `e79baac` and `main` is `3f96715`. Preserved divergent local documentation history with a merge rather than forcibly moving the branch. Team deployment run `38384565267` is successful, and production rechecked at `200`/`401`/`200`.
-**Checks/preservation:** Energy release evidence: client 190/190 plus TypeScript/ESLint, Trip Planning 217/217, Mobility/EV 82/82, both backend suites using disposable real PostgreSQL. Exact nested pins were verified before release and again after the pull. Stopped temporary config server and PostgreSQL container. Kept local reports/output/handoff text, `CLAUDE.md`, and service logs uncommitted. Phase 4C.1 remains deferred unless reproduced.
-## 2026-10-13 - Codex - Pull from main
+## Template
 
-**Request/result:** Pulled `origin/main` into every active repository using `--ff-only`, ordered from child services/client through server and root. All pulls returned already up to date, with no conflict or tracked-file change. Repositories remain on `dev`; preserved local-only reports, `CLAUDE.md`, and service logs were not modified.
-## 2026-10-13 - Codex - Diagnose missing TipTap module
+```markdown
 
-**Request/result:** Diagnosed the Next/Turbopack `Can't resolve '@tiptap/core'` build error without fixing it. TipTap `3.31.4` is present in both committed dependency files, but absent from local `node_modules` and its installed-tree lock. `npm ls` and `require.resolve` independently confirm the missing installation. Local install metadata is older than the pulled package files, so the root cause is a stale local dependency tree after Git synchronization, not a missing import declaration or missing lockfile entry. No application or dependency changes were made.
+## YYYY-MM-DD â€” <agent> â€” <short title>
+
+**Goal:** what the user asked for.
+**Done:**
+- change (repo, branch, commit SHA)
+**Verified:** tests/checks run and their result; say what was not verified.
+**Not done / left uncommitted:** anything half-finished, with file paths.
+**Follow-ups:** decisions pending from the user, known risks.
+```
+
+---
+
+## YYYY-MM-DD — <agent> — <short title>
+
+**Goal:** what the user asked for.
+**Done:**
+- change (repo, branch, commit SHA)
+**Verified:** tests/checks run and their result; say what was not verified.
+**Not done / left uncommitted:** anything half-finished, with file paths.
+**Follow-ups:** decisions pending from the user, known risks.
+```
+
+---
+
