@@ -1,0 +1,7 @@
+{
+  "guides.json": "58b4ac3f3c5eed4aa40e13269216ce5abd16283cff6e33c243a921128a44ff06",
+  "expanded-guides.json": "03a0ac51d1e9a24fefb6242f0140cedbdcdb53427815c7e8f26d4f3e1597da48",
+  "upgrade.py": "de5a371e0440d75dfc94833cf7493c8e039f3a3d7428c77eb19b29d2a7602124",
+  "upgrade_test.py": "1bad9a088c1e3102ab992c2a9e1cc1544f2a205ceaf18ca663da98061134345f",
+  "maintain.py": "6f6616c43a243d38dd7fd2658372cca6aa4d37919aec8b4790d54279ec85e04f"
+}

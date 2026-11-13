@@ -1,5 +1,82 @@
 # Navio Team Guides, November 2026
 
+## Maintained expansion: 13 November
+
+`guides.json` remains the original expected-content manifest. Do not replace it
+or rerun the original INSERT workflow to expand existing records.
+`expanded-guides.json` contains the reviewed replacement content for the same
+twenty identities: **219 distinct-within-Guide mapped places, 77 populated
+sections**, with varied totals from **9 to 19**. The four older original Guides
+and all traveler-authored Guides are outside this update.
+
+| Guide | Places | Guide | Places |
+| --- | ---: | --- | ---: |
+| Kyoto | 19 | Osaka & Nara | 9 |
+| Sapporo & Otaru | 12 | Seoul | 12 |
+| Busan | 9 | Taipei | 13 |
+| Hong Kong | 11 | Singapore | 10 |
+| Ubud | 9 | Hanoi | 9 |
+| Luang Prabang | 9 | Siem Reap | 10 |
+| Chiang Mai | 15 | Chiang Rai | 10 |
+| Hua Hin & Pranburi | 10 | Paris | 11 |
+| Rome | 10 | Barcelona | 9 |
+| Amsterdam | 11 | London | 11 |
+
+Original prose, mapped place records, category/list order, cover and references
+remain intact. Added groups provide specific choices and reading context; they
+are not a requirement to visit everything or a compressed one-day itinerary.
+Outlying excursions are explicitly labelled. No hotel/city-anchor padding or
+invented coordinates was used to meet the minimum.
+
+Most additions reuse real mapped places in existing maintained Navio plans.
+Twelve missing venue records were resolved with bounded, cached normal
+autocomplete/detail requests and their location/country reviewed. The public
+Places discovery switch was not enabled or changed. Official destination and
+venue links remain in each Guide. This publication workflow makes **no provider
+requests**; normal reader photos/details still follow existing application
+behaviour and are not a new API-cost countermeasure.
+
+### Exact in-place update
+
+1. Run only in the existing authenticated VM session; do not expose service
+   ports or change SSH access. Download the bundle from a full reviewed Git SHA.
+2. `python3 run_expansion.py --revision <full-sha>` checks every downloaded file,
+   runs the nine offline tests, creates and verifies a private custom-format
+   **whole IAM schema backup**, records the before-state, and runs the complete
+   SQL dry run ending in ROLLBACK. It changes no Guide content.
+3. Review the reported private `backups/<timestamp>/dry-run.log`, then run the
+   same pinned command with `--apply`. This creates another verified backup,
+   repeats the full dry run, applies Kyoto as a canary, verifies it, then applies
+   and verifies the full batch. Re-running an already completed batch is a no-op.
+4. Keep backups on the VM. Share only the compact `result.json` or success
+   output, never the database archive or full before-state.
+
+The SQL locks only matching rows, requires the original null-owned curated
+identities to remain PUBLISHED, checks every old field against the original or
+already-upgraded manifest, and checks palette colours. Changed, missing,
+unpublished or administrator-edited Guides abort the entire transaction. The
+only updates are content, version and updated_at. Identity, original publish
+time, owner, cover, saved links, readership, ratings and comments are preserved.
+There is no INSERT, DELETE, migration, deployment or service restart.
+
+For a manually reviewed maintenance session, `upgrade.py` can also generate SQL
+directly. Its default is ROLLBACK; `--apply` requires the SHA256 of the verified
+private backup through `--backup-sha256`. `--only kyoto` limits a canary.
+
+Validation: nine offline safety tests; eight disposable PostgreSQL checks
+(rollback, canary, rerun, all-target preservation, changed-content and unpublished
+rejection, missing identity); all twenty frontend schemas/read models/editor
+round trips; desktop Kyoto/Chiang Mai and mobile Ubud readers without external
+provider requests, overflow or runtime errors. **Preparation/test success does
+not mean the VM data has already been updated.** Record the live result before
+claiming publication complete.
+
+Bundle maintainers: stage the five files first, then run
+`python checksum_bundle.py` and stage `expansion-checksums.json`. Checksums must
+come from Git's staged bytes, since Windows working copies may contain CRLF
+while the pinned download contains LF. Verify the manifest against the final
+committed Git blobs before providing a VM command.
+
 Twenty additional curated Guides across 15 countries and territories. The
 reviewed manifest contains 101 existing real place references, 40 populated
 sections, introductions, tailored visitor tips and official reference links.
