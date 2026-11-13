@@ -1,7 +1,7 @@
 # Navio first-time highlight tours: implementation plan
 
 Date: 2026-11-13 (supersedes the 2026-11-02 `/learn` landing-page plan)
-Status: **Implemented 2026-11-13** in client commit `17993b2` (`feat/onboarding-tours`, merged to client `dev`; root `dev` pin bumped). Not on `main` or production yet. The user asked to build it now, superseding the earlier "build last" decision. See §12 for what shipped and where it differs from this plan.
+Status: **Implemented 2026-11-13** in client commit `17993b2` (`feat/onboarding-tours`, merged to client `dev`; root `dev` pin bumped). Feature tours and two fixes followed in client `017327d` (see §13). Not on `main` or production yet. The user asked to build it now, superseding the earlier "build last" decision. See §12 for what shipped and where it differs from this plan.
 
 ## 1. Objective
 
@@ -195,3 +195,38 @@ Build on `feat/onboarding-tours` in `client`, cut from an up-to-date `dev`, with
 - Focus moves to **Next** on each step (Driver.js would focus the close button), and returns to the opener or the page `h1` afterwards.
 
 **Verified:** `tests/tour/tour-policy.test.mjs` and `tour-data.test.mjs` 14/14. Full client suite 726/727; the one failure is the known `canonical.test.mjs` golden-fixture check that reads `server/...` beside the main checkout. `tsc`, changed-file ESLint and `next build` pass. `tests/tour/tour-browser-check.mjs` passed 10/10 against an isolated `next dev` (port 3121, test `AUTH_SECRET`, placeholder Keycloak env, all APIs mocked, system Chrome): auto-start once, completion recorded, Show tips replay, Escape mid-animation dismisses, focus restore, navigation away records nothing, planner every target, no auto-start in table view or phone map view, phone replay switches to itinerary, community guest at 375px with no overflow, dark theme, reduced motion. **Not verified:** a real signed-in account against live services, and Safari/Firefox.
+
+## 13. Planner feature tours and fixes (2026-11-13, client 017327d)
+
+**Why:** The user wanted every planner feature taught. One tour would have run past 30 steps, so the planner tutorial is split.
+
+**What shipped:**
+
+- The automatic 8-step planner overview is unchanged except for its last step, which now points to the other tips.
+- **Seven feature tours run only on request:** Days and timing, Auto plan, Notes and checklists, Your EV, Charging stops, Budget, and Share and export. Content is in `planId/_components/tour/data.ts`.
+- **Ways in:**
+  - **Show tips** (sidebar) is a shadcn `DropdownMenu` listing the page's tours, with a tick on finished ones. Pages with one tour still start it directly.
+  - A **?** beside the Itinerary heading offers Days, Auto plan, Notes and Share.
+  - A **?** beside My garage offers Your EV and Charging stops.
+  - A **?** beside Budgeting starts Budget.
+  - A **?** in the EV charging panel header starts Charging stops.
+  - These buttons are hidden on read-only plans. A green dot appears once every tour in a section is finished.
+- **Step model** (`components/tour/tour.types.ts`):
+  - `opens`: press this trigger first, because the target sits inside its menu. The tour closes it again afterwards.
+  - `unless`: skip this step while that control is on screen. This pairs a "set it up" step with the steps for the feature once it is set up.
+  - `fallback`: centred text shown when the control is missing.
+- **Rule:** tours may open and close menus, but never press anything that changes a trip. Modal dialogs are never opened, because their focus trap would conflict with Driver.js.
+- **Navigation:** buttons and arrow keys both go through one `go()` in the controller. It prepares each step: opens or closes the menu, then waits up to 700 ms for the target. A step that is still missing is skipped, unless it has a fallback.
+
+**Fixes in the same release:**
+
+- **Spotlight drifting:** the spotlight now follows its control when content above grows (late garage charts) or a nested panel scrolls (`tour-layout-tracker.ts`). Driver.js only listens to window scroll and resize.
+- **Close button:** the × works again. `all: unset` had dropped its z-index, so the title covered it.
+
+**Verified:**
+
+- **Unit tests:** 23 tour tests. They include a check that every target and every `opens` trigger exists in app code, and that check excludes the tour data files.
+- **Full suite:** 748/749 after rebasing onto `fa1fea5`. The one failure is the known `canonical.test.mjs` worktree path.
+- **Build and lint:** `tsc`, ESLint and `next build` pass.
+- **Browser:** `tests/tour/tour-browser-check.mjs` 16/16 against a mocked isolated dev server, covering the tips menu and ticks, the day menu opened and closed by a tour, the Itinerary and garage menus, real add-button targets, Escape closing the day menu, and spotlight drift.
+- **Not run:** a real login with live data. The charger panel steps are checked by the target test and code reading, not walked in a browser.
