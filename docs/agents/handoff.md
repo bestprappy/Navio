@@ -1,3 +1,8 @@
+## 2026-11-13 - Claude - Planner feature tours on dev
+
+**State:** Client `dev` = `017327d`; root `dev` pins it. Seven on-request planner tours, plus Show tips as a menu and section ? buttons. Spotlight drift and X fixes are included. Details: `docs/agents/tutorial-plan.md` §13. Not on `main` yet.
+**Next:** Release with the next `main` merge (`docs/agents/release.md`). `/help` is still a 404. Client `stash@{0}` holds the old `feat/profile-page-rework` uncommitted work for the user to sort out.
+
 ## 2026-11-13 - Claude - Shared-plan views counted once per browser (merged to dev, not deployed)
 
 **State:** On `dev` everywhere, not on `main`. Trip `789714e` (server dev `107f53b`), client `6ba87e2`, root dev `5a05377`. Trip: `V29__shared_plan_unique_viewers.sql` (`trip.publication_viewer`, PK publication+visitor, cascade). `readSharedPlan(token, visitorId)` increments `view_count` and daily activity only on a browser's first read of a listed plan. A missing or malformed visitor id is served but not counted. Header `X-Navio-Visitor` (optional). Client: `proxy.ts` also matches `/explore/shared/*` and `/share/plans/*` with no auth. It sets a 1-year httpOnly `navio_vid` cookie (`lib/visitor-id.ts`) and writes it onto the same request, so the first view counts. `fetchSharedPlan` forwards it.

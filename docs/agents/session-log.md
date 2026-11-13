@@ -1,3 +1,11 @@
+## 2026-11-13 - Claude - Planner feature tours and tour fixes (client 017327d, on dev)
+
+**Request:** Fix the spotlight drifting when an EV is selected and the X not closing tips. Then split the planner tutorial into per-section tours, with a ? per section and a Show tips menu (/frontend-design, shadcn). Merge to dev only.
+**Done:** See `docs/agents/tutorial-plan.md` §13. Client `9a966cb` fix(tour) and `017327d` feat(tour), rebased onto `fa1fea5` (trip cover upload) and fast-forwarded into client `dev`; root `dev` pin bumped. The main `Navio/client` checkout was fast-forwarded to `017327d` so the user's :3000 server has the fixes.
+**Verified:** Tour unit tests 23/23; full client suite 748/749 (the known `canonical.test.mjs` worktree path); tsc, ESLint and `next build` pass; browser check 16/16 against mocked APIs. Not run: a real login with live data, or the charger panel walked in a browser.
+**Note:** The main client checkout holds someone else's uncommitted sidebar restyle (`SidebarItem variant="action"`) and two guide files. They were left untouched and keep the tour attributes. Client stash `stash@{0}` still holds the old profile-rework work.
+**Next:** Release with the next `dev` → `main`. Keep `data-tour` attributes when changing planner controls; `tests/tour/tour-data.test.mjs` enforces this.
+
 ## 2026-11-13 - Claude - Shared-plan views once per browser (merged to dev)
 
 **Request:** Count shared-plan views for signed-in and signed-out readers, but once per browser. Then merge to dev without deploying. Earlier in the session: fixed a Turbopack `next/font/google` "queries have exactly one entry" error by removing Plus Jakarta Sans's `weight` list (variable font). That local edit was later reverted on disk by someone else.
