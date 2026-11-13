@@ -1,3 +1,11 @@
+## 2026-11-13 - Claude - Shared-plan views once per browser (merged to dev)
+
+**Request:** Count shared-plan views for signed-in and signed-out readers, but once per browser. Then merge to dev without deploying. Earlier in the session: fixed a Turbopack `next/font/google` "queries have exactly one entry" error by removing Plus Jakarta Sans's `weight` list (variable font). That local edit was later reverted on disk by someone else.
+**Done:** Trip `feat/unique-plan-views` -> dev `789714e`: V29 `trip.publication_viewer`, `PublicationViewerRepository.registerFirstView` (`INSERT ... ON CONFLICT DO NOTHING`), `readSharedPlan(token, visitorId)`, optional `X-Navio-Visitor` in `SharedPlanController`. Client `feat/unique-plan-views` -> dev `6ba87e2`: proxy sets `navio_vid` on shared-plan pages, and `fetchSharedPlan` forwards it. Server dev `107f53b` and root dev `5a05377` pin them. All were fast-forward pushes from worktrees in `Capstone/Navio-worktrees/unique-plan-views/`. The gateway strips only `X-User-*`, so the header passes through.
+**Verified:** `TripPublicationServiceTests` 55 and `SharedPlanControllerTests` 17 pass (6 new). Full trip suite: 999 run, 2 errors (`contextLoads`, `VerificationTests`), which need Postgres on 5432; Docker was down. Client `tsc` and scoped ESLint clean; `tests/planner-access.test.mjs` 8/8 (2 new). Postgres-gated tests and a browser check not run.
+**Not done:** No `main` merge or deploy (user asked). Postgres verification.
+**Next:** See handoff: renumber trip-cover to V30; run Postgres tests before release.
+
 ## 2026-11-13 - Codex - Discovery polish, sample expansion and unique Guide views audited
 
 **Request:** Fix Month/Season dropdown top padding/scrollbar and Plans/Guides filter scrollbar; distinguish Kyoto spring/autumn; repair missing plan covers; expand our sample Guides to9-20 varied places; make Guide views unique per account and verify discovery ranking/sections. No implementation or content mutation yet. Awaiting user choice: lifetime account uniqueness with anonymous once-per-browser first-party identity (recommended), or authenticated views only. Asked through async input; do not infer answer. User did not authorize a new deployment in this turn.
