@@ -1,3 +1,11 @@
+## 2026-11-13 - Claude - First-time highlight tours (client 17993b2, on dev)
+
+**Request:** Rescope the tutorial to in-app highlight tours only, then build them with /frontend-design; commit and merge to dev, not main.
+**Done:** `docs/agents/tutorial-plan.md` now covers only Driver.js first-time tours (the `/learn` page and Motion were dropped). Built tours for Dashboard, Trip planner and Community; each auto-starts once per account per browser and replays from **Show tips** (app sidebar account section; ? icon in the community header). Details in the plan's §12. Client `feat/onboarding-tours` 17993b2 fast-forwarded into client `dev`; root `dev` pin bumped.
+**Verified:** Tour unit tests 14/14; full client suite 726/727 (the known `canonical.test.mjs` failure, which needs `server/` beside the checkout); `tsc`, scoped ESLint and `next build` pass. `tests/tour/tour-browser-check.mjs` 10/10 against an isolated dev server with mocked APIs; light, dark, 375px and reduced-motion screenshots reviewed. Not run: a real login against live services; Safari and Firefox.
+**Also:** The user's :3000 dev server failed with a Turbopack `next/font/google` "queries have exactly one entry" error. Its `client/.next` cache holds Google's `fonts.gstatic.com/l/font?kit=` URL form. Fix: delete `client/.next` and restart; if it recurs, self-host the font with `next/font/local`.
+**Not done:** Nothing merged to `main`, no deploy (only root `main` deploys). Root local `dev` is 15 ahead / 125 behind `origin/dev` with older unpushed docs commits; untouched. `/help` is still a 404 behind the sidebar, navbar and footer links.
+
 ## 2026-11-13 - Codex - Local generated-file Git noise resolved
 
 **Request/result:** User requested safely resolving the10k+ Source Control changes. Confirmed10351 untracked output files, report-tool dependencies, isolated worktrees and Python bytecode; no mass staging/commit/delete is appropriate. Added only local .git/info/exclude entries /output/, __pycache__/ and *.pyc. Existing private rules preserved. No shared .gitignore, product code, documents, configuration, permissions, services or deployment changed. All files remain on disk. Report documents remain deliberately visible for explicit review rather than silently hiding real deliverables.

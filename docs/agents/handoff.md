@@ -1,3 +1,8 @@
+## 2026-11-13 - Claude - First-time highlight tours on dev
+
+**State:** Client `dev` = 17993b2 `feat(tour): add first-time highlight tours...`; root `dev` pins it. Code: `client/components/tour/*`, a tour `data.ts` beside the dashboard, planner and community features, `data-tour` attributes on their controls, `driver.js` pinned to 1.10.2. `tests/tour/tour-data.test.mjs` fails if a step's target disappears, so keep `data-tour` attributes when you change those controls.
+**Next:** Release to `main` with the next release (read `docs/agents/release.md`). Decide what `/help` should be (it is a 404). To repeat the browser check: start `next dev -p 3121` with a test `AUTH_SECRET`, placeholder `AUTH_KEYCLOAK_*` and an unreachable `NAVIO_API_BASE_URL`, then run `node tests/tour/tour-browser-check.mjs` with `NAVIO_PLAYWRIGHT_MODULE` set.
+
 ## 2026-11-13 - Codex - Local generated-file Git noise resolved
 
 **Request/result:** User requested safely resolving the10k+ Source Control changes. Confirmed10351 untracked output files, report-tool dependencies, isolated worktrees and Python bytecode; no mass staging/commit/delete is appropriate. Added only local .git/info/exclude entries /output/, __pycache__/ and *.pyc. Existing private rules preserved. No shared .gitignore, product code, documents, configuration, permissions, services or deployment changed. All files remain on disk. Report documents remain deliberately visible for explicit review rather than silently hiding real deliverables.
