@@ -1,3 +1,11 @@
+## 2026-11-13 - Codex - Production release verified
+
+**Goal:** Complete the authorized feature consolidation and production deployment.
+**Done:** Released root main 643cf26f6459697d087a15abe625d7cf828b0580 through dev; workflow 43407351162: https://github.com/bestprappy/Navio/actions/runs/43407351162 ended success. Child main revisions: client dc6028c, server f596297, trip 81e5d43, mobility 0477c36, iam 7ce3e90, community 753a7a2. Root and server gitlink revisions exactly match every child origin/main. Feature commits and conflict decisions are detailed in the preceding consolidation entry.
+**Verified:** Client785/785, TypeScript, scoped ESLint and production build; Trip1040/0 errors (5 skipped), Mobility239/0 errors (1 skipped), IAM442/0 errors (2 skipped), Community184/0 errors (32 skipped), gateway20/0 errors (1 skipped). Real PostgreSQL schema checks passed for all four services; Trip includes V31 and the historical upgrade. IAM required cleaning stale target output from older checkouts; no schema source changed. Deployment revision gate, CI PostgreSQL checks, all ten image builds and VM deployment completed successfully. Live health/protected-route checks are recorded in the release artifact directory.
+**Not done / left uncommitted:** Only local CLAUDE.md, existing runtime/crash logs and historical scratch worktrees/stashes are excluded. No feature source remains pending in the active feature worktrees. Release backups and logs are retained under C:/Users/User/.codex/tmp/navio-release-20261113. No signed-in real-account end-to-end browser session was performed in this release session.
+**Follow-ups:** These final result notes are committed on a docs branch from dev and merged/pushed to dev only; they will reach main with the next release. Do not push main just for these notes. The existing /help route gap and external provider billing/quotas remain separate follow-ups. Deferred Places editorial/report exclusions remain in effect.
+
 ## 2026-11-13 - Codex - Consolidate feature branches for main release
 
 **Goal:** Commit all pending feature work, preserve features across branches, resolve conflicts, and deploy through dev to main. The user explicitly authorized commits, pushes, conflict resolution and production deployment.
