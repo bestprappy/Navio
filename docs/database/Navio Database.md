@@ -1,3 +1,7 @@
+# Place popularity preferences (2026-11-13, feature worktree, not released)
+
+Trip migration `V31__place_popularity_preferences.sql` creates `trip.place_popularity_preference` (`user_id uuid` primary key, `contributes boolean NOT NULL DEFAULT TRUE`, `updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP`). A missing row means enabled. It adds a partial `(place_lat, place_lng, block_id)` index for located PLACE items. Counts are computed from authoritative saved itinerary membership with distinct account IDs; there is no new copy of planner/provider content or cross-service table access. Opt-out removes all retained contributions on subsequent reads. Existing planner rows and entity mappings are unchanged; older releases ignore the new table/index. V31 follows the banner feature's V30, now included in the feature checkout; the V13 upgrade test expects 18 subsequent migrations. API/eligibility details: [Place recommendations](../api/place-recommendations.md).
+
 # Implemented Shared Plan copy ledger (2026-10-22)
 
 Trip migration V21__shared_plan_copy_events.sql adds trip.shared_plan_copy for transactional successful-copy events and aggregate total/distinct counts. It retains events after private-copy deletion and cascades on publication deletion. Backfill recovers only identifiable existing imports. Fresh and historical-upgrade checks passed against disposable real PostgreSQL; the configured VM was not migrated/deployed by this task. See [contract and persistence notes](../api/Shared%20Plan%20Card%20Metrics.md).

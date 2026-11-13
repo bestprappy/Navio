@@ -59,6 +59,7 @@ Official attribution files in client/public/attribution came unchanged from Goog
 -19 Mobility tests pass: ranking, closure/deduplication, seasonal bounds, provider fields/attribution, HTTP contracts/failures, rate and concurrency budgets.
 -29 Trip tests pass: append service/controller and existing snapshot service checks.7 gateway security tests pass.
 -3 real PostgreSQL concurrency tests are present but skipped: Docker Desktop engine is unavailable and `NAVIO_APPEND_TEST_DB_URL` is absent. Run them against a disposable PostgreSQL database with `NAVIO_TEST_DB_USERNAME`/`NAVIO_TEST_DB_PASSWORD`.
+
 - Browser automation cannot initialize its Node runtime (OS error3). Actual mobile/tablet/desktop light/dark screenshots, keyboard interaction, map resize, back-scroll restoration, and end-to-end add/save/reopen remain unverified. Do not enable production until these are exercised against the rebuilt local stack.
 
 No push, main merge, production deployment, shared service restart, account change, or database mutation was performed.

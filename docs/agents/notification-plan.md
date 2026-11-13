@@ -4,6 +4,8 @@
 **Prepared:** 2026-10-31.
 **Requested outcome:** A complete, colorful profile experience with private settings, public profiles, following, privacy and safety controls, and persistent Kafka-backed notifications that appear throughout the app, including the planner.
 
+**Implementation status (2026-10-31, Claude):** Phases 2-6 are live (root main 6d5e7e4). Phases 7 (trip outbox -> Kafka -> Community consumer, quarantine and replay) and 8 (authenticated SSE, app-wide provider, toasts) are implemented and verified locally on `feat/live-notifications` branches (worktrees in `Capstone/Navio-worktrees/live-notifications/`), not pushed or released. Phase 9 is not started. Details, evidence and limits: `docs/agents/handoff.md` (top entry) and `docs/features/live-notifications.md` on that branch.
+
 This document is the implementation brief and acceptance checklist. An unchecked task is future work, not evidence that a capability exists. Implementation starts only after the user asks to proceed. Completing this plan does not authorize deploying it.
 
 ## 1. Required working rules
