@@ -1,3 +1,8 @@
+## 2026-11-14 - Claude - Google "Ignore limits this month" override (uncommitted, not released)
+
+**State:** Feature is complete and tested but uncommitted: mobility `dev` (V3 `ev.provider_limit_override`, store/service/controller, `PUT /v1/admin/ev/google-usage/limit-override`), client `dev` (`limit-override-control.tsx`, model/api/ledger/workspace, PUT proxy route, tests), root docs (Open API, Database.md). Details in the session log. Client `app/planner/new/page.tsx` and `tsconfig.json` changes belong to someone else: leave them out.
+**Next:** On the user's go-ahead: run mobility `PostgresSchemaTests` against disposable Postgres (Docker was off), commit mobility -> server -> client -> root on `feat/google-limit-override` branches, merge to dev, and release per `docs/agents/release.md` (V3 is additive; the previous image ignores the new table).
+
 ## 2026-11-14 - Claude - Sign-up guidance, Home rework and denser EV search released
 
 **LIVE (confirmed):** root main `391c732` (deploy run 43602963292 success; /health 200, /v1/trips 401, new Home and sign-up checklist served live) (client `27d55c6`, server `1e7018c`, mobility `521330e`). Ships: Keycloak sign-up guidance (`.deploy/keycloak/themes/navio/login/resources/js/navio-forms.js`: hints on every field, live password checklist, red state clears once a rejected field is valid, pre-submit check), the Codex Home rework, the Claude denser EV station search (client + mobility) and a planner side-panel header fix (`overflow: clip`). Not checked live: the EV search change (needs a signed-in trip).
