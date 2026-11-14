@@ -1,3 +1,15 @@
+## 2026-11-14 - Claude - Recommendation shelf photo inset, heading, release
+
+**Goal:** Fix the photo in the planner "Recommended places" cards that sat half outside its border (/frontend-design), rename the heading toward "Popular places from travelers", then commit and deploy to main.
+**Done:**
+- Card photo is now inset with even padding (`p-1.5`, `size-12 rounded-md`) instead of a 56px tile flush against the left border of a fixed 64px card (`place-recommendations-row.tsx`).
+- Heading: user chose "Popular places from travelers" only when every card has traveler evidence, otherwise "Recommended places" (kept another session's conditional version).
+- With the user's explicit choice, released everything on disk, including another session's uncommitted work: contextual recommendation ranking (`place-recommendations.ts`, new `place-recommendation-category.ts`, row, tests) and a destructive-tinted tour close button (`components/tour/tour.css`).
+- Client `48f62dc` feat(planner) on `feat/planner-recommendation-context`, `58d7c50` style(tour) on `style/tour-close-button`, merge `7d92fc8` = client origin/dev = origin/main. Root `c60dccc` chore(release) on `chore/release-recommendation-context`; root main fast-forwarded to dev with `git push origin dev:main` (root `main` is checked out in the `navio-transit-wt` worktree, so it was not checked out here). That push also shipped the already-on-dev guide maintenance scripts/notes (`7eda26b`, not run by deploy).
+**Verified:** client tsc clean; ESLint clean on changed files; client suite 782/783 with `node --experimental-transform-types --test` (the one failure is the known `tour-policy` extensionless-import runner issue). Pins: client 7d92fc8 and server f596297 equal their origin/main. Workflow run 43564541119 started; live `/health` 200 and `/v1/trips` 401 afterwards. The run's final conclusion was NOT confirmed in this session: unauthenticated GitHub API polling hit the 60/hour limit, and the follow-up wait was killed for low memory. Not run: browser check of the shelf, production `next build`, backend suites (no server change).
+**Not done / left uncommitted:** only local `CLAUDE.md`.
+**Follow-ups:** Confirm run https://github.com/bestprappy/Navio/actions/runs/43564541119 succeeded. Poll the public API at most every 60s+ (60 requests/hour limit).
+
 ## 2026-11-13 - Codex - Twenty expanded Guides LIVE; final public verification passed
 
 **User action/result:** User supplied successful output from pinned3d7f562 run_expansion.py --apply:9 tests OK, verified private whole-IAM backup, all20 ROLLBACK dry run, canary verified, batch verified, all20 same identities/publication metadata preserved. Backup /home/adminnav/navio-maintenance/guide-expansion-3d7f56219431/backups/20261113T153729.682954Z/before-iam.dump; SHA2567056be20345ef57422a9d03a9a15f60bd4775ae4cab7bfe67ba380403daa0f72. Keep it on the VM; do not transmit the archive. The existing SSH session was connected throughout; no access-setting change was needed.

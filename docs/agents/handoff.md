@@ -1,3 +1,8 @@
+## 2026-11-14 - Claude - Contextual recommendations released (confirm workflow)
+
+**Live (pending workflow confirmation):** root main `c60dccc` (client `7d92fc8`, server `f596297`) pushed; workflow 43564541119. It ships contextual planner recommendation ranking, an inset card photo, the conditional "Popular places from travelers" / "Recommended places" heading, and a red-tinted tour close button. Site health was 200 and `/v1/trips` 401 after the push, but the run conclusion was not read (GitHub API rate limit). **Next agent: confirm that run ended success**; if it failed, follow docs/agents/release.md.
+**State:** client dev = main = `7d92fc8`; root dev = main = `c60dccc` before this docs commit. Root `main` is checked out in worktree `../navio-transit-wt`; publish root main with `git push origin dev:main` when fast-forwardable rather than checking it out.
+
 ## 2026-11-13 - Codex - All twenty Guide expansions LIVE and verified
 
 **Complete / do not rerun:** User ran the pinned3d7f562 maintenance bootstrap in the already-connected NAVIO terminal. Nine tests passed; verified private whole-IAM backup: /home/adminnav/navio-maintenance/guide-expansion-3d7f56219431/backups/20261113T153729.682954Z/before-iam.dump, SHA2567056be20345ef57422a9d03a9a15f60bd4775ae4cab7bfe67ba380403daa0f72. Full20 dry run, Kyoto canary and batch verification succeeded. Same20 Team Guides now contain219 places across77 populated sections, varied9-19 each; original content/IDs/covers/publication metadata and other Guides preserved. This was an in-place data update, no new Guide records or release.
