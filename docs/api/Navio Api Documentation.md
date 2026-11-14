@@ -3327,3 +3327,14 @@ all-time totals. Existing destination/season/interest constraints still apply.
 Historical total views are retained. Lifetime signed-in unique tracking starts
 with this revision because expired mixed guest/account daily dedup records
 cannot establish accurate historical lifetime uniqueness. No synthetic backfill.
+
+
+### Reader statistics (2026-11-14 revision)
+
+Guide and listed Shared Plan readers expose Total Views, Unique Visitors, Current Favorites and Rating. Total Views count visible reader openings, including repeat and anonymous reads; SSR, prefetches and retries of the same read UUID do not add views. Unique Visitors count signed-in accounts once per publication. Existing historical totals are preserved; historical signed-in identities cannot be reconstructed.
+
+- `POST /v1/shared-plans/{token}/feedback/view`: optional authenticated identity, JSON `{ "readId": "<UUID>" }`, returns 204. Only active, listed, current-sanitizer publications qualify. Repeating the UUID after sign-in attaches that account without adding another total view. Invalid UUID returns 400; unavailable publications return the existing uniform 404.
+- `GET /v1/shared-plans/{token}/feedback`: adds nonnegative `viewCount` and `uniqueViewCount` to the existing feedback summary; rating and comment fields remain unchanged. Existing GET publication/browser tracking remains compatible with old clients; the new frontend no longer sends a browser visitor header on publication fetch.
+- `GET /v1/saved-content/favorites?identity=plan:<token>&identity=guide:curated:<uuid>`: anonymous aggregate read, 1?48 identities, repeated query parameter. Guide source is lowercase `curated` or `traveler`. Returns `[{ "identity": "plan:<token>", "count": 3 }]`, including zero for valid identities with no active saves. Counts distinct accounts with active Saved library bookmarks; unsave/purge decrease the count and restore increases it. No account details or private saved-item rows are returned. Place identities and malformed/oversized batches are rejected with 400. Response is not cached; cards coalesce requests in batches and refresh after local Saved mutations.
+
+Plan copy totals and distinct copier counts remain separate metrics. Guide view recording retains its existing network budget and account hashing; a same-read sign-in retry now attaches the account without consuming another view budget unit.

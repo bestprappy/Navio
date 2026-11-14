@@ -3246,3 +3246,10 @@ the new read ledgers. Existing daily network budgets protect read writes.
 
 Old view aggregates and legacy tables remain rollback compatible; no migration
 edits, drops or destructive backfill. Unique counts begin with this revision.
+
+
+### Shared publication readership ledgers (Trip V32)
+
+Additive migration `V32__publication_readership.sql` adds `trip.publication_read_receipt` (publication UUID + read UUID primary key, created timestamp) and `trip.publication_account_viewer` (publication UUID + signed-in account UUID primary key, first-viewed timestamp). Both reference the publication with cascading deletion. Existing `view_count`, per-browser ledger and daily activity remain intact for backward compatibility. New read receipts are idempotent; account attachments may be recorded on the same receipt without changing total/daily views. No historical signed-in uniqueness is inferred.
+
+Current Favorites reuse active PLAN rows in `iam.saved_library_items` and GUIDE rows in `iam.saved_guide_items`; no new bookmark store or cross-service SQL is introduced. Public responses expose only aggregate distinct-account counts per requested content identity.
