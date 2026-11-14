@@ -1,3 +1,10 @@
+## 2026-11-15 - Claude - Released comment tree, profile links, comment reports and export notes (LIVE)
+
+**Live (confirmed):** root main `a4428de` (deploy run 43625385065 success, all jobs green). Client `6b0b8d6`, server `6bec02b`, trip `492a3b4`, IAM `be5a4bd`; community/mobility unchanged. Ships: shared comment tree + reply-to-reply + Oldest/Newest + profile links (this session), Guide comments route fix, teammate comment reports in admin Reports (gateway routes `/v1/admin/{plan,guide}-comment-reports`), teammate plain-text itinerary export notes. No migrations.
+**Checks:** live `/health` 200, `/v1/trips` 401; live plan comments return `authorId`; guide comments 200; anonymous admin plan-comment reports 401. Pre-release: release-tree client tsc/ESLint pass, 806/808 (tour-policy known runner issue; energy canonical fixture needs sibling server path, passes 24/24 in normal checkout), IAM 458 and trip 1055 suites pass (see previous entry). Logs `output/release-20261115-client-tests.txt`.
+**Not released (stale, need owner decision):** client `feat/admin-console` (wip snapshot), September `feat/hybrid-energy-model` branches in root/client/trip/IAM/mobility (rated-range test-standard scaling; changes EV range math). `fix/jwks-internal-endpoint` already on main as a different commit.
+**State:** every repo dev = main. Root ordinary checkout on `dev`. Untouched: client `app/planner/new/page.tsx`, `tsconfig.json`, `CLAUDE.md`; root `output/`, `docs/design/*`.
+
 ## 2026-11-15 - Claude - Shared comment tree, reply-to-reply, sorting and author profile links (dev, not released)
 
 **Goal:** Make every comment section match Community's curved-line tree; fix Guide comments "Not found."; allow replying to replies; keep first comment on top or sortable; make commenter names and photos open their profile.
