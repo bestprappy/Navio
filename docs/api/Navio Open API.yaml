@@ -436,6 +436,111 @@ paths:
         '401': {$ref: '#/components/responses/Unauthorized'}
         '403': {$ref: '#/components/responses/Forbidden'}
         '503': {description: The choice could not be saved. Nothing changed.}
+  /v1/admin/plan-comment-reports:
+    get:
+      tags: [Trip Planning Service]
+      summary: Reported Shared Plan comments awaiting moderation
+      description: >-
+        Platform moderators, admins and owners only (gateway X-User-Roles); everyone else gets 403. Every visible
+        comment with at least one report, across all Shared Plans, oldest first report first. Reports on one comment
+        are folded into one row. planToken is null once the plan is no longer shared. Publishers still see reports on
+        their own plans through GET /v1/shared-plans/{token}/feedback/reports. Sent with Cache-Control no-store.
+      parameters:
+        - {name: page, in: query, schema: {type: integer, default: 0, minimum: 0}}
+        - {name: size, in: query, schema: {type: integer, default: 20, minimum: 1, maximum: 50}}
+      responses:
+        '200':
+          description: A Spring Page of reported comments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalElements: {type: integer}
+                  number: {type: integer}
+                  last: {type: boolean}
+                  content:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        commentId: {type: string, format: uuid}
+                        planToken: {type: string, nullable: true}
+                        planTitle: {type: string, nullable: true}
+                        content: {type: string}
+                        authorAccountId: {type: string, format: uuid}
+                        authorName: {type: string}
+                        reportCount: {type: integer}
+                        reasons: {type: array, items: {type: string, enum: [SPAM, HARASSMENT, INAPPROPRIATE, OTHER]}}
+                        firstReportedAt: {type: string, format: date-time}
+                        lastReportedAt: {type: string, format: date-time}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+  /v1/admin/plan-comment-reports/{commentId}:
+    patch:
+      tags: [Trip Planning Service]
+      summary: Remove a reported Shared Plan comment or dismiss its reports
+      description: >-
+        Platform moderators, admins and owners only. decision remove hides the comment text for everyone, as a
+        publisher's removal does, and lowers the plan's comment count; its reports stay as history. decision dismiss
+        deletes the comment's reports and keeps it, so a later report brings it back.
+      parameters:
+        - {name: commentId, in: path, required: true, schema: {type: string, format: uuid}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision]
+              properties:
+                decision: {type: string, enum: [remove, dismiss]}
+      responses:
+        '204': {description: Resolved}
+        '400': {description: decision is missing or unknown (ErrorResponse with validationErrors)}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {description: The comment is gone or has no open reports (already handled)}
+  /v1/admin/guide-comment-reports:
+    get:
+      tags: [User Management Service]
+      summary: Reported Guide comments awaiting moderation
+      description: >-
+        Platform moderators, admins and owners only (validated token roles). Every visible comment with at least one
+        report, across curated and traveler Guides, oldest first report first. guideTitle is null when the Guide was
+        deleted. authorAccountId is the author's Keycloak subject. Sent with Cache-Control no-store.
+      parameters:
+        - {name: page, in: query, schema: {type: integer, default: 0, minimum: 0}}
+        - {name: size, in: query, schema: {type: integer, default: 20, minimum: 1, maximum: 50}}
+      responses:
+        '200':
+          description: >-
+            A Spring Page of reported comments, the same shape as GET /v1/admin/plan-comment-reports with guideSource
+            (CURATED or TRAVELER), guideId and guideTitle in place of planToken and planTitle
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+  /v1/admin/guide-comment-reports/{commentId}:
+    patch:
+      tags: [User Management Service]
+      summary: Remove a reported Guide comment or dismiss its reports
+      description: Same contract as PATCH /v1/admin/plan-comment-reports/{commentId}, for Guide comments.
+      parameters:
+        - {name: commentId, in: path, required: true, schema: {type: string, format: uuid}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [decision]
+              properties:
+                decision: {type: string, enum: [remove, dismiss]}
+      responses:
+        '204': {description: Resolved}
+        '400': {description: decision is missing or unknown (ErrorResponse with validationErrors)}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '404': {description: The comment is gone or has no open reports (already handled)}
   /v1/admin/palette-colors:
     get:
       tags: [User Management Service]

@@ -1,3 +1,9 @@
+## 2026-11-15 - Claude - Comment reports in admin Reports (dev only, release pending)
+
+**On dev, not live:** trip `851ef23`, IAM `b51d649`, server `f27e886`, client `7a36a54`, root `cc21ff0` (plus this docs commit). Admin Reports now shows Shared Plan and Guide comment reports (new `/v1/admin/plan-comment-reports`, `/v1/admin/guide-comment-reports`) and refreshes every 15s. No migration. Release needs trip + IAM + gateway config + client together under docs/agents/release.md; ask before pushing main.
+**Watch out:** (1) Another session had uncommitted edits in the main client checkout (`feedback-comments.tsx`, comment-tree, traveler-guides routes) when this landed, so the ordinary client checkout was NOT fast-forwarded; it is still at `22af1fc`. My commit changes one string in `feedback-comments.tsx` ("Navio moderators and the publisher review reported comments..."); expect a trivial conflict when that work is committed. (2) Root `.deploy/config/api-gateway.yml` (what production mounts) has no `/v1/saved-content/favorites` on the IAM route, while the config-server copy does; the reader-statistics favorites aggregate may 404 in production. Not changed here; verify and fix separately.
+**Not verified:** admin page in a browser, production `next build`, full-context `*ApplicationTests` (need Postgres on :5432).
+
 ## 2026-11-15 - Places cost reduction handoff to the user's friend
 
 ## Current State Summary
