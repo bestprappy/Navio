@@ -28,6 +28,7 @@
   --navio-focus: oklch(0.641 0.197 253 / 35%);
   --navio-danger: oklch(0.499 0.174 25.2);
   --navio-danger-surface: oklch(0.499 0.174 25.2 / 8%);
+  --navio-success: oklch(0.52 0.14 150);
 
   --navio-radius-sm: 0.6rem;
   --navio-radius-md: 0.8rem;
@@ -54,6 +55,7 @@
   --navio-focus: oklch(0.737 0.158 235.9 / 40%);
   --navio-danger: oklch(0.638 0.208 25.1);
   --navio-danger-surface: oklch(0.638 0.208 25.1 / 12%);
+  --navio-success: oklch(0.76 0.16 150);
 }
 
 /* ---------- Page frame ---------------------------------------------------- */
@@ -399,6 +401,72 @@ body,
 
 .navio-auth .pf-v5-c-helper-text__item.pf-m-error {
   color: var(--navio-danger);
+}
+
+/* Edge draws its own reveal/clear buttons inside password fields, on top of
+   Keycloak's show-password button. One toggle is enough. */
+.navio-auth input::-ms-reveal,
+.navio-auth input::-ms-clear {
+  display: none;
+}
+
+/* ---------- Field guidance (js/navio-forms.js) ---------------------------- */
+
+.navio-hint {
+  margin: var(--navio-space-1) 0 0;
+  color: var(--navio-muted);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.navio-rules__title {
+  margin: 0 0 0.25rem;
+  font-weight: 600;
+}
+
+.navio-rules__list {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.navio-rule,
+.navio-hint--status[data-state] {
+  display: flex;
+  align-items: center;
+  gap: var(--navio-space-1);
+}
+
+.navio-rule svg,
+.navio-hint--status svg {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+}
+
+.navio-rule__icon {
+  display: inline-flex;
+}
+
+.navio-rule[data-met="true"],
+.navio-hint--status[data-state="met"] {
+  color: var(--navio-text);
+}
+
+.navio-rule[data-met="true"] svg,
+.navio-hint--status[data-state="met"] svg {
+  color: var(--navio-success);
+}
+
+.navio-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 /* ---------- Buttons ------------------------------------------------------- */
