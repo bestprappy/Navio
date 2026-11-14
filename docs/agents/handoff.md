@@ -1,7 +1,8 @@
-## 2026-11-14 - Claude - Google "Ignore limits this month" override (uncommitted, not released)
+## 2026-11-14 - Claude - Google "Ignore limits this month" override released (confirm run)
 
-**State:** Feature is complete and tested but uncommitted: mobility `dev` (V3 `ev.provider_limit_override`, store/service/controller, `PUT /v1/admin/ev/google-usage/limit-override`), client `dev` (`limit-override-control.tsx`, model/api/ledger/workspace, PUT proxy route, tests), root docs (Open API, Database.md). Details in the session log. Client `app/planner/new/page.tsx` and `tsconfig.json` changes belong to someone else: leave them out.
-**Next:** On the user's go-ahead: run mobility `PostgresSchemaTests` against disposable Postgres (Docker was off), commit mobility -> server -> client -> root on `feat/google-limit-override` branches, merge to dev, and release per `docs/agents/release.md` (V3 is additive; the previous image ignores the new table).
+**Released on user request ("deploy"):** mobility `e19dd0d` (V3 `ev.provider_limit_override`, `PUT /v1/admin/ev/google-usage/limit-override`), server `5ebfacc`, client `e8aac1e` (Admin > Google usage "Ignore limits this month" + confirmation dialog, "Restore limits"). Each child dev = main. Root release commit carries the pins plus Open API / Database.md updates. Details in the session log.
+**Not verified locally:** mobility `PostgresSchemaTests` (Docker Desktop would not start). CI's `verify-database-schema` job runs it before any image builds. **Next agent: confirm the workflow run for the root release commit ended success**; if the schema job failed, nothing deployed; read the `Caused by` line.
+**Left alone:** client `app/planner/new/page.tsx` and `tsconfig.json` (someone else's), client `CLAUDE.md`, root `output/`, mobility `hs_err`/log files.
 
 ## 2026-11-14 - Claude - Sign-up guidance, Home rework and denser EV search released
 

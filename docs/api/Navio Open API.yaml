@@ -392,6 +392,11 @@ paths:
                   asOf: {type: string, format: date-time}
                   limitsEnforced: {type: boolean, description: 'When false, calls are neither counted nor stopped'}
                   placesDiscoveryEnabled: {type: boolean}
+                  limitsIgnoredSince:
+                    type: string
+                    format: date-time
+                    nullable: true
+                    description: When an administrator let this month's calls continue past their limits; null while calls stop at the limit
                   meters:
                     type: array
                     description: Every meter, including those with no calls yet
@@ -406,6 +411,31 @@ paths:
         '401': {$ref: '#/components/responses/Unauthorized'}
         '403': {$ref: '#/components/responses/Forbidden'}
         '503': {description: The counters could not be read. Never reported as zero.}
+  /v1/admin/ev/google-usage/limit-override:
+    put:
+      tags: [Geo Provider]
+      summary: Ignore or restore this billing month's Google limits
+      description: >-
+        Administrators and owners only; moderators get 403. With ignoreLimits true, Google calls keep working past
+        each meter's limit for the rest of the current Pacific billing month and are billed by Google; every call is
+        still counted. The override ends with the month, so limits return on their own. With ignoreLimits false,
+        calls stop at the limit again from the next call. Repeating either choice changes nothing.
+        Sent with Cache-Control no-store.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ignoreLimits]
+              properties:
+                ignoreLimits: {type: boolean}
+      responses:
+        '200': {description: 'The updated report, the same shape as GET /v1/admin/ev/google-usage'}
+        '400': {description: ignoreLimits is missing or not a boolean (ErrorResponse with validationErrors)}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/Forbidden'}
+        '503': {description: The choice could not be saved. Nothing changed.}
   /v1/admin/palette-colors:
     get:
       tags: [User Management Service]
