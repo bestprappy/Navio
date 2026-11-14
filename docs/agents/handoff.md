@@ -1,3 +1,40 @@
+## 2026-11-15 - Places cost reduction handoff to the user's friend
+
+## Current State Summary
+
+The user has assigned the Places cost-reduction work to their friend. The friend is the next owner; this agent completed the council review and documentation only. The recommendation is catalogue-first discovery with optional controlled Google lookup (Option B), delivered initially as catalogue-only exhibition coverage. The original proposal remains a proposal: council endorsement does not record implementation or release approval. No product code, catalogue data or provider switches were changed for this work. The detailed council findings immediately below remain applicable.
+
+## Important Context
+
+- The reported approximately THB3000 charge has no verified cause yet. Historical comments blaming photos are investigation leads, not billing evidence. Remove the proposal's unsupported savings percentages until actual measurements exist; maps, routing and EV costs remain separate.
+- Discovery is currently disabled. Mobility already supplies atomic monthly provider counters and refuses requests if accounting fails. Reuse those controls and define a separate discovery ceiling. The admin monthly ignore-limits override must have explicit precedence; it must not silently bypass the discovery kill switch or mandatory discovery safeguards. Shared provider quotas can still affect planning.
+- My List already supports `SAVED_LOCATION` using validated name/coordinates without Google details. Its current request accepts `GOOGLE|SAVED_LOCATION` and requires `providerPlaceId`; catalogue identity needs an explicit additive contract. Preserve existing Saved, My List, itinerary, Guide and Shared Plan identities/links; do not fabricate Google IDs or perform a broad historical migration.
+- Catalogue records and images need reusable sources, field-level provenance, attribution and freshness rules. Define permitted persistence and deletion/refresh behavior for Google lookup results copied into Saved, itinerary snapshots or caches. A Navio ID does not change content rights. Keep the deferred long-form Places editorial/research system disabled and out of this work.
+
+## Immediate Next Steps
+
+1. Obtain billing for the charged period by project, API/SKU and day, separating credits/adjustments; reconcile available request records and label attribution gaps. Include browser calls, scripts and credential restrictions in the accounting-coverage review.
+2. Agree exhibition destinations, useful visitor tasks, available licensed records/images and a content owner. Keep catalogue-only exhibition delivery separate from the later paid-lookup decision.
+3. Review the minimal backend contract for catalogue search/read and additive place identity, reusing existing database search and the no-provider planning path where suitable. Catalogue search must never silently fall back to Google.
+4. After implementation is authorized, prove one real record through find -> open -> save -> My List -> itinerary with zero Google Places requests, including background details/photos/autocomplete; then expand to agreed coverage and verify legacy compatibility.
+5. Gate later external lookup separately: explicit action, preferably signed-in initially, atomic admission before each provider request, per-user/global limits, bounded photos/retries/pagination, duplicate suppression, feature attribution and protected planner capacity. Test concurrency, exhausted limits, accounting failure and admin override behavior. Reconcile measured usage to billing before claiming savings.
+
+## Critical Files
+
+| File | Relevance |
+| --- | --- |
+| `client/app/feature/explore/places/places-config.ts` | Existing frontend discovery switch. |
+| `server/mobility-and-ev-service/src/main/resources/application.yml` | Discovery disabled and provider-budget configuration. |
+| `server/mobility-and-ev-service/src/main/java/com/navio/mobilityandevservice/provider/usage/GoogleFreeTierBudget.java` | Existing provider admission and accounting-failure behavior. |
+| `server/mobility-and-ev-service/src/main/java/com/navio/mobilityandevservice/provider/usage/JdbcProviderUsageStore.java` | Atomic counters and monthly override bypass. |
+| `server/mobility-and-ev-service/src/main/java/com/navio/mobilityandevservice/provider/google/GooglePlacesAdapter.java` | Shared masks, details, photos and provider operations. |
+| `server/trip-planning-service/src/main/java/com/navio/tripplanningservice/service/MyListPlaceService.java` | Existing no-provider saved-location branch. |
+| `server/trip-planning-service/src/main/java/com/navio/tripplanningservice/dto/AppendMyListPlaceRequest.java` | Current provider and place identity request contract. |
+
+## Decisions Made
+
+The user selected their friend to carry this work forward. The council recommends the smallest complete exhibition slice, reusing existing controls and retaining old references; paid lookup is a later gate. Billing attribution, final allowance amounts, supported coverage, catalogue ownership and schema/service ownership remain unresolved. Read `docs/agents/database-changes.md` before any entity/migration work and `docs/agents/release.md` before any root-main release. Preserve other contributors' uncommitted edits; session-note commits belong on root dev only. This handoff does not authorize a main push or deployment.
+
 ## 2026-11-15 - Codex - Places API cost proposal reviewed; implementation unapproved
 
 **Request/result:** `/llm-council` review completed: five advisors plus five fresh anonymous peer reviews, primary-agent chair synthesis. Council supports Option B in principle, with separate catalogue-only exhibition and later optional Google-lookup approval. All peer reviewers favored the narrow Executor approach. Remove unsupported savings percentages; define useful exhibition coverage/content owner; extend existing accounting instead of adding a competing subsystem. No implementation, paid provider calls, deployment or product/data changes authorized or made. Required notes committed on `docs/places-council-session-20261115`, merged locally to root `dev` only, no push.

@@ -1,3 +1,13 @@
+## 2026-11-15 - Codex - Places work handed to the user's friend
+
+**Goal:** Add the Places cost-reduction plan and council outcome to the handoff because the user's friend will carry the work forward.
+**Done:**
+- Added an explicit friend-owned handoff at the top of `docs/agents/handoff.md`, preserving the council review and previous histories. Captured scope/approval status, first billing investigation, bounded exhibition coverage, existing accounting and no-provider My List capabilities, critical source paths, additive identity, provider-data lifecycle, deferred-feature boundary and later external-lookup acceptance gates.
+- Documentation only, on `docs/places-friend-handoff-20261115` from root local dev, merged back locally to dev only. No push, main merge, deployment, provider call or product implementation performed. Upstream dev was fetched/pulled in the isolated prior notes branch; its unrelated report-moderation changes were not merged into the ordinary root checkout by this documentation update.
+**Verified:** Checked current root/client/server and changed service state; preserved all existing source edits, submodule positions, design files/output and runtime logs. Validated the new handoff section for completeness, secrets and referenced source paths; checked documentation diff and whitespace. Application tests unnecessary for documentation-only changes.
+**Not done / left uncommitted:** Product work belongs to the friend; the original proposal does not record implementation/release approval. Existing unrelated work remains uncommitted and untouched.
+**Follow-ups:** Friend starts with the charged-period project/API/SKU/day billing breakdown and request reconciliation, then bounds exhibition coverage and the minimal additive catalogue contract. Require zero-Places-call catalogue journeys and independently gated optional lookup. Prior release workflow confirmation remains separate.
+
 ## 2026-11-15 - Codex - Places cost proposal council review
 
 **Goal:** Review the user's Navio Places API Cost Reduction Proposal with `/llm-council`; no implementation approved.
