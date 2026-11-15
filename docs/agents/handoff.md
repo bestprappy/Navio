@@ -1,3 +1,18 @@
+## 2026-11-15 - Claude - Community flairs use palette colors; members can report posts (releasing)
+
+**Scope:** User: the admin flair editor's "Flair type" and "Tone" selects make no sense; a flair should be a label plus a color from the admin palette (which already holds the white/black text choice). Use /frontend-design and shadcn. Mid-task: members must be able to report posts, and moderators must be able to remove any post in their community. Then commit and deploy to main.
+
+**Done:**
+- community-service `V11__group_flair_colors.sql`: nullable `social.group_flairs.color_id VARCHAR(40)`, backfilled from tone (reliable->emerald, question->blue, unsourced->graphite, speculation->amber, itinerary->teal, food->coral, ev->lime). `FlairColors.resolve` mirrors it for rows an older image writes. `FlairRequest.flairType`/`tone` now optional (default post / reliable), new `colorId` validated as a palette id. `FlairResponse` adds `colorId` and keeps `tone` for old clients.
+- Client: flair editor (`groupname/_components/community-content-form.tsx` + new `community-flair-fields.tsx`) is label + one color button (shadcn Popover holding the planner `TripColorSwatches`), and each item's legend is a live preview badge. Only post flairs are edited; user flairs were never shown anywhere, and saving now drops any that exist. `CommunityFlairBadge` and the composer flair dialog draw `var(--palette-<id>)` / `--palette-<id>-fg`, so the admin text choice applies. Old server responses without `colorId` map tone -> color client-side. The save still sends `flairType: "post"` and `tone: "reliable"` so an older server accepts it.
+- Post menu (`community-post-editor.tsx`): "Report post" for signed-in non-authors via the existing `components/social/report-dialog.tsx` (reports go to the Navio admin report queue, not a per-community queue). Moderators already could delete any post in their community (service `requireAuthorOrModerator`, UI `canDelete`); they now see "Remove post" wording, and new `PostServiceTests` cover moderator-can / member-cannot.
+
+**Commits:** community `007ba11` (merge `a77f937`), server `1af357f` (merge `5a2a1ab`), client `04aec5f` (merge `6d360bb`), root pins on `chore/community-flair-colors-pins`. All on dev and main.
+
+**Verified:** community full `./mvnw -o test` green; `PostgresSchemaTests` + `GroupPostgresIntegrationTest` (8/8, incl. colorId and tone-only requests) against disposable PostGIS 16 on port 5433. Client tsc clean on a staged-only copy; ESLint clean on `app/feature/community`. Temporary preview route of the flair editor screenshotted dark/light with the popover open (route deleted). NOT verified signed in against a live community.
+
+**Next:** User checks the flair editor and Report post on the VM. Possible follow-ups: Report on comments, a per-community moderator report queue. Left alone: client `app/planner/new/page.tsx`, `CLAUDE.md`, `server/mobility-and-ev-service` untracked files, community `logs/`, root `output/`.
+
 ## 2026-11-15 - Claude - Auto Add is threshold-only; planner shows no reserve (LIVE)
 
 **Scope:** User: remove the optimization from the EV sidebar (Auto Plan already optimizes), remove Minimum Arrival Battery so Battery Threshold is the only Auto Add slider, revamp the Auto Add UI (/frontend-design + /anti-ai-ui-review), stop showing the reserve anywhere in the planner (the slider must not affect it), remove the Auto Add button under Route estimate, remove the red reserve line from Route estimate. Then merge to dev and deploy.
