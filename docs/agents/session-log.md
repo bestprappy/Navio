@@ -1,3 +1,15 @@
+## 2026-11-15 - Claude - Dashboard trip cards show the uploaded cover
+
+**Scope:** User reported that changing a trip cover updated the planner banner but not the dashboard card, and asked that cards with a cover not call the Places API.
+
+**Done (client `ca1ee43` on `fix/dday-guide-link-tab-alignment`, fast-forwarded into client dev and pushed; NOT on main, root client pin NOT advanced):** `dashboard/scenery.tsx` `TripScenery` takes `coverUrl` (from `tripCoverUrl(trip.id, trip.coverMediaId)`) and renders it first. `usePlaceDetails` moved into a `PlaceScenery` child that is only mounted when there is no cover (or the cover image fails), so a trip with a cover makes no Places request. Both `trip-summary-card.tsx` and `trip-hero-card.tsx` pass the cover. The trip list already returns `coverMediaId` (Trip main `getUserTrips`), and `useTripCover` already invalidates `["planner","trips"]`, so the card updates after an upload with no backend change.
+
+**Verified:** client `tsc --noEmit` and ESLint on `dashboard/` clean. NOT verified in a browser (dashboard needs sign-in and a trip with a cover).
+
+**Left alone:** another session's uncommitted client admin catalog edits, `app/planner/new/page.tsx`, `tsconfig.json`, `CLAUDE.md`; root `output/`, `docs/design/*`.
+
+**Next:** Release with the pending client work (a6642ef, e4d78cd, c3a6bbd, ca1ee43) only after user approval per docs/agents/release.md.
+
 ## 2026-11-15 - Claude - Photo cropper dialog rebuilt with shadcn Slider
 
 **Scope:** User asked to rework the "Position your trip cover" dialog with shadcn on the D-Day fix branch, then merge to dev. The dialog is the shared `components/profile/avatar-cropper.tsx`, so the profile banner and profile photo croppers change too.
