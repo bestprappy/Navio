@@ -7257,6 +7257,27 @@ components:
           type: boolean
           examples:
             - false
+        tipsHidden:
+          type: boolean
+          description: The person chose "Don't show me again"; first-time tips no longer open by themselves. Omit to leave unchanged.
+          examples:
+            - false
+        seenTips:
+          type: object
+          description: >-
+            First-time tip tours already shown to this account, tour id -> tour version. A PATCH merges per tour and keeps
+            the higher version; send only the tours that changed. At most 40 entries; keys match ^[a-z][a-z0-9-]{0,39}$,
+            versions 1..1000. Missing on profiles that never recorded a tip.
+          maxProperties: 40
+          propertyNames:
+            pattern: '^[a-z][a-z0-9-]{0,39}$'
+          additionalProperties:
+            type: integer
+            minimum: 1
+            maximum: 1000
+          examples:
+            - planner: 1
+              planner-auto-plan: 1
     UserProfile:
       type: object
       properties:
