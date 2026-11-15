@@ -1,0 +1,8 @@
+Web App : React 19, Next.js 16, TypeScript, Tailwind CSS v4, shadcn/ui, TanStack Query, Jotai, Zod, Auth.js
+Maps & UI : Mapbox GL, Google Maps, Tiptap, GSAP, Driver.js
+Backend : Java 25, Spring Boot 4, Spring Data JPA, Spring Security, Flyway, REST API
+Microservices : Spring Cloud Gateway, Eureka, Config Server, Apache Kafka
+Travel Data : Google Places API, Google Routes API, OpenTripPlanner, Frankfurter
+Database & Security : PostgreSQL + PostGIS, MinIO (S3), Keycloak, OAuth2 / JWT
+DevOps & Monitoring : Docker, Nginx, GitHub Actions, Prometheus, Grafana, Loki, Tempo
+Testing & Tools : JUnit 5, Mockito, Maven, ESLint, Git, GitHub, Claude Code, Codex
