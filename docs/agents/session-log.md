@@ -1,3 +1,11 @@
+## 2026-11-15 - Codex - Deferred-work audit
+
+**Request/result:** Audited supplied conversation, newest release history, current frontend/Trip main code and deferred documents. Saved detailed engineering register in docs/agents/deferred-work-audit-2026-11-15.md. Distinguishes explicit holds, incomplete acceptance/investigations, older unapproved roadmap and completed/superseded tasks. Private trip cover upload is live, but must not be confused with the held durable public Shared Plan cover override. Core ratings/comments/Guides/Saved/sample work is not pending. PLACES_EDITORIAL remains disabled and excluded from academic reports; this engineering register does not change report scope.
+
+**Read-only findings:** Live valid-format favorites lookup returned upstream404 at /v1/saved-content/favorites; deployed gateway route omits that public IAM path. Live Kyoto Spring search returned searchAssist.blocked=true and zero pools, consistent with Trip main seasonal-term block. No provider calls, views, account writes, application fixes or deployment. Existing generic api-client rejection remains unidentified. Catalogue live signed-in persistence QA remains unperformed after Computer Use URL safety halt.
+
+**Preservation:** Only owned engineering audit/session notes added on docs branch from remote dev; push to dev only, no main deployment. Existing ordinary-root notes/config/server dirty state untouched. User can choose next scope from the register; no held feature implicitly resumed.
+
 ## 2026-11-15 - Codex - Catalogue-only Places LIVE
 
 **Release:** Explicit user approval fulfilled. Root main1b31aa02d8bca69a286c0df0bf5a030f758568e2; client076b47c89774562d8b92233b3f07491e310a77f8. Workflow43685663127 succeeded in every revision/schema/build/deploy job: https://github.com/bestprappy/Navio/actions/runs/43685663127 . Existing live server6bec02b, IAMbe5a4bd, Trip492a3b4, Mobilitye19dd0d and Community753a7a2 preserved. All six pins matched origin/main. Newer already-live teammate comments/export changes merged into catalogue candidate and reverified; no unrelated new code included beyond current main baseline. Initial auto-review rejected push over mistaken unrelated-history concern; read-only ancestry/stat/remote proof established catalogue-only fast-forward beyond already-live main, guarded non-force retry approved.
