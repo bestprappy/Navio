@@ -1,3 +1,20 @@
+## 2026-11-15 - Claude - Auto Add deep debug: four real blockers fixed (dev only, NOT released)
+
+**Scope:** User: "Auto Add just doesn't work, NAVIO Estimate also doesn't have it, fix everything". User runs `npm run dev:vm` (local client against the production VM), so server fixes are invisible to them until released.
+
+**Root causes found and fixed (each reproduced by a failing test first):**
+1. No usable battery capacity on any live catalogue car (prior session's finding) -> client `canAutomaticallyPlan` false, mobility could not compute charge time. Fix: `energy-selection.withCalculationCapacity` falls back to the vehicle's declared `batteryCapacityKwh` in `snapshotTripVehicle`, `savedVehicleForPlanner` and `activeEvCarAtom` (old snapshots read the trip's `vehicles` descriptor). Trip `TripOptimizationEnergy.vehicle(trip)` does the same from `trip.tripVehicles`.
+2. NAVIO Estimate (RATED_RANGE) and legacy/catalogue consumption were preview-only/refused. Now any predictable model (consumption or rated range) plus a battery size may preview and apply. `applying` parameter removed.
+3. Mobility insertion search added every new station id to `visitedChargerIds`, which disabled dominance pruning -> "Optimizer search limit reached" on dense corridors needing 2 stops. Now only saved stops are tracked; a plan revisiting one new station is filtered from ranked results.
+4. Unknown car charging limit (null) dropped every charger. Now 7 kW AC / 50 kW DC (client `UNKNOWN_CAR_*_KW` and mobility `carLimitKw`); 0 still means unsupported.
+Also: server starting battery falls back to the trip vehicle's `settings.startingBatteryPct` (the planner already displayed that, but the server refused); preceding-day failure now names "Day N runs out ... Use Auto Add on Day N first"; "no Auto Add slot" copy on the day and in guidance; fixed the optimization-panel test stub broken by `auto-add-guidance` (80c60ce).
+
+**Commits (all merged to dev and pushed; NOT on main):** mobility `01ddeae` (merge `03fc5fd`), trip `b0ecab0` (merge `6244638`), server `f953b73`, client `fix/auto-add-reliability` (dev `2f4346b`), root dev `965e191`.
+
+**Verified:** mobility full 262/0 fail. Trip full 1058 run, 0 failures, 2 errors = the two full-context tests needing live Postgres (Docker down; config server started temporarily, then stopped). Client energy+garage node tests 88/94 with `node --test --experimental-transform-types`; the 6 failures are pre-existing module-resolution harness errors (`constants/types`, `vehicle-image-url` without extension) identical on a clean tree. tsc clean, ESLint clean on touched files. NOT verified end to end in a signed-in planner (no local backend/accounts; VM needs login).
+
+**Next:** Release needs the user's go-ahead (push root main deploys production): fast-forward main in mobility, trip, server, client, root per docs/agents/release.md. Then retest Auto Add on the VM with a catalogue car on NAVIO Estimate. Known limits: dedupe of a revisited new station is post-filter (a dominated duplicate-free plan could be pruned, rare); unknown-speed defaults are estimates. Left alone: client `app/planner/new/page.tsx`, `CLAUDE.md`, mobility logs, root `output/`. Note: a `git stash`/pop round trip in client normalized `tsconfig.json` (its prior "modified" state was line endings only; no content change).
+
 ## 2026-11-15 - Claude - Full release to production + Auto Add guidance fix (LIVE)
 
 **Scope:** User asked to deploy every pending change to main, then reported Auto Add could not be used.
