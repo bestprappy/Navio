@@ -1,3 +1,15 @@
+## 2026-11-15 - Codex - Daily reader views and Shared Plan navbar LIVE
+
+**Approved/released:** User explicitly approved client a6642ef for VM release. Client dev/main advanced to a6642ef9a67413df1dd34aaa9488b052ca7e22a9. Root release e393a0e7ebc3667b7c98da2fd1c8e9f10acd5c05 changes only client pin; existing teammate/audit documentation retained. Server pin6bec02b and all backend/service pins unchanged and verified equal origin/main. No migrations or application edits in release turn.
+
+**Deployment:** https://github.com/bestprappy/Navio/actions/runs/43693217039 completed SUCCESS: pin verification, real PostgreSQL schema verification, every image build and Deploy to Navio VM all succeeded. Fresh release run840/840 frontend tests passed on exact a6642ef; prior exact production build and local browser verification remain applicable. Brief HTTP502 observed during rollout; after rollout health200 and protected unauthenticated /v1/trips401 confirmed.
+
+**Live verification:**13 read-only checks passed: health200 plus both /explore/shared/[token] and /share/plans/[token] serve200 with Main navigation, fixed contained viewport, no app sidebar, daily-view description and HttpOnly navio_vid cookie. Artifact output/daily-reader-live-smoke.json, script output/daily-reader-live-smoke.py. No view POSTs or synthetic engagement, paid provider requests, production account writes or browser credentials used. Actual daily/reload/source/auth forwarding behavior was covered by implementation tests and isolated production-browser fixture; do not imply live signed-in accounting was mutated/tested.
+
+**Behavior:** Total Views now one browser/publication/UTC-day; Unique Visitors stays lifetime signed-in accounts; historical totals retained. Cookie reset or a different browser can count separately. Both Shared Plan reader entry points use top Navbar and existing contained document/map layout. Guide layout unchanged. Direct gateway receipt abuse remains a preexisting backend-hardening consideration, not addressed by this approved frontend/BFF revision.
+
+**Preserved/next:** Ordinary client remains dev a6642ef with original tsconfig hash1D992BD1B931C3E8265212BF7868BC5BCD9E96AA7CE899345EA36C963E6DEB9C. Root user notes/documents, server pointer/logs and unrelated files untouched. End notes branch from remote dev and dev-only push; no second root main push. Favorites gateway404, Kyoto seasonal search, held features and previous audit unchanged. No remaining deployment step for this revision.
+
 ## 2026-11-15 - Claude - Pulled and reviewed teammate daily reader views fix
 
 **Scope:** User asked to pull the teammate's pushed fixes from the handoff and check them. Review only; no application code changed, nothing released.
