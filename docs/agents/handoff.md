@@ -1,3 +1,22 @@
+## 2026-11-15 - Claude - Admin vehicle catalog redesign, vehicle photo upload, garage energy select
+
+**Scope:** User asked to (1) swap the native Energy Consumption `<select>` in garage vehicle settings for shadcn, (2) redesign `/admin/vehicles` with shadcn and more colour, (3) fix "Add vehicle cannot upload a photo from PC", and merge to dev.
+
+**Done (all merged to dev and pushed; NOT on main; root client/server pins NOT advanced):**
+- Client `a1dbee7` (`style/garage-energy-select`): `vehicle-settings-form.tsx` uses shadcn `Select` with `items` labels and a placeholder for legacy vehicles.
+- Client `3244235` (`feat/admin-catalog-redesign`): new `catalog/catalog-status(.ts|-filter.tsx)` (count strip that is also the status filter; four `size=1` count queries, dash on pending/error), `catalog-search.tsx` (one debounced field, Esc/clear), `catalog-vehicle-row.tsx` (thumbnail, labelled battery/range/charging, missing specs in warning colour, status badge, row menu Edit/Publish/Archive), `catalog-transition-dialog.tsx`, `catalog-vehicle-thumb.tsx`. `AdminPageHeader` gained an optional `actions` slot (Add vehicle). `listAdminCatalog` takes optional `size`.
+- user-management-service `8d5cfca`: `V17__vehicle_model_images.sql` (new table `iam.vehicle_model_images`, additive), `POST /v1/admin/vehicle-models/images` (admin, multipart, `PictureValidator` re-encode, returns `{id,imageUrl}`), public `GET /v1/vehicle-models/images/{imageId}` (immutable cache). `VehicleImagePaths` shared by catalog and garage image validation now also accepts `/api/vehicle-models/images/<uuid>`. Tests: controller auth/404/400/body, `VehicleModelImageServiceTests`.
+- Server `9dc3878`: gateway permits GET `/v1/vehicle-models/images/{imageId}`; `GroupPublicRoutesTest` covers it; ums pin advanced.
+- Client `4ed14d4`: `catalog-image-field.tsx` (button + drag-and-drop upload with progress, or paste HTTPS link), proxies allow `POST /api/admin/vehicle-models/images` and `GET /api/vehicle-models/images/<uuid>`, garage `vehicle-image-url.ts` shared by schema, `VehicleMedia` and catalog thumbnails.
+
+**Verified:** ums full `./mvnw -o test` 467 run, 0 failures (46 Postgres tests skipped: Docker not running, so `PostgresSchemaTests` for V17 NOT run locally; CI `verify-database-schema` will run it). Gateway `GroupPublicRoutesTest` passes. Client `tsc` clean for touched files (only a stale `.next/types` traveler-guides error) and ESLint clean. NOT verified in a browser: the admin pages need a signed-in admin and the backend.
+
+**Concurrency incident:** another session created `feat/day-charging-actions` in the main client checkout mid-commit; client commit `4ed14d4` landed on it. `feat/vehicle-image-upload` was re-pointed to `4ed14d4` and merged to dev; `feat/day-charging-actions` (local only) still contains `4ed14d4`, which is harmless since dev has it. Checkout was restored to that branch.
+
+**Left alone:** client `app/planner/new/page.tsx`, `tsconfig.json`, `CLAUDE.md`; server `mobility-and-ev-service`, `trip-planning-service`, `community-service` working changes; root `output/`, `docs/design/*`.
+
+**Next:** Run `PostgresSchemaTests` for user-management-service against disposable Postgres before release. Release needs all three repos (ums -> server -> client -> root pins) per docs/agents/release.md, only with user approval. Uploaded photos that are never saved to a vehicle stay in `iam.vehicle_model_images` (no cleanup job yet).
+
 ## 2026-11-15 - Claude - Dashboard trip cards show the uploaded cover
 
 **Scope:** User reported that changing a trip cover updated the planner banner but not the dashboard card, and asked that cards with a cover not call the Places API.
