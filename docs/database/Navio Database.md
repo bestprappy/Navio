@@ -321,6 +321,7 @@ erDiagram
 | `ev`     | `charger_suggestions`      | Missing charger submissions and suggested edits                                                                         |
 | `ev`     | `provider_request_logs`    | Provider API usage, errors, and quota observability                                                                     |
 | `ev`     | `provider_monthly_usage`   | Google Maps Platform requests per billing month; calls stop at the free-tier limit (V2, applied)                      |
+| `ev`     | `provider_limit_override`  | Billing months whose Google limits an administrator chose to ignore; calls still counted (V3)                          |
 | `ev`     | `outbox`                   | Transactional event outbox for EV events                                                                                |
 | `social` | `groups`                   | Community groups such as Thailand Restaurants or EV road-trip groups                                                    |
 | `social` | `group_profiles`           | Group banner, summary, and display metadata                                                                             |
@@ -1408,6 +1409,18 @@ Applied in mobility-and-ev-service `V2__provider_monthly_usage.sql`. Counts Goog
 | `updated_at`    | `TIMESTAMPTZ` |      Yes | Last counted request                                                        |
 
 Default monthly limits sit about 5% under each free cap: `PLACES_AUTOCOMPLETE` 9,500; `PLACE_DETAILS`, `PLACE_PHOTOS`, `PLACES_TEXT_SEARCH` and `PLACES_NEARBY_SEARCH` 950 each; `ROUTES` 4,750. Override with `navio.google.free-tier.monthly-limits.<METER>`; turn off with `navio.google.free-tier.enabled=false`.
+
+## 10.9 `ev.provider_limit_override`
+
+### Purpose
+
+Added in mobility-and-ev-service `V3__provider_limit_override.sql`. A row means an administrator chose, from Admin > Google usage, to let that billing month's Google calls continue past their limits (for example while free trial credit pays for them). The counter's single upsert checks for the row in the same statement, so calls are still counted and restoring the limits takes effect on the next call. Rows cover one month only, so limits return on their own at the reset. Written through `PUT /v1/admin/ev/google-usage/limit-override`.
+
+| Column        |          Type | Required | Description                                                    |
+| ------------- | ------------: | -------: | -------------------------------------------------------------- |
+| `usage_month` |        `DATE` |      Yes | Same month key as `provider_monthly_usage.usage_month`; PK     |
+| `granted_by`  |        `UUID` |       No | Administrator who chose it (from the gateway's `X-User-Id`)    |
+| `granted_at`  | `TIMESTAMPTZ` |      Yes | When it was chosen; repeating the choice keeps the first time  |
 
 ---
 

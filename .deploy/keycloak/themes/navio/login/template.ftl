@@ -155,6 +155,32 @@
   form markup inside <main> is unchanged so Keycloak's validation, password
   toggle and accessibility behaviour keep coming from the parent theme.
 -->
+<#--
+  Navio: field guidance for js/navio-forms.js (sign-up and password forms).
+  The wording lives in messages/messages_en.properties; attributes are
+  HTML-escaped by FreeMarker and read back through element.dataset.
+-->
+<div id="navio-field-hints" hidden
+  data-hint-email="${msg("navioHintEmail")}"
+  data-hint-first-name="${msg("navioHintFirstName")}"
+  data-hint-last-name="${msg("navioHintLastName")}"
+  data-hint-confirm="${msg("navioHintConfirm")}"
+  data-rules-title="${msg("navioRulesTitle")}"
+  data-rule-length="${msg("navioRuleLength")}"
+  data-rule-lower="${msg("navioRuleLower")}"
+  data-rule-number="${msg("navioRuleNumber")}"
+  data-rule-upper-or-symbol="${msg("navioRuleUpperOrSymbol")}"
+  data-rule-not-email="${msg("navioRuleNotEmail")}"
+  data-rule-met="${msg("navioRuleMet")}"
+  data-rule-unmet="${msg("navioRuleUnmet")}"
+  data-rules-progress="${msg("navioRulesProgress")}"
+  data-confirm-match="${msg("navioConfirmMatch")}"
+  data-confirm-mismatch="${msg("navioConfirmMismatch")}"
+  data-error-required="${msg("navioErrorRequired")}"
+  data-error-email="${msg("navioErrorEmail")}"
+  data-error-password="${msg("navioErrorPassword")}"
+  data-error-confirm="${msg("navioErrorConfirm")}"
+></div>
 <div class="${properties.kcLogin!} navio-auth">
   <#-- Decorative only: flowing lines with light pulses over a slow aurora glow. -->
   <div class="navio-art" aria-hidden="true">

@@ -18,10 +18,14 @@ while IFS= read -r -d '' theme_file; do
 done < <(cd "${THEME_SOURCE}" && find login -type f -print0)
 
 # Keycloak and browsers cache resource URLs. A new file name avoids reusing a
-# previous release's compressed CSS or the browser's month-long cached copy.
+# previous release's compressed CSS/JS or the browser's month-long cached copy.
 install -m 0644 "${THEME_SOURCE}/login/resources/css/navio.css" \
   "${THEME_TARGET}/login/resources/css/navio-${THEME_REVISION}.css"
-sed -i "s|^styles=.*|styles=css/styles.css css/navio-${THEME_REVISION}.css|" \
+install -m 0644 "${THEME_SOURCE}/login/resources/js/navio-forms.js" \
+  "${THEME_TARGET}/login/resources/js/navio-forms-${THEME_REVISION}.js"
+sed -i \
+  -e "s|^styles=.*|styles=css/styles.css css/navio-${THEME_REVISION}.css|" \
+  -e "s|^scripts=.*|scripts=js/navio-forms-${THEME_REVISION}.js|" \
   "${THEME_TARGET}/login/theme.properties"
 
 printf '%s\n' "${THEME_REVISION}"

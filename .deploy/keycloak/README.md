@@ -119,6 +119,19 @@ compressed CSS from `data/tmp/kc-gzip-cache`, and resource responses allow
 browsers to cache the same URL for 30 days. The login smoke check therefore
 verifies both the wording and the SHA-256 of the compressed stylesheet response.
 
+`themes/navio/login/resources/js/navio-forms.js` adds guidance to the sign-up
+and password forms only. Every field gets a hint before anyone types, and the
+password field shows a live checklist of the rules above. A field Keycloak
+rejected loses its red state as soon as its value is valid (Keycloak itself
+never clears `aria-invalid`/`pf-m-error`). The script also checks the form before
+it is sent, because a rejected registration empties both password fields. The
+checklist hard-codes the policy, so **change `deploy.sh`, `navio-realm.json` and
+`navio-forms.js` together**; `node --test .deploy/keycloak/tests/navio-forms.test.mjs`
+fails when the script and `deploy.sh` disagree. Its wording is in
+`messages_en.properties` and reaches the script through the hidden
+`#navio-field-hints` element in `template.ftl`. The installer gives the script a
+revisioned file name, as it does the stylesheet.
+
 The Next.js `/sign-in` and `/sign-up` pages send visitors straight to this
 theme, so it is the only login screen people see.
 

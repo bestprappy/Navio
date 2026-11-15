@@ -531,6 +531,8 @@ readonly KEYCLOAK_REGISTRATION_HTML="$(curl --fail --silent --show-error \
 if [[ "${KEYCLOAK_REGISTRATION_HTML}" != *'name="email"'* ]] \
   || [[ "${KEYCLOAK_REGISTRATION_HTML}" != *'kc-register-form'* ]] \
   || [[ "${KEYCLOAK_REGISTRATION_HTML}" != *"navio-${KEYCLOAK_THEME_REVISION}.css"* ]] \
+  || [[ "${KEYCLOAK_REGISTRATION_HTML}" != *"navio-forms-${KEYCLOAK_THEME_REVISION}.js"* ]] \
+  || [[ "${KEYCLOAK_REGISTRATION_HTML}" != *'id="navio-field-hints"'* ]] \
   || [[ "${KEYCLOAK_REGISTRATION_HTML}" != *'Create your Navio account'* ]]; then
   echo "Expected the themed Keycloak email registration form." >&2
   exit 1
