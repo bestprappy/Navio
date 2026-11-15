@@ -1,3 +1,15 @@
+## 2026-11-16 - Claude - Released Places Release 2 (switched off) + real-world EV planning (LIVE)
+
+**Scope:** User: "merge everything to main and deploy", then confirmed the release includes the EV changes. Everything on dev at the time shipped: Places Release 2 (this agent) and the Codex real-world EV planning work (Mobility `bcc0ac8`, Trip `4e6840b`, client `333f94f`, root docs `7cf84eb`). No migrations or entity changes in either.
+
+**Released (fast-forward dev -> main, child first):** Mobility `fba96c4`, Trip `f6b054a`, server `a193130`, client `116e5dc`, root `50811fb`. IAM `a0cb118` and Community `8b46397` unchanged. Run 43763256389 SUCCESS (revision check, Postgres schema check, all image builds, VM deploy).
+
+**Pre-release checks on the exact commits:** Mobility full suite 289, 0 failures (7 skipped). Trip 1,214 run, 0 failures; 2 errors are full-application context tests needing Postgres on 5432 (same 1,212-test scope the Codex session reported; CI's Postgres schema check then passed). Trip WebMvc tests need a local configuration server on 8888 (`server/configuration-server`, `./mvnw -o spring-boot:run`); without it 87 context tests error. Client tsc + ESLint on 32 changed files clean; full suite 825/831, the 6 failures are the known baseline (fail identically on clean dev); production build passes. Running Maven and the client suite at the same time ran this machine out of memory (JVM malloc failure, spurious planner test failures): run them one at a time.
+
+**Production smoke (read-only, no provider call, no account write):** `/health` 200; `/v1/trips` 401; `/v1/geo/place-searches` 401 at the gateway and `/api/geo/place-searches` 401 at the BFF for anonymous callers; catalogue explore 200 with `NAVIO:` items; legacy discovery 410; Explore shows the flag-off copy and the corrected footer.
+
+**State:** Places Release 2 is LIVE but switched off on both sides (`NAVIO_PLACES_PROVIDER_SEARCH_ENABLED` unset, client built without `NEXT_PUBLIC_PLACES_PROVIDER_SEARCH`). Enabling still needs the owner's spend ceiling and Google Cloud Text Search quotas, then the steps in `places-release-2-handoff.md` (client rebuild required for the flag). EV real-world estimates are live for everyone. Not verified: signed-in EV planner and Saved/Add to Plan flows against a real production account.
+
 ## 2026-11-16 - Codex - Merge real-world EV planning changes to dev
 
 **Goal:** Commit and merge the completed EV range policy, planner UI, tests and research into dev only.
