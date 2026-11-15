@@ -1,3 +1,23 @@
+## 2026-11-15 - Claude - Auto plan tip fixed; tips open once per account with "Don't show me again" (dev only, NOT released)
+
+**Scope:** User (screenshot): the Auto plan tip is broken; tips show every time they log in, so make them show once per account; add a "Don't show me again" button. Merge to dev only; the user checks first.
+
+**Root cause (Auto plan tip):** step 2 (`opens: planner.day-options`) pressed the FIRST visible day-options trigger. With a filled day, that header sat ~1300 px above the viewport, Base UI positioned the menu next to it off screen, and Driver.js drew the tip over nothing (reproduced: target top -1291). The existing browser check used an empty planner, so it never caught it.
+
+**Done:**
+- Client `components/tour`: `findVisibleTourTargetNear(target, anchor)` picks the trigger containing or nearest above the last non-menu control the tour showed (same day); `revealTourElement` scrolls an off-screen trigger to center before opening. Controller `syncMenu` is async and uses both. Auto plan copy no longer claims sectioned days are excluded (they are supported since `820f36e`).
+- Once per account: an automatic tour is recorded as seen the moment it starts (leaving mid-tour no longer brings it back) in localStorage AND on the account via `PATCH /api/users/me/preferences {seenTips:{id:version}}`. `useTour` reads the profile query (same key as navbar/settings), merges account `seenTips` into local records (`mergeAccountTourRecords`, seen-elsewhere reads as dismissed, no tick), and `PageTour` waits for the profile before auto-starting (a failed load falls back to local).
+- "Don't show me again": a quiet row under the step buttons, automatic tours only (`StartTourOptions.onHide`). Sets local `navio:tours:v1:<user>:hidden` + account `tipsHidden: true`, ends the tour as dismissed, toast says Show tips still has every tour. `canAutoStartTour` takes `hidden`.
+- user-management-service: `UserPreferences` adds `tipsHidden` and `seenTips` (`Map<@Pattern id, @Min(1) @Max(1000) Integer>`, `@Size(max=40)`); `mergedOnto` merges seenTips per tour keeping the higher version, capped at 40. 4-arg constructor kept. JSONB, no migration. OpenAPI documents both fields.
+
+**Commits:** user-management `a882379` (merge `a0cb118`), server pin `2689c50` (merge `bf77610`), client `78eba04` (merge `a057c00`), root pins on `chore/tour-tips-pins`, this log on `docs/tour-tips-once-per-account`. All on dev; NOT on main.
+
+**Verified:** user-management full `./mvnw -o test` 480 run, 0 failures (46 Postgres skipped). Client tsc + ESLint clean (also on the merged tree); tour unit tests 27/27; `tests/tour/tour-browser-check.mjs` 16/16 (one case renamed: leaving mid-tour now records dismissed). Scratch Playwright repro (filled 2-day planner, mocked APIs) at 1440 dark and 390 light: Auto plan step highlights the action inside the open menu, Back reopens it; fresh account auto-starts, opt-out sends `{seenTips}` then `{tipsHidden}` and ends; with account `tipsHidden` or `seenTips.planner` and empty localStorage nothing auto-starts; a 400/ignored PATCH still keeps the browser copy. No Postgres check needed (no schema/entity change).
+
+**Findings / risks:** (1) Spring's Jackson 3 web binding silently IGNORES unknown preference keys despite `@JsonIgnoreProperties(ignoreUnknown = false)` (only the plain ObjectMapper in the DTO test rejects them) - pre-existing; it is also why the current production server returns 200 and drops the new fields, so the dev client degrades to per-browser on the VM. (2) Rollback: an older image reading a row that has `tipsHidden`/`seenTips` fails `convertValue` and returns default preferences for that user (language/distance/notification flags) until re-saved. Only accounts that used tips after release are affected.
+
+**Next:** User checks on the VM via `dev:vm`: the Auto plan tip and the opt-out work now; per-account (cross-browser) memory needs the user-management release. Release only with approval (release.md; service + client together is fine either order). Possible follow-up: a Settings toggle to turn tips back on (today only Show tips replays). Worktrees in `Navio-worktrees/tour-tips/{client,server,user-management-service,root}` are safe to remove. Left alone: client `app/planner/new/page.tsx`, `CLAUDE.md`, root `output/`, other sessions' worktrees.
+
 ## 2026-11-15 - Codex - Auto plan supports multiple day sections; purple New section (dev)
 
 **Scope:** User reported Auto plan breaking with several sections in one day and asked for a purple section-add control. Continue the existing dev-only merge scope.
