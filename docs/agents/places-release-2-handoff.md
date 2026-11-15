@@ -2,7 +2,11 @@
 
 Prepared 2026-11-16 for the next maintainer and their coding agent. This document is self-contained; do not assume access to the conversation that produced Release 1.
 
-## Status 2026-11-16: implemented on dev, switched off, NOT released
+## Status 2026-11-16: RELEASED switched off (root `50811fb`, run 43763256389)
+
+Shipped to production with both switches off; behaviour is Release 1 plus the corrected footer and Saved links until the owner enables it (see "To enable" below).
+
+### Implementation record
 
 The owner chose **option 1 (catalogue + explicit search)** and **"ship disabled for now"**: build and test everything, keep the paid path off until a spend ceiling and Google Cloud daily quotas exist. Everything below is on `dev` only; root `main` was not touched.
 
