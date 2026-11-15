@@ -6,7 +6,8 @@
 **Verified:** RED/GREEN reproduced initial blanket rejection, negated-description false positives and blocked completion edge. Final exact integrated commit full Maven suite on disposable PostgreSQL16/PostGIS:1212 tests,0 failures,0 errors,5 skips. Includes153 seasonal checks (144 country/duration/sort combinations), existing320-case search/filter audit,60-query judged holdout and real JSONB seasonal retrieval/filter regression. Search tests construct no paid provider clients; live diagnosis uses only database-backed search. Diff checks clean and focused review has no remaining findings. Artifacts:output/seasonal-search-diagnosis.json, season-search-{red,negation-red,completion-red,evidence-green,integrated-final}.txt. First full-suite attempt had scratch configuration-server setup errors, corrected without changing app configuration; final complete run passed.
 **Preserved/not done:** Ordinary root Nov09 notes/untracked documents, service logs and client tsconfig untouched (SHA2561D992BD1B931C3E8265212BF7868BC5BCD9E96AA7CE899345EA36C963E6DEB9C). Guides/Places algorithms and seasonal landing filters unchanged. No live post-deploy acceptance claimed; no deployment done. Temporary test container/config server stopped after verification. Existing local services remain running.
 **Follow-up:** Request separate approval to release Trip868c374 through child-first dev/main and server/root pins; verify current remote revisions again before integration because teammate work is active. After deployment repeat seasonal live cases, country/duration controls and completion checks. Do not redo already-live Favorites routing fix. Broader held/deferred scope remains unchanged.
-## 2026-11-15 - Claude - Auto Add Battery Threshold is a trigger, not a floor at chargers (dev, release pending approval)
+
+## 2026-11-15 - Claude - Auto Add Battery Threshold is a trigger, not a floor at chargers (LIVE)
 
 **Scope:** After the LIVE release (root `322cd8e`) the user showed Day with start 80%, threshold 87%, minimum arrival 10%, many chargers, and "No workable charging plan found".
 
@@ -18,7 +19,9 @@
 
 **Verified:** mobility full 265/0 (2 of 3 new tests fail on the old rule, the third is a floor guard). Client tests 94/97; the 3 failures are pre-existing harness module-resolution errors (`day-route-optimization`, `garage/api`, `catalogue-flow`). tsc and ESLint clean.
 
-**Next:** Release on user approval (fast-forward mobility, server, client, root main), then user retests the 80%/87% day.
+**Released (user approved):** mobility `f640c08`, server `dc5ca6e`, client `f83b712`, root `4c00ffa`; run 43711676980 SUCCESS. /health 200, anonymous /v1/trips 401.
+
+**Next:** User retests the 80% start / 92% threshold day. Note: with a 92% threshold every itinerary stop needs a charger within about 8% of rated range (~38 km for ATTO 3) before it; rural stops may still have no qualifying charger.
 
 ## 2026-11-15 - Claude - Auto Add deep debug: four real blockers fixed (LIVE)
 
