@@ -1,3 +1,6 @@
+## 2026-11-15 seasonal search status update
+
+Season-word Plans search is now repaired and verified in local Trip868c374, pending separate VM release approval. This supersedes older diagnosis-only entries below. All1212 integrated backend tests pass (5 skipped), including153 seasonal checks,320-case filter audit and PostgreSQL seasonal retrieval. The blanket block is replaced with affirmative publication evidence; no climate/date inference or paid provider calls. Seasonal landing collection filters are unchanged. Favorites routing is already live; do not redo it.
 # Deferred work and follow-up audit ? 2026-11-15
 
 Engineering backlog requested by the user. Cross-checked supplied conversation, current client source, Trip origin/main, latest release handoff and historical plans. This is not an academic feature report. Older implementation-pending notes are superseded by later releases. No application fix is authorized or performed by this audit.
