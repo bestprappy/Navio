@@ -1,4 +1,4 @@
-## 2026-11-15 - Claude - Auto Add deep debug: four real blockers fixed (dev only, NOT released)
+## 2026-11-15 - Claude - Auto Add deep debug: four real blockers fixed (LIVE)
 
 **Scope:** User: "Auto Add just doesn't work, NAVIO Estimate also doesn't have it, fix everything". User runs `npm run dev:vm` (local client against the production VM), so server fixes are invisible to them until released.
 
@@ -13,7 +13,9 @@ Also: server starting battery falls back to the trip vehicle's `settings.startin
 
 **Verified:** mobility full 262/0 fail. Trip full 1058 run, 0 failures, 2 errors = the two full-context tests needing live Postgres (Docker down; config server started temporarily, then stopped). Client energy+garage node tests 88/94 with `node --test --experimental-transform-types`; the 6 failures are pre-existing module-resolution harness errors (`constants/types`, `vehicle-image-url` without extension) identical on a clean tree. tsc clean, ESLint clean on touched files. NOT verified end to end in a signed-in planner (no local backend/accounts; VM needs login).
 
-**Next:** Release needs the user's go-ahead (push root main deploys production): fast-forward main in mobility, trip, server, client, root per docs/agents/release.md. Then retest Auto Add on the VM with a catalogue car on NAVIO Estimate. Known limits: dedupe of a revisited new station is post-filter (a dominated duplicate-free plan could be pruned, rare); unknown-speed defaults are estimates. Left alone: client `app/planner/new/page.tsx`, `CLAUDE.md`, mobility logs, root `output/`. Note: a `git stash`/pop round trip in client normalized `tsconfig.json` (its prior "modified" state was line endings only; no content change).
+**Released (user approved):** fast-forwarded main in mobility `03fc5fd`, trip `6244638`, server `f953b73`, client `2f4346b`, root `322cd8e`; run 43709388067 SUCCESS (all stages). Post-deploy /health 200, anonymous /v1/trips 401.
+
+**Next:** User to retest Auto Add on the VM with a catalogue car on NAVIO Estimate, including a long day needing two stops. Known limits: dedupe of a revisited new station is post-filter (a dominated duplicate-free plan could be pruned, rare); unknown-speed defaults are estimates. Left alone: client `app/planner/new/page.tsx`, `CLAUDE.md`, mobility logs, root `output/`. Note: a `git stash`/pop round trip in client normalized `tsconfig.json` (its prior "modified" state was line endings only; no content change).
 
 ## 2026-11-15 - Claude - Full release to production + Auto Add guidance fix (LIVE)
 
