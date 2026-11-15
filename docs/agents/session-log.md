@@ -1,3 +1,19 @@
+## 2026-11-15 - Claude - Photo cropper dialog rebuilt with shadcn Slider
+
+**Scope:** User asked to rework the "Position your trip cover" dialog with shadcn on the D-Day fix branch, then merge to dev. The dialog is the shared `components/profile/avatar-cropper.tsx`, so the profile banner and profile photo croppers change too.
+
+**Done (client `c3a6bbd` on `fix/dday-guide-link-tab-alignment`, fast-forwarded into client dev and pushed; NOT on main, root client pin NOT advanced):**
+- New `components/ui/slider.tsx` (shadcn base-nova style on `@base-ui/react/slider`, with `getAriaLabel`/`getAriaValueText` passed to the thumbs). Replaces the unstyled native `<input type=range>`, which rendered as a grey bar with a tiny thumb.
+- New `components/profile/crop-zoom-controls.tsx`: zoom out / slider / zoom in, percent readout, Reset (icon-only below `sm`).
+- Cropper: photo sits in a recessed `bg-well` tray; thirds guides show only while the photo is moving (pointer drag or held arrow key); a "Drag to reposition" chip shows until the first move; uploads use shadcn `Progress`; the error is an inline alert with an icon. Crop maths, keyboard steps, props and save flow are unchanged.
+- Trip cover description shortened to "Drag the photo or use the arrow keys to choose what fills the banner."
+
+**Verified:** client `tsc --noEmit` and scoped ESLint clean. Temporary preview route on `next dev --webpack` (Turbopack rejects the junctioned node_modules in a worktree), screenshots via playwright-core with the bundled Chromium at 1280 dark (banner and circle) and 390 light. Slider keyboard (PageUp) zooms to 400%, guides appear while moving, no page errors from the change (the dev overlay's palette 502 comes from having no backend). Preview route, copied env files and `.next` removed before commit. NOT verified: a real upload against the backend.
+
+**Left alone:** client `app/planner/new/page.tsx`, `tsconfig.json`, `CLAUDE.md`; root `output/`, `docs/design/*`, ordinary root checkout. Worktrees `Navio-worktrees/dday-cover/client` and `Navio-worktrees/docs-cropper` can be removed.
+
+**Next:** Release with the pending client work (a6642ef + e4d78cd + c3a6bbd) only after user approval per docs/agents/release.md: client dev -> main, then advance root client pin child-first.
+
 ## 2026-11-15 - Claude - EV catalogue expansion sheet (no code/data change)
 
 **Scope:** User wants more garage cars covering every connector type before D-Day, entered by an admin through /admin/vehicles on production (no migration, no deploy). Live public catalogue has 3 BYD cars; connectors covered TYPE2, CCS2 and CHADEMO (live BYD SEAL lists CHADEMO, which the Thai SEAL does not have; flagged to user). Missing CCS1, J1772, NACS, GB_T.
