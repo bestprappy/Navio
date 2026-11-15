@@ -1,4 +1,4 @@
-## 2026-11-15 - Claude - Community flairs use palette colors; members can report posts (releasing)
+## 2026-11-15 - Claude - Community flairs use palette colors; members can report posts (LIVE)
 
 **Scope:** User: the admin flair editor's "Flair type" and "Tone" selects make no sense; a flair should be a label plus a color from the admin palette (which already holds the white/black text choice). Use /frontend-design and shadcn. Mid-task: members must be able to report posts, and moderators must be able to remove any post in their community. Then commit and deploy to main.
 
@@ -8,6 +8,8 @@
 - Post menu (`community-post-editor.tsx`): "Report post" for signed-in non-authors via the existing `components/social/report-dialog.tsx` (reports go to the Navio admin report queue, not a per-community queue). Moderators already could delete any post in their community (service `requireAuthorOrModerator`, UI `canDelete`); they now see "Remove post" wording, and new `PostServiceTests` cover moderator-can / member-cannot.
 
 **Commits:** community `007ba11` (merge `a77f937`), server `1af357f` (merge `5a2a1ab`), client `04aec5f` (merge `6d360bb`), root pins on `chore/community-flair-colors-pins`. All on dev and main.
+
+**Released (user approved):** root `f6dbfef`; run 43719598854 SUCCESS. /health 200, anonymous /v1/trips 401.
 
 **Verified:** community full `./mvnw -o test` green; `PostgresSchemaTests` + `GroupPostgresIntegrationTest` (8/8, incl. colorId and tone-only requests) against disposable PostGIS 16 on port 5433. Client tsc clean on a staged-only copy; ESLint clean on `app/feature/community`. Temporary preview route of the flair editor screenshotted dark/light with the popover open (route deleted). NOT verified signed in against a live community.
 
