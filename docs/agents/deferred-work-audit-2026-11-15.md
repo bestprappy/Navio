@@ -63,3 +63,9 @@ Completed/superseded: daily browser/UTC-day Total Views and lifetime signed-in U
 - Browser-extension hydration warning was explicitly set aside by user, not a required repair. Help links were deliberately removed in later Home work because no Help route existed; do not revive automatically. Desert Escapes was explicitly cut, not postponed. AI assistant from rejected poster was not an approved product feature.
 
 Suggested priority for next discussion: live catalogue round-trip QA and favorites gateway; billing/limits; focused seasonal search repair; then the requested Auto Add redesign. Held features remain held until user chooses them.
+
+##2026-11-15 follow-up: Favorites fix ready; seasonal diagnosis only
+
+Favorites root cause is now established: the actual production-mounted root .deploy/config/api-gateway.yml lacked the exact public aggregate path, unlike the server source's development configuration. Root dev514ea15 adds that one route and read-only deployment response verification;7 smoke regressions, YAML and shell syntax checks pass. Main/VM unchanged pending release approval. Do not list the repair as live until that release succeeds.
+
+Seasonal query diagnosis:14 read-only cases,8 season-word queries rejected by SearchIntentParser;6 controls not blocked. Kyoto control returns the existing Spring/Autumn publications, demonstrating rejection before matching rather than missing records. No seasonal implementation changes authorized or made; proposed targeted handling needs user review. Full evidence in output/seasonal-search-diagnosis.json and latest handoff.
