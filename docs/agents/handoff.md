@@ -25,7 +25,7 @@
 
 **Next:** User tests on a local client (needs the local community-service from dev, since the VM still runs the single-picture service; against the VM the composer sends several parts and the old service rejects them). Do a visual pass of the composer strip and the carousel at 390 px and desktop, dark and light. Release only with user approval (release.md order; V13 + nginx 24m ship together). Worktrees used: scratchpad `wt-community`, `wt-client`, `wt-server`, `wt-root` (safe to remove). Left alone: client `app/planner/new/page.tsx`, `CLAUDE.md`, community `logs/`, root `output/`.
 
-## 2026-11-15 - Claude - Flairs take any color from a color wheel (releasing)
+## 2026-11-15 - Claude - Flairs take any color from a color wheel (LIVE)
 
 **Scope:** User rejected the palette-based flair colors released earlier today: flairs must use the admin color-wheel picker so any color is possible, separate from the planner palette, with a white/black text option per flair. /frontend-design + shadcn.
 
@@ -35,9 +35,11 @@
 
 **Commits:** community `593cfd2` (merge `55c4786`), server pin on `chore/community-flair-hex-colors-pin`, client `ffb7ea3` (merge `a8d56d9`), root pins on `chore/community-flair-hex-colors-pins`. All on dev and main. Release (user approved) also ships client `5888d60` "fix(planner): remove Optimize Route from itinerary days" from a concurrent session, which landed on client dev mid-release; the user approved shipping it, and committed tree `e68456e` type-checks clean.
 
+**Released:** root `4f6104e`; run 43725324783 SUCCESS. /health 200, anonymous /v1/trips 401.
+
 **Verified:** community full `./mvnw -o test` green; `PostgresSchemaTests` + `GroupPostgresIntegrationTest` 8/8 on disposable PostGIS 16 (port 5433). Client tsc clean on a staged-only copy; ESLint clean on `app/feature/community`. Temporary preview route screenshotted at 640 dark (popover open) and 390 light: no horizontal overflow, no page errors (route deleted). NOT verified signed in.
 
-**Next:** Release to main when the user approves (release.md order: community -> server pin -> client -> root pins; root `main` is checked out in worktree `navio-transit-wt`, so fast-forward with `git push origin dev:main` after confirming ancestry). Left alone: client `app/planner/new/page.tsx`, `CLAUDE.md`, `server/mobility-and-ev-service` untracked files, community `logs/`, root `output/`.
+**Next:** User checks the color-wheel flair editor on the VM. Root `main` is checked out in worktree `navio-transit-wt`; releases fast-forward it with `git push origin dev:main` after confirming ancestry. Left alone: client `app/planner/new/page.tsx`, `CLAUDE.md`, `server/mobility-and-ev-service` untracked files, community `logs/`, root `output/`.
 
 ## 2026-11-15 - Claude - Community flairs use palette colors; members can report posts (LIVE)
 
