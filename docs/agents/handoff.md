@@ -1,3 +1,11 @@
+## 2026-11-16 - Codex - Real-world EV planning feature merged to dev
+
+**Merged/pushed:** client 116e5dc; trip f6b054a; mobility fba96c4; server a193130; rootPins b9d4de2. Feature commits: client `333f94f`, Trip `4e6840b`, Mobility `bcc0ac8`; research/API documentation `7cf84eb`. This session's documentation is on `docs/real-world-energy-20261116` and integrated into root dev only. No main merge/push or deployment by this session.
+
+**Scope/checks:** Canonical energy v2, 20% factory-based range allowance, unchanged original range/capacity, observed averages without a second reduction, Garage comparison/disclosure, corrected energy/range totals and Auto Add compatibility guards. Four supporting PDFs and policy/API notes are committed under `docs/research/ev-real-world-range/`. Integrated frontend 134/134 plus TSC; Mobility 289 total with zero failures/errors and seven skips. Trip previously verified at 1,212 total with 47 DB skips; its baseline was unchanged. PostgreSQL/startup checks remain unrun. Newer provider-search and day-number fixes retained.
+
+**Preserved/next:** Root README/.gitignore and pre-existing pending note entries, client new-trip page/CLAUDE.md, original Community/User Management checkouts, service logs and ignored videos remain untouched/uncommitted as applicable. Only this fresh block is committed from each shared session document. Scoped backup stashes and original notes remain in `output/real-world-energy-merge/merge-manifest.json`. User authorized this dev merge after the historical-file warning; no forbidden files were newly staged or edited. Matching client/Trip/Mobility release requires a separate production action and release verification.
+
 ## 2026-11-16 - Claude - Places Release 2 implemented: explicit Google Maps search, switched off (dev only, NOT released)
 
 **Scope:** User (friend taking over) pasted `places-release-2-handoff.md`: verify it, implement Release 2, /frontend-design + shadcn for client work, merge to dev. Owner decisions asked and answered in-session: **option 1 (catalogue + explicit search)** and **"ship disabled for now"** (no spend ceiling yet).
