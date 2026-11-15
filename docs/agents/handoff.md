@@ -1,3 +1,11 @@
+## 2026-11-15 - Claude - D-Day readiness check (read-only)
+
+**Scope:** User asked what must be done before D-Day (2026-11-16). Read-only review of handoff, deferred-work audit, git state and live site. No code, config, data or deployment changes.
+
+**Findings:** Live site up (web 200, /explore 200, anonymous /v1/trips 401). navio.sit.kmutt.ac.th resolves to private 10.4.56.58 and serves a self-signed certificate (CN=navio.sit.kmutt.ac.th, valid to 2036): poster QR visitors off campus network cannot reach it, and on campus will see a browser certificate warning. Open items from the audit still apply: Kyoto Spring and other season-word Plans searches return zero (blocked=true) although D-Day samples have season titles; signed-in catalogue Save/My List/publish/copy journey never live-verified; Google billing caps unconfirmed. Local client has a stray whitespace-only edit in app/planner/new/page.tsx (not from this session, left untouched). Local root dev is behind origin/dev.
+
+**Next:** User decides: rehearse demo path with a real account, avoid season words in live search (or approve a fix), set Google Cloud quota/budget caps, prepare a cert/network fallback (laptop demo, pre-accepted cert, campus Wi-Fi), freeze main deploys until after D-Day.
+
 ## 2026-11-15 - Codex - Current Favorites production routing LIVE
 
 **Approved/released:** User approved Favorites repair release. Root main advanced from e393a0e to34b4973c612f3a61cf74da2e03872d4f358cf9b0, including fix514ea15. Exact /v1/saved-content/favorites path added to existing production IAM route; read-only deployment smoke validates aggregate shape independently of listed-plan availability. No frontend/service pins, schema, counting logic or seasonal-search code changed. Client a6642ef/server6bec02b and four service pins verified equal remote main before push.
