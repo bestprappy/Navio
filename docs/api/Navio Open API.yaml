@@ -5159,6 +5159,72 @@ paths:
                   placeIds:
                   - place_01HX
                   - place_02HX
+  /v1/geo/place-searches:
+    get:
+      tags:
+      - Geo Provider
+      summary: Search Google Maps beyond Navio's catalogue
+      description: >-
+        Places Release 2. Explicit, user-started Google Places text search for Explore's
+        "Search beyond Navio's catalogue". Signed-in users only (outside /v1/geo/places/** so the
+        guest-readable place rules never cover it). One Text Search request per call with Pro-tier
+        fields only: no photos, ratings, hours, details or retries. Results are transient and
+        Cache-Control no-store; source is always GOOGLE and items never carry NAVIO: identities.
+        Off unless navio.places.provider-search.enabled (env NAVIO_PLACES_PROVIDER_SEARCH_ENABLED)
+        is true. Limits: 20 requests/minute and 2 concurrent per instance, 10 searches per user and
+        30 in total per billing day per instance, then the monthly PLACES_TEXT_SEARCH meter.
+      operationId: searchProviderPlaces
+      parameters:
+      - name: query
+        in: query
+        required: true
+        schema:
+          type: string
+          minLength: 2
+          maxLength: 120
+        description: Search text. When country is given and the text does not name it, " in <country>" is appended.
+        examples:
+          default:
+            value: ramen
+      - name: country
+        in: query
+        required: false
+        schema:
+          type: string
+          pattern: ^[A-Za-z]{2}$
+        description: ISO 3166-1 alpha-2 region; results verified in another country are dropped.
+      - name: cursor
+        in: query
+        required: false
+        schema:
+          type: string
+          maxLength: 2100
+        description: Opaque cursor from the previous page ("<page>.<provider token>"); pages stop at maxPages (3).
+      responses:
+        '200':
+          description: One page of Google Maps results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlaceProviderSearchResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          description: >-
+            Busy instance (Retry-After header, may be retried) or a used-up per-user daily, global
+            daily or monthly allowance (no Retry-After; error names which). Nothing was sent to Google.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: The feature is switched off, or Google is unavailable. The catalogue still works.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /v1/geo/places/autocomplete:
     get:
       tags:
@@ -6634,6 +6700,30 @@ components:
           type: integer
         last:
           type: boolean
+    PlaceProviderSearchResponse:
+      type: object
+      required: [items, page, maxPages, source]
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            required: [providerPlaceId, name, lat, lng]
+            properties:
+              providerPlaceId: {type: string, description: Google place ID, stored unchanged by Save and Add to Plan}
+              name: {type: string}
+              address: {type: string, nullable: true}
+              lat: {type: number}
+              lng: {type: number}
+              category: {type: string, nullable: true}
+              primaryType: {type: string, nullable: true}
+              countryCode: {type: string, nullable: true}
+              city: {type: string, nullable: true}
+              googleMapsUri: {type: string, nullable: true, description: https link to the place on Google Maps}
+        cursor: {type: string, nullable: true}
+        page: {type: integer, minimum: 1}
+        maxPages: {type: integer, minimum: 1}
+        source: {type: string, enum: [GOOGLE]}
     ErrorResponse:
       type: object
       properties:
