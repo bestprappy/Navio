@@ -590,6 +590,13 @@ async function expect(path, status, method = 'GET') {
   return response;
 }
 (async () => {
+  const identity = 'plan:deployment-routing-check';
+  const favorites = await (await expect(`/v1/saved-content/favorites?identity=${encodeURIComponent(identity)}`, 200)).json();
+  if (!Array.isArray(favorites) || favorites.length !== 1 || favorites[0].identity !== identity ||
+      !Number.isSafeInteger(favorites[0].count) || favorites[0].count < 0) {
+    throw new Error('Favorites route check: invalid aggregate response.');
+  }
+  console.log('Favorites aggregate routing verified.');
   const feed = await (await expect('/v1/shared-plans?page=0&size=1', 200)).json();
   const token = feed.content?.[0]?.token;
   if (token) {
