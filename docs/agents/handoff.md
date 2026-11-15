@@ -1,3 +1,17 @@
+## 2026-11-15 - Claude - Flairs take any color from a color wheel (on dev, release awaiting approval)
+
+**Scope:** User rejected the palette-based flair colors released earlier today: flairs must use the admin color-wheel picker so any color is possible, separate from the planner palette, with a white/black text option per flair. /frontend-design + shadcn.
+
+**Done:**
+- community-service `V12__group_flair_hex_colors.sql`: nullable `color_hex VARCHAR(7)` and `text_color VARCHAR(5)` on `social.group_flairs`, backfilled from the V11 `color_id` (24 built-in hexes, default teal) with white text. `FlairColors.resolveHex/resolveText/resolveId`. `FlairRequest` adds `color` (`#rrggbb`) and `textColor` (`white|black`); `colorId`/`tone`/`flairType` stay optional for older clients. `FlairResponse` adds `color`, `textColor` (keeps `colorId`, `tone`). V11 untouched (it is live).
+- Client: new `_components/flair-colors.ts` (hex/text schemas, starter colors, readable default, 3:1 contrast warning threshold). `community-flair-fields.tsx`: color button opens `components/color-picker` (area, eyedropper, hue, channels) in a shadcn Popover; `CommunityFlairTextField` radio group shows "White"/"Black" on the flair color; `CommunityFlairContrastNote` names the fix. Badge draws hex + chosen text. Planner palette no longer used by flairs. Report post / moderator Remove post from the earlier release are unchanged.
+
+**Commits:** community `593cfd2` (merge `55c4786`), server pin on `chore/community-flair-hex-colors-pin`, client `ffb7ea3` (merge `a8d56d9`), root pins on `chore/community-flair-hex-colors-pins`. All on dev only, NOT on main.
+
+**Verified:** community full `./mvnw -o test` green; `PostgresSchemaTests` + `GroupPostgresIntegrationTest` 8/8 on disposable PostGIS 16 (port 5433). Client tsc clean on a staged-only copy; ESLint clean on `app/feature/community`. Temporary preview route screenshotted at 640 dark (popover open) and 390 light: no horizontal overflow, no page errors (route deleted). NOT verified signed in.
+
+**Next:** Release to main when the user approves (release.md order: community -> server pin -> client -> root pins; root `main` is checked out in worktree `navio-transit-wt`, so fast-forward with `git push origin dev:main` after confirming ancestry). Left alone: client `app/planner/new/page.tsx`, `CLAUDE.md`, `server/mobility-and-ev-service` untracked files, community `logs/`, root `output/`.
+
 ## 2026-11-15 - Claude - Community flairs use palette colors; members can report posts (LIVE)
 
 **Scope:** User: the admin flair editor's "Flair type" and "Tone" selects make no sense; a flair should be a label plus a color from the admin palette (which already holds the white/black text choice). Use /frontend-design and shadcn. Mid-task: members must be able to report posts, and moderators must be able to remove any post in their community. Then commit and deploy to main.
