@@ -1,3 +1,16 @@
+## 2026-11-15 - Codex - Daily Auto Add and Optimize Route (dev only)
+
+**Scope:** User requested separate selected-day charging insertion and route optimization, frontend-design/shadcn controls, and merge to dev.
+
+**Done:** Client 2301651, mobility 058930e, trip 9377592, server c39dec0, root 71c79d3 committed on feature/chore branches, pushed and merged to origin/dev. No main merge or production deployment. Root pins also include already-committed prior client/server dev work.
+- Separate per-day Auto Add and Optimize Route actions/settings. Synchronized shadcn sliders/numeric inputs enforce 1-100 for Battery Threshold and Minimum Arrival Battery. Global charge target removed; new automatic stops charge to 100%. Existing battery gauges use the threshold.
+- Auto Add requires day-auto-add-v1 server capability. Server protects all existing chargers and targets, checks unchanged route first, enforces both battery requirements on road routes, excludes duplicate stations and prioritizes fewer insertions. Apply rejects destructive/non-100% operations. Prior battery carries forward without applying today's threshold retroactively. Other days' itineraries stay unchanged.
+- Optimize uses bounded permissible within-section swaps (32 maximum) and flexible compatible replacements (up to 6 existing stations, 4 candidates each). Strategies score road distance, driving time, or distance plus repeated-road penalty. Changes need at least 2% and 250 m/60 s improvement. Endpoints, times, schedules, notes, observations, locked stops, non-driving constraints and charging targets are preserved. Preview lists moves/replacements and before/after metrics. Canonical battery is rechecked, including rejection of newly infeasible later days. Apply and session-local undo affect only the selected day; undo survives dialog closure and disables after intervening edits to that day.
+
+**Verified:** 85 client energy tests; TypeScript and scoped ESLint pass. Mobility optimization/verifier selection: 59 tests pass. Trip optimization selection: 40 tests pass. Added insertion-only/full-charge/minimum-arrival/saved-target/no-station tests and destructive response guard; client constraint/strategy tests. Playwright Chromium preview at 390/1280 has no overflow/page errors; slider/input sync and clamping tested. Screenshots remain in untracked output/day-actions-*.png. Temporary preview route removed. No entity or migration changes.
+
+**Limits/next:** Bounded heuristic search is not a global optimum; repeated-road scoring uses rounded undirected geometry edges. Undo is not persisted after page reload. A real authenticated multi-day mutation with live station/routing services was not exercised; validate that on dev before separately approved release. Deploy the trip/mobility capability with the client. Unrelated app/planner/new/page.tsx, tsconfig.json, CLAUDE.md, service logs, docs/design and output were preserved and not committed.
+
 ## 2026-11-15 - Claude - Admin vehicle catalog redesign, vehicle photo upload, garage energy select
 
 **Scope:** User asked to (1) swap the native Energy Consumption `<select>` in garage vehicle settings for shadcn, (2) redesign `/admin/vehicles` with shadcn and more colour, (3) fix "Add vehicle cannot upload a photo from PC", and merge to dev.
