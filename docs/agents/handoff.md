@@ -1,4 +1,4 @@
-## 2026-11-15 - Claude - Flairs take any color from a color wheel (on dev, release awaiting approval)
+## 2026-11-15 - Claude - Flairs take any color from a color wheel (releasing)
 
 **Scope:** User rejected the palette-based flair colors released earlier today: flairs must use the admin color-wheel picker so any color is possible, separate from the planner palette, with a white/black text option per flair. /frontend-design + shadcn.
 
@@ -6,7 +6,7 @@
 - community-service `V12__group_flair_hex_colors.sql`: nullable `color_hex VARCHAR(7)` and `text_color VARCHAR(5)` on `social.group_flairs`, backfilled from the V11 `color_id` (24 built-in hexes, default teal) with white text. `FlairColors.resolveHex/resolveText/resolveId`. `FlairRequest` adds `color` (`#rrggbb`) and `textColor` (`white|black`); `colorId`/`tone`/`flairType` stay optional for older clients. `FlairResponse` adds `color`, `textColor` (keeps `colorId`, `tone`). V11 untouched (it is live).
 - Client: new `_components/flair-colors.ts` (hex/text schemas, starter colors, readable default, 3:1 contrast warning threshold). `community-flair-fields.tsx`: color button opens `components/color-picker` (area, eyedropper, hue, channels) in a shadcn Popover; `CommunityFlairTextField` radio group shows "White"/"Black" on the flair color; `CommunityFlairContrastNote` names the fix. Badge draws hex + chosen text. Planner palette no longer used by flairs. Report post / moderator Remove post from the earlier release are unchanged.
 
-**Commits:** community `593cfd2` (merge `55c4786`), server pin on `chore/community-flair-hex-colors-pin`, client `ffb7ea3` (merge `a8d56d9`), root pins on `chore/community-flair-hex-colors-pins`. All on dev only, NOT on main.
+**Commits:** community `593cfd2` (merge `55c4786`), server pin on `chore/community-flair-hex-colors-pin`, client `ffb7ea3` (merge `a8d56d9`), root pins on `chore/community-flair-hex-colors-pins`. All on dev and main. Release (user approved) also ships client `5888d60` "fix(planner): remove Optimize Route from itinerary days" from a concurrent session, which landed on client dev mid-release; the user approved shipping it, and committed tree `e68456e` type-checks clean.
 
 **Verified:** community full `./mvnw -o test` green; `PostgresSchemaTests` + `GroupPostgresIntegrationTest` 8/8 on disposable PostGIS 16 (port 5433). Client tsc clean on a staged-only copy; ESLint clean on `app/feature/community`. Temporary preview route screenshotted at 640 dark (popover open) and 390 light: no horizontal overflow, no page errors (route deleted). NOT verified signed in.
 
