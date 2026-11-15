@@ -11,6 +11,8 @@
 
 **Commits:** mobility `2731c13` (merge `8cc53d1`), server `93253ca` (merge `92829a9`), client `947c31a` (merge `f68d5bd`), root pins on `chore/auto-add-threshold-only-pins`. All on dev and main.
 
+**Released (user approved):** root `2e52d23`; run 43716955132 SUCCESS (all 13 jobs). /health 200, anonymous /v1/trips 401.
+
 **Verified:** mobility full `./mvnw -o test` 270 run, 0 failures. Client energy tests all pass except the known pre-existing `day-route-optimization` harness module-resolution failure; tsc clean on a staged-only copy; ESLint clean on touched files. Temporary preview route of the new threshold/preview components screenshotted at 390 dark and 1280 light: no overflow, no page or console errors (route deleted). NOT verified end to end in a signed-in planner.
 
 **Incident (resolved):** a chained `git stash -q push` failed on git 2.45 and the following `git stash pop` applied another session's `stash@{0}` (release-20261113-usage-client) to client dev, conflicting in two files. Both files were restored to HEAD; that stash entry is still in the list, untouched. Nothing was pushed in that state.
