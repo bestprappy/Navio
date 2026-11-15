@@ -1,3 +1,10 @@
+## 2026-11-16 - Codex - Places Release 2 handoff prepared
+
+**Request/authority:** Owner is handing Places Release 2 to a friend whose agent may have no prior context. Release 1 is already live; do not redeploy it as new work. The friend owns Release 2 implementation and normal release after its acceptance checks pass, but no provider-spend ceiling or single final Release 2 product contract was recorded.
+**Handoff:** Read `docs/agents/places-release-2-handoff.md` first. It records the live Release 1 baseline, current remote revisions, dirty/stale local checkout warning, code entry points, the existing disabled paid backend path, a catalogue-first explicit-lookup recommendation, cost/terms/quota prerequisites, tests, release order and acceptance criteria. Confirm whether Release 2 means explicit paid lookup, fixed catalogue expansion, or automatic provider discovery before coding; never infer silent paid fallback.
+**Verified in this documentation session:** Root/client/server and all four service refs and statuses; Release 1 ancestry and recorded successful run; current catalogue/BFF code; Mobility discovery limiter, provider path, monthly usage budget and disabled configuration; `docs/agents/release.md`. No application code, provider calls, account data, configuration, pins, migrations or deployment changed.
+**Current remote baseline at handoff:** root `ec9f326`, client `45c390e`, server `bf77610`, IAM `a0cb118`, Trip `868c374`, Mobility `8cc53d1`, Community `8b46397`; each observed `origin/dev == origin/main`. Fetch and verify again. Ordinary root/client/server checkouts are stale and dirty; use fresh worktrees and preserve user files/logs.
+
 ## 2026-11-15 - Claude - Auto plan tip fixed; tips open once per account with "Don't show me again" (dev only, NOT released)
 
 **Scope:** User (screenshot): the Auto plan tip is broken; tips show every time they log in, so make them show once per account; add a "Don't show me again" button. Merge to dev only; the user checks first.

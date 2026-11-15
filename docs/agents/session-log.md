@@ -1,3 +1,10 @@
+## 2026-11-16 - Codex - Places Release 2 handoff prepared
+
+**Goal:** Create a self-contained handoff for a friend/their agent to implement and release Places Release 2 without prior conversation context.
+**Done:** Added `docs/agents/places-release-2-handoff.md` with authority, live Release 1 evidence, exact current remote baseline, local-worktree preservation warning, code entry points, missing-scope decision, recommended catalogue-first/explicit-paid-lookup contract, cost and Google quota prerequisites, implementation/test/release sequence and acceptance criteria. Added a pointer/status entry to the main handoff.
+**Checked:** Root/client/server and all service refs/statuses; first catalogue release ancestry and recorded successful workflow; current catalogue/BFF code; Mobility's disabled discovery flag, limiter, provider explore path and monthly usage budget; release instructions. No tests rerun because this session changed documentation only. No application code, provider request, production mutation, pin, config, migration, push to root main or deployment.
+**State/next:** At observation time remote dev/main matched at root `ec9f326`, client `45c390e`, server `bf77610`, IAM `a0cb118`, Trip `868c374`, Mobility `8cc53d1`, Community `8b46397`; re-fetch before work. Existing ordinary worktrees are stale/dirty and were not changed. Friend should confirm whether Release 2 is explicit paid lookup, fixed coverage expansion, or automatic discovery, plus the spend/quota boundary, then work from fresh `origin/dev` branches and follow the detailed handoff.
+
 ## 2026-11-15 - Claude - Auto plan tip fixed; tips open once per account with "Don't show me again" (dev only, NOT released)
 
 **Scope:** User (screenshot): the Auto plan tip is broken; tips show every time they log in, so make them show once per account; add a "Don't show me again" button. Merge to dev only; the user checks first.
