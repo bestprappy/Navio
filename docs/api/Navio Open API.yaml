@@ -1,4 +1,21 @@
 openapi: 3.1.0
+x-navio-real-world-energy:
+  status: Merged to dev 2026-11-16; not production-released by this change.
+  contract: docs/research/ev-real-world-range/README.md
+  plannerCapability: real-world-energy-v2
+  calculationPolicy: navio-energy-v2
+  factoryPolicy: Preserve original range, test standard and capacity; apply a stated 20 percent road-trip range allowance to rated-range and manufacturer/regulatory consumption inputs across all supported EVs.
+  observedPolicy: User-observed and unconfirmed consumption receive no additional automatic allowance; preserve their provenance.
+  formulas: Planning range equals rated range times 0.8; factory consumption is divided by 0.8. Battery capacity is unchanged; apply the allowance once to driving only.
+  energyModelAddedField:
+    consumptionSource:
+      type: [string, "null"]
+      enum: [MANUFACTURER_REPORTED, REGULATORY_REPORTED, USER_OBSERVED, UNKNOWN, null]
+      description: Optional on internal optimization input. Trip Planning supplies the saved owned snapshot value, ignoring client-supplied vehicle specifications.
+  canonicalResultAddedFields: [planningEnergyKwh, planningSocUsePct, rangeReductionPct]
+  retainedFields: nominalEnergyKwh and nominalSocUsePct retain their unadjusted meanings.
+  mobilityResponseAddedField: energyPolicyVersion; current value navio-energy-v2.
+  compatibility: Adjusted frontend charging previews require the planner capability; Trip Planning rejects adjusted previews and applies when Mobility returns a missing or mismatched energy policy. No database migration or factory-data rewrite.
 x-navio-community-library:
   status: Released 2026-11-08 in root5ebfa3a; workflow42399073886 succeeded.
   contract: docs/api/community-library.md

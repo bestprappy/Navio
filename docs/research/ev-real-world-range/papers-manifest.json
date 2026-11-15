@@ -1,0 +1,26 @@
+[
+  {
+    "file": "papers/aaa-2025-byd-atto-3-road-test.pdf",
+    "pages": 2,
+    "bytes": 559614,
+    "sha256": "717a5445567372935d066d2bf4d49716c28ece39ff9dc468d81e102e12e40f38"
+  },
+  {
+    "file": "papers/cheng-2025-driving-cycles-bev.pdf",
+    "pages": 16,
+    "bytes": 5340249,
+    "sha256": "364e180f6d34007b4d4c6e0bbac8e44aae280f4144aa92425f473eba60bcf2a7"
+  },
+  {
+    "file": "papers/icct-2023-real-world-passenger-bevs.pdf",
+    "pages": 19,
+    "bytes": 1502475,
+    "sha256": "f4879469dbc2b9829f516980ce8d77bee988918ae2c9f2569e9cbe7bf43308f2"
+  },
+  {
+    "file": "papers/weiss-2024-energy-consumption-europe.pdf",
+    "pages": 26,
+    "bytes": 5610966,
+    "sha256": "8ed03884fdd61587e2f5a476a403e1ba6678be56ae88ed12d38f60d9bd39ab4a"
+  }
+]
