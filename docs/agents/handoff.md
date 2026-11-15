@@ -1,3 +1,17 @@
+## 2026-11-15 - Claude - Full release to production + Auto Add guidance fix (LIVE)
+
+**Scope:** User asked to deploy every pending change to main, then reported Auto Add could not be used.
+
+**Release 1 (root `1bb7989`, run 43703473118 SUCCESS):** Fast-forwarded dev -> main in ums `d727c7c` (V17 vehicle_model_images), trip `9377592`, mobility `058930e`, server `c39dec0`, client `2301651` (all pending client work: D-Day tab/guide fixes, cropper, dashboard cover, admin catalog redesign, vehicle photo upload, daily Auto Add/Optimize Route). Root also carries `docs/design/navio-tools-techniques*` (committed on `docs/tools-techniques`). Root `main` is checked out in worktree `navio-transit-wt`, so root main was advanced with `git push origin dev:main` (fast-forward), not a local checkout.
+
+**Release 2 (root `ff6f15b`, client `80c60ce`, run 43705920289 SUCCESS):** `fix(planner)`: new `charger/auto-add-guidance.tsx` explains why Auto Add is unavailable (no vehicle, unsaved trip, energy unconfirmed, sign-in, nothing needed, infeasible) with "Open vehicle settings"/"Go to My garage" buttons; `garage/focus-vehicle-settings.ts` scrolls to and focuses the Energy Consumption select (`ENERGY_SELECTION_ID`); day dialog closes first. Auto Add preview/errors now sit under its button (DayRouteOptimizer moved to the end of the panel). "Saving?" typo fixed.
+
+**Verified:** ums 467/0 fail, mobility and api-gateway full suites pass; trip 1054 pass, 0 failures, 2 errors = full-context tests needing live Postgres (Docker down; WebMvc slices need config server on 8888, started temporarily with `--spring.cloud.bus.enabled=false`). CI PostgresSchemaTests passed both runs. Client tsc + ESLint clean. Guidance notices screenshotted on a temporary route (dark 390, light 1280): no overflow/page errors. Post-deploy /health 200, anonymous /v1/trips 401. Not verified: the scroll/focus button inside a signed-in planner.
+
+**ROOT CAUSE FOUND, NOT FIXED:** Auto Add cannot work for ANY live catalogue car. Live `/v1/vehicle-models` (ATTO 3, DOLPHIN, SEAL) all have `batteryCapacityBasis` MANUFACTURER_DECLARED, so `VehicleCatalogResponse` leaves `energyProfile.usableBatteryCapacityKwh` null and client `canAutomaticallyPlan` is false even with Custom consumption. Also `UserVehicleService.applyEnergySelection` USER_OVERRIDE uses the car's stored catalog snapshot (`userMapper.toVehicle(vehicle).catalog()`), not a refreshed catalogue, so an admin fix does not reach already-saved cars.
+
+**Next:** User choosing between (a) admin data fix: /admin/vehicles set basis USABLE per car (verify source), user removes + re-adds car, Custom ~16 kWh/100 km; and/or (b) server fix: USER_OVERRIDE refreshes catalogue via `catalogService.requireVehicle` like the default path, with a test (no migration). Left alone: client `app/planner/new/page.tsx` (whitespace), `tsconfig.json` (line endings), `CLAUDE.md`, service logs, root `output/` (329 MB scratch; not committed).
+
 ## 2026-11-15 - Codex - Daily Auto Add and Optimize Route (dev only)
 
 **Scope:** User requested separate selected-day charging insertion and route optimization, frontend-design/shadcn controls, and merge to dev.
