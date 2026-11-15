@@ -1,3 +1,17 @@
+## 2026-11-15 - Claude - Auto Add Battery Threshold is a trigger, not a floor at chargers (dev, release pending approval)
+
+**Scope:** After the LIVE release (root `322cd8e`) the user showed Day with start 80%, threshold 87%, minimum arrival 10%, many chargers, and "No workable charging plan found".
+
+**Root cause:** Auto Add search (`SocConstrainedRouteOptimizer.optimizeSpan`) and `OptimizedRouteVerifier` required EVERY arrival, including the charger itself, to be >= the threshold. Starting below the threshold made every plan impossible.
+
+**Fix:** mobility `AutoAddArrivalPolicy` (insertion-only): itinerary stops need the threshold; a charger may be reached down to min(threshold, minimum arrival); the final stop needs only the minimum arrival; the verifier's end-of-day reserve check is skipped for Auto Add. Non-insertion optimization unchanged. Client `charger/day-charging-need.ts` (`dayHasNoAutoAddSlot`, `requiredArrivalPct`) mirrors it and replaces the duplicated "satisfied" logic in `day-automation-actions`, `ev-route-optimization-panel` and the Optimize Route candidate check. Copy for threshold/no-plan clarified.
+
+**Commits (dev, pushed):** mobility `f640c08` (fix on `fix/auto-add-threshold-trigger`), server `dc5ca6e`, client `f83b712`, root this commit. NOT on main.
+
+**Verified:** mobility full 265/0 (2 of 3 new tests fail on the old rule, the third is a floor guard). Client tests 94/97; the 3 failures are pre-existing harness module-resolution errors (`day-route-optimization`, `garage/api`, `catalogue-flow`). tsc and ESLint clean.
+
+**Next:** Release on user approval (fast-forward mobility, server, client, root main), then user retests the 80%/87% day.
+
 ## 2026-11-15 - Claude - Auto Add deep debug: four real blockers fixed (LIVE)
 
 **Scope:** User: "Auto Add just doesn't work, NAVIO Estimate also doesn't have it, fix everything". User runs `npm run dev:vm` (local client against the production VM), so server fixes are invisible to them until released.
