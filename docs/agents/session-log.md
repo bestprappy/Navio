@@ -1,3 +1,9 @@
+## 2026-11-15 - Codex - Pending-work priorities refreshed
+
+**Request/result:** User requested confirmed pending work first, vague ideas next, completed/superseded items last, with short and detailed explanations. Updated docs/agents/deferred-work-audit-2026-11-15.md priority refresh. Confirmed production Current Favorites still404 and Kyoto Spring search blocked=true via two read-only API calls; source inspection shows favorites gateway allowance and configuration-server route already exist, so prior precise missing-route attribution is not established. No fixes performed. API reduction release and new daily-view/Navbar release are live, not pending. Actual signed-in catalogue/publish/copy journey remains an acceptance gap. Holds and report exclusion unchanged.
+
+**Follow-up answer:** Catalogue-only Places API reduction is already published and deployed (root1b31aa0/client076b47c, inherited by current main e393a0e/client a6642ef). Friend needs no new push; use live site or pull latest rootmain with recursive submodules for local code. Reconciled no user's files, no provider requests or account mutations, no new release. Documentation-only branch from remote dev, push dev only. Next scope remains user choice; prioritize confirmed bugs/QA, billing residuals, then Auto Add redesign.
+
 ## 2026-11-15 - Codex - Daily reader views and Shared Plan navbar LIVE
 
 **Approved/released:** User explicitly approved client a6642ef for VM release. Client dev/main advanced to a6642ef9a67413df1dd34aaa9488b052ca7e22a9. Root release e393a0e7ebc3667b7c98da2fd1c8e9f10acd5c05 changes only client pin; existing teammate/audit documentation retained. Server pin6bec02b and all backend/service pins unchanged and verified equal origin/main. No migrations or application edits in release turn.
