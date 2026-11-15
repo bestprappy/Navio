@@ -1,3 +1,22 @@
+## 2026-11-15 - Claude - Auto Add is threshold-only; planner shows no reserve (LIVE)
+
+**Scope:** User: remove the optimization from the EV sidebar (Auto Plan already optimizes), remove Minimum Arrival Battery so Battery Threshold is the only Auto Add slider, revamp the Auto Add UI (/frontend-design + /anti-ai-ui-review), stop showing the reserve anywhere in the planner (the slider must not affect it), remove the Auto Add button under Route estimate, remove the red reserve line from Route estimate. Then merge to dev and deploy.
+
+**Done:**
+- Mobility `AutoAddArrivalPolicy`: when `minimumArrivalSocPct` is absent, itinerary stops AND the final stop need the threshold, and a charger may be reached down to min(threshold, `CHARGER_FLOOR_SOC_PCT` = 10). Clients that still send minimum arrival keep the old rule. New `AutoAddArrivalPolicyTests` (the floor test fails on the old rule).
+- Client EV side panel: Auto Add only. New `charger/auto-add-threshold.tsx` (one slider + number input, labelled "Lowest stop" marker for the day's lowest itinerary arrival, context sentence) and `charger/auto-add-preview.tsx` (stops to add in route order: name, "Before <stop>", arrival/departure %, charge time, detour; end-of-day %). Action reads "Add N charging stops"; Sparkles icon, collapsed settings and the DayRouteOptimizer are gone. `charging-preferences.tsx` and unused `garage/arrival-reserve-control.tsx` deleted; `minimumArrivalPctAtom` removed; the request omits `minimumArrivalSocPct`.
+- Itinerary `DayAutomationActions`: only Optimize Route (dialog) and undo remain; Auto Add and Charging settings buttons removed. Optimize's battery check uses the threshold only.
+- Planner display decoupled from the threshold: `arrivalReservePctAtom` renamed `lowBatteryPctAtom`, now a fixed `BATTERY_CRITICAL_PCT` = 10 (`garage-formatters`). Dashed reserve marks removed from `BatteryGauge`, day bars and the route chart; "reserve" captions/copy replaced with "very low" wording; the Route estimate fallback meter tick removed.
+- `day-charging-need.ts` mirrors the server (`requiredArrivalPct(threshold, isCharger)`), adds `lowestStopArrivalPct`. Guidance copy and the charging tour (version 2) updated.
+
+**Commits:** mobility `2731c13` (merge `8cc53d1`), server `93253ca` (merge `92829a9`), client `947c31a` (merge `f68d5bd`), root pins on `chore/auto-add-threshold-only-pins`. All on dev and main.
+
+**Verified:** mobility full `./mvnw -o test` 270 run, 0 failures. Client energy tests all pass except the known pre-existing `day-route-optimization` harness module-resolution failure; tsc clean on a staged-only copy; ESLint clean on touched files. Temporary preview route of the new threshold/preview components screenshotted at 390 dark and 1280 light: no overflow, no page or console errors (route deleted). NOT verified end to end in a signed-in planner.
+
+**Incident (resolved):** a chained `git stash -q push` failed on git 2.45 and the following `git stash pop` applied another session's `stash@{0}` (release-20261113-usage-client) to client dev, conflicting in two files. Both files were restored to HEAD; that stash entry is still in the list, untouched. Nothing was pushed in that state.
+
+**Next:** User retests Auto Add on the VM. The threshold default stays 12% (localStorage key `navio:arrival-reserve-pct`); the old `navio:minimum-day-arrival-pct` key is now unused. Left alone: client `app/planner/new/page.tsx`, `CLAUDE.md`, mobility hs_err/logs, root `output/`.
+
 ## 2026-11-15 - Codex - Seasonal Plans search repair LIVE
 
 **Approved/released:** User explicitly approved seasonal-search release. Root main72e3e4d71d56abd991f6782828029dc240939771 deploys server497062cbd8a6cc39d96197170f067733e28c816b and Trip868c374c653f14959a04dc5623bee89bfc4aa2db. Trip feature was replayed onto teammate baseline6244638 before final full verification; no overlapping edits. Current clientf83b712, IAMd727c7c, Mobilityf640c08 and Community753a7a2 preserved and all pins verified equal remote main before root push. No frontend, migrations or paid Places changes.
