@@ -1,3 +1,6 @@
+## 2026-11-15 seasonal search LIVE update
+
+Seasonal Plans keyword-search repair is now deployed in root72e3e4d / Trip868c374, workflow43712771105 all13 jobs successful. Seventy live seasonal/search/filter/auth/health checks and fifteen Favorites regressions pass. Earlier diagnosis-only and release-pending notes below are historical. No seasonal implementation or release task remains. Season matches use affirmative published evidence; collection filters and all other held scope remain unchanged.
 ## 2026-11-15 seasonal search status update
 
 Season-word Plans search is now repaired and verified in local Trip868c374, pending separate VM release approval. This supersedes older diagnosis-only entries below. All1212 integrated backend tests pass (5 skipped), including153 seasonal checks,320-case filter audit and PostgreSQL seasonal retrieval. The blanket block is replaced with affirmative publication evidence; no climate/date inference or paid provider calls. Seasonal landing collection filters are unchanged. Favorites routing is already live; do not redo it.
