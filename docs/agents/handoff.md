@@ -1,3 +1,17 @@
+## 2026-11-15 - Claude - D-Day UI fixes: new-guide link 404, profile and report tab alignment
+
+**Scope:** User reported three D-Day bugs: trip setup "Or write a new guide" 404, profile Posts/Shared plans/Guides tabs misaligned, admin Reports tabs misaligned.
+
+**Done (client `e4d78cd` on `fix/dday-guide-link-tab-alignment`, fast-forwarded into client dev and pushed; NOT on main, root client pin NOT advanced):**
+- Link pointed at `/guides/new` (no page). Now `/dashboard/guides?new=1`; `dashboard/guides/page.tsx` reads `searchParams` and `YourGuides startNewGuide` opens `NewGuideDialog defaultOpen`. Cancel replaces the URL with the bare pathname (no `useSearchParams`, so the trip-dashboard preview needs no Suspense); successful creation only closes, so it does not race `router.push` to the new guide. Link gained a visible focus ring.
+- Root cause of the tab misalignment: shadcn line tabs with `h-10` on both list and triggers pushed the `after:bottom-[-5px]` underline ~6px below the list's border; triggers were `flex-1` thirds. New shared `components/page-tabs.tsx` (`PageTabs.Bar`, `PageTabs.Trigger`): bordered, sideways-scrolling bar, content-width triggers at full height, underline `bottom-0` on the rule. Used by profile tabs and the Reports queue selector (with open-count badges). Report status pills (`community-report-queue.tsx`) fixed to `h-9` list with `h-full` triggers (was 1px off-centre from `h-[calc(100%-1px)]`). `components/ui/tabs.tsx` untouched (Explore/home unchanged).
+
+**Verified:** client `tsc --noEmit` and scoped ESLint clean; tests 815/818 (same 3 known ERR_MODULE_NOT_FOUND runner files). Temporary preview route on `next dev` (removed before commit), Edge via Playwright at 1280 light/dark and 390 dark: underline bottom equals rule top on both bars, no page overflow, no page errors. NOT verified in a browser: the `?new=1` dialog auto-open (route needs sign-in).
+
+**Left alone:** client `app/planner/new/page.tsx`, `tsconfig.json`, `CLAUDE.md`; root `output/`, `docs/design/*`, ordinary root checkout (7 behind origin/dev).
+
+**Next:** Release with the pending client work (a6642ef + e4d78cd) only after user approval per docs/agents/release.md: client dev -> main, then advance root client pin child-first.
+
 ## 2026-11-15 - Claude - D-Day readiness check (read-only)
 
 **Scope:** User asked what must be done before D-Day (2026-11-16). Read-only review of handoff, deferred-work audit, git state and live site. No code, config, data or deployment changes.
