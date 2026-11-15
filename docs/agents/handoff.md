@@ -1,3 +1,15 @@
+## 2026-11-15 - Claude - Pulled and reviewed teammate daily reader views fix
+
+**Scope:** User asked to pull the teammate's pushed fixes from the handoff and check them. Review only; no application code changed, nothing released.
+
+**Pulled:** Root dev fast-forwarded to `014bf31` (catalogue release notes, deferred-work audit). Client dev fast-forwarded to origin/dev `076b47c` then to `a6642ef` (`fix/daily-reader-views-20261115`); local client dev is now ahead of origin/dev and the root client pin is NOT advanced. No new server/service commits exist on any remote.
+
+**Review of a6642ef:** BFF `proxyDailyPublicationView` derives readId = sha256(visitorId, upstream path, UTC day) and always forwards; backend ledgers (Trip `PlanFeedbackRepository.recordView`, IAM `GuideEngagementRepository.record`) insert the receipt ON CONFLICT DO NOTHING and attach the account separately, so daily dedup plus guest-to-sign-in attach works with no backend change. Strictly tighter than before (previously each opening's random client readId counted). Notes: direct gateway calls with random readIds still bypass the BFF and inflate totals (pre-existing, backend unchanged); proxy matcher `/explore/guides/:path*` also matches bare `/explore/guides`, which has no page, so an anonymous visitor there is redirected to sign-in instead of 404 (cosmetic). Client-sent readId is still validated but ignored (fine).
+
+**Verification:** `node --experimental-transform-types --test "tests/**/*.test.mjs"`: 815/818 pass; the 3 failing files (places-catalogue x2, tour-policy) fail on extensionless-import resolution in the plain Node runner (ERR_MODULE_NOT_FOUND), unrelated to this change. New daily-publication-view tests pass. `tsc --noEmit`: only error is the stale generated `.next/types/validator.ts` for the deleted traveler-guides catch-all route. Scoped ESLint on changed files clean.
+
+**Next:** Release client a6642ef only after user approval per docs/agents/release.md (merge to client dev/main, advance root pin child-first). Favorites gateway 404 remains unfixed.
+
 ## 2026-11-15 - Codex - Daily browser readership and Shared Plan navbar ready
 
 **Scope:** User now requests Total Views once per browser per UTC calendar day, signed in or out; Unique Visitors remains lifetime distinct signed-in accounts. Shared Plan readers use normal top Navbar like Guides. No unrelated fixes or held features resumed.
