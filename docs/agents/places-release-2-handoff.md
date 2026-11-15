@@ -2,6 +2,30 @@
 
 Prepared 2026-11-16 for the next maintainer and their coding agent. This document is self-contained; do not assume access to the conversation that produced Release 1.
 
+## Status 2026-11-16: implemented on dev, switched off, NOT released
+
+The owner chose **option 1 (catalogue + explicit search)** and **"ship disabled for now"**: build and test everything, keep the paid path off until a spend ceiling and Google Cloud daily quotas exist. Everything below is on `dev` only; root `main` was not touched.
+
+| Repo | Commit | Merge on dev |
+| --- | --- | --- |
+| Mobility | `909e65e` feat(places): add explicit bounded Google place search | `a6dbeb9` |
+| server pin | `19dea02` | `b64efd2` |
+| client | `0b7008a` feat(places): add explicit Search beyond Navio's catalogue | `3e778c6` |
+| root | pins on `chore/places-release-2-pins`; OpenAPI + these docs on `docs/places-release-2` | root `dev` |
+
+What exists:
+
+- **Backend** `GET /v1/geo/place-searches` (`PlaceProviderSearchController` / `PlaceProviderSearchService` / `GooglePlacesAdapter.providerSearch`). Deliberately outside `/v1/geo/places/**` because the gateway lets guests read `/v1/geo/places/{placeId}`; this path falls under the gateway's deny-by-default rule, and the service refuses a missing `X-User-Id` again (401). One Text Search call per request, Pro-tier field mask (id, name, address, location, type, address components, `googleMapsUri`; no photos, ratings, hours, editorial), page size 10, max 3 pages via a stateless `"<page>.<token>"` cursor, no fallback query, no retry. Guards in order: switch -> identity -> input -> 20/min + 2 concurrent per instance -> 10 per user + 30 total per billing day per instance (in memory) -> monthly `PLACES_TEXT_SEARCH` meter (exhaustion becomes 429 "month", not an outage). Items claiming `NAVIO:` are dropped. `no-store`, nothing cached.
+- **Switches.** Mobility `navio.places.provider-search.enabled: ${NAVIO_PLACES_PROVIDER_SEARCH_ENABLED:false}` (separate from `navio.discovery.enabled`, which stays false). Client `NEXT_PUBLIC_PLACES_PROVIDER_SEARCH=true` shows the panel (build-time). Both default off, so a release with no env change ships Release 1 behaviour plus the corrected footer and Saved links.
+- **Client.** `ProviderSearch` compound (`provider-search.tsx`), `ProviderPlaceCard`, `provider-search-api.ts`, BFF `app/api/geo/place-searches/route.ts` (validates before proxying; not in `isPublicPlannerRequest`). The panel renders under catalogue *results* only (query of 2-120 chars). Only the button press (signed in, via `requireAuth`) enables the TanStack query: `retry: false`, no refetch on focus/reconnect/mount, `gcTime: 0`, keyed by query+country so a new search starts unrequested and the old one aborts. Text cards, no photo area; Google Maps attribution logo under results; links go to the result's `googleMapsUri` (free). Save and Add to Plan keep the raw Google ID (`google:<id>` saved identity; My List `provider: GOOGLE`).
+- **Saved fix.** `savedPlaceDestination`: only `NAVIO:` places open the catalogue reader; Google places open Google Maps (they previously hit the reader's 404).
+
+Terms decision (checked 2026-11-16; re-check before enabling): Navio stores no search results. Google allows place IDs to be stored indefinitely; coordinates may be cached up to 30 days. Save / Add to Plan store name, address and coordinates exactly as the planner's existing Google search already does; that pre-existing retention is NOT solved by Release 2 and needs an owner/legal decision before scale.
+
+**To enable (owner decision required):** set a monthly/daily ceiling; configure Google Cloud daily quotas for Text Search (Pro/Enterprise); snapshot `/admin/google-usage`; set `NAVIO_PLACES_PROVIDER_SEARCH_ENABLED=true` on Mobility and `NEXT_PUBLIC_PLACES_PROVIDER_SEARCH=true` for the client build; release per `release.md`; run one authorized canary search and confirm the `PLACES_TEXT_SEARCH` counter moved by exactly one per press.
+
+Known follow-ups: (1) a Google place in Saved, My List or a Shared Plan still lazy-loads one cached Place Details + photo when shown (existing planner path, `ReaderStopPhoto`/`usePlaceDetails`); more saved Google places means more of those calls. (2) Daily limits are per instance and reset on restart; Cloud quotas are the real ceiling. (3) Add to Plan from a Google result was not driven end to end in a browser (payload code path is the existing one).
+
 ## Authority and decision boundary
 
 The owner asked a friend to take over and "do Release 2." Treat that as authorization to own the phase, implement it, and use Navio's normal release process once its acceptance checks pass. It is not an unlimited provider-spend authorization and it does not define a billing ceiling.
