@@ -1103,6 +1103,42 @@ paths:
                 format: binary
         '404':
           $ref: '#/components/responses/NotFound'
+  /v1/posts/{postId}/images/{position}:
+    parameters:
+    - name: postId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: position
+      in: path
+      required: true
+      description: Zero-based gallery position, as listed in the post's imageUrls.
+      schema:
+        type: integer
+        minimum: 0
+        maximum: 9
+    get:
+      tags:
+      - Community Service
+      summary: Read one gallery picture with the same visibility checks as the post
+      security:
+      - {}
+      responses:
+        '200':
+          description: 'Validated, re-encoded image; Cache-Control: no-store and X-Content-Type-Options: nosniff.'
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFound'
   /v1/posts/{postId}/comments/{commentId}/reactions/{reaction}:
     parameters:
     - name: postId
@@ -3909,8 +3945,13 @@ paths:
                 post:
                   $ref: '#/components/schemas/CommunityCreatePostRequest'
                 file:
-                  type: string
-                  format: binary
+                  description: One to ten PNG or JPEG pictures, repeated as file parts in gallery order. Each at most 5 MiB; the whole request at most 21 MiB (413 above that).
+                  type: array
+                  minItems: 1
+                  maxItems: 10
+                  items:
+                    type: string
+                    format: binary
             encoding:
               post:
                 contentType: application/json
@@ -6420,6 +6461,12 @@ components:
           - 'null'
         sharedTripId: *id002
         imageUrl: *id002
+        imageUrls:
+          description: Every picture in gallery order (/v1/posts/{id}/images/{position}); empty when the post has none. imageUrl stays the first picture for older clients.
+          type: array
+          maxItems: 10
+          items:
+            type: string
         flairId: &id003
           type:
           - string
