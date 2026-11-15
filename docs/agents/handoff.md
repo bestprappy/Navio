@@ -1,3 +1,11 @@
+## 2026-11-15 - Claude - EV catalogue expansion sheet (no code/data change)
+
+**Scope:** User wants more garage cars covering every connector type before D-Day, entered by an admin through /admin/vehicles on production (no migration, no deploy). Live public catalogue has 3 BYD cars; connectors covered TYPE2, CCS2 and CHADEMO (live BYD SEAL lists CHADEMO, which the Thai SEAL does not have; flagged to user). Missing CCS1, J1772, NACS, GB_T.
+
+**Prepared:** Paste-ready sheet in chat for Nissan LEAF B5 X (JP, CHADEMO+J1772), Hyundai IONIQ 5 SE RWD 2025 (US, NACS+CCS1 via included adapter), Chevrolet Equinox EV LT FWD 2025 (US, CCS1+J1772), Xiaomi SU7 (CN, GB_T). Some DC/AC peaks came only from secondary sources and are marked verify-before-publish. No production writes by the agent.
+
+**Next:** Admin enters, previews and publishes; check a Japan/US EV sample route picks compatible chargers. Images optional (HTTPS link or bundled file needs a client release).
+
 ## 2026-11-15 - Claude - D-Day UI fixes: new-guide link 404, profile and report tab alignment
 
 **Scope:** User reported three D-Day bugs: trip setup "Or write a new guide" 404, profile Posts/Shared plans/Guides tabs misaligned, admin Reports tabs misaligned.
