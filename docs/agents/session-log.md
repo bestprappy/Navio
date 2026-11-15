@@ -1,4 +1,4 @@
-## 2026-11-15 - Claude - Auto Add Battery Threshold is a trigger, not a floor at chargers (dev, release pending approval)
+## 2026-11-15 - Claude - Auto Add Battery Threshold is a trigger, not a floor at chargers (LIVE)
 
 **Scope:** After the LIVE release (root `322cd8e`) the user showed Day with start 80%, threshold 87%, minimum arrival 10%, many chargers, and "No workable charging plan found".
 
@@ -10,7 +10,9 @@
 
 **Verified:** mobility full 265/0 (2 of 3 new tests fail on the old rule, the third is a floor guard). Client tests 94/97; the 3 failures are pre-existing harness module-resolution errors (`day-route-optimization`, `garage/api`, `catalogue-flow`). tsc and ESLint clean.
 
-**Next:** Release on user approval (fast-forward mobility, server, client, root main), then user retests the 80%/87% day.
+**Released (user approved):** mobility `f640c08`, server `dc5ca6e`, client `f83b712`, root `4c00ffa`; run 43711676980 SUCCESS. /health 200, anonymous /v1/trips 401.
+
+**Next:** User retests the 80% start / 92% threshold day. Note: with a 92% threshold every itinerary stop needs a charger within about 8% of rated range (~38 km for ATTO 3) before it; rural stops may still have no qualifying charger.
 
 ## 2026-11-15 - Claude - Auto Add deep debug: four real blockers fixed (LIVE)
 
