@@ -2,6 +2,10 @@
 
 Engineering backlog requested by the user. Cross-checked supplied conversation, current client source, Trip origin/main, latest release handoff and historical plans. This is not an academic feature report. Older implementation-pending notes are superseded by later releases. No application fix is authorized or performed by this audit.
 
+## Latest status: Favorites repaired live
+
+2026-11-15: Favorites production routing fix514ea15 released in root main34b4973. Workflow43697906582 all-success;15 live aggregate/validation/auth/health checks passed. This defect belongs in completed work now. Older404 and approval-pending entries below describe the historical investigation. Seasonal Plans search remains diagnosed but deliberately unchanged.
+
 ## Priority refresh after daily-reader deployment
 
 Verified2026-11-15 against root main e393a0e/client a6642ef and live read-only APIs. No application fixes performed. Prioritize actual defects and acceptance checks ahead of new feature scope.

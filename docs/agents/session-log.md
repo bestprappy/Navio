@@ -1,3 +1,11 @@
+## 2026-11-15 - Codex - Current Favorites production routing LIVE
+
+**Approved/released:** User approved Favorites repair release. Root main advanced from e393a0e to34b4973c612f3a61cf74da2e03872d4f358cf9b0, including fix514ea15. Exact /v1/saved-content/favorites path added to existing production IAM route; read-only deployment smoke validates aggregate shape independently of listed-plan availability. No frontend/service pins, schema, counting logic or seasonal-search code changed. Client a6642ef/server6bec02b and four service pins verified equal remote main before push.
+
+**Verified:** Seven routing/smoke regression tests re-passed, deployment shell syntax and diff checks clean. Workflow https://github.com/bestprappy/Navio/actions/runs/43697906582 completed SUCCESS including PostgreSQL checks, every image build, deployment and new Favorites smoke. Transient health/Favorites timeouts during service recreation resolved after rollout. Fifteen final public live checks passed (output/favorites-live-smoke.{py,json}): actual public Plan and Traveler Guide identities plus nonexistent Plan/Curated Guide identities through both BFF and direct gateway return200, exact identities and integer nonnegative counts, missing identities0, no-store headers; malformed BFF identity400, anonymous aggregate POST401, private subpath401, private Saved401 and health200. No production saves/view POSTs, account writes or Google calls. Actual account save/unsave mutations were not exercised by this release verification.
+
+**State/next:** Current Favorites routing defect resolved live; refresh an already-open page to clear old failed query state. Seasonal Plans search remains diagnosis-only and unchanged, pending user's decision. Prior14-case evidence and proposed catalogue-evidence approach remain in latest earlier notes. No further deployment step for Favorites. Ordinary user files and dirty configurations preserved (client tsconfig hash1D992BD1B931C3E8265212BF7868BC5BCD9E96AA7CE899345EA36C963E6DEB9C). End notes dev-only; no extra main deploy.
+
 ## 2026-11-15 - Codex - Favorites route repaired; seasonal search diagnosed only
 
 **Scope:** User authorized Favorites repair and read-only diagnosis/tests for seasonal Plans search; explicitly no seasonal fix yet. No client, service, entity or migration files changed.
